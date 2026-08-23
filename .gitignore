@@ -1,0 +1,10 @@
+data/
+results/*.json
+results/*.png
+__pycache__/
+*.pyc
+.venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.DS_Store

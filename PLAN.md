@@ -163,6 +163,18 @@ PTB-XL calibration; nothing is tuned on Shandong or Chongqing.
 6. **Mon 31 — the page a cardiologist can read.** Plus the ten questions the
    object will trigger, answered in writing.
 
+**What the day-1 probe decided (23 Aug, `results/timing.json`).** Seconds per
+hundred PTB-XL records on the laptop under a load average near 400, so
+pessimistic: random-init ResNet1d 12.65 · ECGFounder 38.95 · HuBERT-ECG 101.46 ·
+ECG-FM 173.81. Every arm loaded under the pinned torch 2.2.2. A full pass over
+the ~67,000 records therefore costs, at that speed, about 2 h, 7 h, 19 h and
+33 h respectively. The consequence: each encoder's representations (one vector
+per tracing) are computed **once per arm on `esprimo`, as overnight jobs in
+cost order, and cached**; every conformal experiment then runs on the cache in
+seconds. Caching a representation does not breach C-14b, which is about
+waveforms: a representation is a computed result, not a rewritten tracing.
+The random arm starts Monday morning to measure the box's real speed.
+
 **Sacrifice order if it overruns:** ACS-ECG as a second target, then encoder
 arms from the least informative upward. The day-6 page is never cut.
 

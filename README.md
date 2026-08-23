@@ -43,6 +43,13 @@ so the effective resolution is 2 µV against PTB-XL's 1 µV. The CSV column
 `ecg_row_record` names the file (`04904.dat`); every name in the CSVs is on
 disk and every file on disk is named, and no patient appears in both CSVs.
 
+A full pass through the ingestion chain (`scripts/scan_corpora.py`, counts in
+`results/ingest_report.json`) keeps every PTB-XL and Shandong record and drops
+five of Chongqing's 19,955: two (`03228`, `14262`) whose `.dat` holds 3,500
+samples under a header claiming 5,000, and three (`02008`, `03054`, `16558`)
+carrying WFDB's missing-sample code, which reads back as NaN. 6,928 Shandong
+records are longer than ten seconds and are cropped to the first ten.
+
 Reading cost: `wfdb.rdrecord` spends ~23 ms per record parsing the header (wfdb
 4.3.1 does it through pandas) against 0.8 ms reading the samples, so a full
 pass over a WFDB corpus takes about eight minutes on the laptop; the HDF5 corpus

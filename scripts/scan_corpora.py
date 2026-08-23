@@ -1,6 +1,6 @@
 """Run every record of every corpus through the ingestion chain and write the
-counts to results/ingest.json: records read, records excluded for a NaN or Inf
-sample (C-15), and the deviations the chain had to name (C-14).
+counts to results/ingest_report.json: records read, records excluded with the
+reason (C-15), and the deviations the chain had to name (C-14).
 
 Reads in chunks of a thousand records so that no corpus is ever held in memory
 whole; nothing transformed is written anywhere (C-14b).
@@ -28,11 +28,11 @@ def scan(
     name: str, ids: Sequence[str], load: Callable[[Sequence[str]], Corpus]
 ) -> dict[str, object]:
     started = time.time()
-    total = Corpus(name, np.empty((0, N_LEADS, WINDOW_SAMPLES), np.float32), [], [])
+    total = Corpus(name, np.empty((0, N_LEADS, WINDOW_SAMPLES), np.float32), [], {})
     for start in range(0, len(ids), CHUNK):
         chunk = load(ids[start : start + CHUNK])
         total.ids.extend(chunk.ids)
-        total.excluded.extend(chunk.excluded)
+        total.excluded.update(chunk.excluded)
         total.n_resampled += chunk.n_resampled
         total.n_cropped += chunk.n_cropped
         total.notes = chunk.notes
@@ -43,7 +43,7 @@ def scan(
         "n_records": len(ids),
         "n_kept": len(total.ids),
         "n_excluded": len(total.excluded),
-        "excluded_ids": total.excluded,
+        "excluded": total.excluded,
         "deviations": total.deviations,
         "seconds": round(time.time() - started, 1),
     }
@@ -65,10 +65,10 @@ def main() -> int:
         "acs": scan("acs", acs_ids, lambda ids: load_acs(train, ids=ids)),
     }
     RESULTS_DIR.mkdir(exist_ok=True)
-    path = RESULTS_DIR / "ingest.json"
+    path = RESULTS_DIR / "ingest_report.json"
     path.write_text(json.dumps(out, indent=2) + "\n")
     for name, counts in out.items():
-        print(name, {k: v for k, v in counts.items() if k != "excluded_ids"})
+        print(name, counts)
     print(f"written {path}")
     return 0
 

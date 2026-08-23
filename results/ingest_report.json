@@ -1,0 +1,35 @@
+{
+  "ptbxl": {
+    "n_records": 21799,
+    "n_kept": 21799,
+    "n_excluded": 0,
+    "excluded": {},
+    "deviations": [],
+    "seconds": 1373.8
+  },
+  "sph": {
+    "n_records": 25770,
+    "n_kept": 25770,
+    "n_excluded": 0,
+    "excluded": {},
+    "deviations": [
+      "lead order and sampling rate are not in the record (no HDF5 attributes); taken from Liu et al. 2022, Data Records",
+      "6928 of 25770 records longer than ten seconds, cropped to the first"
+    ],
+    "seconds": 389.0
+  },
+  "acs": {
+    "n_records": 19955,
+    "n_kept": 19950,
+    "n_excluded": 5,
+    "excluded": {
+      "16558": "NaN or Inf sample",
+      "14262": "unreadable: Samples were not loaded correctly",
+      "03054": "NaN or Inf sample",
+      "02008": "NaN or Inf sample",
+      "03228": "unreadable: Samples were not loaded correctly"
+    },
+    "deviations": [],
+    "seconds": 633.8
+  }
+}

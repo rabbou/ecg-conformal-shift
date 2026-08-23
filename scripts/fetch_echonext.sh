@@ -28,7 +28,7 @@ fi
 # Cheap auth probe before committing to a multi-gigabyte pull: a signed-in user
 # gets 200, an unsigned or unregistered one gets 401/403.
 echo "probing access to ${BASE} ..."
-code=$(curl -s -o /dev/null -w '%{http_code}' --netrc --max-time 60 -L "$BASE")
+code=$(wget --auth-no-challenge --netrc --spider -S "$BASE" 2>&1 | awk "/HTTP\/1/{c=\$2} END{print c}")
 case "$code" in
   200) echo "access confirmed (HTTP 200)" ;;
   401|403) echo "error: HTTP $code — the account is not signed onto the DUA for this project yet." >&2; exit 3 ;;
@@ -42,7 +42,7 @@ echo "destination ${DEST} — ${avail_gb} GB free"
 mkdir -p "$DEST"
 # -c resumes a partial file, -N skips what is already current, -np stays inside
 # the version directory.  Safe to re-run after an interruption.
-wget --netrc -r -N -c -np -nH --cut-dirs=3 -P "$DEST" \
+wget --auth-no-challenge --netrc -r -N -c -np -nH --cut-dirs=3 -P "$DEST" \
      --progress=dot:giga --tries=5 --waitretry=10 "$BASE"
 
 echo

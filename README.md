@@ -21,6 +21,36 @@ All three are public and permissively licensed (CC BY 4.0, CC0, CC0). None of
 the counts above is quoted from a paper: each is computed from the corpus's own
 description file and pinned by a test in `tests/test_labels.py`.
 
+## Corpora on disk
+
+What each corpus is, as read off its own files on 2026-08-23.
+
+| | PTB-XL | SPH (Shandong) | ACS-ECG (Chongqing) |
+|---|---|---|---|
+| Where | `~/Developer/ptbxl5d/data/records500/` | `data/sph/records/*.h5` | `data/acs/row_data/*.{dat,hea}` |
+| Format | WFDB, format 16 (int16), `.hea` header | HDF5, one dataset `ecg`, float16, no attributes | WFDB, format 16 (int16), `.hea` header |
+| Rate, length | 500 Hz, 5000 samples | 500 Hz, 5000–28,000 samples in steps of 500 (18,842 of 25,770 exactly 5000) | 500 Hz, 5000 samples |
+| Amplitude | 1000 ADC units per mV, baseline 0 (header) | mV, stored as float16 (paper: 24-bit ADC, "16-bit precision") | 1000 ADC units per mV, baseline 0 (header) |
+| Lead order | in each header (`AVR`/`AVL`/`AVF` upper-case) | not in the file; paper, Data Records: I, II, III, aVR, aVL, aVF, V1–V6 | in each header (`aVR` lower-case) |
+| Filtering at source | Schiller device | MedEx MECG-200: mains, baseline wander and muscle noise removed by the machine, nothing added by the authors | Mecg-300, per the paper |
+| Records | 21,799 | 25,770 | 19,955 = 17,960 `train.csv` + 1,995 `test.csv` (no labels) |
+
+Two things about the Chongqing files that are not in its paper: the header
+columns WFDB reserves for a lead's initial value and checksum hold that lead's
+maximum and minimum instead, so `wfdb` reads the samples correctly but the
+checksum cannot validate them; and every sample is an even number of ADC units,
+so the effective resolution is 2 µV against PTB-XL's 1 µV. The CSV column
+`ecg_row_record` names the file (`04904.dat`); every name in the CSVs is on
+disk and every file on disk is named, and no patient appears in both CSVs.
+
+Reading cost: `wfdb.rdrecord` spends ~23 ms per record parsing the header (wfdb
+4.3.1 does it through pandas) against 0.8 ms reading the samples, so a full
+pass over a WFDB corpus takes about eight minutes on the laptop; the HDF5 corpus
+reads at ~7 ms per record.
+
+The fetch is reproducible: `scripts/fetch_open_corpora.sh` carries the figshare
+file ids and MD5 sums for the three Chongqing archives.
+
 ## What the prevalence gap means
 
 MI is 25 times rarer in Shandong than in PTB-XL. That is not a labelling

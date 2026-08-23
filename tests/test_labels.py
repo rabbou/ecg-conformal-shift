@@ -13,12 +13,12 @@ from __future__ import annotations
 import pandas as pd
 import pytest
 
-from ecs.config import PTBXL_DIR, SPH_DIR
+from ecs.config import ACS_DIR, PTBXL_DIR, SPH_DIR
 from ecs.labels import MILabelSpec, ptbxl_mi_label, sph_mi_label
 
 pytestmark = pytest.mark.data
 
-ACS_CSV = SPH_DIR.parent / "acs/CSV/train.csv"
+ACS_CSV = ACS_DIR / "CSV/train.csv"
 
 
 def _skip_unless(*paths: object) -> None:

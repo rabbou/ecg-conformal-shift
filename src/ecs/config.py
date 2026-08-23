@@ -11,6 +11,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 # read in place.  Override with ECS_PTBXL_DIR when it moves.
 PTBXL_DIR = Path(os.environ.get("ECS_PTBXL_DIR", Path.home() / "Developer/ptbxl5d/data"))
 SPH_DIR = Path(os.environ.get("ECS_SPH_DIR", REPO_ROOT / "data/sph"))
+ACS_DIR = Path(os.environ.get("ECS_ACS_DIR", REPO_ROOT / "data/acs"))
 RESULTS_DIR = Path(os.environ.get("ECS_RESULTS_DIR", REPO_ROOT / "results"))
 
 # PTB-XL ships the MI superclass with five subendocardial-injury statements
@@ -24,8 +25,9 @@ SPH_MODIFIER_ACUTE = "330"
 SPH_MODIFIER_RECENT = "331"
 SPH_MODIFIER_OLD = "332"
 
-# Both corpora are read at 500 Hz and cropped to ten seconds.  PTB-XL records
-# are exactly that long; Shandong records run from ten to sixty seconds.
+# Every corpus is read at 500 Hz and cropped to ten seconds.  PTB-XL and
+# Chongqing records are exactly that long; Shandong records run from ten to
+# sixty seconds.
 SAMPLING_RATE_HZ = 500
 WINDOW_SAMPLES = 5000
 N_LEADS = 12

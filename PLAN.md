@@ -21,11 +21,59 @@ Each maps to a named test. Unchecked means unverified, not done.
 | C-10 | THE harness SHALL report every coverage figure as a mean over >= 100 calibration/test draws, with its standard deviation. | pending — `test_report.py` |
 | C-11 | THE harness SHALL report coverage separately for MI and non-MI cases. | `metrics.class_conditional_coverage`, wired at C-10 |
 | C-12 | THE results file SHALL record the encoder's pre-training corpora. | pending — `test_report.py` |
+| C-13 | THE ingestion layer SHALL return, for every corpus, a float32 array of shape (N, 12, 5000): 10 seconds, 500 Hz, millivolts, leads ordered I, II, III, aVR, aVL, aVF, V1-V6. | pending — `test_ingest.py` |
+| C-14 | THE ingestion layer SHALL apply an identical filter and scaling chain to every corpus, and SHALL emit, per corpus, the list of steps that could not be made identical. | pending — `test_ingest.py` |
+| C-15 | WHEN a record contains a NaN or Inf sample, THE loader SHALL exclude it and report the excluded count per corpus. | pending — `test_ingest.py` |
+| C-16 | WHEN PTB-XL is round-tripped through 250 Hz and back to 500 Hz, THE resulting coverage SHALL move by less than one third of the coverage gap attributed to dataset shift. | pending — `test_resample_control.py` |
+| C-17 | THE encoder comparison SHALL include a frozen randomly-initialised encoder, reported alongside the pre-trained arms. | pending — `test_report.py` |
+| C-18 | THE harness SHALL report per-task AUROC and AUPRC with bootstrapped confidence intervals, and SHALL use paired comparisons for any claim that one arm beats another. | pending — `test_report.py` |
+
+## The ingestion contract
+
+Every corpus is reduced to one canonical form before anything else touches it:
+**float32, shape (N, 12, 5000) — ten seconds, 500 Hz, millivolts, leads in the
+order I, II, III, aVR, aVL, aVF, V1-V6.** Records carrying a NaN or Inf sample
+are dropped and counted. This is the form prescribed in arXiv:2602.17531, which
+the ptbxl5d report already cites, so it is a convention with a citation behind
+it rather than a house style.
+
+**The rule that matters more than the values: the chain is identical for every
+corpus.** Tuning preprocessing per dataset would raise each one's signal quality
+and destroy the only quantity this study measures, because a difference produced
+by my own pipeline is indistinguishable from one produced by the hospital. Where
+a corpus cannot be made to match, the deviation is named in the results file
+rather than absorbed silently.
+
+Four deviations are known in advance and none can be fully removed:
+
+- **Resampling.** PTB-XL and Shandong are natively 500 Hz; EchoNext is 250 Hz,
+  INCART 257 Hz, PTB 1000 Hz. Upsampling invents detail and downsampling discards
+  it, so resampling is itself a source of apparent shift. Polyphase resampling
+  with anti-aliasing (`scipy.signal.resample_poly`) is the defensible choice, and
+  C-16 measures what it costs instead of assuming it is free.
+- **EchoNext cannot join the contract.** Its waveforms ship already median-
+  filtered, percentile-clipped and normalised with a dataset-wide mean and
+  standard deviation, so they are not in millivolts and cannot be returned to
+  that scale. Worse for this purpose, that normalisation was computed across all
+  splits including test. EchoNext is usable as a benchmark target, not as a
+  cohort in a like-for-like shift comparison.
+- **Lead order is not documented consistently.** The ACS-ECG paper states it two
+  different ways in consecutive paragraphs, with aVR and aVL swapped. Order is
+  read from each record's own header, never assumed.
+- **Amplitude scaling differs at source** (PTB-XL in mV, Chapman at 4.88 uV per
+  least-significant bit). Conversion happens once, in the loader, and the factor
+  for each corpus is asserted by a test against a known record.
+
+On filtering: the cited protocol prescribes none, and neither do we beyond what a
+corpus already carried at source. Every filter added is a chance to help one
+cohort more than another, so the honest default is the lightest chain all
+corpora can share.
+
 
 ## Days
 
-1. **Mon 24 — harness + the timing probe.** Patient-level splits (C-4). Baseline
-   1D-ResNet trained through on PTB-XL. Then 100 records through each encoder,
+1. **Mon 24 — the ingestion contract, then the timing probe.** Build the canonical
+   loader (C-13 to C-15) and patient-level splits (C-4). Baseline
    stopwatch out: that number sizes every experiment this week. Do not launch
    anything long before it.
 2. **Tue 25 — abstention table on PTB-XL.** Conformal wired to the model, C-5

@@ -23,6 +23,7 @@ Each maps to a named test. Unchecked means unverified, not done.
 | C-12 | THE results file SHALL record the encoder's pre-training corpora. | pending — `test_report.py` |
 | C-13 | THE ingestion layer SHALL return, for every corpus, a float32 array of shape (N, 12, 5000): 10 seconds, 500 Hz, millivolts, leads ordered I, II, III, aVR, aVL, aVF, V1-V6. | pending — `test_ingest.py` |
 | C-14 | THE ingestion layer SHALL apply an identical filter and scaling chain to every corpus, and SHALL emit, per corpus, the list of steps that could not be made identical. | pending — `test_ingest.py` |
+| C-14b | THE corpora SHALL be stored exactly as distributed; no transformed waveform array is persisted, and every transform is applied at read time. | pending — `test_ingest.py` |
 | C-15 | WHEN a record contains a NaN or Inf sample, THE loader SHALL exclude it and report the excluded count per corpus. | pending — `test_ingest.py` |
 | C-16 | WHEN PTB-XL is round-tripped through 250 Hz and back to 500 Hz, THE resulting coverage SHALL move by less than one third of the coverage gap attributed to dataset shift. | pending — `test_resample_control.py` |
 | C-17 | THE encoder comparison SHALL include a frozen randomly-initialised encoder, reported alongside the pre-trained arms. | pending — `test_report.py` |
@@ -64,6 +65,22 @@ Four deviations are known in advance and none can be fully removed:
   least-significant bit). Conversion happens once, in the loader, and the factor
   for each corpus is asserted by a test against a known record.
 
+**Storage stays raw.** Each corpus sits on disk exactly as distributed and every
+transform happens at read time, so the transform remains a parameter that can be
+varied and tested rather than a fact baked into a file. EchoNext is the
+cautionary example, and it is sitting in our own data directory: its published
+arrays have median-filtering, percentile-clipping and dataset-wide normalisation
+already applied, so millivolts cannot be recovered and the test-set leakage in
+its normalisation cannot be undone. Persisting a preprocessed array is how a
+corpus becomes unusable to everyone downstream.
+
+The caveat that has to be said out loud: **there is no truly raw ECG here.**
+Every recording has already passed through its device's anti-aliasing, mains
+notch and baseline correction — PTB-XL through Schiller hardware of 1989-96,
+Chongqing through a single Mecg-300, EchoNext through GE MUSE. "Raw" can only
+mean "as the corpus ships it", and that residual device filtering is itself part
+of the shift being measured rather than something the pipeline removes.
+
 On filtering: the cited protocol prescribes none, and neither do we beyond what a
 corpus already carried at source. Every filter added is a chance to help one
 cohort more than another, so the honest default is the lightest chain all
@@ -91,8 +108,32 @@ corpora can share.
 6. **Mon 31 — the page a cardiologist can read.** Plus the ten questions the
    object will trigger, answered in writing.
 
-**Sacrifice order if it overruns:** fourth encoder, then ACS-ECG as second
-target, then the third encoder branch. The day-6 page is never cut.
+**Sacrifice order if it overruns:** ACS-ECG as a second target, then encoder
+arms from the least informative upward. The day-6 page is never cut.
+
+**Encoder count is a compute question, not a plan question.** Adding a frozen
+arm costs almost no developer time — same code path, different weights — and
+costs one more forward pass over ~65,000 records on a CPU with no GPU. Monday's
+timing probe produces that number, and it decides how many arms fit. Do not
+trade an arm away before the probe has run.
+
+The grid the arms are meant to fill:
+
+| Arm | Saw PTB-XL (source) | Saw Shandong (target) |
+|---|---|---|
+| Random init, frozen | no | no |
+| ECGFounder | no | no |
+| ECG-FM | yes | no |
+| HuBERT-ECG | yes | yes |
+
+The bottom row is where pre-training contamination should look most flattering,
+so it is the most informative arm, not the most expendable. Two conditions on
+it: its licence is CC BY-NC 4.0, which permits a public research demonstration
+but excludes anything the venture ships (D-059 excluded it on venture grounds;
+a demonstration is not a product, and that distinction is Ruben's call). And the
+claim that its pre-training included SPH is second-hand — the audit could not
+fetch medRxiv directly and relied on a search-retrieved quote. **Verify that at
+source before Thursday, because the bottom row rests entirely on it.**
 
 ## Hardware
 

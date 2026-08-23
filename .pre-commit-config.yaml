@@ -1,5 +1,6 @@
 # The gates, on every commit.  They call the project's own tools in .venv so the
 # hook and `uv run ruff / mypy / pytest` can never disagree.
+exclude: ^third_party/  # upstream code kept as published
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0

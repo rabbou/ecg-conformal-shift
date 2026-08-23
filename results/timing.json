@@ -1,0 +1,72 @@
+{
+  "machine": {
+    "cpu": "Intel(R) Core(TM) i7-6700HQ CPU @ 2.60GHz",
+    "platform": "macOS-12.7.6-x86_64-i386-64bit",
+    "python": "3.11.15",
+    "torch": "2.2.2",
+    "torch_threads": 4
+  },
+  "arms": [
+    {
+      "arm": "random_init",
+      "seconds_per_100": 12.65,
+      "n_params": 4082306,
+      "weights_source": "torch default initialisation, seed unset",
+      "pretraining_corpora": "none (random initialisation, frozen)",
+      "notes": "ResNet1d from src/ecs/models.py, input (B, 12, 5000) mV, 256-d embedding; measured while other sessions loaded the machine (see load_average_1min)",
+      "n_records": 100,
+      "batch_size": 20,
+      "torch_threads": 4,
+      "load_average_1min": 409.1,
+      "embedding_shape": [
+        256
+      ]
+    },
+    {
+      "arm": "ecgfounder",
+      "seconds_per_100": 38.95,
+      "n_params": 30819014,
+      "weights_source": "huggingface.co/PKUDigitalHealth/ECGFounder 12_lead_ECGFounder.pth (MIT)",
+      "pretraining_corpora": "Harvard-Emory ECG Database, >10 million recordings; no public corpus named (arXiv:2410.04133; HF model card PKUDigitalHealth/ECGFounder)",
+      "notes": "Net1D per the authors' finetune_model.py; 1024-d features before the dense head; input (B, 12, 5000) at 500 Hz per config.json; the authors' fine-tuning code band-passes and z-scores each record, not applied here; load_state_dict missing=0 unexpected=0",
+      "n_records": 100,
+      "batch_size": 20,
+      "torch_threads": 4,
+      "load_average_1min": 389.6,
+      "embedding_shape": [
+        1024
+      ]
+    },
+    {
+      "arm": "ecgfm",
+      "seconds_per_100": 173.81,
+      "n_params": 90883072,
+      "weights_source": "huggingface.co/wanglab/ecg-fm mimic_iv_ecg_physionet_pretrained.pt (MIT)",
+      "pretraining_corpora": "MIMIC-IV-ECG v1.0 and PhysioNet/CinC 2021 v1.0.3, the latter containing PTB-XL (github.com/bowang-lab/ECG-FM README, 'Pretrained on')",
+      "notes": "fairseq_signals wav2vec2_cmsc; input (B, 12, 5000) at 500 Hz; mean-pooled extract_features output; run from the separate environment scripts/setup_ecgfm_env.sh builds (fairseq_signals from source, transformers<5), not the project venv",
+      "n_records": 100,
+      "batch_size": 20,
+      "torch_threads": 4,
+      "load_average_1min": 105.5,
+      "embedding_shape": [
+        768
+      ]
+    },
+    {
+      "arm": "hubert_ecg",
+      "seconds_per_100": 101.46,
+      "n_params": 93123712,
+      "weights_source": "huggingface.co/Edoardo-Coppola/hubert-ecg-base model.safetensors (CC BY-NC 4.0)",
+      "pretraining_corpora": "Ribeiro/CODE, CPSC and CPSC-Extra, PTB and PTB-XL, Georgia, Chapman-Shaoxing, Ningbo, Tianchi (Hefei), Shandong Provincial Hospital (SPH), MIMIC-IV ECG (medRxiv 10.1101/2024.11.14.24317328v3, Methods - Data and Preprocessing, read 2026-08-23)",
+      "notes": "transformers AutoModel with the repo's hubert_ecg.py (custom code); input (B, 6000): 5 s x 12 leads flattened then decimated by 5; 768-d mean-pooled last hidden state",
+      "n_records": 100,
+      "batch_size": 20,
+      "torch_threads": 4,
+      "load_average_1min": 156.7,
+      "embedding_shape": [
+        768
+      ]
+    }
+  ],
+  "note": "Wall-clock seconds per 100 PTB-XL records in canonical form, batches of 20, torch 2.2.2 on 4 intra-op threads, CPU only; every row was measured while other sessions were running on the same laptop (1-minute load averages of 105 to 409 on an 8-thread machine), so the absolute numbers are upper bounds and the ratios between arms are the usable signal."
+}

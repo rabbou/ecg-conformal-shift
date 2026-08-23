@@ -1,6 +1,7 @@
 data/
-results/*.json
-results/*.png
+results/*
+!results/timing.json
+!results/ingest_report.json
 __pycache__/
 *.pyc
 .venv/

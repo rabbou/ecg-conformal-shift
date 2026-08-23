@@ -9,6 +9,7 @@ result.
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import h5py
@@ -17,7 +18,7 @@ import pandas as pd
 import pytest
 import wfdb
 
-from ecs.config import ACS_DIR, PTBXL_DIR, SPH_DIR
+from ecs.config import ACS_DIR, PTBXL_DIR, RESULTS_DIR, SPH_DIR
 from ecs.ingest import (
     CANONICAL_LEADS,
     Record,
@@ -26,6 +27,7 @@ from ecs.ingest import (
     load_acs,
     load_ptbxl,
     load_sph,
+    read_or_error,
     read_wfdb,
 )
 
@@ -126,8 +128,23 @@ class TestAssembly:
         corpus = assemble_corpus("synthetic", records, n=4)
         assert corpus.x.shape == (2, 12, 5000)
         assert corpus.ids == ["good-1", "good-2"]
-        assert corpus.excluded == ["bad-nan", "bad-inf"]
+        assert corpus.excluded == {"bad-nan": "NaN or Inf sample", "bad-inf": "NaN or Inf sample"}
         assert corpus.x[1, 0, 0] == 2.0
+
+    def test_a_record_the_reader_cannot_load_is_excluded_with_its_error(self) -> None:
+        records: list[tuple[str, Record | Exception]] = [
+            ("good", _record(np.ones((12, 5000)))),
+            ("broken", ValueError("Samples were not loaded correctly")),
+        ]
+        corpus = assemble_corpus("synthetic", records, n=2)
+        assert corpus.ids == ["good"]
+        assert corpus.excluded == {"broken": "unreadable: Samples were not loaded correctly"}
+
+    def test_read_or_error_returns_the_error_instead_of_raising(self, tmp_path: Path) -> None:
+        result = read_or_error(read_wfdb, tmp_path / "missing")
+        assert isinstance(result, FileNotFoundError)
+        good = read_or_error(read_wfdb, _write_wfdb(tmp_path, "fine", np.zeros((5000, 12))))
+        assert isinstance(good, Record)
 
     def test_deviations_name_what_the_chain_did_differently(self) -> None:
         records = [
@@ -190,7 +207,7 @@ class TestPTBXL:
         assert corpus.x.shape == (3, 12, 5000)
         assert corpus.x.dtype == np.float32
         assert corpus.ids == ["1", "2", "3"]
-        assert corpus.excluded == []
+        assert corpus.excluded == {}
         assert corpus.deviations == []
         header = wfdb.rdheader(str(PTBXL_DIR / str(database.at[1, "filename_hr"])))
         assert [name.upper() for name in header.sig_name] == [n.upper() for n in CANONICAL_LEADS]
@@ -209,7 +226,7 @@ class TestSPH:
         corpus = load_sph(metadata, ids=["A00001", "A00002"])
         assert corpus.x.shape == (2, 12, 5000)
         assert corpus.x.dtype == np.float32
-        assert corpus.excluded == []
+        assert corpus.excluded == {}
         assert corpus.deviations == [
             "lead order and sampling rate are not in the record (no HDF5 attributes); "
             "taken from Liu et al. 2022, Data Records",
@@ -229,6 +246,27 @@ class TestSPH:
 
 @pytest.mark.data
 class TestACS:
+    def test_the_two_seven_second_records_are_excluded_with_the_reason(self) -> None:
+        """03228.dat and 14262.dat hold 3,500 samples under a header that
+        claims 5,000; wfdb refuses them and the loader reports that."""
+        _skip_unless(ACS_DIR / "CSV/train.csv", ACS_DIR / "row_data/03228.dat")
+        train = pd.read_csv(ACS_DIR / "CSV/train.csv")
+        corpus = load_acs(train, ids=["03228", "04904", "14262"])
+        assert corpus.ids == ["04904"]
+        assert corpus.excluded == {
+            "03228": "unreadable: Samples were not loaded correctly",
+            "14262": "unreadable: Samples were not loaded correctly",
+        }
+
+    def test_the_three_records_with_a_missing_sample_are_excluded(self) -> None:
+        """WFDB format 16 marks a missing sample with -32768, which wfdb reads
+        back as NaN; three Chongqing records carry at least one."""
+        _skip_unless(ACS_DIR / "CSV/train.csv", ACS_DIR / "row_data/16558.dat")
+        train = pd.read_csv(ACS_DIR / "CSV/train.csv")
+        corpus = load_acs(train, ids=["02008", "03054", "16558"])
+        assert corpus.ids == []
+        assert corpus.excluded == dict.fromkeys(["02008", "03054", "16558"], "NaN or Inf sample")
+
     def test_record_04904_first_samples_and_header_lead_order(self) -> None:
         _skip_unless(ACS_DIR / "CSV/train.csv", ACS_DIR / "row_data/04904.hea")
         train = pd.read_csv(ACS_DIR / "CSV/train.csv")
@@ -236,7 +274,7 @@ class TestACS:
         corpus = load_acs(train, ids=["04904", "00001"])
         assert corpus.x.shape == (2, 12, 5000)
         assert corpus.x.dtype == np.float32
-        assert corpus.excluded == []
+        assert corpus.excluded == {}
         assert corpus.deviations == []
         header = wfdb.rdheader(str(ACS_DIR / "row_data/04904"))
         assert tuple(header.sig_name) == CANONICAL_LEADS
@@ -244,4 +282,31 @@ class TestACS:
         np.testing.assert_allclose(
             corpus.x[0, :, 0],
             np.array([0, 4, 4, -2, -2, 4, 0, -118, 20, 2, 4, 16]) / 1000.0,
+        )
+
+
+@pytest.mark.data
+class TestScanReport:
+    """results/ingest_report.json is what scripts/scan_corpora.py wrote after a
+    full pass over every corpus (2026-08-23); these are the C-15 counts."""
+
+    def test_every_record_is_either_kept_or_excluded_with_a_reason(self) -> None:
+        _skip_unless(RESULTS_DIR / "ingest_report.json")
+        report = json.loads((RESULTS_DIR / "ingest_report.json").read_text())
+        assert {name: r["n_records"] for name, r in report.items()} == {
+            "ptbxl": 21799,
+            "sph": 25770,
+            "acs": 19955,
+        }
+        assert {name: r["n_excluded"] for name, r in report.items()} == {
+            "ptbxl": 0,
+            "sph": 0,
+            "acs": 5,
+        }
+        for r in report.values():
+            assert r["n_kept"] + r["n_excluded"] == r["n_records"]
+            assert len(r["excluded"]) == r["n_excluded"]
+        assert sorted(report["acs"]["excluded"]) == ["02008", "03054", "03228", "14262", "16558"]
+        assert report["sph"]["deviations"][1] == (
+            "6928 of 25770 records longer than ten seconds, cropped to the first"
         )

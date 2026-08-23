@@ -19,7 +19,7 @@ distributed and every transform happens here, at read time.
 from __future__ import annotations
 
 import math
-from collections.abc import Iterable, Iterator, Sequence
+from collections.abc import Callable, Iterable, Iterator, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -44,6 +44,7 @@ __all__ = [
     "load_acs",
     "load_ptbxl",
     "load_sph",
+    "read_or_error",
     "read_sph",
     "read_wfdb",
 ]
@@ -79,7 +80,7 @@ class Corpus:
     name: str
     x: NDArray[np.float32]  # (N, 12, 5000)
     ids: list[str]  # one per row of x
-    excluded: list[str]  # record ids dropped for a NaN or Inf sample
+    excluded: dict[str, str]  # record id -> why it was dropped
     n_resampled: int = 0  # records that were not at 500 Hz
     n_cropped: int = 0  # records longer than ten seconds
     notes: tuple[str, ...] = ()  # deviations known before any record is read
@@ -129,6 +130,20 @@ def read_sph(path: Path) -> Record:
     return Record(signal, SPH_LEADS, SPH_SAMPLING_RATE_HZ)
 
 
+def read_or_error(read: Callable[[Path], Record], path: Path) -> Record | Exception:
+    """The record, or the error the reader raised.
+
+    A file the corpus ships but cannot be read (Chongqing has two whose samples
+    stop at seven seconds under a ten-second header) is a fact about the
+    corpus.  It is reported in ``Corpus.excluded`` with the reader's message,
+    not raised halfway through a pass.
+    """
+    try:
+        return read(path)
+    except (ValueError, OSError, KeyError) as error:
+        return error
+
+
 # --------------------------------------------------------------------------
 # The chain
 # --------------------------------------------------------------------------
@@ -160,24 +175,28 @@ def _lead_order(lead_names: Sequence[str]) -> list[int]:
 
 def assemble_corpus(
     name: str,
-    records: Iterable[tuple[str, Record]],
+    records: Iterable[tuple[str, Record | Exception]],
     n: int,
     notes: Sequence[str] = (),
 ) -> Corpus:
     """Run ``n`` records through the chain and stack the survivors.
 
-    A record with a NaN or Inf sample is excluded and its id kept, so the count
-    is reported rather than the record silently imputed.  ``n`` is known before
-    any record is read, so the array is allocated once rather than stacked.
+    A record with a NaN or Inf sample, or one its reader could not load, is
+    excluded and its id kept with the reason, so the count is reported rather
+    than the record silently imputed.  ``n`` is known before any record is
+    read, so the array is allocated once rather than stacked.
     """
     x = np.empty((n, N_LEADS, WINDOW_SAMPLES), dtype=np.float32)
     ids: list[str] = []
-    excluded: list[str] = []
+    excluded: dict[str, str] = {}
     resampled = 0
     cropped = 0
     for record_id, record in records:
+        if isinstance(record, Exception):
+            excluded[record_id] = f"unreadable: {record}"
+            continue
         if not np.isfinite(record.signal).all():
-            excluded.append(record_id)
+            excluded[record_id] = "NaN or Inf sample"
             continue
         if record.sampling_rate_hz != SAMPLING_RATE_HZ:
             resampled += 1
@@ -199,26 +218,26 @@ def assemble_corpus(
 
 def iter_ptbxl(
     database: pd.DataFrame, root: Path = PTBXL_DIR, ids: Sequence[int] | None = None
-) -> Iterator[tuple[str, Record]]:
+) -> Iterator[tuple[str, Record | Exception]]:
     """PTB-XL records at 500 Hz.  ``database`` is ptbxl_database.csv indexed by
     ecg_id; the path of each record is the database's own ``filename_hr``."""
     rows = database if ids is None else database.loc[list(ids)]
     for ecg_id, filename in rows["filename_hr"].items():
-        yield str(ecg_id), read_wfdb(root / str(filename))
+        yield str(ecg_id), read_or_error(read_wfdb, root / str(filename))
 
 
 def iter_sph(
     metadata: pd.DataFrame, root: Path = SPH_DIR, ids: Sequence[str] | None = None
-) -> Iterator[tuple[str, Record]]:
+) -> Iterator[tuple[str, Record | Exception]]:
     """Shandong records.  ``metadata`` is the corpus metadata.csv."""
     wanted = metadata["ECG_ID"] if ids is None else pd.Series(list(ids))
     for ecg_id in wanted:
-        yield str(ecg_id), read_sph(root / "records" / f"{ecg_id}.h5")
+        yield str(ecg_id), read_or_error(read_sph, root / "records" / f"{ecg_id}.h5")
 
 
 def iter_acs(
     table: pd.DataFrame, root: Path = ACS_DIR, ids: Sequence[str] | None = None
-) -> Iterator[tuple[str, Record]]:
+) -> Iterator[tuple[str, Record | Exception]]:
     """Chongqing records.  ``table`` is train.csv or test.csv, whose
     ``ecg_row_record`` column names the file (``04904.dat``); ``ids`` are those
     names without the extension."""
@@ -226,7 +245,7 @@ def iter_acs(
         [str(f).removesuffix(".dat") for f in table["ecg_row_record"]] if ids is None else list(ids)
     )
     for name in names:
-        yield name, read_wfdb(root / "row_data" / name)
+        yield name, read_or_error(read_wfdb, root / "row_data" / name)
 
 
 def load_ptbxl(

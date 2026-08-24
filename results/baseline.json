@@ -1,0 +1,16 @@
+{
+  "reference_auroc": 0.930,
+  "reference_is": "macro AUROC over the five PTB-XL diagnostic superclasses (NORM, MI, STTC, CD, HYP), not the MI column alone",
+  "reference_model": "resnet1d_wang",
+  "reference_spread": "0.930(05) — the benchmark's own bootstrap spread, +/- 0.005",
+  "reference_split": "PTB-XL folds 1-8 train, fold 9 validation, fold 10 test",
+  "reference_source": "github.com/helme/ecg_ptbxl_benchmarking, README leaderboard table 'PTB-XL: Diagnostic superclasses'; the underlying paper is Strodthoff et al. 2020, IEEE JBHI, doi 10.1109/jbhi.2020.3022989",
+  "reference_read_on": "2026-08-24",
+  "why_not_the_per_class_mi_value": {
+    "wanted": "the AUROC of the MI column alone on fold 10, computed from the benchmark's archived predictions (preds_x.npy / targs_x.npy)",
+    "what_happened": "the archive the README links, datacloud.hhi.fraunhofer.de/s/gLkjQL94d7FXBbS, is reachable and serves a file named output.zip (1152089000 bytes, 8810 members, HTTP range requests supported), but its contents belong to a different study: top-level directories lenet_all, lenet_superdiagnostic, inception_all, inception_superdiagnostic, lstm_all, lstm_superdiagnostic, resnet_all, resnet_superdiagnostic, xresnet_all, xresnet_superdiagnostic, each holding hparams.yaml, PyTorch Lightning checkpoints and an audit_results/interpretability tree of TCAV concept scores. It contains no .npy file at all, so no preds_x.npy or targs_x.npy, and none of the benchmark's own fastai_* model directories",
+    "second_route_tried": "the benchmark repository itself commits only output/exp0 (the 71-statement 'all' task) for fastai_xresnet1d101 and naive; the diagnostic-superclass experiment, which is the one that carries an MI column, is not committed",
+    "third_route_tried": "the arXiv text of the paper (2004.13701) reports macro figures; it carries no per-class MI AUROC table",
+    "consequence": "criterion C-19 compares our MI AUROC against the macro figure, as PLAN.md provides for. The two quantities are not the same: 0.930 averages MI with four other superclasses, and MI is not the easiest of them, so a gap larger than 0.03 does not by itself mean the baseline is broken. Any such gap is investigated before it is accepted"
+  }
+}

@@ -1,6 +1,7 @@
 data/
 results/*
 !results/timing.json
+!results/baseline.json
 !results/ingest_report.json
 __pycache__/
 *.pyc

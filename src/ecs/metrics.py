@@ -10,6 +10,8 @@ size are what keep those three failures visible.
 
 from __future__ import annotations
 
+from collections.abc import Callable
+
 import numpy as np
 from numpy.typing import NDArray
 from scipy import stats
@@ -20,6 +22,7 @@ BoolArray = NDArray[np.bool_]
 
 __all__ = [
     "abstention_rate",
+    "bootstrap_ci",
     "class_conditional_coverage",
     "coverage",
     "effective_sample_size",
@@ -27,6 +30,11 @@ __all__ = [
     "singleton_rate",
     "wilson_interval",
 ]
+
+
+# Share of bootstrap draws that must hold both classes for the percentile
+# interval to be reported at all.
+MIN_USABLE_DRAWS = 0.95
 
 
 def coverage(sets: BoolArray, labels: IntArray) -> float:
@@ -52,6 +60,48 @@ def wilson_interval(successes: int, n: int, confidence: float = 0.95) -> tuple[f
     centre = (p + z**2 / (2 * n)) / denominator
     half = (z / denominator) * np.sqrt(p * (1 - p) / n + z**2 / (4 * n**2))
     return float(centre - half), float(centre + half)
+
+
+def bootstrap_ci(
+    statistic: Callable[[IntArray, Array], float],
+    labels: IntArray,
+    scores: Array,
+    n_draws: int = 1000,
+    confidence: float = 0.95,
+    seed: int = 0,
+) -> tuple[float, float, float]:
+    """The statistic on the sample, and the percentile interval around it.
+
+    Returns ``(point, low, high)``.  The interval comes from resampling the
+    test points with replacement ``n_draws`` times, which is what makes a
+    claim that one arm beats another checkable (C-18): two point estimates a
+    hundredth apart with overlapping intervals are not a difference.
+
+    A draw that happens to contain one class only leaves AUROC undefined and is
+    dropped.  Dropping draws biases the percentiles, so it is tolerated only
+    while it stays rare: if fewer than ``MIN_USABLE_DRAWS`` of the draws hold
+    both classes, the sample is too small for an interval to mean anything and
+    that is an error rather than a number computed on what is left.
+    """
+    labels = np.asarray(labels)
+    scores = np.asarray(scores, dtype=np.float64)
+    if len(labels) != len(scores):
+        raise ValueError(f"{len(labels)} labels for {len(scores)} scores")
+    rng = np.random.default_rng(seed)
+    drawn = []
+    for _ in range(n_draws):
+        index = rng.integers(0, len(labels), len(labels))
+        if len(np.unique(labels[index])) < 2:
+            continue
+        drawn.append(statistic(labels[index], scores[index]))
+    if len(drawn) < MIN_USABLE_DRAWS * n_draws:
+        raise ValueError(
+            f"only {len(drawn)} of {n_draws} draws held both classes; "
+            f"the sample of {len(labels)} is too small for an interval"
+        )
+    tail = (1.0 - confidence) / 2.0
+    low, high = np.percentile(drawn, [100 * tail, 100 * (1 - tail)])
+    return float(statistic(labels, scores)), float(low), float(high)
 
 
 def class_conditional_coverage(

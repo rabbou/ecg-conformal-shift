@@ -2,6 +2,7 @@ data/
 results/*
 !results/timing.json
 !results/baseline.json
+!results/timing_esprimo.json
 !results/ingest_report.json
 __pycache__/
 *.pyc

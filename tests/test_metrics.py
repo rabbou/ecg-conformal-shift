@@ -2,9 +2,11 @@ from __future__ import annotations
 
 import numpy as np
 import pytest
+from sklearn.metrics import roc_auc_score
 
 from ecs.metrics import (
     abstention_rate,
+    bootstrap_ci,
     class_conditional_coverage,
     coverage,
     effective_sample_size,
@@ -98,3 +100,44 @@ class TestEffectiveSampleSize:
     def test_rejects_negative_weights(self) -> None:
         with pytest.raises(ValueError, match="non-negative"):
             effective_sample_size(np.array([1.0, -0.5]))
+
+
+class TestBootstrapInterval:
+    """The interval C-18 asks for, pinned to hand-computable AUROC values."""
+
+    @staticmethod
+    def _auroc(labels: np.ndarray, scores: np.ndarray) -> float:
+        return float(roc_auc_score(labels, scores))
+
+    def test_the_point_estimate_is_the_statistic_on_the_sample_itself(self) -> None:
+        # Two positives ranked second and third of four: of the four
+        # positive/negative pairs, two are ordered correctly, so AUROC is 0.5.
+        # The block is repeated ten times so no resample lands on one class;
+        # duplicating it changes no pairwise ordering, so AUROC is still 0.5.
+        labels = np.tile([0, 0, 1, 1], 10)
+        scores = np.tile([0.1, 0.4, 0.2, 0.3], 10)
+        point, low, high = bootstrap_ci(self._auroc, labels, scores, n_draws=200, seed=1)
+        assert point == pytest.approx(0.5)
+        assert low <= point <= high
+
+    def test_a_perfectly_separated_sample_has_a_degenerate_interval(self) -> None:
+        labels = np.array([0] * 20 + [1] * 20)
+        scores = np.concatenate([np.linspace(0.0, 0.4, 20), np.linspace(0.6, 1.0, 20)])
+        point, low, high = bootstrap_ci(self._auroc, labels, scores, n_draws=200, seed=1)
+        assert (point, low, high) == (1.0, 1.0, 1.0)
+
+    def test_the_same_seed_gives_the_same_interval(self) -> None:
+        labels = np.repeat([0, 1], 30)
+        scores = np.linspace(0, 1, 60)
+        first = bootstrap_ci(self._auroc, labels, scores, n_draws=100, seed=7)
+        assert first == bootstrap_ci(self._auroc, labels, scores, n_draws=100, seed=7)
+
+    def test_a_sample_too_small_to_resample_is_an_error_not_a_narrow_interval(self) -> None:
+        labels = np.array([0, 1])
+        scores = np.array([0.2, 0.8])
+        with pytest.raises(ValueError, match="too small for an interval"):
+            bootstrap_ci(self._auroc, labels, scores, n_draws=100, seed=1)
+
+    def test_mismatched_lengths_are_refused(self) -> None:
+        with pytest.raises(ValueError, match="labels for"):
+            bootstrap_ci(self._auroc, np.array([0, 1, 0]), np.array([0.1, 0.2]))

@@ -297,8 +297,10 @@ class _Accumulator:
         for klass, (value, _support) in class_conditional_coverage(sets, labels, n_classes).items():
             self.per_class[klass].append(value)
 
-    def as_dict(self) -> dict[str, object]:
+    def as_dict(self, keep_draws: bool = False) -> dict[str, object]:
+        drawn = {"coverage_by_draw": list(self.covered)} if keep_draws else {}
         return {
+            **drawn,
             "coverage": spread(self.covered).as_dict(),
             "empty_rate": spread(self.empty).as_dict(),
             "one_label_rate": spread(self.single).as_dict(),
@@ -317,6 +319,7 @@ def frozen_calibration_table(
     alphas: Sequence[float],
     n_draws: int = 200,
     seed: int = 0,
+    keep_draws: bool = False,
 ) -> list[dict[str, object]]:
     """Coverage on every corpus under one PTB-XL threshold, over ``n_draws`` draws.
 
@@ -325,6 +328,13 @@ def frozen_calibration_table(
     size (C-9), and a block per corpus holding coverage, coverage per class
     (C-11) and the set-size shares -- each a mean over the draws with its
     standard deviation (C-10).
+
+    ``keep_draws`` additionally writes each corpus's coverage draw by draw.  The
+    summary alone cannot answer a paired question -- the gap between two corpora
+    within one draw, or the gap between two encoder arms on the same draw -- and
+    subtracting two means throws away the fact that the draws were shared.  It
+    is off by default because the series is two hundred numbers per corpus per
+    row and only the caller asking a paired question needs them.
     """
     n_classes = source.probs.shape[1]
     keys = pd.Series(list(source.patients), index=range(len(source.labels)))
@@ -415,7 +425,7 @@ def frozen_calibration_table(
                             np.mean(source.labels if name == source.name else targets[name].labels)
                         ),
                         "deviations": list(supports[name][2]),
-                        **gathered[setting][name].as_dict(),
+                        **gathered[setting][name].as_dict(keep_draws),
                     }
                     for name in corpora
                 },

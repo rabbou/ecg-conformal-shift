@@ -9,6 +9,7 @@ results/*
 results/baseline/model.pt
 !results/external/
 !results/shift.json
+!results/seen_target.json
 !results/embeddings/
 results/embeddings/**/*.npz
 !results/figures/

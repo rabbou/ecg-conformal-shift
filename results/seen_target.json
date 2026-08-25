@@ -1,0 +1,151 @@
+{
+  "bundle": "/home/ruben/data/challenge2021",
+  "git_commit": "120d1715925965c4501931062b40e56d4b0a4ca0",
+  "partitions_read": [
+    "chapman_shaoxing",
+    "cpsc_2018",
+    "cpsc_2018_extra",
+    "georgia",
+    "ningbo"
+  ],
+  "partitions_refused": {
+    "ptb-xl": "holds the calibration corpus or a corpus derived from it",
+    "ptb": "holds the calibration corpus or a corpus derived from it"
+  },
+  "infarction_codes": {
+    "164865005": "myocardial infarction",
+    "164867002": "old myocardial infarction",
+    "54329005": "anterior myocardial infarction",
+    "57054005": "acute myocardial infarction"
+  },
+  "ischaemia_codes": {
+    "164861001": "myocardial ischemia",
+    "413444003": "acute myocardial ischemia",
+    "413844008": "chronic myocardial ischemia",
+    "425419005": "inferior ischaemia",
+    "425623009": "lateral ischaemia",
+    "426434006": "anterior ischemia"
+  },
+  "by_partition": {
+    "chapman_shaoxing": {
+      "n_records": 10237,
+      "n_infarction": 40,
+      "n_ischaemia": 0,
+      "n_infarction_or_ischaemia": 40,
+      "infarction_prevalence": 0.003907394744554068
+    },
+    "cpsc_2018": {
+      "n_records": 6877,
+      "n_infarction": 0,
+      "n_ischaemia": 0,
+      "n_infarction_or_ischaemia": 0,
+      "infarction_prevalence": 0.0
+    },
+    "cpsc_2018_extra": {
+      "n_records": 3453,
+      "n_infarction": 1515,
+      "n_ischaemia": 544,
+      "n_infarction_or_ischaemia": 1850,
+      "infarction_prevalence": 0.43874891398783666
+    },
+    "georgia": {
+      "n_records": 10343,
+      "n_infarction": 7,
+      "n_ischaemia": 1588,
+      "n_infarction_or_ischaemia": 1593,
+      "infarction_prevalence": 0.0006767862322343614
+    },
+    "ningbo": {
+      "n_records": 34905,
+      "n_infarction": 165,
+      "n_ischaemia": 0,
+      "n_infarction_or_ischaemia": 165,
+      "infarction_prevalence": 0.004727116458960034
+    }
+  },
+  "by_partition_by_code": {
+    "chapman_shaoxing": {
+      "164865005": 40
+    },
+    "cpsc_2018": {},
+    "cpsc_2018_extra": {
+      "164861001": 384,
+      "164865005": 376,
+      "164867002": 1168,
+      "413444003": 1,
+      "413844008": 161,
+      "54329005": 62
+    },
+    "georgia": {
+      "164865005": 7,
+      "413444003": 1,
+      "425419005": 451,
+      "425623009": 903,
+      "426434006": 281
+    },
+    "ningbo": {
+      "164865005": 83,
+      "54329005": 57,
+      "57054005": 49
+    }
+  },
+  "readings": {
+    "four_partitions_named": {
+      "partitions": [
+        "chapman_shaoxing",
+        "cpsc_2018",
+        "georgia",
+        "ningbo"
+      ],
+      "n_records": 62362,
+      "n_infarction": 212,
+      "n_ischaemia": 1588,
+      "n_infarction_or_ischaemia": 1798,
+      "infarction_prevalence": 0.0033995061094897533,
+      "enough_infarction": {
+        "holds": false,
+        "n_infarction": 212,
+        "floor": 260,
+        "floor_is": "Shandong's infarction count, the thinnest target already in the study"
+      },
+      "prevalence_is_a_population_not_an_assembly": {
+        "holds": false,
+        "largest_contributor": "ningbo",
+        "share_of_infarction": 0.7783018867924528,
+        "ceiling": 0.5
+      },
+      "holds": false
+    },
+    "with_cpsc_extra": {
+      "partitions": [
+        "chapman_shaoxing",
+        "cpsc_2018",
+        "cpsc_2018_extra",
+        "georgia",
+        "ningbo"
+      ],
+      "n_records": 65815,
+      "n_infarction": 1727,
+      "n_ischaemia": 2132,
+      "n_infarction_or_ischaemia": 3648,
+      "infarction_prevalence": 0.0262402187951075,
+      "enough_infarction": {
+        "holds": true,
+        "n_infarction": 1727,
+        "floor": 260,
+        "floor_is": "Shandong's infarction count, the thinnest target already in the study"
+      },
+      "prevalence_is_a_population_not_an_assembly": {
+        "holds": false,
+        "largest_contributor": "cpsc_2018_extra",
+        "share_of_infarction": 0.8772437753329473,
+        "ceiling": 0.5
+      },
+      "holds": false
+    }
+  },
+  "decision": {
+    "seen_target_cell": "dropped",
+    "rule": "a seen target has to carry at least as much infarction as the thinnest target already in the study, and no single partition may supply more than half of it; both conditions and the numbers that decided them are in readings"
+  }
+}

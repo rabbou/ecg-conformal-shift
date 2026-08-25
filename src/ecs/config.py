@@ -14,6 +14,13 @@ SPH_DIR = Path(os.environ.get("ECS_SPH_DIR", REPO_ROOT / "data/sph"))
 ACS_DIR = Path(os.environ.get("ECS_ACS_DIR", REPO_ROOT / "data/acs"))
 RESULTS_DIR = Path(os.environ.get("ECS_RESULTS_DIR", REPO_ROOT / "results"))
 
+# The PhysioNet/CinC Challenge-2021 bundle, read only to count how much
+# infarction its non-PTB-XL partitions carry.  It lives on the box, not in
+# this repository, and nothing else here depends on it being present.
+CHALLENGE2021_DIR = Path(
+    os.environ.get("ECS_CHALLENGE2021_DIR", Path.home() / "data/challenge2021")
+)
+
 # PTB-XL ships the MI superclass with five subendocardial-injury statements
 # folded in.  They are a different clinical entity from an infarct pattern, so
 # the mapping keeps them separable rather than deciding for the caller.

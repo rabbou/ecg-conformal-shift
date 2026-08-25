@@ -8,6 +8,9 @@ memory, and a surprising result cannot be quietly re-cut.
    it hold for the sick as well as the healthy.
 2. Set-size distribution -- how often the model answers with one label, both, or
    neither, at each hospital.
+3. Encoder arms on the same break -- does the encoder underneath change how far
+   the guarantee falls, and does an encoder that saw the calibration corpus look
+   better at home for a reason other than being better.
 4. Baseline discrimination -- the reproduction of known ground that licenses
    everything else.
 
@@ -15,11 +18,13 @@ Figures 1 and 2 read ``results/shift.json``, where one PTB-XL threshold was
 spent on all three corpora at once, so the panels differ in nothing but the
 population they describe.
 
-Figure 3 compares the encoder arms on that same break; it needs each arm's
-cached representations turned into scores, which happens later in the week, and
-this script says so rather than drawing an empty frame.
+Figure 3 reads ``results/arms.json``, where each arm's cached representations
+went through the same linear probe, the same folds and the same frozen
+calibration, so a difference between two arms is a difference between two
+pre-trainings.  Until that file exists this script says what it is waiting for
+rather than drawing an empty frame.
 
-Usage: .venv/bin/python scripts/figures.py [--figure 1 2 4]
+Usage: .venv/bin/python scripts/figures.py [--figure 1 2 3 4]
 """
 
 from __future__ import annotations
@@ -48,6 +53,25 @@ CORPUS_NAMES = {
     "sph": "Shandong",
     "acs": "Chongqing",
 }
+# The arms in contamination order: the control, then the arms that saw no public
+# corpus, then the one that saw the calibration corpus, then the one that saw a
+# target too.  Reading the figure left to right is reading that order.
+ARM_ORDER = ("random_init", "ecgfounder", "ecgfm", "hubert_ecg")
+ARM_NAMES = {
+    "random_init": "random init,\nfrozen",
+    "ecgfounder": "ECGFounder",
+    "ecgfm": "ECG-FM",
+    "hubert_ecg": "HuBERT-ECG",
+}
+# Grey for the arms that saw neither corpus, warm for the ones that saw PTB-XL,
+# hottest for the one that saw a target as well.  The colour carries the claim.
+ARM_COLOUR = {
+    "random_init": "#adb5bd",
+    "ecgfounder": "#6c757d",
+    "ecgfm": "#fb8500",
+    "hubert_ecg": "#bf4342",
+}
+
 # One hue per level, dark enough to survive greyscale printing.
 LEVEL_COLOUR = {0.20: "#8ecae6", 0.10: "#219ebc", 0.05: "#023047"}
 SET_COLOUR = {"empty_rate": "#bf4342", "one_label_rate": "#5f8d4e", "two_label_rate": "#e9c46a"}
@@ -224,6 +248,111 @@ def figure_2_set_sizes(table: dict[str, Any], out: Path, source: Path) -> Path:
     return out
 
 
+def _headline_row(arms: dict[str, Any], arm: str) -> dict[str, Any]:
+    """The arm's coverage row at the level the grid quotes its headline at."""
+    wanted = arms["headline"]
+    for row in arms["coverage"][arm]:
+        if all(row[key] == value for key, value in wanted.items()):
+            return row
+    raise KeyError(f"{arm} has no row for {wanted}")
+
+
+def _saw(arms: dict[str, Any], arm: str, corpus_name: str) -> bool:
+    """Whether this arm's own sidecar names ``corpus_name`` among its pre-training."""
+    return corpus_name.lower() in arms["arms"][arm]["pretraining_corpora"].lower()
+
+
+def figure_3_arms(arms: dict[str, Any], out: Path, source: Path) -> Path:
+    """The four encoder arms on the same break.
+
+    One panel per target: how far each arm's coverage falls between PTB-XL and
+    that hospital, as a signed gap, so a bar above zero is a guarantee that
+    stopped holding and a bar below zero is one that over-covered.  The last
+    panel is what each arm is worth at home, because a small gap earned by an
+    arm that discriminates nothing is not the same achievement as a small gap
+    earned by one that does; the panels have to be read together.
+
+    The two target panels keep their own vertical scales.  Forcing one scale
+    would flatten Shandong into a line beside Chongqing, and the comparison the
+    figure is for is between arms inside a panel, not between panels.
+    """
+    targets = [c for c in CORPUS_ORDER if c != "ptbxl"]
+    figure, axes = plt.subplots(1, len(targets) + 1, figsize=(14.0, 5.8), squeeze=False)
+    positions = np.arange(len(ARM_ORDER))
+    ticks = [ARM_NAMES[a] for a in ARM_ORDER]
+    colours = [ARM_COLOUR[a] for a in ARM_ORDER]
+
+    for axis, corpus in zip(axes[0], targets, strict=False):
+        means = [_headline_row(arms, a)["coverage_gap"][corpus]["mean"] for a in ARM_ORDER]
+        sds = [_headline_row(arms, a)["coverage_gap"][corpus]["sd"] for a in ARM_ORDER]
+        axis.bar(positions, means, 0.6, yerr=sds, capsize=4, color=colours, edgecolor="white")
+        axis.axhline(0.0, color="#333333", linewidth=1)
+        low = min([*means, 0.0]) - max(sds)
+        high = max([*means, 0.0]) + max(sds)
+        pad = 0.22 * (high - low)
+        axis.set_ylim(low - pad, high + pad)
+        for index, (value, sd) in enumerate(zip(means, sds, strict=True)):
+            above = value >= 0
+            axis.text(
+                index,
+                value + (sd + 0.04 * (high - low)) * (1 if above else -1),
+                f"{value:+.3f} ± {sd:.3f}",
+                ha="center",
+                va="bottom" if above else "top",
+                fontsize=8,
+            )
+        axis.set_xticks(positions)
+        axis.set_xticklabels(ticks, fontsize=8)
+        axis.set_title(CORPUS_NAMES[corpus], fontsize=10)
+        axis.set_ylabel("coverage at home minus coverage here", fontsize=9)
+
+    home_axis = axes[0][-1]
+    home = [arms["discrimination"][a]["ptbxl"]["auroc"] for a in ARM_ORDER]
+    low_ci = [arms["discrimination"][a]["ptbxl"]["auroc_ci95"][0] for a in ARM_ORDER]
+    high_ci = [arms["discrimination"][a]["ptbxl"]["auroc_ci95"][1] for a in ARM_ORDER]
+    home_axis.bar(
+        positions,
+        home,
+        0.6,
+        yerr=np.array([np.subtract(home, low_ci), np.subtract(high_ci, home)]),
+        capsize=4,
+        color=colours,
+        edgecolor="white",
+    )
+    for index, (value, lo, hi) in enumerate(zip(home, low_ci, high_ci, strict=True)):
+        home_axis.text(
+            index, hi + 0.03, f"{value:.3f}\n[{lo:.3f}, {hi:.3f}]", ha="center", fontsize=8
+        )
+    home_axis.axhline(0.5, color="#333333", linestyle=":", linewidth=1)
+    home_axis.text(-0.45, 0.515, "chance", fontsize=7, color="#333333")
+    home_axis.set_ylim(0.0, 1.18)
+    home_axis.set_xticks(positions)
+    home_axis.set_xticklabels(ticks, fontsize=8)
+    home_axis.set_title("what the arm is worth at home", fontsize=10)
+    home_axis.set_ylabel("PTB-XL fold 10 AUROC, infarction against the rest", fontsize=9)
+
+    plain = {a: ARM_NAMES[a].replace("\n", " ") for a in ARM_ORDER}
+    saw_source = [plain[a] for a in ARM_ORDER if _saw(arms, a, "PTB-XL")]
+    worst = max(ARM_ORDER, key=lambda a: _headline_row(arms, a)["coverage_gap"]["acs"]["mean"])
+    best = min(ARM_ORDER, key=lambda a: _headline_row(arms, a)["coverage_gap"]["acs"]["mean"])
+    figure.suptitle(
+        "Figure 3 — four encoders, one break\n"
+        f"Gap to Chongqing runs from {plain[best]} "
+        f"{_headline_row(arms, best)['coverage_gap']['acs']['mean']:+.3f} to {plain[worst]} "
+        f"{_headline_row(arms, worst)['coverage_gap']['acs']['mean']:+.3f}.\n"
+        f"Warm bars saw PTB-XL in pre-training ({', '.join(saw_source)}); grey bars saw no "
+        f"public corpus. Gap bars: mean over {arms['n_draws']} calibration draws, whiskers\n"
+        "one standard deviation. AUROC whiskers are 95% bootstrap intervals over records; "
+        "paired arm-versus-arm differences are in the results file.",
+        fontsize=9.5,
+    )
+    figure.tight_layout(rect=(0, 0.035, 1, 0.925))
+    _source_note(figure, source)
+    figure.savefig(out, dpi=200)
+    plt.close(figure)
+    return out
+
+
 def figure_4_discrimination(
     metrics: dict[str, Any], reference: dict[str, Any], out: Path, source: Path
 ) -> Path:
@@ -282,7 +411,7 @@ def figure_4_discrimination(
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--figure", nargs="+", type=int, default=[1, 2, 4], choices=[1, 2, 3, 4])
+    parser.add_argument("--figure", nargs="+", type=int, default=[1, 2, 3, 4], choices=[1, 2, 3, 4])
     parser.add_argument("--out", default=str(RESULTS_DIR / "figures"))
     args = parser.parse_args(argv)
     out = Path(args.out)
@@ -291,6 +420,7 @@ def main(argv: list[str] | None = None) -> int:
     shift_path = RESULTS_DIR / "shift.json"
     metrics_path = RESULTS_DIR / "baseline/metrics.json"
     baseline_path = RESULTS_DIR / "baseline.json"
+    arms_path = RESULTS_DIR / "arms.json"
 
     drawn = []
     if 1 in args.figure:
@@ -300,12 +430,17 @@ def main(argv: list[str] | None = None) -> int:
         table = json.loads(shift_path.read_text())
         drawn.append(figure_2_set_sizes(table, out / "fig2_set_sizes.png", shift_path))
     if 3 in args.figure:
-        print(
-            "figure 3 needs each encoder arm's cached representations turned into scores "
-            "and put through the same frozen calibration; that is later in the week, so it "
-            "is not drawn",
-            file=sys.stderr,
-        )
+        if arms_path.exists():
+            drawn.append(
+                figure_3_arms(json.loads(arms_path.read_text()), out / "fig3_arms.png", arms_path)
+            )
+        else:
+            print(
+                "figure 3 needs each encoder arm's cached representations turned into scores "
+                f"and put through the same frozen calibration; {arms_path} does not exist "
+                "yet, so it is not drawn",
+                file=sys.stderr,
+            )
     if 4 in args.figure:
         drawn.append(
             figure_4_discrimination(

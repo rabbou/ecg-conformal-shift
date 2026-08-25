@@ -1,0 +1,617 @@
+{
+  "corpus": "ptbxl",
+  "split": "PTB-XL fold 10, halved by patient at every draw",
+  "source": "results/baseline/scores.npz",
+  "classes": {
+    "0": "no infarction",
+    "1": "infarction"
+  },
+  "n_records": 2198,
+  "n_positive": 550,
+  "n_draws": 200,
+  "seed": 0,
+  "git_commit": "8d1f9fbd76f88516dc8a32aa7752e15a7291b7b2",
+  "seconds": 9.6,
+  "rows": [
+    {
+      "alpha": 0.2,
+      "target_coverage": 0.8,
+      "score": "lac",
+      "correction": "none",
+      "n_points": 2198,
+      "n_patients": 1904,
+      "coverage": {
+        "mean": 0.7999705824323743,
+        "sd": 0.01931961063998766,
+        "n_draws": 200
+      },
+      "empty_rate": {
+        "mean": 0.1342989925751424,
+        "sd": 0.02102702575768415,
+        "n_draws": 200
+      },
+      "one_label_rate": {
+        "mean": 0.8657010074248577,
+        "sd": 0.021027025757684146,
+        "n_draws": 200
+      },
+      "two_label_rate": {
+        "mean": 0.0,
+        "sd": 0.0,
+        "n_draws": 200
+      },
+      "abstention_rate": {
+        "mean": 0.1342989925751424,
+        "sd": 0.02102702575768415,
+        "n_draws": 200
+      },
+      "mean_set_size": {
+        "mean": 0.8657010074248577,
+        "sd": 0.021027025757684146,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.8841725965712378,
+          "sd": 0.013812211098450907,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.5480182039878472,
+          "sd": 0.03809143133507362,
+          "n_draws": 200
+        }
+      }
+    },
+    {
+      "alpha": 0.2,
+      "target_coverage": 0.8,
+      "score": "lac",
+      "correction": "mondrian",
+      "n_points": 2198,
+      "n_patients": 1904,
+      "coverage": {
+        "mean": 0.8006039986016971,
+        "sd": 0.017911261201046327,
+        "n_draws": 200
+      },
+      "empty_rate": {
+        "mean": 0.08949267964848547,
+        "sd": 0.020372763690894503,
+        "n_draws": 200
+      },
+      "one_label_rate": {
+        "mean": 0.9105073203515144,
+        "sd": 0.020372763690894503,
+        "n_draws": 200
+      },
+      "two_label_rate": {
+        "mean": 0.0,
+        "sd": 0.0,
+        "n_draws": 200
+      },
+      "abstention_rate": {
+        "mean": 0.08949267964848547,
+        "sd": 0.020372763690894503,
+        "n_draws": 200
+      },
+      "mean_set_size": {
+        "mean": 0.9105073203515144,
+        "sd": 0.020372763690894503,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.8000981163650303,
+          "sd": 0.02070161796379324,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.80202307025859,
+          "sd": 0.03557991508347185,
+          "n_draws": 200
+        }
+      }
+    },
+    {
+      "alpha": 0.2,
+      "target_coverage": 0.8,
+      "score": "aps",
+      "correction": "none",
+      "n_points": 2198,
+      "n_patients": 1904,
+      "coverage": {
+        "mean": 0.7995986556610393,
+        "sd": 0.016925634834966136,
+        "n_draws": 200
+      },
+      "empty_rate": {
+        "mean": 0.1169852663832108,
+        "sd": 0.012270899349733917,
+        "n_draws": 200
+      },
+      "one_label_rate": {
+        "mean": 0.790716640097552,
+        "sd": 0.01155165196512199,
+        "n_draws": 200
+      },
+      "two_label_rate": {
+        "mean": 0.09229809351923719,
+        "sd": 0.010749884290046625,
+        "n_draws": 200
+      },
+      "abstention_rate": {
+        "mean": 0.209283359902448,
+        "sd": 0.011551651965121992,
+        "n_draws": 200
+      },
+      "mean_set_size": {
+        "mean": 0.9753128271360265,
+        "sd": 0.019970711131005733,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.8295418877097731,
+          "sd": 0.01615252261451682,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.7099261807622196,
+          "sd": 0.029058684455105007,
+          "n_draws": 200
+        }
+      }
+    },
+    {
+      "alpha": 0.2,
+      "target_coverage": 0.8,
+      "score": "aps",
+      "correction": "mondrian",
+      "n_points": 2198,
+      "n_patients": 1904,
+      "coverage": {
+        "mean": 0.7989896464329889,
+        "sd": 0.0169733373551803,
+        "n_draws": 200
+      },
+      "empty_rate": {
+        "mean": 0.12757346837393171,
+        "sd": 0.013283398097522568,
+        "n_draws": 200
+      },
+      "one_label_rate": {
+        "mean": 0.7345141577139124,
+        "sd": 0.016956810883036195,
+        "n_draws": 200
+      },
+      "two_label_rate": {
+        "mean": 0.1379123739121559,
+        "sd": 0.01622026328730539,
+        "n_draws": 200
+      },
+      "abstention_rate": {
+        "mean": 0.2654858422860877,
+        "sd": 0.0169568108830362,
+        "n_draws": 200
+      },
+      "mean_set_size": {
+        "mean": 1.0103389055382244,
+        "sd": 0.024321960795348957,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.7989295095096253,
+          "sd": 0.019954999670769552,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.7992638911614651,
+          "sd": 0.034107520613506255,
+          "n_draws": 200
+        }
+      }
+    },
+    {
+      "alpha": 0.1,
+      "target_coverage": 0.9,
+      "score": "lac",
+      "correction": "none",
+      "n_points": 2198,
+      "n_patients": 1904,
+      "coverage": {
+        "mean": 0.8998879340752071,
+        "sd": 0.013255375290888577,
+        "n_draws": 200
+      },
+      "empty_rate": {
+        "mean": 0.0,
+        "sd": 0.0,
+        "n_draws": 200
+      },
+      "one_label_rate": {
+        "mean": 0.9477799413546477,
+        "sd": 0.016089518690059854,
+        "n_draws": 200
+      },
+      "two_label_rate": {
+        "mean": 0.05222005864535234,
+        "sd": 0.016089518690059857,
+        "n_draws": 200
+      },
+      "abstention_rate": {
+        "mean": 0.05222005864535234,
+        "sd": 0.016089518690059857,
+        "n_draws": 200
+      },
+      "mean_set_size": {
+        "mean": 1.0522200586453523,
+        "sd": 0.016089518690059857,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.9550754380151111,
+          "sd": 0.008999979304472445,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.7346896019671594,
+          "sd": 0.030317608240003343,
+          "n_draws": 200
+        }
+      }
+    },
+    {
+      "alpha": 0.1,
+      "target_coverage": 0.9,
+      "score": "lac",
+      "correction": "mondrian",
+      "n_points": 2198,
+      "n_patients": 1904,
+      "coverage": {
+        "mean": 0.9010107341330439,
+        "sd": 0.013457466597522588,
+        "n_draws": 200
+      },
+      "empty_rate": {
+        "mean": 0.0,
+        "sd": 0.0,
+        "n_draws": 200
+      },
+      "one_label_rate": {
+        "mean": 0.8948753213079818,
+        "sd": 0.021818031024385634,
+        "n_draws": 200
+      },
+      "two_label_rate": {
+        "mean": 0.10512467869201832,
+        "sd": 0.021818031024385634,
+        "n_draws": 200
+      },
+      "abstention_rate": {
+        "mean": 0.10512467869201832,
+        "sd": 0.021818031024385634,
+        "n_draws": 200
+      },
+      "mean_set_size": {
+        "mean": 1.1051246786920184,
+        "sd": 0.02181803102438564,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.9008622523813803,
+          "sd": 0.015728069725842616,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.9014086836808219,
+          "sd": 0.02483134612700285,
+          "n_draws": 200
+        }
+      }
+    },
+    {
+      "alpha": 0.1,
+      "target_coverage": 0.9,
+      "score": "aps",
+      "correction": "none",
+      "n_points": 2198,
+      "n_patients": 1904,
+      "coverage": {
+        "mean": 0.8996707196880902,
+        "sd": 0.012965384144946883,
+        "n_draws": 200
+      },
+      "empty_rate": {
+        "mean": 0.045530830439420106,
+        "sd": 0.008479505534240267,
+        "n_draws": 200
+      },
+      "one_label_rate": {
+        "mean": 0.7412079576995037,
+        "sd": 0.01406078187050054,
+        "n_draws": 200
+      },
+      "two_label_rate": {
+        "mean": 0.21326121186107627,
+        "sd": 0.017670258881167467,
+        "n_draws": 200
+      },
+      "abstention_rate": {
+        "mean": 0.25879204230049635,
+        "sd": 0.014060781870500538,
+        "n_draws": 200
+      },
+      "mean_set_size": {
+        "mean": 1.1677303814216562,
+        "sd": 0.02388670214273167,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.9238123995405456,
+          "sd": 0.011626746608678335,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.8274675621431875,
+          "sd": 0.025225224842483508,
+          "n_draws": 200
+        }
+      }
+    },
+    {
+      "alpha": 0.1,
+      "target_coverage": 0.9,
+      "score": "aps",
+      "correction": "mondrian",
+      "n_points": 2198,
+      "n_patients": 1904,
+      "coverage": {
+        "mean": 0.9002584991293482,
+        "sd": 0.012962408640231925,
+        "n_draws": 200
+      },
+      "empty_rate": {
+        "mean": 0.05496633457849387,
+        "sd": 0.009172276787068162,
+        "n_draws": 200
+      },
+      "one_label_rate": {
+        "mean": 0.6512326199498727,
+        "sd": 0.027660351899027,
+        "n_draws": 200
+      },
+      "two_label_rate": {
+        "mean": 0.2938010454716334,
+        "sd": 0.030400306676584325,
+        "n_draws": 200
+      },
+      "abstention_rate": {
+        "mean": 0.34876738005012725,
+        "sd": 0.027660351899027002,
+        "n_draws": 200
+      },
+      "mean_set_size": {
+        "mean": 1.2388347108931397,
+        "sd": 0.03537687871760208,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.8999107239459218,
+          "sd": 0.014490027146322675,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.9012886944509185,
+          "sd": 0.026015189675588284,
+          "n_draws": 200
+        }
+      }
+    },
+    {
+      "alpha": 0.05,
+      "target_coverage": 0.95,
+      "score": "lac",
+      "correction": "none",
+      "n_points": 2198,
+      "n_patients": 1904,
+      "coverage": {
+        "mean": 0.9503166597853423,
+        "sd": 0.00955518932055836,
+        "n_draws": 200
+      },
+      "empty_rate": {
+        "mean": 0.0,
+        "sd": 0.0,
+        "n_draws": 200
+      },
+      "one_label_rate": {
+        "mean": 0.8153020712059478,
+        "sd": 0.01628536408107868,
+        "n_draws": 200
+      },
+      "two_label_rate": {
+        "mean": 0.1846979287940523,
+        "sd": 0.016285364081078682,
+        "n_draws": 200
+      },
+      "abstention_rate": {
+        "mean": 0.1846979287940523,
+        "sd": 0.016285364081078682,
+        "n_draws": 200
+      },
+      "mean_set_size": {
+        "mean": 1.1846979287940522,
+        "sd": 0.016285364081078682,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.9847853266452222,
+          "sd": 0.004190668839640921,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.8473554642516021,
+          "sd": 0.027687350141310896,
+          "n_draws": 200
+        }
+      }
+    },
+    {
+      "alpha": 0.05,
+      "target_coverage": 0.95,
+      "score": "lac",
+      "correction": "mondrian",
+      "n_points": 2198,
+      "n_patients": 1904,
+      "coverage": {
+        "mean": 0.9507065161475998,
+        "sd": 0.009753223007496101,
+        "n_draws": 200
+      },
+      "empty_rate": {
+        "mean": 0.0,
+        "sd": 0.0,
+        "n_draws": 200
+      },
+      "one_label_rate": {
+        "mean": 0.7267045949639303,
+        "sd": 0.024892247198829834,
+        "n_draws": 200
+      },
+      "two_label_rate": {
+        "mean": 0.2732954050360697,
+        "sd": 0.02489224719882984,
+        "n_draws": 200
+      },
+      "abstention_rate": {
+        "mean": 0.2732954050360697,
+        "sd": 0.02489224719882984,
+        "n_draws": 200
+      },
+      "mean_set_size": {
+        "mean": 1.2732954050360699,
+        "sd": 0.024892247198829837,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.9501753166519754,
+          "sd": 0.011760331823655193,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.9522511451712304,
+          "sd": 0.017928398616790738,
+          "n_draws": 200
+        }
+      }
+    },
+    {
+      "alpha": 0.05,
+      "target_coverage": 0.95,
+      "score": "aps",
+      "correction": "none",
+      "n_points": 2198,
+      "n_patients": 1904,
+      "coverage": {
+        "mean": 0.950847708997961,
+        "sd": 0.00986130361815752,
+        "n_draws": 200
+      },
+      "empty_rate": {
+        "mean": 0.016237980407154594,
+        "sd": 0.004927801810756212,
+        "n_draws": 200
+      },
+      "one_label_rate": {
+        "mean": 0.6396014552701085,
+        "sd": 0.023840833866883245,
+        "n_draws": 200
+      },
+      "two_label_rate": {
+        "mean": 0.3441605643227369,
+        "sd": 0.02653739169902737,
+        "n_draws": 200
+      },
+      "abstention_rate": {
+        "mean": 0.36039854472989163,
+        "sd": 0.02384083386688324,
+        "n_draws": 200
+      },
+      "mean_set_size": {
+        "mean": 1.3279225839155826,
+        "sd": 0.02981018983970198,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.9671435214752337,
+          "sd": 0.007877906775655369,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.9021593307527576,
+          "sd": 0.02134483303293355,
+          "n_draws": 200
+        }
+      }
+    },
+    {
+      "alpha": 0.05,
+      "target_coverage": 0.95,
+      "score": "aps",
+      "correction": "mondrian",
+      "n_points": 2198,
+      "n_patients": 1904,
+      "coverage": {
+        "mean": 0.9513093664382023,
+        "sd": 0.009410004093426738,
+        "n_draws": 200
+      },
+      "empty_rate": {
+        "mean": 0.02194226552153479,
+        "sd": 0.005925585420226309,
+        "n_draws": 200
+      },
+      "one_label_rate": {
+        "mean": 0.5202924665333442,
+        "sd": 0.0491910720565951,
+        "n_draws": 200
+      },
+      "two_label_rate": {
+        "mean": 0.45776526794512107,
+        "sd": 0.05082948569498448,
+        "n_draws": 200
+      },
+      "abstention_rate": {
+        "mean": 0.4797075334666559,
+        "sd": 0.049191072056595106,
+        "n_draws": 200
+      },
+      "mean_set_size": {
+        "mean": 1.4358230024235863,
+        "sd": 0.053082358529938437,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.951692288271975,
+          "sd": 0.010558076920279874,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.9501644435599131,
+          "sd": 0.01807523829486049,
+          "n_draws": 200
+        }
+      }
+    }
+  ]
+}

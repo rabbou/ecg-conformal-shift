@@ -1,0 +1,67 @@
+{
+  "corpus": "acs",
+  "title": "Chongqing ACS-ECG",
+  "model": "the PTB-XL supervised baseline, frozen: no fine-tuning, no per-corpus preprocessing, one forward pass",
+  "checkpoint": "results/baseline/model.pt",
+  "baseline_config": {
+    "epochs": 15,
+    "learning_rate": 0.001,
+    "batch_size": 64,
+    "weight_decay": 0.01,
+    "patience": 3,
+    "seed": 0,
+    "bootstrap_draws": 1000,
+    "label_spec": {
+      "include_injury": true,
+      "min_likelihood": 0.0,
+      "chronic_only": false
+    },
+    "split": "PTB-XL strat_fold: 1-8 train, 9 validation, 10 test",
+    "standardisation": {
+      "centre_mv": -0.0007768306531943381,
+      "scale_mv": 0.23706911504268646
+    },
+    "n_train": 17418,
+    "n_validation": 2183,
+    "n_test": 2198,
+    "max_records": null,
+    "machine": {
+      "cpu": "Intel(R) Core(TM) i7-8700 CPU @ 3.20GHz",
+      "platform": "Linux-6.8.0-136-generic-x86_64-with-glibc2.39",
+      "python": "3.11.15",
+      "torch": "2.2.2+cu121",
+      "torch_threads": 6
+    }
+  },
+  "standardisation": {
+    "centre_mv": -0.0007768306531943381,
+    "scale_mv": 0.23706911504268646
+  },
+  "seed": 0,
+  "max_records": null,
+  "git_commit": "13a43574bd481d2cf562eb44a7e9d928fa5d1dbc",
+  "n_scored": 17955,
+  "n_positive": 2679,
+  "prevalence": 0.1492063492063492,
+  "n_excluded": 5,
+  "excluded": {
+    "16558": "NaN or Inf sample",
+    "14262": "unreadable: Samples were not loaded correctly",
+    "03054": "NaN or Inf sample",
+    "02008": "NaN or Inf sample",
+    "03228": "unreadable: Samples were not loaded correctly"
+  },
+  "deviations": [
+    "only the 17960 records of CSV/train.csv carry labels; the published test split withholds them, so the remaining waveforms on disk are not scored",
+    "the label is the corpus's own AMI column, read from a coronary angiogram rather than from the tracing, and acute by construction; PTB-XL's and Shandong's positives are dominated by the chronic infarct pattern, so the two label sets name different clinical events and no re-coding here makes them the same",
+    "5 of 17960 records excluded: see the excluded field"
+  ],
+  "seconds": 240.9,
+  "machine": {
+    "cpu": "Intel(R) Core(TM) i7-8700 CPU @ 3.20GHz",
+    "platform": "Linux-6.8.0-136-generic-x86_64-with-glibc2.39",
+    "python": "3.11.15",
+    "torch": "2.2.2+cu121",
+    "torch_threads": 6
+  }
+}

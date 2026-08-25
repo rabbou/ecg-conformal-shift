@@ -200,8 +200,8 @@ class TestTheFigures:
     redrawn by a script from a results file that is already committed."""
 
     NAMED = {
-        1: ("fig1_coverage.png", RESULTS_DIR / "abstention.json"),
-        2: ("fig2_set_sizes.png", RESULTS_DIR / "abstention.json"),
+        1: ("fig1_coverage.png", RESULTS_DIR / "shift.json"),
+        2: ("fig2_set_sizes.png", RESULTS_DIR / "shift.json"),
         4: ("fig4_discrimination.png", RESULTS_DIR / "baseline/metrics.json"),
     }
 
@@ -225,6 +225,16 @@ class TestTheFigures:
             )
             assert tracked.returncode == 0, f"figure {number} draws from an uncommitted {source}"
 
+    def test_figure_one_carries_a_panel_row_per_corpus(self, tmp_path: Path) -> None:
+        """A figure with two of the three hospitals on it would read as a result.
+        The count of panel rows is checked against the corpora on the table."""
+        import figures
+
+        table = json.loads((RESULTS_DIR / "shift.json").read_text())
+        assert set(figures.corpora_on(table)) == {"ptbxl", "sph", "acs"}
+        drawn = figures.figure_1_coverage(table, tmp_path / "fig1.png", RESULTS_DIR / "shift.json")
+        assert drawn.stat().st_size > 10_000
+
     def test_figure_three_says_what_it_is_waiting_for_rather_than_drawing_empty(
         self, tmp_path: Path, capsys: pytest.CaptureFixture[str]
     ) -> None:
@@ -232,7 +242,7 @@ class TestTheFigures:
 
         assert figures.main(["--figure", "3", "--out", str(tmp_path)]) == 0
         assert not list(tmp_path.glob("*.png"))
-        assert "Shandong and Chongqing" in capsys.readouterr().err
+        assert "encoder arm" in capsys.readouterr().err
 
 
 # The shifted corpora are scored once and whole (C-20), so unlike the re-draw
@@ -518,3 +528,101 @@ class TestWhatTheBreakTableCarries:
                 )
                 means = [r["threshold_by_class"]["1"]["mean"] for r in rows]
                 assert means == sorted(means), (score, correction, means)
+
+
+class TestTheCommittedBreakTable:
+    """The three-corpus table itself, held to C-9, C-10, C-11, C-14 and C-20."""
+
+    # Read off the corpora's own description files on 2026-08-22 and asserted in
+    # test_labels.py; repeated here because a table whose prevalences drifted is
+    # measuring a different shift from the one the study describes.
+    PREVALENCE = {"ptbxl": 0.2502, "sph": 0.0101, "acs": 0.1492}
+
+    @pytest.fixture(scope="class")
+    @staticmethod
+    def table() -> dict:
+        return json.loads((RESULTS_DIR / "shift.json").read_text())
+
+    def test_all_three_corpora_are_on_every_row(self, table: dict) -> None:
+        for row in table["rows"]:
+            assert set(row["by_corpus"]) == {"ptbxl", "sph", "acs"}
+
+    def test_it_covers_the_three_levels_both_scores_and_both_corrections(self, table: dict) -> None:
+        assert sorted({row["alpha"] for row in table["rows"]}) == [0.05, 0.10, 0.20]
+        assert {row["score"] for row in table["rows"]} == {"lac", "aps"}
+        assert {row["correction"] for row in table["rows"]} == {"none", "mondrian"}
+
+    def test_every_threshold_was_fitted_on_ptbxl_and_nowhere_else(self, table: dict) -> None:
+        """C-20 on the committed file: the protocol is named and every row says
+        which corpus its threshold came from."""
+        assert table["calibrated_on"] == "ptbxl"
+        assert "never re-calibrated on themselves" in table["protocol"]
+        for row in table["rows"]:
+            assert row["calibrated_on"] == "ptbxl"
+
+    def test_every_figure_is_a_mean_over_at_least_a_hundred_draws_with_its_spread(
+        self, table: dict
+    ) -> None:
+        assert table["n_draws"] >= MIN_DRAWS
+        for row in table["rows"]:
+            for block in row["by_corpus"].values():
+                for key in ("coverage", "empty_rate", "one_label_rate", "two_label_rate"):
+                    assert block[key]["n_draws"] >= MIN_DRAWS
+                    assert block[key]["sd"] >= 0.0
+
+    def test_coverage_is_reported_for_infarction_and_for_not_on_every_corpus(
+        self, table: dict
+    ) -> None:
+        assert table["classes"] == {"0": "no infarction", "1": "infarction"}
+        for row in table["rows"]:
+            for block in row["by_corpus"].values():
+                assert set(block["coverage_by_class"]) == {"0", "1"}
+                for figures in block["coverage_by_class"].values():
+                    assert figures["n_draws"] >= MIN_DRAWS
+
+    def test_the_calibration_sample_reports_its_effective_size(self, table: dict) -> None:
+        """C-9."""
+        for row in table["rows"]:
+            calibration = row["calibration"]
+            assert calibration["effective_sample_size"]["mean"] == pytest.approx(
+                calibration["n"]["mean"]
+            )
+            assert calibration["n"]["mean"] > 0
+
+    def test_each_corpus_names_what_could_not_be_made_identical(self, table: dict) -> None:
+        """C-14: every external corpus states its own ingestion and label deviations,
+        and the file would rather carry an awkward one than drop it."""
+        for row in table["rows"]:
+            for corpus in ("ptbxl", "sph", "acs"):
+                assert row["by_corpus"][corpus]["deviations"], corpus
+        deviations = " ".join(table["rows"][0]["by_corpus"]["acs"]["deviations"])
+        assert "acute" in deviations, "the label mismatch Chongqing carries must be on the file"
+
+    def test_the_prevalences_are_the_ones_the_study_is_built_on(self, table: dict) -> None:
+        for corpus, expected in self.PREVALENCE.items():
+            got = table["rows"][0]["by_corpus"][corpus]["prevalence"]
+            assert got == pytest.approx(expected, abs=5e-4), corpus
+
+    def test_every_corpus_names_the_commit_that_scored_it(self, table: dict) -> None:
+        for corpus in ("ptbxl", "sph", "acs"):
+            assert len(table["corpora"][corpus]["git_commit"]) == 40, corpus
+        assert len(table["git_commit"]) == 40
+
+    def test_every_corpus_was_scored_whole_against_what_ingestion_kept(self, table: dict) -> None:
+        """The external corpora are not subsampled: the row count on the table is
+        the count the score file wrote, and that is the corpus minus its named
+        exclusions."""
+        for corpus in ("sph", "acs"):
+            sidecar = json.loads((RESULTS_DIR / f"external/{corpus}.json").read_text())
+            assert table["rows"][0]["by_corpus"][corpus]["n_points"] == sidecar["n_scored"]
+            assert table["corpora"][corpus]["n_scored"] == sidecar["n_scored"]
+
+    def test_where_it_was_calibrated_the_guarantee_still_holds(self, table: dict) -> None:
+        """The control that licenses reading the other two panels: on the PTB-XL
+        patients the threshold was not fitted on, coverage lands where it was
+        asked to. A break there would mean the harness, not the hospital."""
+        for row in table["rows"]:
+            block = row["by_corpus"]["ptbxl"]
+            got, target = block["coverage"]["mean"], row["target_coverage"]
+            low, high = target + COVERAGE_BAND[0], target + COVERAGE_BAND[1]
+            assert low <= got <= high, (row["score"], row["correction"], target, got)

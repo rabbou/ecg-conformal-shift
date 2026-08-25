@@ -1,0 +1,61 @@
+{
+  "corpus": "sph",
+  "title": "Shandong Provincial Hospital",
+  "model": "the PTB-XL supervised baseline, frozen: no fine-tuning, no per-corpus preprocessing, one forward pass",
+  "checkpoint": "results/baseline/model.pt",
+  "baseline_config": {
+    "epochs": 15,
+    "learning_rate": 0.001,
+    "batch_size": 64,
+    "weight_decay": 0.01,
+    "patience": 3,
+    "seed": 0,
+    "bootstrap_draws": 1000,
+    "label_spec": {
+      "include_injury": true,
+      "min_likelihood": 0.0,
+      "chronic_only": false
+    },
+    "split": "PTB-XL strat_fold: 1-8 train, 9 validation, 10 test",
+    "standardisation": {
+      "centre_mv": -0.0007768306531943381,
+      "scale_mv": 0.23706911504268646
+    },
+    "n_train": 17418,
+    "n_validation": 2183,
+    "n_test": 2198,
+    "max_records": null,
+    "machine": {
+      "cpu": "Intel(R) Core(TM) i7-8700 CPU @ 3.20GHz",
+      "platform": "Linux-6.8.0-136-generic-x86_64-with-glibc2.39",
+      "python": "3.11.15",
+      "torch": "2.2.2+cu121",
+      "torch_threads": 6
+    }
+  },
+  "standardisation": {
+    "centre_mv": -0.0007768306531943381,
+    "scale_mv": 0.23706911504268646
+  },
+  "seed": 0,
+  "max_records": null,
+  "git_commit": "13a43574bd481d2cf562eb44a7e9d928fa5d1dbc",
+  "n_scored": 25770,
+  "n_positive": 260,
+  "prevalence": 0.010089251067132324,
+  "n_excluded": 0,
+  "excluded": {},
+  "deviations": [
+    "lead order and sampling rate are not in the record (no HDF5 attributes); taken from Liu et al. 2022, Data Records",
+    "the label is AHA category M (160, 161, 165, 166); 233 of its 260 positives carry the 'old' modifier, so the class is a chronic infarct pattern as PTB-XL's is",
+    "6928 of 25770 records longer than ten seconds, cropped"
+  ],
+  "seconds": 259.4,
+  "machine": {
+    "cpu": "Intel(R) Core(TM) i7-8700 CPU @ 3.20GHz",
+    "platform": "Linux-6.8.0-136-generic-x86_64-with-glibc2.39",
+    "python": "3.11.15",
+    "torch": "2.2.2+cu121",
+    "torch_threads": 6
+  }
+}

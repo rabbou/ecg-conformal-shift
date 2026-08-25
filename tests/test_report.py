@@ -13,6 +13,8 @@ for every encoder arm.
 from __future__ import annotations
 
 import json
+import subprocess
+from pathlib import Path
 
 import numpy as np
 import pytest
@@ -191,3 +193,43 @@ class TestTheEncoderArmsOnRecord:
         for sidecar in sidecars:
             expected = ingest[sidecar["corpus"]]["n_kept"]
             assert sidecar["n_kept"] == expected, (sidecar["arm"], sidecar["corpus"])
+
+
+class TestTheFigures:
+    """C-20: the report holds exactly the figures the plan named, each one
+    redrawn by a script from a results file that is already committed."""
+
+    NAMED = {
+        1: ("fig1_coverage.png", RESULTS_DIR / "abstention.json"),
+        2: ("fig2_set_sizes.png", RESULTS_DIR / "abstention.json"),
+        4: ("fig4_discrimination.png", RESULTS_DIR / "baseline/metrics.json"),
+    }
+
+    def test_each_figure_redraws_from_the_committed_numbers(self, tmp_path: Path) -> None:
+        import figures
+
+        assert figures.main(["--figure", "1", "2", "4", "--out", str(tmp_path)]) == 0
+        for number, (name, _source) in self.NAMED.items():
+            drawn = tmp_path / name
+            assert drawn.exists(), number
+            assert drawn.stat().st_size > 10_000, f"{name} is too small to hold a plot"
+
+    def test_the_file_each_one_is_drawn_from_is_already_committed(self) -> None:
+        for number, (_name, source) in self.NAMED.items():
+            tracked = subprocess.run(
+                ["git", "ls-files", "--error-unmatch", str(source)],
+                capture_output=True,
+                text=True,
+                cwd=RESULTS_DIR.parent,
+                check=False,
+            )
+            assert tracked.returncode == 0, f"figure {number} draws from an uncommitted {source}"
+
+    def test_figure_three_says_what_it_is_waiting_for_rather_than_drawing_empty(
+        self, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        import figures
+
+        assert figures.main(["--figure", "3", "--out", str(tmp_path)]) == 0
+        assert not list(tmp_path.glob("*.png"))
+        assert "Shandong and Chongqing" in capsys.readouterr().err

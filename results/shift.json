@@ -1,0 +1,2481 @@
+{
+  "question": "what a coverage guarantee calibrated on PTB-XL is worth at two other hospitals",
+  "protocol": "the threshold is fitted on half the PTB-XL fold-10 patients and spent unchanged on the other half, on all of Shandong and on all of Chongqing; the external corpora are scored once, never re-calibrated on themselves, and nothing is tuned on them (C-20). The spread is over the calibration draw alone, since the targets are fixed",
+  "calibrated_on": "ptbxl",
+  "corrections": {
+    "none": "one threshold shared by both classes",
+    "mondrian": "one threshold per class, each fitted inside that class on PTB-XL"
+  },
+  "classes": {
+    "0": "no infarction",
+    "1": "infarction"
+  },
+  "n_draws": 200,
+  "seed": 0,
+  "git_commit": "120d1715925965c4501931062b40e56d4b0a4ca0",
+  "corpora": {
+    "sph": {
+      "title": "Shandong Provincial Hospital",
+      "checkpoint": "results/baseline/model.pt",
+      "git_commit": "13a43574bd481d2cf562eb44a7e9d928fa5d1dbc",
+      "seed": 0,
+      "n_scored": 25770,
+      "n_excluded": 0
+    },
+    "acs": {
+      "title": "Chongqing ACS-ECG",
+      "checkpoint": "results/baseline/model.pt",
+      "git_commit": "13a43574bd481d2cf562eb44a7e9d928fa5d1dbc",
+      "seed": 0,
+      "n_scored": 17955,
+      "n_excluded": 5
+    },
+    "ptbxl": {
+      "title": "PTB-XL fold 10, the half not used to calibrate at each draw",
+      "checkpoint": "results/baseline/scores.npz",
+      "git_commit": "8cefa979acc717c076a49416699999807476c10c",
+      "seed": 0,
+      "n_scored": 2198,
+      "n_excluded": 0
+    }
+  },
+  "seconds": 9.6,
+  "rows": [
+    {
+      "alpha": 0.2,
+      "target_coverage": 0.8,
+      "score": "lac",
+      "correction": "none",
+      "calibrated_on": "ptbxl",
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.34483979612588883,
+          "sd": 0.01880718898234257,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.34483979612588883,
+          "sd": 0.01880718898234257,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      },
+      "calibration": {
+        "weighting": "uniform: no correction here reweights the calibration sample",
+        "n": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "effective_sample_size": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 824.015,
+            "sd": 14.027065546264335,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 274.775,
+            "sd": 12.929043888834045,
+            "n_draws": 200
+          }
+        }
+      },
+      "by_corpus": {
+        "ptbxl": {
+          "n_points": 2198,
+          "n_patients": 1904,
+          "prevalence": 0.2502274795268426,
+          "deviations": [
+            "the label is the SCP-ECG MI superclass as shipped, subendocardial-injury statements included and no likelihood floor; dropping the injury statements moves the positive count from 5,469 to 5,288",
+            "the infarct patterns PTB-XL records are undated, so the class is read as a chronic pattern rather than an acute event"
+          ],
+          "coverage": {
+            "mean": 0.7999705824323743,
+            "sd": 0.01931961063998766,
+            "n_draws": 200
+          },
+          "empty_rate": {
+            "mean": 0.1342989925751424,
+            "sd": 0.02102702575768415,
+            "n_draws": 200
+          },
+          "one_label_rate": {
+            "mean": 0.8657010074248577,
+            "sd": 0.021027025757684146,
+            "n_draws": 200
+          },
+          "two_label_rate": {
+            "mean": 0.0,
+            "sd": 0.0,
+            "n_draws": 200
+          },
+          "abstention_rate": {
+            "mean": 0.1342989925751424,
+            "sd": 0.02102702575768415,
+            "n_draws": 200
+          },
+          "mean_set_size": {
+            "mean": 0.8657010074248577,
+            "sd": 0.021027025757684146,
+            "n_draws": 200
+          },
+          "coverage_by_class": {
+            "0": {
+              "mean": 0.8841725965712378,
+              "sd": 0.013812211098450907,
+              "n_draws": 200
+            },
+            "1": {
+              "mean": 0.5480182039878472,
+              "sd": 0.03809143133507362,
+              "n_draws": 200
+            }
+          }
+        },
+        "sph": {
+          "n_points": 25770,
+          "n_patients": 24666,
+          "prevalence": 0.010089251067132324,
+          "deviations": [
+            "lead order and sampling rate are not in the record (no HDF5 attributes); taken from Liu et al. 2022, Data Records",
+            "the label is AHA category M (160, 161, 165, 166); 233 of its 260 positives carry the 'old' modifier, so the class is a chronic infarct pattern as PTB-XL's is",
+            "6928 of 25770 records longer than ten seconds, cropped"
+          ],
+          "coverage": {
+            "mean": 0.890628831975165,
+            "sd": 0.006792156228097493,
+            "n_draws": 200
+          },
+          "empty_rate": {
+            "mean": 0.0724231664726426,
+            "sd": 0.009894616831560099,
+            "n_draws": 200
+          },
+          "one_label_rate": {
+            "mean": 0.9275768335273574,
+            "sd": 0.0098946168315601,
+            "n_draws": 200
+          },
+          "two_label_rate": {
+            "mean": 0.0,
+            "sd": 0.0,
+            "n_draws": 200
+          },
+          "abstention_rate": {
+            "mean": 0.0724231664726426,
+            "sd": 0.009894616831560099,
+            "n_draws": 200
+          },
+          "mean_set_size": {
+            "mean": 0.9275768335273574,
+            "sd": 0.0098946168315601,
+            "n_draws": 200
+          },
+          "coverage_by_class": {
+            "0": {
+              "mean": 0.8907157977263819,
+              "sd": 0.006756650013331084,
+              "n_draws": 200
+            },
+            "1": {
+              "mean": 0.8820961538461538,
+              "sd": 0.010814125181459562,
+              "n_draws": 200
+            }
+          }
+        },
+        "acs": {
+          "n_points": 17955,
+          "n_patients": 17018,
+          "prevalence": 0.1492063492063492,
+          "deviations": [
+            "only the 17960 records of CSV/train.csv carry labels; the published test split withholds them, so the remaining waveforms on disk are not scored",
+            "the label is the corpus's own AMI column, read from a coronary angiogram rather than from the tracing, and acute by construction; PTB-XL's and Shandong's positives are dominated by the chronic infarct pattern, so the two label sets name different clinical events and no re-coding here makes them the same",
+            "5 of 17960 records excluded: see the excluded field"
+          ],
+          "coverage": {
+            "mean": 0.6586218323586744,
+            "sd": 0.011125824281477605,
+            "n_draws": 200
+          },
+          "empty_rate": {
+            "mean": 0.15262907268170425,
+            "sd": 0.019356539166035486,
+            "n_draws": 200
+          },
+          "one_label_rate": {
+            "mean": 0.8473709273182958,
+            "sd": 0.01935653916603549,
+            "n_draws": 200
+          },
+          "two_label_rate": {
+            "mean": 0.0,
+            "sd": 0.0,
+            "n_draws": 200
+          },
+          "abstention_rate": {
+            "mean": 0.15262907268170425,
+            "sd": 0.019356539166035486,
+            "n_draws": 200
+          },
+          "mean_set_size": {
+            "mean": 0.8473709273182958,
+            "sd": 0.01935653916603549,
+            "n_draws": 200
+          },
+          "coverage_by_class": {
+            "0": {
+              "mean": 0.6680806493846557,
+              "sd": 0.011196577523883807,
+              "n_draws": 200
+            },
+            "1": {
+              "mean": 0.6046864501679731,
+              "sd": 0.010739659643282697,
+              "n_draws": 200
+            }
+          }
+        }
+      }
+    },
+    {
+      "alpha": 0.2,
+      "target_coverage": 0.8,
+      "score": "lac",
+      "correction": "mondrian",
+      "calibrated_on": "ptbxl",
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.20981380254030227,
+          "sd": 0.011576476945968561,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.6518929520249367,
+          "sd": 0.02970191777940699,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      },
+      "calibration": {
+        "weighting": "uniform: no correction here reweights the calibration sample",
+        "n": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "effective_sample_size": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 824.015,
+            "sd": 14.027065546264335,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 274.775,
+            "sd": 12.929043888834045,
+            "n_draws": 200
+          }
+        }
+      },
+      "by_corpus": {
+        "ptbxl": {
+          "n_points": 2198,
+          "n_patients": 1904,
+          "prevalence": 0.2502274795268426,
+          "deviations": [
+            "the label is the SCP-ECG MI superclass as shipped, subendocardial-injury statements included and no likelihood floor; dropping the injury statements moves the positive count from 5,469 to 5,288",
+            "the infarct patterns PTB-XL records are undated, so the class is read as a chronic pattern rather than an acute event"
+          ],
+          "coverage": {
+            "mean": 0.8006039986016971,
+            "sd": 0.017911261201046327,
+            "n_draws": 200
+          },
+          "empty_rate": {
+            "mean": 0.08949267964848547,
+            "sd": 0.020372763690894503,
+            "n_draws": 200
+          },
+          "one_label_rate": {
+            "mean": 0.9105073203515144,
+            "sd": 0.020372763690894503,
+            "n_draws": 200
+          },
+          "two_label_rate": {
+            "mean": 0.0,
+            "sd": 0.0,
+            "n_draws": 200
+          },
+          "abstention_rate": {
+            "mean": 0.08949267964848547,
+            "sd": 0.020372763690894503,
+            "n_draws": 200
+          },
+          "mean_set_size": {
+            "mean": 0.9105073203515144,
+            "sd": 0.020372763690894503,
+            "n_draws": 200
+          },
+          "coverage_by_class": {
+            "0": {
+              "mean": 0.8000981163650303,
+              "sd": 0.02070161796379324,
+              "n_draws": 200
+            },
+            "1": {
+              "mean": 0.80202307025859,
+              "sd": 0.03557991508347185,
+              "n_draws": 200
+            }
+          }
+        },
+        "sph": {
+          "n_points": 25770,
+          "n_patients": 24666,
+          "prevalence": 0.010089251067132324,
+          "deviations": [
+            "lead order and sampling rate are not in the record (no HDF5 attributes); taken from Liu et al. 2022, Data Records",
+            "the label is AHA category M (160, 161, 165, 166); 233 of its 260 positives carry the 'old' modifier, so the class is a chronic infarct pattern as PTB-XL's is",
+            "6928 of 25770 records longer than ten seconds, cropped"
+          ],
+          "coverage": {
+            "mean": 0.8238116026387271,
+            "sd": 0.008323578096379937,
+            "n_draws": 200
+          },
+          "empty_rate": {
+            "mean": 0.06827551416375631,
+            "sd": 0.01391328233824923,
+            "n_draws": 200
+          },
+          "one_label_rate": {
+            "mean": 0.9317244858362437,
+            "sd": 0.01391328233824923,
+            "n_draws": 200
+          },
+          "two_label_rate": {
+            "mean": 0.0,
+            "sd": 0.0,
+            "n_draws": 200
+          },
+          "abstention_rate": {
+            "mean": 0.06827551416375631,
+            "sd": 0.01391328233824923,
+            "n_draws": 200
+          },
+          "mean_set_size": {
+            "mean": 0.9317244858362437,
+            "sd": 0.01391328233824923,
+            "n_draws": 200
+          },
+          "coverage_by_class": {
+            "0": {
+              "mean": 0.8224588396707173,
+              "sd": 0.008405516142332113,
+              "n_draws": 200
+            },
+            "1": {
+              "mean": 0.9565384615384616,
+              "sd": 0.00654351881546155,
+              "n_draws": 200
+            }
+          }
+        },
+        "acs": {
+          "n_points": 17955,
+          "n_patients": 17018,
+          "prevalence": 0.1492063492063492,
+          "deviations": [
+            "only the 17960 records of CSV/train.csv carry labels; the published test split withholds them, so the remaining waveforms on disk are not scored",
+            "the label is the corpus's own AMI column, read from a coronary angiogram rather than from the tracing, and acute by construction; PTB-XL's and Shandong's positives are dominated by the chronic infarct pattern, so the two label sets name different clinical events and no re-coding here makes them the same",
+            "5 of 17960 records excluded: see the excluded field"
+          ],
+          "coverage": {
+            "mean": 0.599332776385408,
+            "sd": 0.00972154938478399,
+            "n_draws": 200
+          },
+          "empty_rate": {
+            "mean": 0.09617627401837929,
+            "sd": 0.020527714082366845,
+            "n_draws": 200
+          },
+          "one_label_rate": {
+            "mean": 0.9038237259816208,
+            "sd": 0.020527714082366845,
+            "n_draws": 200
+          },
+          "two_label_rate": {
+            "mean": 0.0,
+            "sd": 0.0,
+            "n_draws": 200
+          },
+          "abstention_rate": {
+            "mean": 0.09617627401837929,
+            "sd": 0.020527714082366845,
+            "n_draws": 200
+          },
+          "mean_set_size": {
+            "mean": 0.9038237259816208,
+            "sd": 0.020527714082366845,
+            "n_draws": 200
+          },
+          "coverage_by_class": {
+            "0": {
+              "mean": 0.5701269965959677,
+              "sd": 0.010991934579242593,
+              "n_draws": 200
+            },
+            "1": {
+              "mean": 0.7658678611422173,
+              "sd": 0.015778467462564293,
+              "n_draws": 200
+            }
+          }
+        }
+      }
+    },
+    {
+      "alpha": 0.2,
+      "target_coverage": 0.8,
+      "score": "aps",
+      "correction": "none",
+      "calibrated_on": "ptbxl",
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.7883370700591534,
+          "sd": 0.01135888419502888,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.7883370700591534,
+          "sd": 0.01135888419502888,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      },
+      "calibration": {
+        "weighting": "uniform: no correction here reweights the calibration sample",
+        "n": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "effective_sample_size": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 824.015,
+            "sd": 14.027065546264335,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 274.775,
+            "sd": 12.929043888834045,
+            "n_draws": 200
+          }
+        }
+      },
+      "by_corpus": {
+        "ptbxl": {
+          "n_points": 2198,
+          "n_patients": 1904,
+          "prevalence": 0.2502274795268426,
+          "deviations": [
+            "the label is the SCP-ECG MI superclass as shipped, subendocardial-injury statements included and no likelihood floor; dropping the injury statements moves the positive count from 5,469 to 5,288",
+            "the infarct patterns PTB-XL records are undated, so the class is read as a chronic pattern rather than an acute event"
+          ],
+          "coverage": {
+            "mean": 0.7995986556610393,
+            "sd": 0.016925634834966136,
+            "n_draws": 200
+          },
+          "empty_rate": {
+            "mean": 0.1169852663832108,
+            "sd": 0.012270899349733917,
+            "n_draws": 200
+          },
+          "one_label_rate": {
+            "mean": 0.790716640097552,
+            "sd": 0.01155165196512199,
+            "n_draws": 200
+          },
+          "two_label_rate": {
+            "mean": 0.09229809351923719,
+            "sd": 0.010749884290046625,
+            "n_draws": 200
+          },
+          "abstention_rate": {
+            "mean": 0.209283359902448,
+            "sd": 0.011551651965121992,
+            "n_draws": 200
+          },
+          "mean_set_size": {
+            "mean": 0.9753128271360265,
+            "sd": 0.019970711131005733,
+            "n_draws": 200
+          },
+          "coverage_by_class": {
+            "0": {
+              "mean": 0.8295418877097731,
+              "sd": 0.01615252261451682,
+              "n_draws": 200
+            },
+            "1": {
+              "mean": 0.7099261807622196,
+              "sd": 0.029058684455105007,
+              "n_draws": 200
+            }
+          }
+        },
+        "sph": {
+          "n_points": 25770,
+          "n_patients": 24666,
+          "prevalence": 0.010089251067132324,
+          "deviations": [
+            "lead order and sampling rate are not in the record (no HDF5 attributes); taken from Liu et al. 2022, Data Records",
+            "the label is AHA category M (160, 161, 165, 166); 233 of its 260 positives carry the 'old' modifier, so the class is a chronic infarct pattern as PTB-XL's is",
+            "6928 of 25770 records longer than ten seconds, cropped"
+          ],
+          "coverage": {
+            "mean": 0.8154736127279781,
+            "sd": 0.011776182614247347,
+            "n_draws": 200
+          },
+          "empty_rate": {
+            "mean": 0.13911951882033372,
+            "sd": 0.010552083661395803,
+            "n_draws": 200
+          },
+          "one_label_rate": {
+            "mean": 0.807140279394645,
+            "sd": 0.005412343868813155,
+            "n_draws": 200
+          },
+          "two_label_rate": {
+            "mean": 0.05374020178502135,
+            "sd": 0.00561833299635904,
+            "n_draws": 200
+          },
+          "abstention_rate": {
+            "mean": 0.19285972060535506,
+            "sd": 0.005412343868813158,
+            "n_draws": 200
+          },
+          "mean_set_size": {
+            "mean": 0.9146206829646877,
+            "sd": 0.016016579046596265,
+            "n_draws": 200
+          },
+          "coverage_by_class": {
+            "0": {
+              "mean": 0.815421207369659,
+              "sd": 0.01177777929609499,
+              "n_draws": 200
+            },
+            "1": {
+              "mean": 0.8206153846153846,
+              "sd": 0.024058001335638596,
+              "n_draws": 200
+            }
+          }
+        },
+        "acs": {
+          "n_points": 17955,
+          "n_patients": 17018,
+          "prevalence": 0.1492063492063492,
+          "deviations": [
+            "only the 17960 records of CSV/train.csv carry labels; the published test split withholds them, so the remaining waveforms on disk are not scored",
+            "the label is the corpus's own AMI column, read from a coronary angiogram rather than from the tracing, and acute by construction; PTB-XL's and Shandong's positives are dominated by the chronic infarct pattern, so the two label sets name different clinical events and no re-coding here makes them the same",
+            "5 of 17960 records excluded: see the excluded field"
+          ],
+          "coverage": {
+            "mean": 0.70292425508215,
+            "sd": 0.011451997064790696,
+            "n_draws": 200
+          },
+          "empty_rate": {
+            "mean": 0.10347173489278752,
+            "sd": 0.008643771025540698,
+            "n_draws": 200
+          },
+          "one_label_rate": {
+            "mean": 0.7881136173767753,
+            "sd": 0.0037190145233678288,
+            "n_draws": 200
+          },
+          "two_label_rate": {
+            "mean": 0.10841464773043721,
+            "sd": 0.01082908728732361,
+            "n_draws": 200
+          },
+          "abstention_rate": {
+            "mean": 0.2118863826232247,
+            "sd": 0.0037190145233678335,
+            "n_draws": 200
+          },
+          "mean_set_size": {
+            "mean": 1.0049429128376497,
+            "sd": 0.019238938354594323,
+            "n_draws": 200
+          },
+          "coverage_by_class": {
+            "0": {
+              "mean": 0.7099122807017545,
+              "sd": 0.011326498184980724,
+              "n_draws": 200
+            },
+            "1": {
+              "mean": 0.6630776409107875,
+              "sd": 0.013719321423626963,
+              "n_draws": 200
+            }
+          }
+        }
+      }
+    },
+    {
+      "alpha": 0.2,
+      "target_coverage": 0.8,
+      "score": "aps",
+      "correction": "mondrian",
+      "calibrated_on": "ptbxl",
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.758758923742165,
+          "sd": 0.013983493273816238,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.8661745794129975,
+          "sd": 0.01604285579413421,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      },
+      "calibration": {
+        "weighting": "uniform: no correction here reweights the calibration sample",
+        "n": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "effective_sample_size": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 824.015,
+            "sd": 14.027065546264335,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 274.775,
+            "sd": 12.929043888834045,
+            "n_draws": 200
+          }
+        }
+      },
+      "by_corpus": {
+        "ptbxl": {
+          "n_points": 2198,
+          "n_patients": 1904,
+          "prevalence": 0.2502274795268426,
+          "deviations": [
+            "the label is the SCP-ECG MI superclass as shipped, subendocardial-injury statements included and no likelihood floor; dropping the injury statements moves the positive count from 5,469 to 5,288",
+            "the infarct patterns PTB-XL records are undated, so the class is read as a chronic pattern rather than an acute event"
+          ],
+          "coverage": {
+            "mean": 0.7989896464329889,
+            "sd": 0.0169733373551803,
+            "n_draws": 200
+          },
+          "empty_rate": {
+            "mean": 0.12757346837393171,
+            "sd": 0.013283398097522568,
+            "n_draws": 200
+          },
+          "one_label_rate": {
+            "mean": 0.7345141577139124,
+            "sd": 0.016956810883036195,
+            "n_draws": 200
+          },
+          "two_label_rate": {
+            "mean": 0.1379123739121559,
+            "sd": 0.01622026328730539,
+            "n_draws": 200
+          },
+          "abstention_rate": {
+            "mean": 0.2654858422860877,
+            "sd": 0.0169568108830362,
+            "n_draws": 200
+          },
+          "mean_set_size": {
+            "mean": 1.0103389055382244,
+            "sd": 0.024321960795348957,
+            "n_draws": 200
+          },
+          "coverage_by_class": {
+            "0": {
+              "mean": 0.7989295095096253,
+              "sd": 0.019954999670769552,
+              "n_draws": 200
+            },
+            "1": {
+              "mean": 0.7992638911614651,
+              "sd": 0.034107520613506255,
+              "n_draws": 200
+            }
+          }
+        },
+        "sph": {
+          "n_points": 25770,
+          "n_patients": 24666,
+          "prevalence": 0.010089251067132324,
+          "deviations": [
+            "lead order and sampling rate are not in the record (no HDF5 attributes); taken from Liu et al. 2022, Data Records",
+            "the label is AHA category M (160, 161, 165, 166); 233 of its 260 positives carry the 'old' modifier, so the class is a chronic infarct pattern as PTB-XL's is",
+            "6928 of 25770 records longer than ten seconds, cropped"
+          ],
+          "coverage": {
+            "mean": 0.786640473418704,
+            "sd": 0.01433322529127088,
+            "n_draws": 200
+          },
+          "empty_rate": {
+            "mean": 0.161697904540163,
+            "sd": 0.012409376562577554,
+            "n_draws": 200
+          },
+          "one_label_rate": {
+            "mean": 0.7465011641443539,
+            "sd": 0.015689265072963338,
+            "n_draws": 200
+          },
+          "two_label_rate": {
+            "mean": 0.09180093131548311,
+            "sd": 0.012657862877400877,
+            "n_draws": 200
+          },
+          "abstention_rate": {
+            "mean": 0.2534988358556461,
+            "sd": 0.015689265072963338,
+            "n_draws": 200
+          },
+          "mean_set_size": {
+            "mean": 0.9301030267753202,
+            "sd": 0.019551859248167613,
+            "n_draws": 200
+          },
+          "coverage_by_class": {
+            "0": {
+              "mean": 0.7855721285770286,
+              "sd": 0.014480693632449566,
+              "n_draws": 200
+            },
+            "1": {
+              "mean": 0.8914615384615385,
+              "sd": 0.022457079477557942,
+              "n_draws": 200
+            }
+          }
+        },
+        "acs": {
+          "n_points": 17955,
+          "n_patients": 17018,
+          "prevalence": 0.1492063492063492,
+          "deviations": [
+            "only the 17960 records of CSV/train.csv carry labels; the published test split withholds them, so the remaining waveforms on disk are not scored",
+            "the label is the corpus's own AMI column, read from a coronary angiogram rather than from the tracing, and acute by construction; PTB-XL's and Shandong's positives are dominated by the chronic infarct pattern, so the two label sets name different clinical events and no re-coding here makes them the same",
+            "5 of 17960 records excluded: see the excluded field"
+          ],
+          "coverage": {
+            "mean": 0.6909003063213589,
+            "sd": 0.01193706352894165,
+            "n_draws": 200
+          },
+          "empty_rate": {
+            "mean": 0.10474825953773323,
+            "sd": 0.008273315980256914,
+            "n_draws": 200
+          },
+          "one_label_rate": {
+            "mean": 0.7394622667780562,
+            "sd": 0.013446287147155535,
+            "n_draws": 200
+          },
+          "two_label_rate": {
+            "mean": 0.15578947368421056,
+            "sd": 0.016905333721242376,
+            "n_draws": 200
+          },
+          "abstention_rate": {
+            "mean": 0.26053773322194373,
+            "sd": 0.013446287147155535,
+            "n_draws": 200
+          },
+          "mean_set_size": {
+            "mean": 1.0510412141464773,
+            "sd": 0.022971144791405974,
+            "n_draws": 200
+          },
+          "coverage_by_class": {
+            "0": {
+              "mean": 0.6810464126734748,
+              "sd": 0.013596877547427657,
+              "n_draws": 200
+            },
+            "1": {
+              "mean": 0.7470884658454647,
+              "sd": 0.0198858100321668,
+              "n_draws": 200
+            }
+          }
+        }
+      }
+    },
+    {
+      "alpha": 0.1,
+      "target_coverage": 0.9,
+      "score": "lac",
+      "correction": "none",
+      "calibrated_on": "ptbxl",
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.5659704312682152,
+          "sd": 0.018056888321604708,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.5659704312682152,
+          "sd": 0.018056888321604708,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      },
+      "calibration": {
+        "weighting": "uniform: no correction here reweights the calibration sample",
+        "n": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "effective_sample_size": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 824.015,
+            "sd": 14.027065546264335,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 274.775,
+            "sd": 12.929043888834045,
+            "n_draws": 200
+          }
+        }
+      },
+      "by_corpus": {
+        "ptbxl": {
+          "n_points": 2198,
+          "n_patients": 1904,
+          "prevalence": 0.2502274795268426,
+          "deviations": [
+            "the label is the SCP-ECG MI superclass as shipped, subendocardial-injury statements included and no likelihood floor; dropping the injury statements moves the positive count from 5,469 to 5,288",
+            "the infarct patterns PTB-XL records are undated, so the class is read as a chronic pattern rather than an acute event"
+          ],
+          "coverage": {
+            "mean": 0.8998879340752071,
+            "sd": 0.013255375290888577,
+            "n_draws": 200
+          },
+          "empty_rate": {
+            "mean": 0.0,
+            "sd": 0.0,
+            "n_draws": 200
+          },
+          "one_label_rate": {
+            "mean": 0.9477799413546477,
+            "sd": 0.016089518690059854,
+            "n_draws": 200
+          },
+          "two_label_rate": {
+            "mean": 0.05222005864535234,
+            "sd": 0.016089518690059857,
+            "n_draws": 200
+          },
+          "abstention_rate": {
+            "mean": 0.05222005864535234,
+            "sd": 0.016089518690059857,
+            "n_draws": 200
+          },
+          "mean_set_size": {
+            "mean": 1.0522200586453523,
+            "sd": 0.016089518690059857,
+            "n_draws": 200
+          },
+          "coverage_by_class": {
+            "0": {
+              "mean": 0.9550754380151111,
+              "sd": 0.008999979304472445,
+              "n_draws": 200
+            },
+            "1": {
+              "mean": 0.7346896019671594,
+              "sd": 0.030317608240003343,
+              "n_draws": 200
+            }
+          }
+        },
+        "sph": {
+          "n_points": 25770,
+          "n_patients": 24666,
+          "prevalence": 0.010089251067132324,
+          "deviations": [
+            "lead order and sampling rate are not in the record (no HDF5 attributes); taken from Liu et al. 2022, Data Records",
+            "the label is AHA category M (160, 161, 165, 166); 233 of its 260 positives carry the 'old' modifier, so the class is a chronic infarct pattern as PTB-XL's is",
+            "6928 of 25770 records longer than ten seconds, cropped"
+          ],
+          "coverage": {
+            "mean": 0.9475838183934807,
+            "sd": 0.0034450232807571165,
+            "n_draws": 200
+          },
+          "empty_rate": {
+            "mean": 0.0,
+            "sd": 0.0,
+            "n_draws": 200
+          },
+          "one_label_rate": {
+            "mean": 0.9696422196352347,
+            "sd": 0.008085813940028514,
+            "n_draws": 200
+          },
+          "two_label_rate": {
+            "mean": 0.03035778036476523,
+            "sd": 0.008085813940028516,
+            "n_draws": 200
+          },
+          "abstention_rate": {
+            "mean": 0.03035778036476523,
+            "sd": 0.008085813940028516,
+            "n_draws": 200
+          },
+          "mean_set_size": {
+            "mean": 1.0303577803647652,
+            "sd": 0.008085813940028526,
+            "n_draws": 200
+          },
+          "coverage_by_class": {
+            "0": {
+              "mean": 0.9477026656213249,
+              "sd": 0.003458204644600659,
+              "n_draws": 200
+            },
+            "1": {
+              "mean": 0.9359230769230769,
+              "sd": 0.003436645450099444,
+              "n_draws": 200
+            }
+          }
+        },
+        "acs": {
+          "n_points": 17955,
+          "n_patients": 17018,
+          "prevalence": 0.1492063492063492,
+          "deviations": [
+            "only the 17960 records of CSV/train.csv carry labels; the published test split withholds them, so the remaining waveforms on disk are not scored",
+            "the label is the corpus's own AMI column, read from a coronary angiogram rather than from the tracing, and acute by construction; PTB-XL's and Shandong's positives are dominated by the chronic infarct pattern, so the two label sets name different clinical events and no re-coding here makes them the same",
+            "5 of 17960 records excluded: see the excluded field"
+          ],
+          "coverage": {
+            "mean": 0.7713558897243107,
+            "sd": 0.008197773624179918,
+            "n_draws": 200
+          },
+          "empty_rate": {
+            "mean": 0.0,
+            "sd": 0.0,
+            "n_draws": 200
+          },
+          "one_label_rate": {
+            "mean": 0.9377852965747703,
+            "sd": 0.01725791061752641,
+            "n_draws": 200
+          },
+          "two_label_rate": {
+            "mean": 0.062214703425229737,
+            "sd": 0.017257910617526406,
+            "n_draws": 200
+          },
+          "abstention_rate": {
+            "mean": 0.062214703425229737,
+            "sd": 0.017257910617526406,
+            "n_draws": 200
+          },
+          "mean_set_size": {
+            "mean": 1.0622147034252296,
+            "sd": 0.017257910617526406,
+            "n_draws": 200
+          },
+          "coverage_by_class": {
+            "0": {
+              "mean": 0.7795427467923539,
+              "sd": 0.008232759177165561,
+              "n_draws": 200
+            },
+            "1": {
+              "mean": 0.7246733855916386,
+              "sd": 0.008016839047796437,
+              "n_draws": 200
+            }
+          }
+        }
+      }
+    },
+    {
+      "alpha": 0.1,
+      "target_coverage": 0.9,
+      "score": "lac",
+      "correction": "mondrian",
+      "calibrated_on": "ptbxl",
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.38824841886758804,
+          "sd": 0.019896059150677735,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.7871697789430618,
+          "sd": 0.01982082492381366,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      },
+      "calibration": {
+        "weighting": "uniform: no correction here reweights the calibration sample",
+        "n": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "effective_sample_size": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 824.015,
+            "sd": 14.027065546264335,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 274.775,
+            "sd": 12.929043888834045,
+            "n_draws": 200
+          }
+        }
+      },
+      "by_corpus": {
+        "ptbxl": {
+          "n_points": 2198,
+          "n_patients": 1904,
+          "prevalence": 0.2502274795268426,
+          "deviations": [
+            "the label is the SCP-ECG MI superclass as shipped, subendocardial-injury statements included and no likelihood floor; dropping the injury statements moves the positive count from 5,469 to 5,288",
+            "the infarct patterns PTB-XL records are undated, so the class is read as a chronic pattern rather than an acute event"
+          ],
+          "coverage": {
+            "mean": 0.9010107341330439,
+            "sd": 0.013457466597522588,
+            "n_draws": 200
+          },
+          "empty_rate": {
+            "mean": 0.0,
+            "sd": 0.0,
+            "n_draws": 200
+          },
+          "one_label_rate": {
+            "mean": 0.8948753213079818,
+            "sd": 0.021818031024385634,
+            "n_draws": 200
+          },
+          "two_label_rate": {
+            "mean": 0.10512467869201832,
+            "sd": 0.021818031024385634,
+            "n_draws": 200
+          },
+          "abstention_rate": {
+            "mean": 0.10512467869201832,
+            "sd": 0.021818031024385634,
+            "n_draws": 200
+          },
+          "mean_set_size": {
+            "mean": 1.1051246786920184,
+            "sd": 0.02181803102438564,
+            "n_draws": 200
+          },
+          "coverage_by_class": {
+            "0": {
+              "mean": 0.9008622523813803,
+              "sd": 0.015728069725842616,
+              "n_draws": 200
+            },
+            "1": {
+              "mean": 0.9014086836808219,
+              "sd": 0.02483134612700285,
+              "n_draws": 200
+            }
+          }
+        },
+        "sph": {
+          "n_points": 25770,
+          "n_patients": 24666,
+          "prevalence": 0.010089251067132324,
+          "deviations": [
+            "lead order and sampling rate are not in the record (no HDF5 attributes); taken from Liu et al. 2022, Data Records",
+            "the label is AHA category M (160, 161, 165, 166); 233 of its 260 positives carry the 'old' modifier, so the class is a chronic infarct pattern as PTB-XL's is",
+            "6928 of 25770 records longer than ten seconds, cropped"
+          ],
+          "coverage": {
+            "mean": 0.9053938688397362,
+            "sd": 0.005807976978533027,
+            "n_draws": 200
+          },
+          "empty_rate": {
+            "mean": 0.0,
+            "sd": 0.0,
+            "n_draws": 200
+          },
+          "one_label_rate": {
+            "mean": 0.9195611175785798,
+            "sd": 0.015263118211758978,
+            "n_draws": 200
+          },
+          "two_label_rate": {
+            "mean": 0.08043888242142026,
+            "sd": 0.015263118211758972,
+            "n_draws": 200
+          },
+          "abstention_rate": {
+            "mean": 0.08043888242142026,
+            "sd": 0.015263118211758972,
+            "n_draws": 200
+          },
+          "mean_set_size": {
+            "mean": 1.0804388824214204,
+            "sd": 0.015263118211758976,
+            "n_draws": 200
+          },
+          "coverage_by_class": {
+            "0": {
+              "mean": 0.9046977655821246,
+              "sd": 0.0058664569169010776,
+              "n_draws": 200
+            },
+            "1": {
+              "mean": 0.9736923076923074,
+              "sd": 0.0015150911439618395,
+              "n_draws": 200
+            }
+          }
+        },
+        "acs": {
+          "n_points": 17955,
+          "n_patients": 17018,
+          "prevalence": 0.1492063492063492,
+          "deviations": [
+            "only the 17960 records of CSV/train.csv carry labels; the published test split withholds them, so the remaining waveforms on disk are not scored",
+            "the label is the corpus's own AMI column, read from a coronary angiogram rather than from the tracing, and acute by construction; PTB-XL's and Shandong's positives are dominated by the chronic infarct pattern, so the two label sets name different clinical events and no re-coding here makes them the same",
+            "5 of 17960 records excluded: see the excluded field"
+          ],
+          "coverage": {
+            "mean": 0.7156385407964355,
+            "sd": 0.009952323376904743,
+            "n_draws": 200
+          },
+          "empty_rate": {
+            "mean": 0.0,
+            "sd": 0.0,
+            "n_draws": 200
+          },
+          "one_label_rate": {
+            "mean": 0.8825143414090784,
+            "sd": 0.020508575673342386,
+            "n_draws": 200
+          },
+          "two_label_rate": {
+            "mean": 0.11748565859092175,
+            "sd": 0.020508575673342386,
+            "n_draws": 200
+          },
+          "abstention_rate": {
+            "mean": 0.11748565859092175,
+            "sd": 0.020508575673342386,
+            "n_draws": 200
+          },
+          "mean_set_size": {
+            "mean": 1.1174856585909216,
+            "sd": 0.02050857567334239,
+            "n_draws": 200
+          },
+          "coverage_by_class": {
+            "0": {
+              "mean": 0.6938220083791569,
+              "sd": 0.011561817894594503,
+              "n_draws": 200
+            },
+            "1": {
+              "mean": 0.8400391937290033,
+              "sd": 0.009884457503145684,
+              "n_draws": 200
+            }
+          }
+        }
+      }
+    },
+    {
+      "alpha": 0.1,
+      "target_coverage": 0.9,
+      "score": "aps",
+      "correction": "none",
+      "calibrated_on": "ptbxl",
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.8890185844601257,
+          "sd": 0.008550176570466235,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.8890185844601257,
+          "sd": 0.008550176570466235,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      },
+      "calibration": {
+        "weighting": "uniform: no correction here reweights the calibration sample",
+        "n": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "effective_sample_size": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 824.015,
+            "sd": 14.027065546264335,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 274.775,
+            "sd": 12.929043888834045,
+            "n_draws": 200
+          }
+        }
+      },
+      "by_corpus": {
+        "ptbxl": {
+          "n_points": 2198,
+          "n_patients": 1904,
+          "prevalence": 0.2502274795268426,
+          "deviations": [
+            "the label is the SCP-ECG MI superclass as shipped, subendocardial-injury statements included and no likelihood floor; dropping the injury statements moves the positive count from 5,469 to 5,288",
+            "the infarct patterns PTB-XL records are undated, so the class is read as a chronic pattern rather than an acute event"
+          ],
+          "coverage": {
+            "mean": 0.8996707196880902,
+            "sd": 0.012965384144946883,
+            "n_draws": 200
+          },
+          "empty_rate": {
+            "mean": 0.045530830439420106,
+            "sd": 0.008479505534240267,
+            "n_draws": 200
+          },
+          "one_label_rate": {
+            "mean": 0.7412079576995037,
+            "sd": 0.01406078187050054,
+            "n_draws": 200
+          },
+          "two_label_rate": {
+            "mean": 0.21326121186107627,
+            "sd": 0.017670258881167467,
+            "n_draws": 200
+          },
+          "abstention_rate": {
+            "mean": 0.25879204230049635,
+            "sd": 0.014060781870500538,
+            "n_draws": 200
+          },
+          "mean_set_size": {
+            "mean": 1.1677303814216562,
+            "sd": 0.02388670214273167,
+            "n_draws": 200
+          },
+          "coverage_by_class": {
+            "0": {
+              "mean": 0.9238123995405456,
+              "sd": 0.011626746608678335,
+              "n_draws": 200
+            },
+            "1": {
+              "mean": 0.8274675621431875,
+              "sd": 0.025225224842483508,
+              "n_draws": 200
+            }
+          }
+        },
+        "sph": {
+          "n_points": 25770,
+          "n_patients": 24666,
+          "prevalence": 0.010089251067132324,
+          "deviations": [
+            "lead order and sampling rate are not in the record (no HDF5 attributes); taken from Liu et al. 2022, Data Records",
+            "the label is AHA category M (160, 161, 165, 166); 233 of its 260 positives carry the 'old' modifier, so the class is a chronic infarct pattern as PTB-XL's is",
+            "6928 of 25770 records longer than ten seconds, cropped"
+          ],
+          "coverage": {
+            "mean": 0.9135651920838186,
+            "sd": 0.00818787807439185,
+            "n_draws": 200
+          },
+          "empty_rate": {
+            "mean": 0.05571750097012029,
+            "sd": 0.006616831759446628,
+            "n_draws": 200
+          },
+          "one_label_rate": {
+            "mean": 0.8094652696934419,
+            "sd": 0.005123972658589729,
+            "n_draws": 200
+          },
+          "two_label_rate": {
+            "mean": 0.13481722933643772,
+            "sd": 0.011134899492162493,
+            "n_draws": 200
+          },
+          "abstention_rate": {
+            "mean": 0.19053473030655801,
+            "sd": 0.005123972658589727,
+            "n_draws": 200
+          },
+          "mean_set_size": {
+            "mean": 1.0790997283663173,
+            "sd": 0.017586409601188895,
+            "n_draws": 200
+          },
+          "coverage_by_class": {
+            "0": {
+              "mean": 0.9135883967071737,
+              "sd": 0.008190231287388317,
+              "n_draws": 200
+            },
+            "1": {
+              "mean": 0.9112884615384615,
+              "sd": 0.016882429573237462,
+              "n_draws": 200
+            }
+          }
+        },
+        "acs": {
+          "n_points": 17955,
+          "n_patients": 17018,
+          "prevalence": 0.1492063492063492,
+          "deviations": [
+            "only the 17960 records of CSV/train.csv carry labels; the published test split withholds them, so the remaining waveforms on disk are not scored",
+            "the label is the corpus's own AMI column, read from a coronary angiogram rather than from the tracing, and acute by construction; PTB-XL's and Shandong's positives are dominated by the chronic infarct pattern, so the two label sets name different clinical events and no re-coding here makes them the same",
+            "5 of 17960 records excluded: see the excluded field"
+          ],
+          "coverage": {
+            "mean": 0.8087752715121138,
+            "sd": 0.010123963489482763,
+            "n_draws": 200
+          },
+          "empty_rate": {
+            "mean": 0.03710275689223058,
+            "sd": 0.004953987487015544,
+            "n_draws": 200
+          },
+          "one_label_rate": {
+            "mean": 0.7151063770537455,
+            "sd": 0.013119534685427647,
+            "n_draws": 200
+          },
+          "two_label_rate": {
+            "mean": 0.2477908660540239,
+            "sd": 0.017755768053851782,
+            "n_draws": 200
+          },
+          "abstention_rate": {
+            "mean": 0.28489362294625453,
+            "sd": 0.013119534685427653,
+            "n_draws": 200
+          },
+          "mean_set_size": {
+            "mean": 1.2106881091617934,
+            "sd": 0.022527680574023615,
+            "n_draws": 200
+          },
+          "coverage_by_class": {
+            "0": {
+              "mean": 0.8147633542812255,
+              "sd": 0.009922525790564827,
+              "n_draws": 200
+            },
+            "1": {
+              "mean": 0.7746304591265397,
+              "sd": 0.012314417915552364,
+              "n_draws": 200
+            }
+          }
+        }
+      }
+    },
+    {
+      "alpha": 0.1,
+      "target_coverage": 0.9,
+      "score": "aps",
+      "correction": "mondrian",
+      "calibrated_on": "ptbxl",
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.8619104346954681,
+          "sd": 0.011799963952538054,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.9405331474567663,
+          "sd": 0.010972733212579334,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      },
+      "calibration": {
+        "weighting": "uniform: no correction here reweights the calibration sample",
+        "n": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "effective_sample_size": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 824.015,
+            "sd": 14.027065546264335,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 274.775,
+            "sd": 12.929043888834045,
+            "n_draws": 200
+          }
+        }
+      },
+      "by_corpus": {
+        "ptbxl": {
+          "n_points": 2198,
+          "n_patients": 1904,
+          "prevalence": 0.2502274795268426,
+          "deviations": [
+            "the label is the SCP-ECG MI superclass as shipped, subendocardial-injury statements included and no likelihood floor; dropping the injury statements moves the positive count from 5,469 to 5,288",
+            "the infarct patterns PTB-XL records are undated, so the class is read as a chronic pattern rather than an acute event"
+          ],
+          "coverage": {
+            "mean": 0.9002584991293482,
+            "sd": 0.012962408640231925,
+            "n_draws": 200
+          },
+          "empty_rate": {
+            "mean": 0.05496633457849387,
+            "sd": 0.009172276787068162,
+            "n_draws": 200
+          },
+          "one_label_rate": {
+            "mean": 0.6512326199498727,
+            "sd": 0.027660351899027,
+            "n_draws": 200
+          },
+          "two_label_rate": {
+            "mean": 0.2938010454716334,
+            "sd": 0.030400306676584325,
+            "n_draws": 200
+          },
+          "abstention_rate": {
+            "mean": 0.34876738005012725,
+            "sd": 0.027660351899027002,
+            "n_draws": 200
+          },
+          "mean_set_size": {
+            "mean": 1.2388347108931397,
+            "sd": 0.03537687871760208,
+            "n_draws": 200
+          },
+          "coverage_by_class": {
+            "0": {
+              "mean": 0.8999107239459218,
+              "sd": 0.014490027146322675,
+              "n_draws": 200
+            },
+            "1": {
+              "mean": 0.9012886944509185,
+              "sd": 0.026015189675588284,
+              "n_draws": 200
+            }
+          }
+        },
+        "sph": {
+          "n_points": 25770,
+          "n_patients": 24666,
+          "prevalence": 0.010089251067132324,
+          "deviations": [
+            "lead order and sampling rate are not in the record (no HDF5 attributes); taken from Liu et al. 2022, Data Records",
+            "the label is AHA category M (160, 161, 165, 166); 233 of its 260 positives carry the 'old' modifier, so the class is a chronic infarct pattern as PTB-XL's is",
+            "6928 of 25770 records longer than ten seconds, cropped"
+          ],
+          "coverage": {
+            "mean": 0.8884588668994955,
+            "sd": 0.011382148516572632,
+            "n_draws": 200
+          },
+          "empty_rate": {
+            "mean": 0.07296507566938301,
+            "sd": 0.008864111479601932,
+            "n_draws": 200
+          },
+          "one_label_rate": {
+            "mean": 0.7057863795110595,
+            "sd": 0.03031321912736173,
+            "n_draws": 200
+          },
+          "two_label_rate": {
+            "mean": 0.2212485448195576,
+            "sd": 0.03171209737420225,
+            "n_draws": 200
+          },
+          "abstention_rate": {
+            "mean": 0.2942136204889406,
+            "sd": 0.03031321912736173,
+            "n_draws": 200
+          },
+          "mean_set_size": {
+            "mean": 1.1482834691501747,
+            "sd": 0.03534922814608463,
+            "n_draws": 200
+          },
+          "coverage_by_class": {
+            "0": {
+              "mean": 0.8877573500588005,
+              "sd": 0.011491657675812459,
+              "n_draws": 200
+            },
+            "1": {
+              "mean": 0.9572884615384615,
+              "sd": 0.013877672647203519,
+              "n_draws": 200
+            }
+          }
+        },
+        "acs": {
+          "n_points": 17955,
+          "n_patients": 17018,
+          "prevalence": 0.1492063492063492,
+          "deviations": [
+            "only the 17960 records of CSV/train.csv carry labels; the published test split withholds them, so the remaining waveforms on disk are not scored",
+            "the label is the corpus's own AMI column, read from a coronary angiogram rather than from the tracing, and acute by construction; PTB-XL's and Shandong's positives are dominated by the chronic infarct pattern, so the two label sets name different clinical events and no re-coding here makes them the same",
+            "5 of 17960 records excluded: see the excluded field"
+          ],
+          "coverage": {
+            "mean": 0.7947680311890838,
+            "sd": 0.011368006537481795,
+            "n_draws": 200
+          },
+          "empty_rate": {
+            "mean": 0.04070648844333055,
+            "sd": 0.005425519121203488,
+            "n_draws": 200
+          },
+          "one_label_rate": {
+            "mean": 0.6327165135059871,
+            "sd": 0.02735893789901338,
+            "n_draws": 200
+          },
+          "two_label_rate": {
+            "mean": 0.32657699805068224,
+            "sd": 0.030373386793654464,
+            "n_draws": 200
+          },
+          "abstention_rate": {
+            "mean": 0.3672834864940128,
+            "sd": 0.027358937899013377,
+            "n_draws": 200
+          },
+          "mean_set_size": {
+            "mean": 1.2858705096073515,
+            "sd": 0.033991856129680614,
+            "n_draws": 200
+          },
+          "coverage_by_class": {
+            "0": {
+              "mean": 0.7852189709347996,
+              "sd": 0.012978503939319135,
+              "n_draws": 200
+            },
+            "1": {
+              "mean": 0.8492179917879804,
+              "sd": 0.019038414079554228,
+              "n_draws": 200
+            }
+          }
+        }
+      }
+    },
+    {
+      "alpha": 0.05,
+      "target_coverage": 0.95,
+      "score": "lac",
+      "correction": "none",
+      "calibrated_on": "ptbxl",
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.7209968891739845,
+          "sd": 0.016045880368380037,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.7209968891739845,
+          "sd": 0.016045880368380037,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      },
+      "calibration": {
+        "weighting": "uniform: no correction here reweights the calibration sample",
+        "n": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "effective_sample_size": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 824.015,
+            "sd": 14.027065546264335,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 274.775,
+            "sd": 12.929043888834045,
+            "n_draws": 200
+          }
+        }
+      },
+      "by_corpus": {
+        "ptbxl": {
+          "n_points": 2198,
+          "n_patients": 1904,
+          "prevalence": 0.2502274795268426,
+          "deviations": [
+            "the label is the SCP-ECG MI superclass as shipped, subendocardial-injury statements included and no likelihood floor; dropping the injury statements moves the positive count from 5,469 to 5,288",
+            "the infarct patterns PTB-XL records are undated, so the class is read as a chronic pattern rather than an acute event"
+          ],
+          "coverage": {
+            "mean": 0.9503166597853423,
+            "sd": 0.00955518932055836,
+            "n_draws": 200
+          },
+          "empty_rate": {
+            "mean": 0.0,
+            "sd": 0.0,
+            "n_draws": 200
+          },
+          "one_label_rate": {
+            "mean": 0.8153020712059478,
+            "sd": 0.01628536408107868,
+            "n_draws": 200
+          },
+          "two_label_rate": {
+            "mean": 0.1846979287940523,
+            "sd": 0.016285364081078682,
+            "n_draws": 200
+          },
+          "abstention_rate": {
+            "mean": 0.1846979287940523,
+            "sd": 0.016285364081078682,
+            "n_draws": 200
+          },
+          "mean_set_size": {
+            "mean": 1.1846979287940522,
+            "sd": 0.016285364081078682,
+            "n_draws": 200
+          },
+          "coverage_by_class": {
+            "0": {
+              "mean": 0.9847853266452222,
+              "sd": 0.004190668839640921,
+              "n_draws": 200
+            },
+            "1": {
+              "mean": 0.8473554642516021,
+              "sd": 0.027687350141310896,
+              "n_draws": 200
+            }
+          }
+        },
+        "sph": {
+          "n_points": 25770,
+          "n_patients": 24666,
+          "prevalence": 0.010089251067132324,
+          "deviations": [
+            "lead order and sampling rate are not in the record (no HDF5 attributes); taken from Liu et al. 2022, Data Records",
+            "the label is AHA category M (160, 161, 165, 166); 233 of its 260 positives carry the 'old' modifier, so the class is a chronic infarct pattern as PTB-XL's is",
+            "6928 of 25770 records longer than ten seconds, cropped"
+          ],
+          "coverage": {
+            "mean": 0.9725504462553357,
+            "sd": 0.002137311328767616,
+            "n_draws": 200
+          },
+          "empty_rate": {
+            "mean": 0.0,
+            "sd": 0.0,
+            "n_draws": 200
+          },
+          "one_label_rate": {
+            "mean": 0.8896247574699262,
+            "sd": 0.009672129727460102,
+            "n_draws": 200
+          },
+          "two_label_rate": {
+            "mean": 0.11037524253007373,
+            "sd": 0.0096721297274601,
+            "n_draws": 200
+          },
+          "abstention_rate": {
+            "mean": 0.11037524253007373,
+            "sd": 0.0096721297274601,
+            "n_draws": 200
+          },
+          "mean_set_size": {
+            "mean": 1.1103752425300737,
+            "sd": 0.009672129727460104,
+            "n_draws": 200
+          },
+          "coverage_by_class": {
+            "0": {
+              "mean": 0.972576244609957,
+              "sd": 0.002136093521024554,
+              "n_draws": 200
+            },
+            "1": {
+              "mean": 0.9700192307692308,
+              "sd": 0.002944015398375777,
+              "n_draws": 200
+            }
+          }
+        },
+        "acs": {
+          "n_points": 17955,
+          "n_patients": 17018,
+          "prevalence": 0.1492063492063492,
+          "deviations": [
+            "only the 17960 records of CSV/train.csv carry labels; the published test split withholds them, so the remaining waveforms on disk are not scored",
+            "the label is the corpus's own AMI column, read from a coronary angiogram rather than from the tracing, and acute by construction; PTB-XL's and Shandong's positives are dominated by the chronic infarct pattern, so the two label sets name different clinical events and no re-coding here makes them the same",
+            "5 of 17960 records excluded: see the excluded field"
+          ],
+          "coverage": {
+            "mean": 0.8417020328599275,
+            "sd": 0.007769329996378951,
+            "n_draws": 200
+          },
+          "empty_rate": {
+            "mean": 0.0,
+            "sd": 0.0,
+            "n_draws": 200
+          },
+          "one_label_rate": {
+            "mean": 0.7757560568086884,
+            "sd": 0.018674815378591506,
+            "n_draws": 200
+          },
+          "two_label_rate": {
+            "mean": 0.2242439431913116,
+            "sd": 0.0186748153785915,
+            "n_draws": 200
+          },
+          "abstention_rate": {
+            "mean": 0.2242439431913116,
+            "sd": 0.0186748153785915,
+            "n_draws": 200
+          },
+          "mean_set_size": {
+            "mean": 1.2242439431913117,
+            "sd": 0.018674815378591527,
+            "n_draws": 200
+          },
+          "coverage_by_class": {
+            "0": {
+              "mean": 0.8477104608536266,
+              "sd": 0.007266456960524703,
+              "n_draws": 200
+            },
+            "1": {
+              "mean": 0.8074412094064951,
+              "sd": 0.01067717671075058,
+              "n_draws": 200
+            }
+          }
+        }
+      }
+    },
+    {
+      "alpha": 0.05,
+      "target_coverage": 0.95,
+      "score": "lac",
+      "correction": "mondrian",
+      "calibrated_on": "ptbxl",
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.5457603958249092,
+          "sd": 0.02553834690511916,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.8778196090459823,
+          "sd": 0.014910881446670465,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      },
+      "calibration": {
+        "weighting": "uniform: no correction here reweights the calibration sample",
+        "n": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "effective_sample_size": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 824.015,
+            "sd": 14.027065546264335,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 274.775,
+            "sd": 12.929043888834045,
+            "n_draws": 200
+          }
+        }
+      },
+      "by_corpus": {
+        "ptbxl": {
+          "n_points": 2198,
+          "n_patients": 1904,
+          "prevalence": 0.2502274795268426,
+          "deviations": [
+            "the label is the SCP-ECG MI superclass as shipped, subendocardial-injury statements included and no likelihood floor; dropping the injury statements moves the positive count from 5,469 to 5,288",
+            "the infarct patterns PTB-XL records are undated, so the class is read as a chronic pattern rather than an acute event"
+          ],
+          "coverage": {
+            "mean": 0.9507065161475998,
+            "sd": 0.009753223007496101,
+            "n_draws": 200
+          },
+          "empty_rate": {
+            "mean": 0.0,
+            "sd": 0.0,
+            "n_draws": 200
+          },
+          "one_label_rate": {
+            "mean": 0.7267045949639303,
+            "sd": 0.024892247198829834,
+            "n_draws": 200
+          },
+          "two_label_rate": {
+            "mean": 0.2732954050360697,
+            "sd": 0.02489224719882984,
+            "n_draws": 200
+          },
+          "abstention_rate": {
+            "mean": 0.2732954050360697,
+            "sd": 0.02489224719882984,
+            "n_draws": 200
+          },
+          "mean_set_size": {
+            "mean": 1.2732954050360699,
+            "sd": 0.024892247198829837,
+            "n_draws": 200
+          },
+          "coverage_by_class": {
+            "0": {
+              "mean": 0.9501753166519754,
+              "sd": 0.011760331823655193,
+              "n_draws": 200
+            },
+            "1": {
+              "mean": 0.9522511451712304,
+              "sd": 0.017928398616790738,
+              "n_draws": 200
+            }
+          }
+        },
+        "sph": {
+          "n_points": 25770,
+          "n_patients": 24666,
+          "prevalence": 0.010089251067132324,
+          "deviations": [
+            "lead order and sampling rate are not in the record (no HDF5 attributes); taken from Liu et al. 2022, Data Records",
+            "the label is AHA category M (160, 161, 165, 166); 233 of its 260 positives carry the 'old' modifier, so the class is a chronic infarct pattern as PTB-XL's is",
+            "6928 of 25770 records longer than ten seconds, cropped"
+          ],
+          "coverage": {
+            "mean": 0.9439741948001551,
+            "sd": 0.005236855839428171,
+            "n_draws": 200
+          },
+          "empty_rate": {
+            "mean": 0.0,
+            "sd": 0.0,
+            "n_draws": 200
+          },
+          "one_label_rate": {
+            "mean": 0.7875764454792394,
+            "sd": 0.021881491041371947,
+            "n_draws": 200
+          },
+          "two_label_rate": {
+            "mean": 0.2124235545207606,
+            "sd": 0.021881491041371944,
+            "n_draws": 200
+          },
+          "abstention_rate": {
+            "mean": 0.2124235545207606,
+            "sd": 0.021881491041371944,
+            "n_draws": 200
+          },
+          "mean_set_size": {
+            "mean": 1.2124235545207604,
+            "sd": 0.02188149104137195,
+            "n_draws": 200
+          },
+          "coverage_by_class": {
+            "0": {
+              "mean": 0.9435684045472366,
+              "sd": 0.005290521688502031,
+              "n_draws": 200
+            },
+            "1": {
+              "mean": 0.9837884615384616,
+              "sd": 0.001630303665556123,
+              "n_draws": 200
+            }
+          }
+        },
+        "acs": {
+          "n_points": 17955,
+          "n_patients": 17018,
+          "prevalence": 0.1492063492063492,
+          "deviations": [
+            "only the 17960 records of CSV/train.csv carry labels; the published test split withholds them, so the remaining waveforms on disk are not scored",
+            "the label is the corpus's own AMI column, read from a coronary angiogram rather than from the tracing, and acute by construction; PTB-XL's and Shandong's positives are dominated by the chronic infarct pattern, so the two label sets name different clinical events and no re-coding here makes them the same",
+            "5 of 17960 records excluded: see the excluded field"
+          ],
+          "coverage": {
+            "mean": 0.7882431077694235,
+            "sd": 0.009934400704332472,
+            "n_draws": 200
+          },
+          "empty_rate": {
+            "mean": 0.0,
+            "sd": 0.0,
+            "n_draws": 200
+          },
+          "one_label_rate": {
+            "mean": 0.7041066555277081,
+            "sd": 0.024049830410525583,
+            "n_draws": 200
+          },
+          "two_label_rate": {
+            "mean": 0.2958933444722918,
+            "sd": 0.02404983041052558,
+            "n_draws": 200
+          },
+          "abstention_rate": {
+            "mean": 0.2958933444722918,
+            "sd": 0.02404983041052558,
+            "n_draws": 200
+          },
+          "mean_set_size": {
+            "mean": 1.295893344472292,
+            "sd": 0.024049830410525577,
+            "n_draws": 200
+          },
+          "coverage_by_class": {
+            "0": {
+              "mean": 0.77026413982718,
+              "sd": 0.011682142605395174,
+              "n_draws": 200
+            },
+            "1": {
+              "mean": 0.8907614781634939,
+              "sd": 0.009625555490313586,
+              "n_draws": 200
+            }
+          }
+        }
+      }
+    },
+    {
+      "alpha": 0.05,
+      "target_coverage": 0.95,
+      "score": "aps",
+      "correction": "none",
+      "calibrated_on": "ptbxl",
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.9407180080659137,
+          "sd": 0.006613187243245095,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.9407180080659137,
+          "sd": 0.006613187243245095,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      },
+      "calibration": {
+        "weighting": "uniform: no correction here reweights the calibration sample",
+        "n": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "effective_sample_size": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 824.015,
+            "sd": 14.027065546264335,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 274.775,
+            "sd": 12.929043888834045,
+            "n_draws": 200
+          }
+        }
+      },
+      "by_corpus": {
+        "ptbxl": {
+          "n_points": 2198,
+          "n_patients": 1904,
+          "prevalence": 0.2502274795268426,
+          "deviations": [
+            "the label is the SCP-ECG MI superclass as shipped, subendocardial-injury statements included and no likelihood floor; dropping the injury statements moves the positive count from 5,469 to 5,288",
+            "the infarct patterns PTB-XL records are undated, so the class is read as a chronic pattern rather than an acute event"
+          ],
+          "coverage": {
+            "mean": 0.950847708997961,
+            "sd": 0.00986130361815752,
+            "n_draws": 200
+          },
+          "empty_rate": {
+            "mean": 0.016237980407154594,
+            "sd": 0.004927801810756212,
+            "n_draws": 200
+          },
+          "one_label_rate": {
+            "mean": 0.6396014552701085,
+            "sd": 0.023840833866883245,
+            "n_draws": 200
+          },
+          "two_label_rate": {
+            "mean": 0.3441605643227369,
+            "sd": 0.02653739169902737,
+            "n_draws": 200
+          },
+          "abstention_rate": {
+            "mean": 0.36039854472989163,
+            "sd": 0.02384083386688324,
+            "n_draws": 200
+          },
+          "mean_set_size": {
+            "mean": 1.3279225839155826,
+            "sd": 0.02981018983970198,
+            "n_draws": 200
+          },
+          "coverage_by_class": {
+            "0": {
+              "mean": 0.9671435214752337,
+              "sd": 0.007877906775655369,
+              "n_draws": 200
+            },
+            "1": {
+              "mean": 0.9021593307527576,
+              "sd": 0.02134483303293355,
+              "n_draws": 200
+            }
+          }
+        },
+        "sph": {
+          "n_points": 25770,
+          "n_patients": 24666,
+          "prevalence": 0.010089251067132324,
+          "deviations": [
+            "lead order and sampling rate are not in the record (no HDF5 attributes); taken from Liu et al. 2022, Data Records",
+            "the label is AHA category M (160, 161, 165, 166); 233 of its 260 positives carry the 'old' modifier, so the class is a chronic infarct pattern as PTB-XL's is",
+            "6928 of 25770 records longer than ten seconds, cropped"
+          ],
+          "coverage": {
+            "mean": 0.9599794334497477,
+            "sd": 0.005794483501897808,
+            "n_draws": 200
+          },
+          "empty_rate": {
+            "mean": 0.020699456732634847,
+            "sd": 0.004169673099094071,
+            "n_draws": 200
+          },
+          "one_label_rate": {
+            "mean": 0.739894450911913,
+            "sd": 0.016543876378912265,
+            "n_draws": 200
+          },
+          "two_label_rate": {
+            "mean": 0.2394060923554521,
+            "sd": 0.020521661783976363,
+            "n_draws": 200
+          },
+          "abstention_rate": {
+            "mean": 0.2601055490880869,
+            "sd": 0.016543876378912265,
+            "n_draws": 200
+          },
+          "mean_set_size": {
+            "mean": 1.2187066356228171,
+            "sd": 0.02456317786072718,
+            "n_draws": 200
+          },
+          "coverage_by_class": {
+            "0": {
+              "mean": 0.9600052920423363,
+              "sd": 0.005789954500424867,
+              "n_draws": 200
+            },
+            "1": {
+              "mean": 0.9574423076923076,
+              "sd": 0.012071057569761125,
+              "n_draws": 200
+            }
+          }
+        },
+        "acs": {
+          "n_points": 17955,
+          "n_patients": 17018,
+          "prevalence": 0.1492063492063492,
+          "deviations": [
+            "only the 17960 records of CSV/train.csv carry labels; the published test split withholds them, so the remaining waveforms on disk are not scored",
+            "the label is the corpus's own AMI column, read from a coronary angiogram rather than from the tracing, and acute by construction; PTB-XL's and Shandong's positives are dominated by the chronic infarct pattern, so the two label sets name different clinical events and no re-coding here makes them the same",
+            "5 of 17960 records excluded: see the excluded field"
+          ],
+          "coverage": {
+            "mean": 0.8733146755778336,
+            "sd": 0.009474364014248221,
+            "n_draws": 200
+          },
+          "empty_rate": {
+            "mean": 0.01255889724310777,
+            "sd": 0.0027766058099897794,
+            "n_draws": 200
+          },
+          "one_label_rate": {
+            "mean": 0.593879977722083,
+            "sd": 0.023327468903579115,
+            "n_draws": 200
+          },
+          "two_label_rate": {
+            "mean": 0.39356112503480917,
+            "sd": 0.025911263701331448,
+            "n_draws": 200
+          },
+          "abstention_rate": {
+            "mean": 0.406120022277917,
+            "sd": 0.023327468903579115,
+            "n_draws": 200
+          },
+          "mean_set_size": {
+            "mean": 1.3810022277917016,
+            "sd": 0.028531306443984668,
+            "n_draws": 200
+          },
+          "coverage_by_class": {
+            "0": {
+              "mean": 0.8775841188792879,
+              "sd": 0.00922940189028246,
+              "n_draws": 200
+            },
+            "1": {
+              "mean": 0.8489697648376259,
+              "sd": 0.011763412176916259,
+              "n_draws": 200
+            }
+          }
+        }
+      }
+    },
+    {
+      "alpha": 0.05,
+      "target_coverage": 0.95,
+      "score": "aps",
+      "correction": "mondrian",
+      "calibrated_on": "ptbxl",
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.9206431416651788,
+          "sd": 0.009049102529737327,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.9728605458605125,
+          "sd": 0.007438234484359984,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      },
+      "calibration": {
+        "weighting": "uniform: no correction here reweights the calibration sample",
+        "n": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "effective_sample_size": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 824.015,
+            "sd": 14.027065546264335,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 274.775,
+            "sd": 12.929043888834045,
+            "n_draws": 200
+          }
+        }
+      },
+      "by_corpus": {
+        "ptbxl": {
+          "n_points": 2198,
+          "n_patients": 1904,
+          "prevalence": 0.2502274795268426,
+          "deviations": [
+            "the label is the SCP-ECG MI superclass as shipped, subendocardial-injury statements included and no likelihood floor; dropping the injury statements moves the positive count from 5,469 to 5,288",
+            "the infarct patterns PTB-XL records are undated, so the class is read as a chronic pattern rather than an acute event"
+          ],
+          "coverage": {
+            "mean": 0.9513093664382023,
+            "sd": 0.009410004093426738,
+            "n_draws": 200
+          },
+          "empty_rate": {
+            "mean": 0.02194226552153479,
+            "sd": 0.005925585420226309,
+            "n_draws": 200
+          },
+          "one_label_rate": {
+            "mean": 0.5202924665333442,
+            "sd": 0.0491910720565951,
+            "n_draws": 200
+          },
+          "two_label_rate": {
+            "mean": 0.45776526794512107,
+            "sd": 0.05082948569498448,
+            "n_draws": 200
+          },
+          "abstention_rate": {
+            "mean": 0.4797075334666559,
+            "sd": 0.049191072056595106,
+            "n_draws": 200
+          },
+          "mean_set_size": {
+            "mean": 1.4358230024235863,
+            "sd": 0.053082358529938437,
+            "n_draws": 200
+          },
+          "coverage_by_class": {
+            "0": {
+              "mean": 0.951692288271975,
+              "sd": 0.010558076920279874,
+              "n_draws": 200
+            },
+            "1": {
+              "mean": 0.9501644435599131,
+              "sd": 0.01807523829486049,
+              "n_draws": 200
+            }
+          }
+        },
+        "sph": {
+          "n_points": 25770,
+          "n_patients": 24666,
+          "prevalence": 0.010089251067132324,
+          "deviations": [
+            "lead order and sampling rate are not in the record (no HDF5 attributes); taken from Liu et al. 2022, Data Records",
+            "the label is AHA category M (160, 161, 165, 166); 233 of its 260 positives carry the 'old' modifier, so the class is a chronic infarct pattern as PTB-XL's is",
+            "6928 of 25770 records longer than ten seconds, cropped"
+          ],
+          "coverage": {
+            "mean": 0.9429844780752813,
+            "sd": 0.008174743698107213,
+            "n_draws": 200
+          },
+          "empty_rate": {
+            "mean": 0.02948447807528133,
+            "sd": 0.005540468130165012,
+            "n_draws": 200
+          },
+          "one_label_rate": {
+            "mean": 0.5735816841288319,
+            "sd": 0.061916008691937585,
+            "n_draws": 200
+          },
+          "two_label_rate": {
+            "mean": 0.3969338377958867,
+            "sd": 0.06430622606911977,
+            "n_draws": 200
+          },
+          "abstention_rate": {
+            "mean": 0.4264183158711681,
+            "sd": 0.061916008691937585,
+            "n_draws": 200
+          },
+          "mean_set_size": {
+            "mean": 1.3674493597206054,
+            "sd": 0.06706998482457066,
+            "n_draws": 200
+          },
+          "coverage_by_class": {
+            "0": {
+              "mean": 0.9425713445707566,
+              "sd": 0.008250243117045964,
+              "n_draws": 200
+            },
+            "1": {
+              "mean": 0.9835192307692308,
+              "sd": 0.008164639565870735,
+              "n_draws": 200
+            }
+          }
+        },
+        "acs": {
+          "n_points": 17955,
+          "n_patients": 17018,
+          "prevalence": 0.1492063492063492,
+          "deviations": [
+            "only the 17960 records of CSV/train.csv carry labels; the published test split withholds them, so the remaining waveforms on disk are not scored",
+            "the label is the corpus's own AMI column, read from a coronary angiogram rather than from the tracing, and acute by construction; PTB-XL's and Shandong's positives are dominated by the chronic infarct pattern, so the two label sets name different clinical events and no re-coding here makes them the same",
+            "5 of 17960 records excluded: see the excluded field"
+          ],
+          "coverage": {
+            "mean": 0.8607165135059871,
+            "sd": 0.01016235782552651,
+            "n_draws": 200
+          },
+          "empty_rate": {
+            "mean": 0.014648008911166807,
+            "sd": 0.003132325922602342,
+            "n_draws": 200
+          },
+          "one_label_rate": {
+            "mean": 0.48596686159844055,
+            "sd": 0.04270095736120508,
+            "n_draws": 200
+          },
+          "two_label_rate": {
+            "mean": 0.4993851294903926,
+            "sd": 0.04480784792690125,
+            "n_draws": 200
+          },
+          "abstention_rate": {
+            "mean": 0.5140331384015595,
+            "sd": 0.04270095736120508,
+            "n_draws": 200
+          },
+          "mean_set_size": {
+            "mean": 1.4847371205792257,
+            "sd": 0.047029114849080206,
+            "n_draws": 200
+          },
+          "coverage_by_class": {
+            "0": {
+              "mean": 0.8517756611678451,
+              "sd": 0.011410764933640682,
+              "n_draws": 200
+            },
+            "1": {
+              "mean": 0.9116983949234789,
+              "sd": 0.017712589430349816,
+              "n_draws": 200
+            }
+          }
+        }
+      }
+    }
+  ]
+}

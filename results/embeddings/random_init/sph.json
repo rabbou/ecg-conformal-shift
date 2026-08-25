@@ -1,0 +1,27 @@
+{
+  "arm": "random_init",
+  "corpus": "sph",
+  "weights_source": "torch default initialisation, seed unset",
+  "pretraining_corpora": "none (random initialisation, frozen)",
+  "preprocessing": "none beyond the common ingestion: (12, 5000) float32 millivolts at 500 Hz goes into the network unchanged",
+  "notes": "ResNet1d from src/ecs/models.py, input (B, 12, 5000) mV, 256-d embedding",
+  "n_params": 4082306,
+  "git_commit": "8d1f9fbd76f88516dc8a32aa7752e15a7291b7b2",
+  "n_records": 25770,
+  "n_kept": 25770,
+  "n_excluded": 0,
+  "excluded": {},
+  "ingestion_deviations": [
+    "lead order and sampling rate are not in the record (no HDF5 attributes); taken from Liu et al. 2022, Data Records",
+    "51 of 170 records longer than ten seconds, cropped to the first"
+  ],
+  "embedding_dim": 256,
+  "seconds": 202.3,
+  "machine": {
+    "cpu": "Intel(R) Core(TM) i7-8700 CPU @ 3.20GHz",
+    "platform": "Linux-6.8.0-136-generic-x86_64-with-glibc2.39",
+    "python": "3.11.15",
+    "torch": "2.2.2+cu121",
+    "torch_threads": 6
+  }
+}

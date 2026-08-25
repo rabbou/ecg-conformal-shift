@@ -4,6 +4,12 @@ results/*
 !results/baseline.json
 !results/timing_esprimo.json
 !results/ingest_report.json
+!results/abstention.json
+!results/baseline/
+results/baseline/model.pt
+!results/embeddings/
+results/embeddings/**/*.npz
+!results/figures/
 __pycache__/
 *.pyc
 .venv/

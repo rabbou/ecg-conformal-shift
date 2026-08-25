@@ -149,9 +149,30 @@ class TestTheReferenceValue:
     """C-19 compares against a number that is on disk with its provenance, never
     one recalled from memory."""
 
+    TOLERANCE = 0.03
+
     def test_results_baseline_json_states_the_value_and_where_it_came_from(self) -> None:
         reference = json.loads((RESULTS_DIR / "baseline.json").read_text())
         assert 0.5 < reference["reference_auroc"] < 1.0
         assert reference["reference_source"]
         assert reference["reference_split"]
         assert reference["reference_read_on"]
+
+    def test_the_trained_baseline_reproduces_it_to_within_three_hundredths(self) -> None:
+        reference = json.loads((RESULTS_DIR / "baseline.json").read_text())
+        metrics = json.loads((RESULTS_DIR / "baseline/metrics.json").read_text())
+        gap = abs(metrics["auroc"] - reference["reference_auroc"])
+        assert gap <= self.TOLERANCE, (
+            f"fold-10 MI AUROC {metrics['auroc']:.4f} is {gap:.4f} from the reference "
+            f"{reference['reference_auroc']}, past the {self.TOLERANCE} C-19 allows"
+        )
+
+    def test_the_run_scored_the_whole_of_fold_ten_once(self) -> None:
+        metrics = json.loads((RESULTS_DIR / "baseline/metrics.json").read_text())
+        config = json.loads((RESULTS_DIR / "baseline/config.json").read_text())
+        with np.load(RESULTS_DIR / "baseline/scores.npz", allow_pickle=False) as scores:
+            assert len(scores["ids"]) == metrics["n_test"] == config["n_test"]
+        assert config["max_records"] is None, "the committed run must be the full one"
+        assert config["split"].startswith("PTB-XL strat_fold")
+        low, high = metrics["auroc_ci95"]
+        assert low < metrics["auroc"] < high

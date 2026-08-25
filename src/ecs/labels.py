@@ -1,9 +1,19 @@
-"""Building one comparable myocardial-infarction label on two corpora.
+"""Building one comparable myocardial-infarction label on three corpora.
 
-The two corpora do not speak the same language.  PTB-XL annotates with SCP-ECG
-statements carrying a 0-100 likelihood; Shandong annotates with AHA codes
-carrying an acute / recent / old modifier.  Everything that makes those two
-comparable -- or fails to -- is decided here and nowhere else.
+The three corpora do not speak the same language.  PTB-XL annotates with
+SCP-ECG statements carrying a 0-100 likelihood; Shandong annotates with AHA
+codes carrying an acute / recent / old modifier; Chongqing annotates with one
+binary column per finding, recorded against a coronary angiogram rather than
+against the tracing.  Everything that makes those three comparable -- or fails
+to -- is decided here and nowhere else.
+
+The failure worth stating in advance: PTB-XL's MI superclass and Shandong's
+category-M codes are dominated by the *chronic* infarct pattern, while every
+Chongqing positive is an *acute* event by construction, because the corpus was
+assembled from patients presenting with acute coronary syndrome.  A label
+learned on one is not the same clinical question as a label read off the other,
+and no re-coding here can make it so; the deviation is named in the results
+file (C-14) instead of being smoothed over.
 """
 
 from __future__ import annotations
@@ -14,12 +24,13 @@ from dataclasses import dataclass
 import pandas as pd
 
 from .config import (
+    ACS_MI_COLUMN,
     PTBXL_INJURY_STATEMENTS,
     SPH_MI_CODES,
     SPH_MODIFIER_OLD,
 )
 
-__all__ = ["MILabelSpec", "ptbxl_mi_label", "sph_mi_label"]
+__all__ = ["MILabelSpec", "acs_mi_label", "ptbxl_mi_label", "sph_mi_label"]
 
 
 @dataclass(frozen=True)
@@ -93,6 +104,31 @@ def sph_mi_label(metadata: pd.DataFrame, spec: MILabelSpec | None = None) -> pd.
         return True
 
     return parsed.apply(is_mi).rename("mi")
+
+
+def acs_mi_label(table: pd.DataFrame, spec: MILabelSpec | None = None) -> pd.Series:
+    """Boolean MI label for every labelled Chongqing record, indexed like ``table``.
+
+    ``table`` is the corpus ``train.csv``, the only split whose labels the
+    publishers release: ``test.csv`` ships the same columns minus the outcomes.
+    The label is the corpus's own ``AMI`` column.
+
+    ``include_injury`` and ``min_likelihood`` have no counterpart here -- the
+    column is binary and carries no confidence -- so they are ignored rather
+    than emulated.  ``chronic_only`` cannot be honoured at all: every positive
+    in this corpus is an acute event, so the strict spec would empty the class
+    rather than select inside it, and asking for it is refused.
+    """
+    spec = spec or MILabelSpec()
+    if spec.chronic_only:
+        raise ValueError(
+            "Chongqing carries no chronic infarction: every positive is an acute event"
+        )
+    if ACS_MI_COLUMN not in table.columns:
+        raise ValueError(
+            f"{ACS_MI_COLUMN} is not in this table; the published test split withholds the labels"
+        )
+    return table[ACS_MI_COLUMN].astype(bool).rename("mi")
 
 
 def _parse_scp_codes(raw: str | dict[str, float]) -> dict[str, float]:

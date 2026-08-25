@@ -7,6 +7,8 @@ results/*
 !results/abstention.json
 !results/baseline/
 results/baseline/model.pt
+!results/external/
+!results/shift.json
 !results/embeddings/
 results/embeddings/**/*.npz
 !results/figures/

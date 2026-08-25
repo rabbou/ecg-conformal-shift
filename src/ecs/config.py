@@ -25,6 +25,12 @@ SPH_MODIFIER_ACUTE = "330"
 SPH_MODIFIER_RECENT = "331"
 SPH_MODIFIER_OLD = "332"
 
+# Chongqing codes its diagnoses as one column per finding.  AMI is the corpus's
+# own acute-myocardial-infarction column and is the union of its STEMI and
+# NSTEMI columns on all but two of the 17,960 labelled records.
+ACS_MI_COLUMN = "AMI"
+ACS_LABELLED_SPLIT = "CSV/train.csv"
+
 # Every corpus is read at 500 Hz and cropped to ten seconds.  PTB-XL and
 # Chongqing records are exactly that long; Shandong records run from ten to
 # sixty seconds.

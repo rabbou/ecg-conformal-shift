@@ -20,7 +20,7 @@ import numpy as np
 import pytest
 
 from ecs.config import RESULTS_DIR
-from ecs.report import repeated_split_report, spread
+from ecs.report import Source, Target, frozen_calibration_table, repeated_split_report, spread
 
 # C-5's band around the target, and C-10's floor on the number of draws.
 COVERAGE_BAND = (-0.012, 0.025)
@@ -233,3 +233,288 @@ class TestTheFigures:
         assert figures.main(["--figure", "3", "--out", str(tmp_path)]) == 0
         assert not list(tmp_path.glob("*.png"))
         assert "Shandong and Chongqing" in capsys.readouterr().err
+
+
+# The shifted corpora are scored once and whole (C-20), so unlike the re-draw
+# harness above the test sample never moves: whatever that one sample happens to
+# be, re-drawing the calibration cannot average its own sampling error away.  The
+# band a fixed target is held to is therefore C-5's band widened by three
+# standard errors of a proportion on that target's own size.
+FIXED_TARGET_SIGMAS = 3.0
+
+# The synthetic shift, sized to the one the study measures: a quarter of the
+# source sick against a fiftieth of the target.
+SOURCE_N = 3000
+SOURCE_PREVALENCE = 0.25
+TARGET_N = 20_000
+TARGET_PREVALENCE = 0.02
+
+
+def _fixed_target_band(alpha: float, n: int) -> tuple[float, float]:
+    slack = FIXED_TARGET_SIGMAS * float(np.sqrt(alpha * (1.0 - alpha) / n))
+    return COVERAGE_BAND[0] - slack, COVERAGE_BAND[1] + slack
+
+
+def _pool(n: int = 45_000, seed: int = 11) -> tuple[np.ndarray, np.ndarray]:
+    """A large calibrated two-class pool to cut source and target samples from.
+
+    Because both samples are cut from the same pool, P(score | class) is identical
+    on either side by construction and the only thing that can differ is the share
+    of each class -- which isolates the shift this study measures.
+    """
+    rng = np.random.default_rng(seed)
+    p1 = rng.uniform(0.05, 0.95, n)
+    labels = (rng.uniform(size=n) < p1).astype(int)
+    return np.column_stack([1.0 - p1, p1]), labels
+
+
+def _sample_at(
+    probs: np.ndarray, labels: np.ndarray, n: int, prevalence: float, taken: set[int], seed: int
+) -> tuple[np.ndarray, np.ndarray]:
+    """``n`` records at the asked-for share of class 1, disjoint from ``taken``."""
+    rng = np.random.default_rng(seed)
+    chosen: list[int] = []
+    for klass, count in ((1, round(n * prevalence)), (0, n - round(n * prevalence))):
+        available = [i for i in np.flatnonzero(labels == klass) if i not in taken]
+        picked = rng.choice(available, count, replace=False)
+        chosen.extend(int(i) for i in picked)
+        taken.update(int(i) for i in picked)
+    index = np.asarray(sorted(chosen))
+    return probs[index], labels[index]
+
+
+def _source(probs: np.ndarray, labels: np.ndarray, **kwargs: object) -> Source:
+    return Source("source", probs, labels, [f"p{i}" for i in range(len(labels))], **kwargs)  # type: ignore[arg-type]
+
+
+@pytest.fixture(scope="module")
+def unshifted_table() -> list[dict]:
+    """Source and target cut from the same pool at the same prevalence: no shift
+    at all, so the guarantee must survive the journey intact."""
+    probs, labels = _pool()
+    taken: set[int] = set()
+    source = _source(*_sample_at(probs, labels, SOURCE_N, SOURCE_PREVALENCE, taken, seed=1))
+    target_probs, target_labels = _sample_at(
+        probs, labels, TARGET_N, SOURCE_PREVALENCE, taken, seed=2
+    )
+    targets = {"elsewhere": Target(target_probs, target_labels, n_patients=TARGET_N)}
+    return frozen_calibration_table(source, targets, (0.20, 0.10, 0.05), n_draws=120, seed=5)
+
+
+@pytest.fixture(scope="module")
+def shifted_table() -> list[dict]:
+    """The same P(score | class) on both sides, a quarter of the source sick
+    against a fiftieth of the target."""
+    probs, labels = _pool()
+    taken: set[int] = set()
+    source = _source(*_sample_at(probs, labels, SOURCE_N, SOURCE_PREVALENCE, taken, seed=1))
+    target_probs, target_labels = _sample_at(
+        probs, labels, TARGET_N, TARGET_PREVALENCE, taken, seed=2
+    )
+    targets = {"elsewhere": Target(target_probs, target_labels, n_patients=TARGET_N)}
+    return frozen_calibration_table(source, targets, (0.10,), n_draws=120, seed=5)
+
+
+def _row(table: list[dict], score: str, correction: str, alpha: float = 0.10) -> dict:
+    found = [
+        r
+        for r in table
+        if r["score"] == score and r["correction"] == correction and r["alpha"] == alpha
+    ]
+    assert len(found) == 1
+    return found[0]
+
+
+class TestTheFrozenCalibrationOnDataWhoseAnswerIsKnown:
+    """The break harness, on data built so that theory says what must come out.
+
+    C-20 is in force throughout: the threshold is fitted on the source sample
+    alone and spent unchanged on a target that is never subsampled, never
+    re-calibrated, and scored whole every draw.
+    """
+
+    def test_without_a_shift_the_frozen_threshold_still_covers_at_the_level_asked_for(
+        self, unshifted_table: list[dict]
+    ) -> None:
+        for row in unshifted_table:
+            if row["correction"] != "none":
+                continue
+            block = row["by_corpus"]["elsewhere"]
+            got, target = block["coverage"]["mean"], row["target_coverage"]
+            low, high = _fixed_target_band(row["alpha"], block["n_points"])
+            assert target + low <= got <= target + high, (row["score"], target, got)
+
+    def test_the_threshold_does_not_depend_on_which_corpus_it_is_spent_on(self) -> None:
+        """C-20's falsifier. ``frozen_threshold`` takes no target argument, so a
+        threshold re-fitted on the target is not something a caller can ask for;
+        this holds the whole table to that, against two unrelated targets -- one
+        of which has had its labels inverted."""
+        probs, labels = _pool(n=8000, seed=3)
+        source = _source(probs[:2000], labels[:2000])
+        one = frozen_calibration_table(
+            source, {"a": Target(probs[2000:5000], labels[2000:5000], 3000)}, (0.10,), 40, seed=7
+        )
+        other = frozen_calibration_table(
+            source, {"b": Target(probs[5000:], 1 - labels[5000:], 3000)}, (0.10,), 40, seed=7
+        )
+        assert [r["threshold_by_class"] for r in one] == [r["threshold_by_class"] for r in other]
+        assert [r["calibration"] for r in one] == [r["calibration"] for r in other]
+
+    def test_the_in_distribution_panel_reproduces_the_re_draw_harness(self) -> None:
+        """The two harnesses answer the same question about the source and must
+        agree there: same halving, same threshold, same held-out half."""
+        probs, labels, patients = _calibrated_problem(n=1500, seed=8)
+        frozen = _row(
+            frozen_calibration_table(_source(probs, labels), {}, (0.10,), 60, seed=4),
+            "lac",
+            "none",
+        )
+        redrawn = repeated_split_report(probs, labels, patients, 0.10, n_draws=60, seed=4)
+        assert frozen["by_corpus"]["source"]["coverage"]["mean"] == pytest.approx(
+            redrawn["coverage"]["mean"]  # type: ignore[index]
+        )
+
+
+class TestWhatAPrevalenceShiftDoesToTheGuarantee:
+    """What breaks and what does not when only the share of sick patients moves."""
+
+    @pytest.mark.parametrize("score", ["lac", "aps"])
+    def test_one_threshold_per_class_holds_both_classes_through_the_shift(
+        self, shifted_table: list[dict], score: str
+    ) -> None:
+        """Mondrian's guarantee is class-conditional, so a change of class
+        proportions cannot touch it -- whatever share of the target is sick."""
+        row = _row(shifted_table, score, "mondrian")
+        block = row["by_corpus"]["elsewhere"]
+        for klass, figures in block["coverage_by_class"].items():
+            support = block["n_points"] * (
+                block["prevalence"] if klass == "1" else 1 - block["prevalence"]
+            )
+            low, high = _fixed_target_band(row["alpha"], round(support))
+            assert 0.9 + low <= figures["mean"] <= 0.9 + high, (score, klass, figures["mean"])
+
+    @pytest.mark.parametrize("score", ["lac", "aps"])
+    def test_the_sick_are_covered_exactly_as_badly_on_either_side_of_the_shift(
+        self, shifted_table: list[dict], score: str
+    ) -> None:
+        """With one shared threshold, what a sick patient gets is fixed by
+        P(score | sick), and that is identical on both sides here. The
+        class-conditional figure therefore travels unchanged."""
+        row = _row(shifted_table, score, "none")
+        here = row["by_corpus"]["source"]["coverage_by_class"]["1"]["mean"]
+        there = row["by_corpus"]["elsewhere"]["coverage_by_class"]["1"]["mean"]
+        assert there == pytest.approx(here, abs=0.04), (score, here, there)
+
+    @pytest.mark.parametrize("score", ["lac", "aps"])
+    def test_the_marginal_figure_is_the_source_per_class_figures_at_the_target_mix(
+        self, shifted_table: list[dict], score: str
+    ) -> None:
+        """The quantitative claim the report rests on: under a pure change of
+        prior, the target's overall coverage is predictable from numbers measured
+        entirely on the source plus the target's share of sick patients. A
+        threshold quietly re-fitted on the target, or labels read off the wrong
+        rows, would not land here."""
+        row = _row(shifted_table, score, "none")
+        source_block = row["by_corpus"]["source"]
+        target_block = row["by_corpus"]["elsewhere"]
+        q1 = target_block["prevalence"]
+        predicted = (
+            q1 * source_block["coverage_by_class"]["1"]["mean"]
+            + (1 - q1) * source_block["coverage_by_class"]["0"]["mean"]
+        )
+        assert target_block["coverage"]["mean"] == pytest.approx(predicted, abs=0.02), score
+
+    @pytest.mark.parametrize("score", ["lac", "aps"])
+    def test_how_far_the_overall_figure_moves_is_the_gap_between_the_classes(
+        self, shifted_table: list[dict], score: str
+    ) -> None:
+        """Why an overall coverage number cannot be carried across hospitals, and
+        exactly how far it can be wrong: under a pure change of prior the overall
+        figure moves by the change in the share of sick patients times the gap
+        between what the sick and the healthy are covered at. A model whose two
+        classes are covered alike barely moves; one that abandons the sick moves
+        by that whole gap, without a single patient being treated differently."""
+        row = _row(shifted_table, score, "none")
+        source_block, target_block = row["by_corpus"]["source"], row["by_corpus"]["elsewhere"]
+        for klass in ("0", "1"):
+            assert target_block["coverage_by_class"][klass]["mean"] == pytest.approx(
+                source_block["coverage_by_class"][klass]["mean"], abs=0.04
+            )
+        gap = (
+            source_block["coverage_by_class"]["1"]["mean"]
+            - source_block["coverage_by_class"]["0"]["mean"]
+        )
+        expected = (target_block["prevalence"] - source_block["prevalence"]) * gap
+        moved = target_block["coverage"]["mean"] - source_block["coverage"]["mean"]
+        assert moved == pytest.approx(expected, abs=0.02), (score, moved, expected)
+
+
+class TestWhatTheBreakTableCarries:
+    """C-9, C-10, C-11 and C-14 on the harness's own output, before any corpus."""
+
+    @pytest.fixture(scope="class")
+    @staticmethod
+    def table() -> list[dict]:
+        probs, labels = _pool(n=6000, seed=4)
+        source = _source(probs[:2000], labels[:2000], deviations=("nothing gave here",))
+        targets = {
+            "elsewhere": Target(
+                probs[2000:], labels[2000:], n_patients=4000, deviations=("a named deviation",)
+            )
+        }
+        return frozen_calibration_table(source, targets, (0.20, 0.10, 0.05), n_draws=101, seed=2)
+
+    def test_it_holds_one_row_per_level_score_and_correction(self, table: list[dict]) -> None:
+        assert len(table) == 3 * 2 * 2
+        assert sorted({r["alpha"] for r in table}) == [0.05, 0.10, 0.20]
+        assert {r["correction"] for r in table} == {"none", "mondrian"}
+
+    def test_every_figure_on_every_corpus_is_a_mean_over_at_least_a_hundred_draws(
+        self, table: list[dict]
+    ) -> None:
+        for row in table:
+            for block in row["by_corpus"].values():
+                for key in ("coverage", "empty_rate", "one_label_rate", "two_label_rate"):
+                    assert block[key]["n_draws"] >= MIN_DRAWS
+                    assert block[key]["sd"] >= 0.0
+                for figures in block["coverage_by_class"].values():
+                    assert figures["n_draws"] >= MIN_DRAWS
+
+    def test_the_calibration_sample_reports_its_effective_size(self, table: list[dict]) -> None:
+        """C-9. No correction here reweights the calibration points, so the
+        effective size is the count itself -- stated rather than assumed, so that
+        the day a weighted correction lands the two numbers part company in
+        plain sight."""
+        for row in table:
+            calibration = row["calibration"]
+            assert calibration["effective_sample_size"]["mean"] == pytest.approx(
+                calibration["n"]["mean"]
+            )
+            assert "uniform" in calibration["weighting"]
+            assert set(calibration["n_by_class"]) == {"0", "1"}
+
+    def test_every_corpus_names_what_could_not_be_made_identical(self, table: list[dict]) -> None:
+        """C-14: the deviations travel with the numbers, not beside them."""
+        for row in table:
+            assert row["by_corpus"]["source"]["deviations"] == ["nothing gave here"]
+            assert row["by_corpus"]["elsewhere"]["deviations"] == ["a named deviation"]
+
+    def test_the_threshold_it_spent_is_on_the_row(self, table: list[dict]) -> None:
+        for row in table:
+            by_class = row["threshold_by_class"]
+            assert set(by_class) == {"0", "1"}
+            for figures in by_class.values():
+                assert figures["n_draws"] == 101
+                assert figures["n_infinite"] == 0
+            if row["correction"] == "none":
+                assert by_class["0"]["mean"] == pytest.approx(by_class["1"]["mean"])
+
+    def test_a_tighter_level_never_lowers_the_threshold(self, table: list[dict]) -> None:
+        for score in ("lac", "aps"):
+            for correction in ("none", "mondrian"):
+                rows = sorted(
+                    (r for r in table if r["score"] == score and r["correction"] == correction),
+                    key=lambda r: -float(r["alpha"]),
+                )
+                means = [r["threshold_by_class"]["1"]["mean"] for r in rows]
+                assert means == sorted(means), (score, correction, means)

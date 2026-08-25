@@ -69,8 +69,14 @@ def n_patients(corpus: str, sph_dir: Path, acs_dir: Path) -> int:
     return int(pd.read_csv(acs_dir / ACS_LABELLED_SPLIT)["Patient_id"].nunique())
 
 
-def git_commit() -> str:
-    out = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True, check=False)
+def git_commit(path: Path | None = None) -> str:
+    """The current commit, or the last one that touched ``path``."""
+    command = (
+        ["git", "rev-parse", "HEAD"]
+        if path is None
+        else ["git", "log", "-1", "--format=%H", "--", str(path)]
+    )
+    out = subprocess.run(command, capture_output=True, text=True, check=False)
     return out.stdout.strip() or "unknown"
 
 

@@ -121,9 +121,7 @@ def main(argv: list[str] | None = None) -> int:
     provenance["ptbxl"] = {
         "title": "PTB-XL fold 10, the half not used to calibrate at each draw",
         "checkpoint": str(Path(args.scores).relative_to(RESULTS_DIR.parent)),
-        "git_commit": json.loads((Path(args.scores).parent / "config.json").read_text()).get(
-            "git_commit", "recorded in results/baseline/config.json"
-        ),
+        "git_commit": git_commit(Path(args.scores)),
         "seed": 0,
         "n_scored": int(len(labels)),
         "n_excluded": 0,

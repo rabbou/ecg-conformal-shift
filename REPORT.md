@@ -1,6 +1,6 @@
 # Report
 
-This repository measures whether a conformal coverage guarantee survives a change of hospital. A classifier trained on a German ECG corpus is calibrated so that its output contains the correct diagnosis for 90% of patients. The guarantee assumes that calibration patients and new patients come from the same distribution. We applied the calibrated model to two Chinese hospital corpora without re-calibration and measured what happened. Coverage degraded differently at each hospital. Of the two standard corrections, per-class calibration repaired most of the damage; reweighting by an estimated class mix repaired almost none of it.
+This repository measures whether a conformal coverage guarantee survives a change of hospital. A classifier trained on a German ECG corpus is calibrated so that its output contains the correct diagnosis for 90% of patients. The guarantee assumes that calibration patients and new patients come from the same distribution. We applied the calibrated model to two Chinese hospital corpora without re-calibration and measured what happened. Coverage degraded differently at each hospital. Of the two standard corrections, per-class calibration recovered most of the loss and reweighting by an estimated class mix had little effect.
 
 [README.md](README.md) documents the corpora and the reproduction commands. [QUESTIONS.md](QUESTIONS.md) answers common questions about the study.
 
@@ -32,7 +32,7 @@ Three threshold variants were compared:
 
 ## Results
 
-At the source hospital, overall coverage is 90.0% when 90% is requested, but coverage of infarction cases is 73.5% (sd 3.0). The overall average is dominated by the majority class. Changing hospital does not create this per-class gap; it changes how visible it is.
+At the source hospital, overall coverage is 90.0% when 90% is requested, but coverage of infarction cases is 73.5% (sd 3.0). The overall average is dominated by the majority class. The per-class gap exists before any change of hospital; the class mix at each hospital determines how much of it the overall average hides.
 
 At the external hospitals the uncorrected threshold moves in opposite directions. In Shandong, where 99% of tracings have no infarction, infarction coverage is 93.6% (sd 0.3), above the requested level. In Chongqing infarction coverage is 72.5% (sd 0.8): about three infarctions in ten receive a set without the true label.
 

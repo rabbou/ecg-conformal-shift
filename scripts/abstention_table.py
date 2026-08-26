@@ -27,7 +27,7 @@ import pandas as pd
 from ecs.config import PTBXL_DIR, RESULTS_DIR
 from ecs.report import REDRAW_CORRECTIONS, SCORES, repeated_split_report
 
-# The levels the plan names, loosest first, so the table reads as confidence rising.
+# Confidence levels from the plan, loosest first.
 ALPHAS = (0.20, 0.10, 0.05)
 
 

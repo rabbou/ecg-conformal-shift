@@ -1,6 +1,6 @@
 """The supervised baseline: our own ResNet1d saying "infarction or not" on PTB-XL.
 
-This is the witness the rest of the week is read against.  If the coverage
+If the coverage
 guarantee breaks on another hospital's tracings, the first question is whether
 the model was ever any good; a baseline that reproduces the published benchmark
 answers it, and one that does not means the break has to be explained before it

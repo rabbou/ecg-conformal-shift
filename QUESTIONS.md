@@ -16,11 +16,11 @@ Its first task was to reproduce a published number, and it did: AUROC 0.932, 95%
 
 ## 4. Would this hold at my hospital? (clinician, commercial)
 
-Unknown, and the repository says so. The two hospitals measured here moved in opposite directions: coverage rose in Shandong and fell in Chongqing. Neither direction nor magnitude can be extrapolated to a third site. What transfers is the harness. The measurement needs a few hundred labelled tracings from the target site and answers the question directly, per class, with its spread. The repository offers a way to measure the promise at a given site, not an assurance that it holds there.
+Unknown. The two hospitals measured here moved in opposite directions: coverage rose in Shandong and fell in Chongqing. Neither direction nor magnitude can be extrapolated to a third site. What transfers is the harness. The measurement needs a few hundred labelled tracings from the target site and answers the question directly, per class, with its spread. The repository offers a way to measure the promise at a given site, not an assurance that it holds there.
 
 ## 5. Is the good Shandong number just prevalence? (technical peer)
 
-Yes, and the report says so. 99% of Shandong's tracings have no infarction, the healthy class is the easy one, and the marginal average is dominated by it; the uncorrected threshold over-covers there (infarctions at 93.6%, sd 0.3, against 90% requested). The same mechanism hides the 73.5% infarction coverage at the source. This is why every coverage figure in the repository is reported per class (criterion C-11 in [PLAN.md](PLAN.md)), and why a single-number coverage claim on an imbalanced cohort deserves suspicion in general.
+Yes. 99% of Shandong's tracings have no infarction, the healthy class is the easy one, and the marginal average is dominated by it; the uncorrected threshold over-covers there (infarctions at 93.6%, sd 0.3, against 90% requested). The same mechanism hides the 73.5% infarction coverage at the source. This is why every coverage figure in the repository is reported per class (criterion C-11 in [PLAN.md](PLAN.md)), and why a single-number coverage claim on an imbalanced cohort deserves suspicion in general.
 
 ## 6. Why did the estimated correction fail where the exact one worked? (technical peer)
 
@@ -32,7 +32,7 @@ More than the class mix moved. Both corrections assume that the appearance of ea
 
 ## 8. Two encoders saw the test data during pre-training. Did that flatter them? (technical peer)
 
-Not where it was looked for. ECG-FM and HuBERT-ECG both had PTB-XL, the source corpus, in their pre-training. The arm with no public corpus at all, ECGFounder, still has the best source AUROC: 0.919 against 0.891 and 0.838 (figure 3, `results/arms.json`, every comparison paired). HuBERT-ECG also saw Shandong, and on Shandong its coverage gap sits between the two uncontaminated arms. Its small Chongqing gap (+0.047 against +0.650 for the random-init arm) is best read as transfer from the broadest pre-training mix, nine corpora including several Chinese ones, since Chongqing is in nobody's pre-training list. The grid cannot prove the absence of contamination effects; it shows that on this break, having seen the test distributions was neither necessary nor sufficient to look good.
+No home advantage is visible in the comparison. ECG-FM and HuBERT-ECG both had PTB-XL, the source corpus, in their pre-training. The arm with no public corpus at all, ECGFounder, still has the best source AUROC: 0.919 against 0.891 and 0.838 (figure 3, `results/arms.json`, every comparison paired). HuBERT-ECG also saw Shandong, and on Shandong its coverage gap sits between the two uncontaminated arms. Its small Chongqing gap (+0.047 against +0.650 for the random-init arm) is best read as transfer from the broadest pre-training mix, nine corpora including several Chinese ones, since Chongqing is in nobody's pre-training list. The grid cannot prove the absence of contamination effects; it shows that on this break, having seen the test distributions did not by itself produce better results.
 
 ## 9. Can this go into a product or a trial? (commercial)
 

@@ -35,7 +35,7 @@ import pandas as pd
 from ecs.config import ACS_DIR, ACS_LABELLED_SPLIT, PTBXL_DIR, RESULTS_DIR, SPH_DIR
 from ecs.report import CORRECTIONS, Source, Target, frozen_calibration_table
 
-# The levels the plan names, loosest first, so the table reads as confidence rising.
+# Confidence levels from the plan, loosest first.
 ALPHAS = (0.20, 0.10, 0.05)
 
 # The setting the reading is written at: the 90% set on the score that gives the

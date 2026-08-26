@@ -1,4 +1,4 @@
-"""The figures the plan fixed before any result existed.
+"""Draw the four figures listed in PLAN.md.
 
 Each one is drawn from a file under ``results/`` that was committed before it,
 so a figure can always be regenerated from the numbers rather than redrawn from
@@ -64,7 +64,7 @@ ARM_NAMES = {
     "hubert_ecg": "HuBERT-ECG",
 }
 # Grey for the arms that saw neither corpus, warm for the ones that saw PTB-XL,
-# hottest for the one that saw a target as well.  The colour carries the claim.
+# hottest for the one that saw a target as well.
 ARM_COLOUR = {
     "random_init": "#adb5bd",
     "ecgfounder": "#6c757d",

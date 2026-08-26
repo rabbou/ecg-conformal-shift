@@ -25,7 +25,7 @@ import numpy as np
 import pandas as pd
 
 from ecs.config import PTBXL_DIR, RESULTS_DIR
-from ecs.report import CORRECTIONS, SCORES, repeated_split_report
+from ecs.report import REDRAW_CORRECTIONS, SCORES, repeated_split_report
 
 # The levels the plan names, loosest first, so the table reads as confidence rising.
 ALPHAS = (0.20, 0.10, 0.05)
@@ -62,7 +62,7 @@ def main(argv: list[str] | None = None) -> int:
         )
         for alpha in ALPHAS
         for score in SCORES
-        for correction in CORRECTIONS
+        for correction in REDRAW_CORRECTIONS
     ]
     report = {
         "corpus": "ptbxl",

@@ -72,6 +72,10 @@ ARM_ORDER = ("random_init", "ecgfounder", "ecgfm", "hubert_ecg")
 # The level the headline is quoted at, and the level day 3's break was quoted
 # at, so the two are read side by side.  The file carries every level.
 HEADLINE = {"alpha": 0.20, "score": "lac", "correction": "none"}
+# The grid asks what the encoder underneath does to the break, so it holds the
+# two corrections that need nothing estimated; which correction repairs the
+# break is the break table's question, not this one's.
+ARM_CORRECTIONS = ("none", "mondrian")
 ALPHAS = (0.20, 0.10, 0.05)
 
 TARGETS = ("sph", "acs")
@@ -305,7 +309,13 @@ def main(argv: list[str] | None = None) -> int:
             for corpus in TARGETS
         }
         tables[arm] = frozen_calibration_table(
-            source, targets, ALPHAS, n_draws=args.draws, seed=args.seed, keep_draws=True
+            source,
+            targets,
+            ALPHAS,
+            n_draws=args.draws,
+            seed=args.seed,
+            keep_draws=True,
+            corrections=ARM_CORRECTIONS,
         )
         print(f"{arm}: conformal table over {args.draws} draws", flush=True)
 
@@ -319,7 +329,7 @@ def main(argv: list[str] | None = None) -> int:
         {"alpha": alpha, "score": score, "correction": correction}
         for alpha in ALPHAS
         for score in ("lac", "aps")
-        for correction in ("none", "mondrian")
+        for correction in ARM_CORRECTIONS
     ]
     gaps: dict[str, list[dict[str, Any]]] = {}
     for arm in ARM_ORDER:

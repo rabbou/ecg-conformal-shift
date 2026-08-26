@@ -15,6 +15,7 @@ from __future__ import annotations
 import json
 import subprocess
 from pathlib import Path
+from typing import Any, cast
 
 import numpy as np
 import pytest
@@ -226,13 +227,16 @@ class TestTheFigures:
             )
             assert tracked.returncode == 0, f"figure {number} draws from an uncommitted {source}"
 
-    def test_figure_one_carries_a_panel_row_per_corpus(self, tmp_path: Path) -> None:
-        """A figure with two of the three hospitals on it would read as a result.
-        The count of panel rows is checked against the corpora on the table."""
+    def test_figure_one_carries_a_panel_per_corpus_and_per_correction(self, tmp_path: Path) -> None:
+        """A figure with two of the three hospitals on it, or with a correction
+        left off, would read as a result. Both counts are checked against what
+        the table holds rather than against a number written here."""
         import figures
 
         table = json.loads((RESULTS_DIR / "shift.json").read_text())
         assert set(figures.corpora_on(table)) == {"ptbxl", "sph", "acs"}
+        assert figures.corrections_on(table) == ["none", "mondrian", "weighted"]
+        assert set(figures.corrections_on(table)) == {r["correction"] for r in table["rows"]}
         drawn = figures.figure_1_coverage(table, tmp_path / "fig1.png", RESULTS_DIR / "shift.json")
         assert drawn.stat().st_size > 10_000
 
@@ -366,21 +370,73 @@ class TestTheFrozenCalibrationOnDataWhoseAnswerIsKnown:
             low, high = _fixed_target_band(row["alpha"], block["n_points"])
             assert target + low <= got <= target + high, (row["score"], target, got)
 
-    def test_the_threshold_does_not_depend_on_which_corpus_it_is_spent_on(self) -> None:
-        """C-20's falsifier. ``frozen_threshold`` takes no target argument, so a
-        threshold re-fitted on the target is not something a caller can ask for;
-        this holds the whole table to that, against two unrelated targets -- one
-        of which has had its labels inverted."""
+    def test_no_target_label_ever_reaches_a_threshold(self) -> None:
+        """C-20's falsifier, and the one the weighted correction has to survive.
+
+        The same source is given a target twice: once as it is, once with every
+        label inverted.  A threshold that read a target label -- or a target
+        score, which needs the label to be picked out -- could not come back
+        bit-identical from both, whatever the correction."""
         probs, labels = _pool(n=8000, seed=3)
         source = _source(probs[:2000], labels[:2000])
-        one = frozen_calibration_table(
-            source, {"a": Target(probs[2000:5000], labels[2000:5000], 3000)}, (0.10,), 40, seed=7
+        upright: list[dict[str, Any]] = cast(
+            "list[dict[str, Any]]",
+            frozen_calibration_table(
+                source,
+                {"t": Target(probs[2000:5000], labels[2000:5000], 3000)},
+                (0.10,),
+                40,
+                seed=7,
+            ),
         )
-        other = frozen_calibration_table(
-            source, {"b": Target(probs[5000:], 1 - labels[5000:], 3000)}, (0.10,), 40, seed=7
+        inverted: list[dict[str, Any]] = cast(
+            "list[dict[str, Any]]",
+            frozen_calibration_table(
+                source,
+                {"t": Target(probs[2000:5000], 1 - labels[2000:5000], 3000)},
+                (0.10,),
+                40,
+                seed=7,
+            ),
         )
-        assert [r["threshold_by_class"] for r in one] == [r["threshold_by_class"] for r in other]
-        assert [r["calibration"] for r in one] == [r["calibration"] for r in other]
+        for here, there in zip(upright, inverted, strict=True):
+            for corpus in ("source", "t"):
+                assert (
+                    here["by_corpus"][corpus]["threshold_by_class"]
+                    == there["by_corpus"][corpus]["threshold_by_class"]
+                ), (here["score"], here["correction"], corpus)
+                assert (
+                    here["by_corpus"][corpus]["calibration"]
+                    == there["by_corpus"][corpus]["calibration"]
+                ), (here["score"], here["correction"], corpus)
+            assert here["calibration"] == there["calibration"]
+
+    def test_an_unweighted_threshold_does_not_depend_on_which_corpus_it_is_spent_on(self) -> None:
+        """The two corrections that estimate nothing spend one threshold
+        everywhere, and the file carries that as three identical blocks rather
+        than as a claim in prose. The weighted one is excluded here because it
+        reads the target's class mix -- which is the whole difference this day
+        measures, and is asserted separately."""
+        probs, labels = _pool(n=8000, seed=3)
+        source = _source(probs[:2000], labels[:2000])
+        table: list[dict[str, Any]] = cast(
+            "list[dict[str, Any]]",
+            frozen_calibration_table(
+                source,
+                {"a": Target(probs[2000:5000], labels[2000:5000], 3000)},
+                (0.10,),
+                40,
+                seed=7,
+            ),
+        )
+        for row in table:
+            blocks = [block["threshold_by_class"] for block in row["by_corpus"].values()]
+            if row["correction"] == "weighted":
+                assert row["threshold_depends_on_target"] is True
+                assert "unlabelled" in row["target_information_used"]
+            else:
+                assert row["threshold_depends_on_target"] is False
+                assert blocks[0] == blocks[1], (row["score"], row["correction"])
 
     def test_the_in_distribution_panel_reproduces_the_re_draw_harness(self) -> None:
         """The two harnesses answer the same question about the source and must
@@ -471,6 +527,95 @@ class TestWhatAPrevalenceShiftDoesToTheGuarantee:
         assert moved == pytest.approx(expected, abs=0.02), (score, moved, expected)
 
 
+class TestTheWeightedCorrection:
+    """The estimated correction, on the shift built so theory says what comes out.
+
+    Its two claims are different in kind from Mondrian's.  Mondrian is exact and
+    needs nothing: the only question is whether the class had enough points.  The
+    weighted correction is exact only if the target prior it was handed is right,
+    so what has to be shown is where the estimate comes from, what it costs, and
+    what happens when it is wrong.
+    """
+
+    def test_on_an_unshifted_target_the_weighting_collapses_to_no_correction(self) -> None:
+        """When the target prior equals the source's, w(y) = 1 and the weighted
+        quantile is the ordinary one. A correction that moved the threshold here
+        would be reading something other than the class mix."""
+        probs, labels = _pool()
+        taken: set[int] = set()
+        source = _source(*_sample_at(probs, labels, SOURCE_N, SOURCE_PREVALENCE, taken, seed=1))
+        target_probs, target_labels = _sample_at(
+            probs, labels, TARGET_N, SOURCE_PREVALENCE, taken, seed=2
+        )
+        table = frozen_calibration_table(
+            source,
+            {"elsewhere": Target(target_probs, target_labels, n_patients=TARGET_N)},
+            (0.10,),
+            n_draws=120,
+            seed=5,
+        )
+        for score in ("lac", "aps"):
+            plain = _row(table, score, "none")["by_corpus"]["elsewhere"]
+            weighted = _row(table, score, "weighted")["by_corpus"]["elsewhere"]
+            assert weighted["threshold_by_class"]["1"]["mean"] == pytest.approx(
+                plain["threshold_by_class"]["1"]["mean"], abs=0.01
+            ), score
+            n = _row(table, score, "weighted")["calibration"]["n"]["mean"]
+            assert weighted["calibration"]["effective_sample_size"]["mean"] > 0.95 * n, score
+
+    def test_the_estimated_prior_follows_the_target_and_costs_effective_sample_size(
+        self, shifted_table: list[dict]
+    ) -> None:
+        """C-9's reason for existing. Reweighting 25% sick calibration points to
+        look like a 2% sick target puts most of the mass on one class, and the
+        effective sample size is what says how few points the restored guarantee
+        actually rests on."""
+        for score in ("lac", "aps"):
+            row = _row(shifted_table, score, "weighted")
+            block = row["by_corpus"]["elsewhere"]
+            estimated = block["calibration"]["estimated_prevalence"]["mean"]
+            assert abs(estimated - TARGET_PREVALENCE) < abs(estimated - SOURCE_PREVALENCE), (
+                score,
+                estimated,
+            )
+            effective = block["calibration"]["effective_sample_size"]["mean"]
+            assert effective < 0.9 * row["calibration"]["n"]["mean"], (score, effective)
+            assert block["calibration"]["weight_by_class"]["1"]["mean"] < 1.0
+            assert block["calibration"]["weight_by_class"]["0"]["mean"] > 1.0
+
+    def test_the_source_panel_is_left_alone_because_its_own_mix_did_not_move(
+        self, shifted_table: list[dict]
+    ) -> None:
+        """Every corpus gets its own estimated prior, the source's held-out half
+        included. There the estimate reproduces the mix the threshold was fitted
+        at, so the weighted threshold must land on the uncorrected one -- the
+        control that shows the correction is driven by the shift and not by the
+        act of weighting."""
+        for score in ("lac", "aps"):
+            plain = _row(shifted_table, score, "none")["by_corpus"]["source"]
+            weighted = _row(shifted_table, score, "weighted")["by_corpus"]["source"]
+            assert weighted["threshold_by_class"]["1"]["mean"] == pytest.approx(
+                plain["threshold_by_class"]["1"]["mean"], abs=0.01
+            ), score
+
+    def test_a_target_prior_that_cannot_be_identified_widens_every_set(self) -> None:
+        """A predictor that says the same thing about everyone carries no
+        information about the target's class mix. The honest answer is an
+        infinite threshold -- every label kept -- counted on the file, not a
+        prior invented to keep the column full."""
+        probs, labels = _pool(n=6000, seed=12)
+        flat = np.column_stack([np.full(3000, 0.7), np.full(3000, 0.3)])
+        source = _source(probs[:3000], labels[:3000])
+        table = frozen_calibration_table(
+            source, {"flat": Target(flat, labels[3000:], 3000)}, (0.10,), n_draws=20, seed=3
+        )
+        for score in ("lac", "aps"):
+            block = _row(table, score, "weighted")["by_corpus"]["flat"]
+            assert block["calibration"]["n_unidentified"] == 20, score
+            assert block["threshold_by_class"]["1"]["n_infinite"] == 20, score
+            assert block["coverage"]["mean"] == pytest.approx(1.0), score
+
+
 class TestWhatTheBreakTableCarries:
     """C-9, C-10, C-11 and C-14 on the harness's own output, before any corpus."""
 
@@ -487,9 +632,9 @@ class TestWhatTheBreakTableCarries:
         return frozen_calibration_table(source, targets, (0.20, 0.10, 0.05), n_draws=101, seed=2)
 
     def test_it_holds_one_row_per_level_score_and_correction(self, table: list[dict]) -> None:
-        assert len(table) == 3 * 2 * 2
+        assert len(table) == 3 * 2 * 3
         assert sorted({r["alpha"] for r in table}) == [0.05, 0.10, 0.20]
-        assert {r["correction"] for r in table} == {"none", "mondrian"}
+        assert {r["correction"] for r in table} == {"none", "mondrian", "weighted"}
 
     def test_every_figure_on_every_corpus_is_a_mean_over_at_least_a_hundred_draws(
         self, table: list[dict]
@@ -502,18 +647,44 @@ class TestWhatTheBreakTableCarries:
                 for figures in block["coverage_by_class"].values():
                     assert figures["n_draws"] >= MIN_DRAWS
 
-    def test_the_calibration_sample_reports_its_effective_size(self, table: list[dict]) -> None:
-        """C-9. No correction here reweights the calibration points, so the
-        effective size is the count itself -- stated rather than assumed, so that
-        the day a weighted correction lands the two numbers part company in
-        plain sight."""
+    def test_every_cell_reports_the_effective_size_of_what_calibrated_it(
+        self, table: list[dict]
+    ) -> None:
+        """C-9, on every (level, score, correction, corpus) cell of the table.
+
+        The two unweighted corrections spend every calibration point at weight
+        one, so their effective size is the count itself and the file says so
+        rather than leaving it to be assumed.  The weighted one reweights, so
+        its effective size can only be lower -- that is the price the criterion
+        exists to keep visible."""
+        for row in table:
+            n = row["calibration"]["n"]["mean"]
+            for corpus, block in row["by_corpus"].items():
+                calibration = block["calibration"]
+                effective = calibration["effective_sample_size"]["mean"]
+                assert calibration["effective_sample_size"]["n_draws"] >= MIN_DRAWS
+                if row["correction"] == "weighted":
+                    assert 0 < effective <= n, (corpus, effective, n)
+                    assert "BBSE" in calibration["weighting"]
+                    assert calibration["n_unidentified"] == 0
+                    assert 0.0 <= calibration["estimated_prevalence"]["mean"] <= 1.0
+                else:
+                    assert effective == pytest.approx(n), (row["correction"], corpus)
+                    assert "uniform" in calibration["weighting"]
+                    for weight in calibration["weight_by_class"].values():
+                        assert weight["mean"] == pytest.approx(1.0)
+
+    def test_the_split_reports_what_each_class_is_calibrated_on(self, table: list[dict]) -> None:
+        """C-9's other half: the Mondrian threshold for a class is only as good
+        as the points that class was left with, and the minority class is where
+        that bites, so the count per class is on the row beside the total."""
         for row in table:
             calibration = row["calibration"]
-            assert calibration["effective_sample_size"]["mean"] == pytest.approx(
-                calibration["n"]["mean"]
-            )
-            assert "uniform" in calibration["weighting"]
             assert set(calibration["n_by_class"]) == {"0", "1"}
+            counted = sum(figures["mean"] for figures in calibration["n_by_class"].values())
+            assert counted == pytest.approx(calibration["n"]["mean"])
+            for figures in calibration["n_by_class"].values():
+                assert figures["mean"] > 0
 
     def test_every_corpus_names_what_could_not_be_made_identical(self, table: list[dict]) -> None:
         """C-14: the deviations travel with the numbers, not beside them."""
@@ -521,25 +692,31 @@ class TestWhatTheBreakTableCarries:
             assert row["by_corpus"]["source"]["deviations"] == ["nothing gave here"]
             assert row["by_corpus"]["elsewhere"]["deviations"] == ["a named deviation"]
 
-    def test_the_threshold_it_spent_is_on_the_row(self, table: list[dict]) -> None:
+    def test_the_threshold_it_spent_is_in_every_corpus_block(self, table: list[dict]) -> None:
+        """The threshold lives beside the corpus it was spent on, because one of
+        the three corrections makes it depend on that corpus."""
         for row in table:
-            by_class = row["threshold_by_class"]
-            assert set(by_class) == {"0", "1"}
-            for figures in by_class.values():
-                assert figures["n_draws"] == 101
-                assert figures["n_infinite"] == 0
-            if row["correction"] == "none":
-                assert by_class["0"]["mean"] == pytest.approx(by_class["1"]["mean"])
+            for corpus, block in row["by_corpus"].items():
+                by_class = block["threshold_by_class"]
+                assert set(by_class) == {"0", "1"}, corpus
+                for figures in by_class.values():
+                    assert figures["n_draws"] == 101
+                    assert figures["n_infinite"] == 0
+                if row["correction"] == "none":
+                    assert by_class["0"]["mean"] == pytest.approx(by_class["1"]["mean"])
 
     def test_a_tighter_level_never_lowers_the_threshold(self, table: list[dict]) -> None:
         for score in ("lac", "aps"):
-            for correction in ("none", "mondrian"):
-                rows = sorted(
-                    (r for r in table if r["score"] == score and r["correction"] == correction),
-                    key=lambda r: -float(r["alpha"]),
-                )
-                means = [r["threshold_by_class"]["1"]["mean"] for r in rows]
-                assert means == sorted(means), (score, correction, means)
+            for correction in ("none", "mondrian", "weighted"):
+                for corpus in ("source", "elsewhere"):
+                    rows = sorted(
+                        (r for r in table if r["score"] == score and r["correction"] == correction),
+                        key=lambda r: -float(r["alpha"]),
+                    )
+                    means = [
+                        r["by_corpus"][corpus]["threshold_by_class"]["1"]["mean"] for r in rows
+                    ]
+                    assert means == sorted(means), (score, correction, corpus, means)
 
 
 class TestTheCommittedBreakTable:
@@ -559,18 +736,34 @@ class TestTheCommittedBreakTable:
         for row in table["rows"]:
             assert set(row["by_corpus"]) == {"ptbxl", "sph", "acs"}
 
-    def test_it_covers_the_three_levels_both_scores_and_both_corrections(self, table: dict) -> None:
+    def test_it_covers_the_three_levels_both_scores_and_all_three_corrections(
+        self, table: dict
+    ) -> None:
         assert sorted({row["alpha"] for row in table["rows"]}) == [0.05, 0.10, 0.20]
         assert {row["score"] for row in table["rows"]} == {"lac", "aps"}
-        assert {row["correction"] for row in table["rows"]} == {"none", "mondrian"}
+        assert {row["correction"] for row in table["rows"]} == {"none", "mondrian", "weighted"}
+        assert set(table["corrections"]) == {"none", "mondrian", "weighted"}
 
     def test_every_threshold_was_fitted_on_ptbxl_and_nowhere_else(self, table: dict) -> None:
-        """C-20 on the committed file: the protocol is named and every row says
-        which corpus its threshold came from."""
+        """C-20 on the committed file: the protocol is named, every row says which
+        corpus its threshold came from, and every row says what -- if anything --
+        the target supplied.
+
+        Only the weighted correction is allowed to differ by corpus, and the file
+        has to say what it read to differ: the target's unlabelled class mix, and
+        nothing that would make the corpus a calibration set for itself."""
         assert table["calibrated_on"] == "ptbxl"
         assert "never re-calibrated on themselves" in table["protocol"]
+        assert "no target label" in table["what_the_target_supplied"]
         for row in table["rows"]:
             assert row["calibrated_on"] == "ptbxl"
+            spent = [block["threshold_by_class"] for block in row["by_corpus"].values()]
+            if row["correction"] == "weighted":
+                assert row["threshold_depends_on_target"] is True
+                assert "unlabelled" in row["target_information_used"]
+            else:
+                assert row["threshold_depends_on_target"] is False
+                assert spent[1:] == spent[:-1], (row["score"], row["correction"])
 
     def test_every_figure_is_a_mean_over_at_least_a_hundred_draws_with_its_spread(
         self, table: dict
@@ -592,14 +785,81 @@ class TestTheCommittedBreakTable:
                 for figures in block["coverage_by_class"].values():
                     assert figures["n_draws"] >= MIN_DRAWS
 
-    def test_the_calibration_sample_reports_its_effective_size(self, table: dict) -> None:
-        """C-9."""
+    def test_every_weighted_cell_reports_what_the_weighting_cost_it(self, table: dict) -> None:
+        """C-9 on the committed file. The two exact corrections spend every point
+        at weight one; the weighted one does not, and on the two corpora whose
+        class mix actually moved it must show a smaller effective sample than the
+        count -- which is the whole reason the criterion exists."""
         for row in table["rows"]:
-            calibration = row["calibration"]
-            assert calibration["effective_sample_size"]["mean"] == pytest.approx(
-                calibration["n"]["mean"]
+            n = row["calibration"]["n"]["mean"]
+            assert n > 0
+            for corpus, block in row["by_corpus"].items():
+                effective = block["calibration"]["effective_sample_size"]["mean"]
+                if row["correction"] != "weighted":
+                    assert effective == pytest.approx(n), (row["correction"], corpus)
+                    continue
+                lost = block["calibration"]["n_unidentified"]
+                assert lost == block["threshold_by_class"]["1"]["n_infinite"], corpus
+                assert lost < 0.05 * table["n_draws"], (corpus, lost)
+                assert block["calibration"]["effective_sample_size"]["n_draws"] == (
+                    table["n_draws"] - lost
+                )
+                assert 0.0 < block["calibration"]["estimated_prevalence"]["mean"] < 1.0
+                if corpus == "ptbxl":
+                    assert effective > 0.98 * n, "the source's own mix did not move"
+                else:
+                    assert effective < 0.95 * n, (corpus, effective, n)
+
+    def test_the_split_reports_what_the_minority_class_is_calibrated_on(self, table: dict) -> None:
+        """C-9's other half: a Mondrian threshold is only as good as the points
+        its class was left with, so the row carries the count per class."""
+        for row in table["rows"]:
+            by_class = row["calibration"]["n_by_class"]
+            assert set(by_class) == {"0", "1"}
+            assert by_class["1"]["mean"] < by_class["0"]["mean"], "MI is the minority at home"
+            counted = sum(figures["mean"] for figures in by_class.values())
+            assert counted == pytest.approx(row["calibration"]["n"]["mean"])
+
+    def test_the_reading_is_read_back_off_the_rows(self, table: dict) -> None:
+        """The answer the day was for cannot drift from the table it sits on: the
+        paired differences it quotes are recomputed here from the per-draw series
+        the rows carry, and the headline figures it names are matched as text."""
+        reading = table["reading"]
+        headline = [r for r in table["rows"] if r["alpha"] == 0.10 and r["score"] == "lac"]
+        by_correction = {row["correction"]: row for row in headline}
+        for corpus, blocks in reading["paired"].items():
+            for pair, quoted in blocks["sick coverage"].items():
+                left, right = pair.split(" - ")
+                difference = np.asarray(
+                    by_correction[left]["by_corpus"][corpus]["coverage_by_class_by_draw"]["1"]
+                ) - np.asarray(
+                    by_correction[right]["by_corpus"][corpus]["coverage_by_class_by_draw"]["1"]
+                )
+                assert quoted["mean"] == pytest.approx(float(difference.mean()), abs=5e-5)
+                assert quoted["sd"] == pytest.approx(float(difference.std(ddof=1)), abs=5e-5)
+                assert quoted["n_draws"] == table["n_draws"]
+        prose = " ".join(
+            reading[key]
+            for key in (
+                "which_correction_this_shift_needed",
+                "what_each_costs",
+                "what_neither_repairs",
+                "what_cannot_be_claimed",
             )
-            assert calibration["n"]["mean"] > 0
+        )
+        for correction in ("none", "mondrian", "weighted"):
+            for corpus in ("sph", "acs"):
+                sick = by_correction[correction]["by_corpus"][corpus]["coverage_by_class"]["1"]
+                assert f"{sick['mean']:.3f}" in prose, (correction, corpus)
+        at_home = by_correction["none"]["by_corpus"]["ptbxl"]["coverage_by_class"]["1"]["mean"]
+        assert f"{at_home:.3f}" in prose, "the break at home is what the answer turns on"
+        weighted = by_correction["weighted"]["by_corpus"]
+        for corpus in ("ptbxl", "sph", "acs"):
+            estimated = weighted[corpus]["calibration"]["estimated_prevalence"]["mean"]
+            assert f"{estimated:.4f}" in prose, corpus
+            effective = weighted[corpus]["calibration"]["effective_sample_size"]["mean"]
+            assert f"{effective:.0f}" in prose, corpus
+        assert "cannot know which of the two promises applies" in prose
 
     def test_each_corpus_names_what_could_not_be_made_identical(self, table: dict) -> None:
         """C-14: every external corpus states its own ingestion and label deviations,
@@ -741,12 +1001,21 @@ class TestTheCommittedArmGrid:
                     assert row["coverage_gap"][corpus]["mean"] == pytest.approx(expected, abs=1e-9)
 
     def test_every_arm_covers_every_level_the_break_table_covers(self, grid: dict) -> None:
+        """The grid asks what the encoder underneath does to the break, so it holds
+        every level and score the break table holds, under the corrections that
+        estimate nothing. Which correction repairs the break is the break table's
+        question; a grid that answered it too would be measuring two things at
+        once. What the grid does report must be a setting the break table also
+        reports, so the two files can be read against each other."""
         break_table = json.loads((RESULTS_DIR / "shift.json").read_text())
         settings = {(r["alpha"], r["score"], r["correction"]) for r in break_table["rows"]}
         for arm in self.ARMS:
-            assert {
-                (r["alpha"], r["score"], r["correction"]) for r in grid["coverage"][arm]
-            } == settings, arm
+            reported = {(r["alpha"], r["score"], r["correction"]) for r in grid["coverage"][arm]}
+            assert reported <= settings, arm
+            assert {(alpha, score) for alpha, score, _ in reported} == {
+                (alpha, score) for alpha, score, _ in settings
+            }, arm
+            assert {correction for _, _, correction in reported} == {"none", "mondrian"}, arm
 
     def test_the_arms_were_scored_on_the_same_records_as_each_other(self, grid: dict) -> None:
         """A pairwise comparison across different record sets is not a comparison."""

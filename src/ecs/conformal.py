@@ -5,7 +5,7 @@ Two non-conformity scores are provided:
 ``lac``
     1 - p(true class).  Gives the smallest average set size at a given coverage
     but its coverage is only marginal -- easy cases get singletons, hard cases
-    get starved.  Sadinle, Lei & Wasserman, JASA 2019.
+    get small or empty sets.  Sadinle, Lei & Wasserman, JASA 2019.
 
 ``aps``
     The cumulative probability mass of all classes ranked at or above the true
@@ -100,8 +100,8 @@ def conformal_quantile(scores: Array, alpha: float) -> float:
 
     Returns the ceil((n + 1)(1 - alpha))-th smallest calibration score.  When
     that rank exceeds n the sample is too small to certify the level and the
-    quantile is +inf, which makes every prediction set the full label set --
-    the honest answer rather than a silently invalid one.
+    quantile is +inf, which makes every prediction set the full label set
+    rather than a silently invalid threshold.
     """
     _check_alpha(alpha)
     scores = np.asarray(scores, dtype=np.float64)
@@ -222,7 +222,7 @@ def mondrian_quantiles(
 
     The price is that each class must carry enough calibration points on its
     own: a class with fewer than ceil(1/alpha) - 1 gets an infinite threshold
-    and is always included, which is the honest failure rather than a quiet one.
+    and is always included, so the failure is visible rather than silent.
     """
     _check_alpha(alpha)
     labels = np.asarray(labels)
@@ -314,7 +314,7 @@ def label_shift_weights(source_prior: Array, target_prior: Array) -> Array:
     """w(y) = q(y) / p(y), the weight each calibration point carries by its label.
 
     A class the source never saw cannot be reweighted into existence: its source
-    share is zero and the ratio is undefined.  Raising is the honest answer,
+    share is zero and the ratio is undefined.  Raising is the right response,
     because the alternative -- an infinite or a silently zeroed weight -- would
     put the whole of the calibration mass on one class without saying so.
     """

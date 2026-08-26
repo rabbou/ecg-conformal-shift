@@ -1,70 +1,85 @@
-# The report
+# Report
 
-**The question, in two sentences.** A heart-attack detector that is allowed to abstain promises that its output contains the correct diagnosis 90% of the time. This page reports whether that promise survives the move from the hospital whose data tuned it to two hospitals it has never seen, and which of the two standard corrections repairs what breaks.
+This repository measures whether a conformal coverage guarantee survives a change of hospital. A classifier trained on a German ECG corpus is calibrated so that its output contains the correct diagnosis for 90% of patients. The guarantee assumes that calibration patients and new patients come from the same distribution. We applied the calibrated model to two Chinese hospital corpora without re-calibration and measured what happened. Coverage degraded differently at each hospital. Of the two standard corrections, per-class calibration repaired most of the damage; reweighting by an estimated class mix repaired almost none of it.
 
-Written for a reader with five minutes; every term is defined where it first appears. The technical front door, with file-level detail, is [README.md](README.md). The ten questions this page tends to raise are answered in [QUESTIONS.md](QUESTIONS.md).
+[README.md](README.md) documents the corpora and the reproduction commands. [QUESTIONS.md](QUESTIONS.md) answers common questions about the study.
 
-## The object
+## Background
 
-A neural network reads a resting 12-lead electrocardiogram and scores it for **myocardial infarction** — the electrical signature of a heart attack, present or past. On top of that score sits a layer that is allowed to hedge. Instead of always answering "infarction" or "no infarction", it returns a **prediction set**: the list of labels it cannot rule out at the confidence asked for. Most tracings get a single label. A tracing can get both labels, meaning the model declines to choose, or no label at all, meaning the tracing resembles nothing it was calibrated on. In a clinic those two outcomes mean the same thing: the tracing goes to a human.
+The classifier reads a resting 12-lead electrocardiogram and scores it for myocardial infarction, the electrical signature of a heart attack. Its output is a prediction set: the subset of the two labels, infarction and no infarction, that it cannot rule out at the requested confidence. Most tracings receive one label. A set with both labels means the model does not decide between them. An empty set means the tracing is unlike anything in the calibration data. In practice both cases mean that a human reads the tracing.
 
-The dial that decides how much to hedge is set from data, never by hand. **Split conformal prediction** works as follows: put aside labelled tracings the model was not trained on (the **calibration set**) and pick the threshold so that the sets contain the true label at the rate asked for, say 90%. That rate, as observed on new patients, is called **coverage**. The method comes with a theorem: ask for 90%, get 90%. The theorem has one premise — the calibration patients and the future patients are statistically interchangeable. Two hospitals are not. This measurement is what the theorem is worth once its premise fails.
+The threshold that determines what enters the set is fitted by split conformal prediction. A labelled sample that the model was not trained on, called the calibration set, is used to choose the threshold so that the sets contain the true label at the requested rate. The observed rate on new patients is called coverage. The guarantee holds under one assumption: calibration and test patients are exchangeable, meaning drawn from the same population.
 
-One honest word about the promise before it is tested: it is **marginal**, an average over patients and over draws of the calibration set. "90% coverage" means 90% of tracings on average, never "90% for this patient", and never by itself "90% within each class of patient". That distinction decides everything below.
+The guarantee is marginal. It is an average over patients and over draws of the calibration set. 90% coverage does not mean 90% for a given patient, and does not by itself mean 90% within each diagnostic class.
 
-## The measurement
+## Setup
 
-One classifier was trained on PTB-XL, a German research corpus. One threshold was fitted on PTB-XL calibration patients and then spent, unchanged, on three test sets: held-out PTB-XL patients (home ground), all of Shandong, all of Chongqing. The two Chinese hospitals were scored once each; nothing was tuned on them and no threshold ever saw their labels. Every coverage figure is a mean over 200 draws of the calibration set, reported with its standard deviation (sd).
+The classifier was trained on PTB-XL, a German research corpus. A threshold was fitted on PTB-XL calibration patients and applied unchanged to three test sets: held-out PTB-XL patients, the full SPH corpus (Shandong), and the full ACS-ECG corpus (Chongqing). Each external corpus was scored once. No external label was used to fit any threshold. Coverage figures are means over 200 draws of the calibration set, reported with their standard deviation (sd).
 
 | Cohort | Country, years | Tracings scored | Infarction share | Role |
 |---|---|---|---|---|
-| PTB-XL | Germany, 1989–96 | 2,198 (fold 10) | 25.0% | calibration + home test |
+| PTB-XL | Germany, 1989–96 | 2,198 (fold 10) | 25.0% | calibration + in-distribution test |
 | SPH (Shandong) | China, 2019–20 | 25,770 | 1.0%, mostly old infarcts | shifted test |
 | ACS-ECG (Chongqing) | China, 2015–24 | 17,955 | 14.9%, acute, angiography-confirmed | shifted test |
 
-The disease mix moves by a factor of 25 in one direction and the meaning of the label itself moves in the other: Chongqing's infarctions are acute events confirmed by angiography, where PTB-XL's are ECG diagnoses, largely older ones. Three versions of the threshold meet this: **no correction** (one threshold for everyone); **Mondrian** (one threshold per class, fitted inside each class on PTB-XL — exact mathematics, nothing estimated, built for a change in disease mix); **label-shift weighting** (calibration points reweighted toward the target hospital's class mix, which is not known and must be estimated from the model's own unlabelled predictions there).
+Two things change between source and targets. The infarction share drops from 25.0% to 1.0% in Shandong and to 14.9% in Chongqing. The label definition also changes: Chongqing labels acute infarctions confirmed by angiography, while PTB-XL labels are ECG diagnoses, most of them older infarcts.
 
-## The four figures
+Three threshold variants were compared:
+
+- none: a single threshold shared by both classes;
+- Mondrian: one threshold per class, fitted within each class on PTB-XL; exact in finite samples under any change of class proportions, with nothing estimated;
+- label-shift weighting: PTB-XL calibration points reweighted toward the target's class mix; the mix is unknown and is estimated from the model's own unlabelled predictions on that corpus (BBSE).
+
+## Results
+
+At the source hospital, overall coverage is 90.0% when 90% is requested, but coverage of infarction cases is 73.5% (sd 3.0). The overall average is dominated by the majority class. Changing hospital does not create this per-class gap; it changes how visible it is.
+
+At the external hospitals the uncorrected threshold moves in opposite directions. In Shandong, where 99% of tracings have no infarction, infarction coverage is 93.6% (sd 0.3), above the requested level. In Chongqing infarction coverage is 72.5% (sd 0.8): about three infarctions in ten receive a set without the true label.
+
+Mondrian calibration brings infarction coverage at the source to 90.1% (sd 2.5), a paired gain of +16.7 points (sd 2.6) over the uncorrected threshold. In Chongqing it adds +11.5 points (sd 1.0), reaching 84.0%. It costs wider sets, with mean set size at the source going from 1.05 to 1.11, and it leaves the minority class calibrated on 275 of 1,099 points.
+
+Label-shift weighting changes little: +0.1 points at the source, +3.6 in Chongqing, and a loss of 2.3 points in Shandong. Its estimate of the class mix is poor on the harder target: 40.9% infarction estimated for Chongqing against 14.9% observed. Reweighting also reduces the effective calibration sample from 1,099 points to 864 in Shandong and 967 in Chongqing.
+
+No correction restores Chongqing to 90%. Both corrections assume that only the class proportions change between hospitals. In Chongqing the label refers to a different clinical event, so the appearance of the positive class changes as well, and reweighting source data cannot compensate for that.
+
+The encoder affects how far coverage falls. Across four frozen encoders, the coverage gap between source and Chongqing ranges from +0.047 to +0.650 at the 80% setting (figure 3). The encoder with no public corpus in its pre-training, ECGFounder, has the best source AUROC, 0.919 with 95% CI 0.907 to 0.932. The two encoders that included PTB-XL in their pre-training score lower at the source, so pre-training contamination produced no visible home advantage in this comparison.
+
+## Figures
 
 ![Figure 1](results/figures/fig1_coverage.png)
 
-**Figure 1 — where the promise holds.** Share of tracings whose set contains the true label, per hospital (rows) and correction (columns); the grey bar is everyone, the red bar is the infarctions, the dashed line is the level asked for.
+Figure 1. Coverage per hospital (rows) and correction (columns). Grey: all tracings. Red: infarction cases. Dashed line: requested coverage.
 
 ![Figure 2](results/figures/fig2_set_sizes.png)
 
-**Figure 2 — what the clinician would see.** As the confidence asked for rises, the share of tracings answered with one label, with both, or with none; the last two are the abstentions that go to a human.
+Figure 2. Composition of the model's output at three confidence levels: one label, both labels, or none. The last two categories go to a human reader.
 
 ![Figure 3](results/figures/fig3_arms.png)
 
-**Figure 3 — four encoders on the same break.** How far coverage falls away from home for each of four network backbones, two of which saw the calibration corpus during their pre-training; the arm that saw no public corpus is the strongest at home.
+Figure 3. Coverage gap between source and targets for four encoders. ECG-FM and HuBERT-ECG included PTB-XL in their pre-training corpora.
 
 ![Figure 4](results/figures/fig4_discrimination.png)
 
-**Figure 4 — the reproduction that licenses the rest.** The supervised baseline reaches an AUROC of 0.932 [0.921, 0.943] on the benchmark split where the published figure is 0.930, so every measurement above sits on a model of known, ordinary quality. (AUROC: the probability that a random infarction tracing is ranked above a random non-infarction one; 0.5 is a coin flip.)
+Figure 4. Discrimination of the supervised baseline on the PTB-XL benchmark split: AUROC 0.932, 95% CI 0.921 to 0.943, against a published reference of 0.930. AUROC is the probability that a randomly chosen infarction tracing receives a higher score than a randomly chosen non-infarction tracing.
 
-## The numbers to remember
+## Limitations
 
-**The promise was already hollow at home.** On PTB-XL itself, with 90% asked for, 90.0% of all sets contain the truth — and only 73.5% (sd 3.0) of infarction sets do. The average is carried by the healthy majority. A hospital switch does not create this gap; it only changes how well the majority hides it.
+- Generality: two target hospitals, one disease, one source corpus. The two targets moved in opposite directions; results at a further hospital cannot be extrapolated.
+- Causes: device, population, era and label definition differ at the same time. This design measures the coverage change and cannot attribute it to any of them.
+- Clinical validity: coverage is a population average, not a per-patient statement. The Mondrian guarantee is conditional on the true class, which is unknown at the point of care. Nothing here is a medical device and nothing was tested in clinical use.
+- The weighting arm: its class-mix estimate came from this model's own predictions, and a better estimator would give it a better result. The estimator (BBSE), its effective sample size and its estimates are reported next to each result.
 
-**Away from home the same threshold breaks in opposite directions.** In Shandong, where 99% of tracings are healthy, infarction coverage lands at 93.6% (sd 0.3) — above the level asked, for the unflattering reason that easy healthy tracings dominate. In Chongqing it falls to 72.5% (sd 0.8): nearly three infarctions in ten receive a set that does not contain the truth.
+## Methods
 
-**The exact correction repairs what it can; the estimated one does not.** Calibrating per class (Mondrian) puts home infarction coverage at 90%, a paired gain of +16.7 points (sd 2.6), and lifts Chongqing by +11.5 points (sd 1.0) to 84.0%. Estimating the target's class mix instead moves almost nothing — +0.1 at home, +3.6 in Chongqing — and in Shandong it is a small loss, −2.3 points, because the estimate itself is poor: it reads Chongqing as 40.9% infarction against a truth of 14.9%. The exact repair has a price: wider sets (mean set size 1.05 → 1.11 at home) and a minority class calibrated on 275 of 1,099 points.
+Each item is enforced by a named test; the acceptance criteria in [PLAN.md](PLAN.md) map to tests in `tests/`.
 
-**Neither correction restores Chongqing to 90%.** Both assume only the disease mix moves between hospitals. In Chongqing the label means a different clinical event, so what an infarction looks like moves too, and no reweighting of German calibration data can repair that.
+- The supervised baseline reproduces a published benchmark value before any other measurement (figure 4).
+- No threshold is hard-coded. Every operating point is calibrated from data.
+- Discrimination is reported without choosing an operating point, with bootstrap confidence intervals. Comparisons between encoders are paired on the same tracings.
+- Coverage is reported per class as well as overall.
+- Splits are drawn by patient. No patient appears on both sides of a calibration or test boundary.
+- No target-corpus label reaches any threshold. A test fails if one does.
 
-**The backbone changes how far the promise falls.** Across four frozen encoders, the coverage gap to Chongqing runs from +0.047 to +0.650 (Figure 3, 80% setting). The encoder that saw no public corpus in pre-training (ECGFounder) is the strongest at home (AUROC 0.919 [0.907, 0.932]); the two that saw PTB-XL do not beat it there, so pre-training contamination bought no visible home advantage in this grid.
+## Data and code
 
-## What this does not claim
-
-- **Generality.** Two target hospitals, one disease, one source corpus. Nothing here says how a fourth hospital would behave, and the two measured here broke in opposite directions.
-- **Causes.** The break is measured, never explained. Device, population, era and label semantics all differ at once; this design cannot attribute the break among them.
-- **Bedside validity.** Coverage is an average over patients, never a per-patient statement. The Mondrian guarantee is conditional on the patient's true class — the thing nobody at the bedside knows. And no part of this pipeline is a medical device or was tested in care.
-- **A fair trial for weighting.** The weighted correction received its class-mix estimate from this particular model's own predictions; a better estimator would give it a better run. What is claimed is what happened here, with the estimator named (BBSE), its effective sample size reported, and the estimate printed next to the truth.
-
-## How it was built
-
-The working habits this repository formalises, each held by a named test rather than by intention: a published value is reproduced first and gates everything downstream (Figure 4); no threshold is hard-coded — every operating point is calibrated from data; discrimination is reported without choosing a threshold, with bootstrap confidence intervals, and every arm-versus-arm claim is a paired comparison on the same tracings; coverage is reported per class, never only on average; every calibration/test boundary is drawn between patients, so no patient sits on both sides; and no target-hospital label ever reaches a threshold — a test fails if one does. The acceptance criteria in [PLAN.md](PLAN.md) map one-to-one to tests in `tests/`.
-
-## Code, data, and how to check
-
-Every number above lives in a JSON file under [`results/`](results/) — the break in `shift.json`, the encoder grid in `arms.json`, the abstention rates in `abstention.json`, the baseline in `baseline.json` — and every figure is redrawn from those files by `scripts/figures.py`. The corpora are public: [PTB-XL](https://physionet.org/content/ptb-xl/1.0.3/) (PhysioNet, CC BY 4.0), [SPH](https://doi.org/10.1038/s41597-022-01403-5) (*Scientific Data*, CC0), [ACS-ECG](https://doi.org/10.6084/m9.figshare.29925314) (figshare, CC0). Method sources: split conformal, Angelopoulos & Bates, arXiv:2107.07511; Mondrian under label shift, Podkopaev & Ramdas, arXiv:2103.03323; weighted conformal, Tibshirani et al., NeurIPS 2019; the prior estimator, Lipton et al., ICML 2018 (BBSE). To reproduce: `uv sync`, then `uv run pytest` for the gates and `uv run python scripts/figures.py` for the figures.
+The numbers in this report are stored under [`results/`](results/): `shift.json` (coverage per hospital and correction), `arms.json` (encoder comparison), `abstention.json` (abstention rates), `baseline.json` (baseline reference). `scripts/figures.py` regenerates the four figures from these files. Corpora: [PTB-XL](https://physionet.org/content/ptb-xl/1.0.3/) (PhysioNet, CC BY 4.0), [SPH](https://doi.org/10.1038/s41597-022-01403-5) (*Scientific Data*, CC0), [ACS-ECG](https://doi.org/10.6084/m9.figshare.29925314) (figshare, CC0). Methods: Angelopoulos & Bates, arXiv:2107.07511 (split conformal); Podkopaev & Ramdas, arXiv:2103.03323 (Mondrian under label shift); Tibshirani et al., NeurIPS 2019 (weighted conformal); Lipton et al., ICML 2018 (BBSE). Reproduction: `uv sync`, then `uv run pytest`, then `uv run python scripts/figures.py`.

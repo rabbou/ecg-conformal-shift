@@ -29,9 +29,9 @@ MIN_DRAWS = 100
 
 
 def _calibrated_problem(n: int = 1200, seed: int = 0) -> tuple[np.ndarray, np.ndarray, list[str]]:
-    """A two-class problem whose probabilities are honest: a record whose stated
-    probability of class 1 is p really is class 1 with probability p.  One record
-    per patient, so the draw is exchangeable by construction."""
+    """A two-class problem whose probabilities are calibrated by construction:
+    a record whose stated probability of class 1 is p really is class 1 with
+    probability p.  One record per patient, so the draw is exchangeable."""
     rng = np.random.default_rng(seed)
     p1 = rng.uniform(0.05, 0.95, n)
     labels = (rng.uniform(size=n) < p1).astype(int)
@@ -600,7 +600,7 @@ class TestTheWeightedCorrection:
 
     def test_a_target_prior_that_cannot_be_identified_widens_every_set(self) -> None:
         """A predictor that says the same thing about everyone carries no
-        information about the target's class mix. The honest answer is an
+        information about the target's class mix. The correct output is an
         infinite threshold -- every label kept -- counted on the file, not a
         prior invented to keep the column full."""
         probs, labels = _pool(n=6000, seed=12)

@@ -107,8 +107,8 @@ of the shift being measured rather than something the pipeline removes.
 
 On filtering: the cited protocol prescribes none, and neither do we beyond what a
 corpus already carried at source. Every filter added is a chance to help one
-cohort more than another, so the honest default is the lightest chain all
-corpora can share.
+cohort more than another, so the default is the lightest chain all corpora can
+share.
 
 
 ## Figures, fixed before any result
@@ -128,7 +128,7 @@ being re-cut. Each is drawn by `scripts/figures.py` from a results file.
    arm, with bootstrapped intervals and paired differences: random-init frozen,
    ECGFounder, ECG-FM, HuBERT-ECG if its contamination claim verifies.
 4. **Baseline discrimination.** AUROC and AUPRC per corpus with intervals; the
-   reproduction of known ground that licenses everything else.
+   reproduction of a published value that validates the setup.
 
 The numbers behind every figure live in `results/` as JSON or CSV and are
 committed before the figure. Each external corpus is scored once with the

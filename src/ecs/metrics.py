@@ -1,11 +1,11 @@
-"""Reporting a coverage number honestly.
+"""Coverage metrics: set size, class-conditional coverage, effective sample size.
 
-Every function here exists because a coverage figure on its own can hide the
-thing that matters.  A set that always contains every class covers perfectly and
-says nothing; a global 90% can be bought by covering the healthy majority while
-missing most of the sick; a weighted correction can "restore" coverage by
-leaning on five patients.  Size, class-conditional coverage and effective sample
-size are what keep those three failures visible.
+A coverage figure on its own can mislead in three ways.  A set that always
+contains every class covers perfectly and says nothing; a global 90% can come
+from covering the healthy majority while missing most of the sick; a weighted
+correction can restore coverage while resting on a handful of patients.  Set
+size, class-conditional coverage and effective sample size expose those three
+cases.
 """
 
 from __future__ import annotations

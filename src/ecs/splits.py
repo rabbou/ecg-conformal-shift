@@ -1,10 +1,10 @@
 """Patient-level splits: every record of a patient lands on one side of a boundary.
 
 The coverage guarantee is a statement about exchangeable patients.  Two
-tracings of the same patient, one used to calibrate and one used to test, are
-not two draws from the population but one draw seen twice, and the guarantee
-they produce is flattered by exactly that much.  So a split is never drawn
-over records here; it is drawn over patients and the records follow.
+tracings of the same patient, one used to calibrate and one used to test,
+amount to one draw from the population seen twice, which inflates the measured
+coverage.  Splits are therefore drawn over patients, never over records, and
+the records follow their patient.
 """
 
 from __future__ import annotations

@@ -1,20 +1,17 @@
 # ecg-conformal-shift
 
-**Does a conformal coverage guarantee survive a change of hospital?**
+Split conformal prediction on 12-lead ECG, calibrated on PTB-XL and evaluated
+without re-calibration on two external hospital corpora (SPH Shandong, ACS-ECG
+Chongqing). The repository measures whether the 90% coverage guarantee survives
+the change of hospital, and compares the two standard corrections: Mondrian
+per-class calibration and label-shift weighting.
 
-A 12-lead ECG classifier that is allowed to abstain, calibrated on one cohort and
-measured on two others. Split conformal prediction promises that its prediction
-sets contain the true label 90% of the time. That promise is a theorem, and the
-theorem assumes calibration and test patients are exchangeable. Hospitals are
-not exchangeable. This measures what the promise is actually worth when they are
-not, and which of the two standard corrections repairs it.
+The findings, the four figures and the limitations are in
+[REPORT.md](REPORT.md). Common questions are answered in
+[QUESTIONS.md](QUESTIONS.md). This file documents the corpora, the layout and
+the reproduction commands.
 
-**Start with [REPORT.md](REPORT.md)** — the findings in plain language, with the
-four figures and what they do and do not claim. The questions the study tends to
-raise are answered in [QUESTIONS.md](QUESTIONS.md). This file is the technical
-front door: the corpora as they sit on disk, the layout, and how to reproduce.
-
-## The cohorts
+## Cohorts
 
 | Cohort | Country, years | Records | Patients | MI prevalence | Role |
 |---|---|---|---|---|---|
@@ -22,13 +19,13 @@ front door: the corpora as they sit on disk, the layout, and how to reproduce.
 | SPH (Shandong) | China, 2019–20 | 25,770 | 24,666 | 1.01% | shifted test |
 | ACS-ECG (Chongqing) | China, 2015–24 | 17,960 | 17,018 | 14.92% acute MI | shifted test |
 
-All three are public and permissively licensed (CC BY 4.0, CC0, CC0). None of
-the counts above is quoted from a paper: each is computed from the corpus's own
-description file and pinned by a test in `tests/test_labels.py`.
+All three are public and permissively licensed (CC BY 4.0, CC0, CC0). The
+counts are computed from each corpus's description file, not quoted from a
+paper, and are pinned by tests in `tests/test_labels.py`.
 
 ## Corpora on disk
 
-What each corpus is, as read off its own files on 2026-08-23.
+Contents recorded from the distributed files on 2026-08-23.
 
 | | PTB-XL | SPH (Shandong) | ACS-ECG (Chongqing) |
 |---|---|---|---|
@@ -40,51 +37,53 @@ What each corpus is, as read off its own files on 2026-08-23.
 | Filtering at source | Schiller device | MedEx MECG-200: mains, baseline wander and muscle noise removed by the machine, nothing added by the authors | Mecg-300 (Medex); the paper describes none |
 | Records | 21,799 | 25,770 | 19,955 = 17,960 `train.csv` + 1,995 `test.csv` (no labels) |
 
-Two things about the Chongqing files that are not in its paper: the header
-columns WFDB reserves for a lead's initial value and checksum hold that lead's
-maximum and minimum instead, so `wfdb` reads the samples correctly but the
-checksum cannot validate them; and every sample is an even number of ADC units,
-so the effective resolution is 2 µV against PTB-XL's 1 µV. The CSV column
-`ecg_row_record` names the file (`04904.dat`); every name in the CSVs is on
-disk and every file on disk is named, and no patient appears in both CSVs.
+Two properties of the Chongqing files are absent from the paper. The header
+columns WFDB reserves for a lead's initial value and checksum hold the lead's
+maximum and minimum, so `wfdb` reads the samples but the checksum cannot
+validate them. Every sample is an even number of ADC units, so the effective
+resolution is 2 µV against PTB-XL's 1 µV. The CSV column `ecg_row_record`
+identifies the file (`04904.dat`); the CSV entries and the files on disk match
+one-to-one, and no patient appears in both CSVs.
 
 A full pass through the ingestion chain (`scripts/scan_corpora.py`, counts in
 `results/ingest_report.json`) keeps every PTB-XL and Shandong record and drops
 five of Chongqing's 19,955: two (`03228`, `14262`) whose `.dat` holds 3,500
-samples under a header claiming 5,000, and three (`02008`, `03054`, `16558`)
-carrying WFDB's missing-sample code, which reads back as NaN. 6,928 Shandong
+samples under a header stating 5,000, and three (`02008`, `03054`, `16558`)
+with WFDB's missing-sample code, which reads back as NaN. 6,928 Shandong
 records are longer than ten seconds and are cropped to the first ten.
 
-Reading cost: `wfdb.rdrecord` spends ~23 ms per record parsing the header (wfdb
-4.3.1 does it through pandas) against 0.8 ms reading the samples, so a full
-pass over a WFDB corpus takes about eight minutes on the laptop; the HDF5 corpus
-reads at ~7 ms per record.
+Reading cost: `wfdb.rdrecord` spends ~23 ms per record parsing the header
+(wfdb 4.3.1 does it through pandas) against 0.8 ms reading the samples, so a
+full pass over a WFDB corpus takes about eight minutes on a laptop; the HDF5
+corpus reads at ~7 ms per record.
 
-The fetch is reproducible: `scripts/fetch_open_corpora.sh` carries the figshare
-file ids and MD5 sums for the three Chongqing archives.
+`scripts/fetch_open_corpora.sh` contains the figshare file ids and MD5 sums
+for the three Chongqing archives.
 
-## What the prevalence gap means
+## Prevalence gap
 
-MI is 25 times rarer in Shandong than in PTB-XL. That is not a labelling
-artefact — dropping PTB-XL's five subendocardial-injury statements, the usual
-suspect, moves prevalence only from 25.09% to 24.26%. PTB-XL is a research
-corpus enriched for pathology; Shandong is an unselected hospital series. And
-89.6% of Shandong's infarctions are annotated *old*, the same chronic-infarct
-target PTB-XL carries, so the two are comparable and the gap is real.
+Infarction is 25 times rarer in Shandong than in PTB-XL. The gap is not a
+labelling artefact: dropping PTB-XL's five subendocardial-injury statements
+moves prevalence only from 25.09% to 24.26%. PTB-XL is a research corpus
+enriched for pathology and Shandong is an unselected hospital series. 89.6% of
+Shandong's infarctions are annotated as old, the same chronic-infarct target
+that PTB-XL uses, so the labels are comparable.
 
-The consequence is methodological. The dominant shift here is in **P(Y)**, not
-**P(X)**. Covariate-shift weighting assumes the opposite and is the wrong
-instrument. Two corrections are implemented instead:
+The dominant shift is therefore in the class prior P(Y) rather than in the
+feature distribution P(X), and covariate-shift weighting does not apply. Two
+corrections are implemented:
 
-- **Mondrian (class-conditional) conformal** — calibrate inside each class.
-  Exactly valid under any change of class proportions, in finite samples, with
-  nothing to estimate.
-- **Label-shift weighting** — reweight by `w(y) = q(y)/p(y)` in the Tibshirani
-  form, with the target prior estimated by BBSE. Asymptotic, and only as good as
-  that estimate — so effective sample size is reported next to every result.
+- Mondrian (class-conditional) conformal: one threshold per class. Exactly
+  valid in finite samples under any change of class proportions, with nothing
+  to estimate.
+- Label-shift weighting: reweight by `w(y) = q(y)/p(y)` in the Tibshirani
+  form, with the target prior estimated by BBSE. The guarantee is asymptotic
+  and depends on that estimate, so effective sample size is reported next to
+  every result.
 
-Chongqing is the harder shift: its label is angiographically confirmed *acute*
-MI, a different clinical target, so label semantics move too.
+Chongqing is the harder target: its label is angiographically confirmed acute
+infarction, a different clinical event, so the label definition changes as
+well as the prevalence.
 
 ## Layout
 
@@ -103,7 +102,8 @@ uv run pytest -m "not data"   # unit tests, no corpora needed
 uv run pytest                 # adds the reference-value tests against the corpora
 ```
 
-PTB-XL is read in place from `ECS_PTBXL_DIR`; SPH and ACS-ECG land in `data/`.
+PTB-XL is read in place from `ECS_PTBXL_DIR`; SPH and ACS-ECG are stored under
+`data/`.
 
 ## Gates
 
@@ -114,9 +114,9 @@ commit via `pre-commit`, tests at pre-push.
 
 MIT ([LICENSE](LICENSE)). The vendored ECGFounder architecture in
 `third_party/ecgfounder/` is MIT, PKUDigitalHealth. The corpora keep their own
-licences (CC BY 4.0 and CC0) and are fetched, never redistributed here. The
-HuBERT-ECG weights are CC BY-NC 4.0: that encoder arm is a research
-demonstration and nothing commercial can ship with it.
+licences (CC BY 4.0 and CC0) and are fetched by script, not redistributed
+here. The HuBERT-ECG weights are CC BY-NC 4.0, so that encoder arm is limited
+to research use and is excluded from any commercial product.
 
 ## Sources
 

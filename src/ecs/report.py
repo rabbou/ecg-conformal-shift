@@ -8,8 +8,8 @@ project is a mean over at least a hundred re-draws with the spread beside it
 predictor -- Angelopoulos & Bates, arXiv:2107.07511, section 3.
 
 The split is drawn over patients, never over records (C-4): two tracings of one
-patient on opposite sides of the boundary are one draw counted twice, and the
-coverage they produce is flattered by exactly that much.
+patient on opposite sides of the boundary are one draw counted twice, which
+inflates the measured coverage.
 
 *Abstaining* here means returning something other than a single label: either
 both labels, which says the tracing is genuinely ambiguous at this confidence,
@@ -197,9 +197,9 @@ def repeated_split_report(
 #
 # A coverage guarantee is a promise about the population the calibration sample
 # came from.  Measuring what it is worth somewhere else means fitting the
-# threshold on the source and spending it, unchanged, on the target -- which is
-# also the only honest protocol, because a threshold re-fitted on the target
-# would measure nothing but the target's own difficulty (C-20).
+# threshold on the source and spending it, unchanged, on the target: a
+# threshold re-fitted on the target would measure only the target's own
+# difficulty (C-20).
 #
 # The spread still has to come from somewhere, since one calibration half gives
 # one number and that number moves by points depending on which half was drawn

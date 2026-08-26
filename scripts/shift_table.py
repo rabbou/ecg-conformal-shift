@@ -262,7 +262,7 @@ def reading(rows: list[dict[str, Any]], corpora: list[str]) -> dict[str, Any]:
         ),
         "what_cannot_be_claimed": (
             "That class-conditional calibration 'works' in deployment. Its guarantee is "
-            "conditional on the patient's true class, which is the thing that is unknown at the "
+            "conditional on the patient's true class, which is unknown at the "
             "bedside: the set is computable without the label, but the clinician holding one "
             "cannot know which of the two promises applies to them, and pays the wider set "
             "either way. Nor that the weighted correction was given a fair estimate here and "

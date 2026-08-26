@@ -1,9 +1,9 @@
-"""Four encoder arms put through the same break, and the distance between them.
+"""Compare four encoder arms on the same calibration-transfer break.
 
-Day 3 measured one model's coverage guarantee falling apart between hospitals.
-This asks whether the encoder underneath changes that, and in particular whether
-an encoder that saw the calibration corpus in pre-training looks better at home
-for a reason that has nothing to do with being better.
+Asks whether the encoder underneath changes how far the coverage guarantee
+falls between hospitals, and in particular whether an encoder that saw the
+calibration corpus in pre-training looks better at home for a reason other
+than being better.
 
 The grid the arms fill:
 

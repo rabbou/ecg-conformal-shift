@@ -138,10 +138,8 @@ class TestPairedDifference:
         assert forward["ci95_low"] == pytest.approx(-backward["ci95_high"], abs=1e-9)
 
     def test_pairing_is_tighter_than_two_separate_intervals(self) -> None:
-        """Why the comparison is paired at all.
-
-        The arms scored the same records, so a draw that happens to pick easy
-        records flatters both.  Pairing removes that shared movement; comparing
+        """The arms scored the same records, so a draw that picks easy records
+        lifts both.  Pairing removes that shared movement; comparing
         two independently drawn intervals leaves it in and would call two arms
         indistinguishable that are in fact cleanly separated.
         """

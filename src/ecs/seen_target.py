@@ -2,11 +2,11 @@
 
 The bundle annotates each record with SNOMED CT concept identifiers on a
 ``# Dx:`` line of its WFDB header.  Which of those identifiers count as
-infarction is the only judgement here, and it is made once, in the open, in
+infarction is the only judgement here, and it is made once, in
 :data:`INFARCTION_CODES`.
 
-The distinction that decides it: SNOMED separates *infarction* -- tissue that
-died -- from *ischaemia* -- tissue starved but not yet dead.  The three corpora
+SNOMED separates *infarction* -- tissue that died -- from *ischaemia* --
+tissue deprived of blood but not yet dead.  The three corpora
 already in this study label infarction (PTB-XL's MI superclass, Shandong's AHA
 category M, Chongqing's angiographic AMI column), so infarction is the class a
 seen target would have to carry, and the ischaemia codes are counted separately
@@ -60,7 +60,7 @@ INFARCTION_CODES = frozenset(
     }
 )
 
-# Ischaemia: tissue starved.  Counted, never added to the infarction class.
+# Ischaemia: tissue deprived of blood.  Counted, never added to the infarction class.
 ISCHAEMIA_CODES = frozenset(
     {
         "164861001",  # myocardial ischemia

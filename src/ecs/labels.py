@@ -1,13 +1,13 @@
 """Building one comparable myocardial-infarction label on three corpora.
 
-The three corpora do not speak the same language.  PTB-XL annotates with
+The three corpora use different annotation schemes.  PTB-XL annotates with
 SCP-ECG statements carrying a 0-100 likelihood; Shandong annotates with AHA
 codes carrying an acute / recent / old modifier; Chongqing annotates with one
 binary column per finding, recorded against a coronary angiogram rather than
-against the tracing.  Everything that makes those three comparable -- or fails
-to -- is decided here and nowhere else.
+against the tracing.  Every decision that makes those three comparable, or
+fails to, is made in this module.
 
-The failure worth stating in advance: PTB-XL's MI superclass and Shandong's
+One known mismatch: PTB-XL's MI superclass and Shandong's
 category-M codes are dominated by the *chronic* infarct pattern, while every
 Chongqing positive is an *acute* event by construction, because the corpus was
 assembled from patients presenting with acute coronary syndrome.  A label

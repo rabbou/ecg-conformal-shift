@@ -144,7 +144,7 @@ class TestWeightedQuantile:
 
     def test_an_overwhelming_test_weight_forces_the_infinite_quantile(self) -> None:
         """When the likelihood ratio says the test point is unlike anything in
-        calibration, the honest threshold is +inf -- predict everything."""
+        calibration, the threshold must be +inf -- predict everything."""
         scores = np.linspace(0, 1, 50)
         q = weighted_conformal_quantile(scores, np.ones(50), np.array([1e9]), 0.1)
         assert math.isinf(q[0])

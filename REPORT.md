@@ -1,6 +1,6 @@
 # Report
 
-This repository measures whether a conformal coverage guarantee survives a change of hospital. A classifier trained on a German ECG corpus is calibrated so that its output contains the correct diagnosis for 90% of patients. The guarantee assumes that calibration patients and new patients come from the same distribution. We applied the calibrated model to two Chinese hospital corpora without re-calibration and measured what happened. Coverage degraded differently at each hospital. Of the two standard corrections, per-class calibration recovered most of the loss and reweighting by an estimated class mix had little effect.
+This is a measurement of whether a conformal coverage guarantee survives a change of hospital. A classifier trained on a German ECG corpus is calibrated so that its output contains the correct diagnosis for 90% of patients. The guarantee assumes that calibration patients and new patients come from the same distribution. We applied the calibrated model to two Chinese hospital corpora without re-calibration and measured what happened. Coverage degraded differently at each hospital. Of the two standard corrections, per-class calibration recovered most of the loss and reweighting by an estimated class mix had little effect.
 
 [README.md](README.md) documents the corpora and the reproduction commands. [QUESTIONS.md](QUESTIONS.md) answers common questions about the study.
 

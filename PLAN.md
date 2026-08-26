@@ -56,8 +56,8 @@ Each maps to a named test. Unchecked means unverified, not done.
 ## The ingestion contract
 
 Every corpus is reduced to one canonical form before anything else touches it:
-**float32, shape (N, 12, 5000) — ten seconds, 500 Hz, millivolts, leads in the
-order I, II, III, aVR, aVL, aVF, V1-V6.** Records carrying a NaN or Inf sample
+float32, shape (N, 12, 5000) — ten seconds, 500 Hz, millivolts, leads in the
+order I, II, III, aVR, aVL, aVF, V1-V6. Records carrying a NaN or Inf sample
 are dropped and counted. This is the form prescribed in arXiv:2602.17531, which
 the ptbxl5d report already cites, so it is a convention with a citation behind
 it rather than a house style.
@@ -71,7 +71,7 @@ rather than absorbed silently.
 
 Four deviations are known in advance and none can be fully removed:
 
-- **Resampling.** PTB-XL and Shandong are natively 500 Hz; EchoNext is 250 Hz,
+- Resampling. PTB-XL and Shandong are natively 500 Hz; EchoNext is 250 Hz,
   INCART 257 Hz, PTB 1000 Hz. Upsampling invents detail and downsampling discards
   it, so resampling is itself a source of apparent shift. Polyphase resampling
   with anti-aliasing (`scipy.signal.resample_poly`) is the defensible choice, and
@@ -117,17 +117,17 @@ Named now so that day 4 onwards produces them instead of inventing them, and so
 that a surprising or negative coverage result stays in the report rather than
 being re-cut. Each is drawn by `scripts/figures.py` from a results file.
 
-1. **Coverage against target.** Empirical coverage of the 90 % set on PTB-XL
+1. Coverage against target. Empirical coverage of the 90 % set on PTB-XL
    (in distribution), Shandong and Chongqing, per class (MI / non-MI), with the
    spread over ≥100 calibration draws. One panel per correction: none, Mondrian,
    label-shift weighted.
-2. **Set-size distribution.** Histogram of set sizes per corpus; the share of
+2. Set-size distribution. Histogram of set sizes per corpus; the share of
    empty, singleton and full sets. Smaller is not better — the spread is what
    shows the model separating easy from hard tracings.
-3. **Encoder arms on the same break.** Coverage gap (source minus target) per
+3. Encoder arms on the same break. Coverage gap (source minus target) per
    arm, with bootstrapped intervals and paired differences: random-init frozen,
    ECGFounder, ECG-FM, HuBERT-ECG if its contamination claim verifies.
-4. **Baseline discrimination.** AUROC and AUPRC per corpus with intervals; the
+4. Baseline discrimination. AUROC and AUPRC per corpus with intervals; the
    reproduction of a published value that validates the setup.
 
 The numbers behind every figure live in `results/` as JSON or CSV and are
@@ -136,28 +136,28 @@ PTB-XL calibration; nothing is tuned on Shandong or Chongqing.
 
 ## Days
 
-1. **Mon 24 — the ingestion contract, then the timing probe.** In this order:
+1. Mon 24 — the ingestion contract, then the timing probe. In this order:
    start the Chongqing waveform download in the background; build the
    canonical loader (C-13 to C-15) and patient-level splits (C-4); then put one
    hundred tracings through every encoder arm, stopwatch out, and write the
    seconds per hundred records to `results/timing.json`. That number sizes
-   every experiment this week. **No training run starts before it exists.**
+   every experiment this week. No training run starts before it exists.
    Evidence the day is done: the loader tests pass on all three corpora, the
    split test passes, and `timing.json` has one row per arm (or a named reason
    an arm could not be timed).
-2. **Tue 25 — abstention table on PTB-XL.** Conformal wired to the model, C-5
+2. Tue 25 — abstention table on PTB-XL. Conformal wired to the model, C-5
    verified in distribution, silence rate against set size. Reproduces known
    ground.
-3. **Wed 26 — the break.** Calibrate on PTB-XL, measure on SPH then ACS-ECG.
+3. Wed 26 — the break. Calibrate on PTB-XL, measure on SPH then ACS-ECG.
    Publishable either way: a clear break is a result and a negligible one is a
    valid null result.
-4. **Thu 27 — three encoders on the same break.** ECG-FM (saw PTB-XL),
+4. Thu 27 — three encoders on the same break. ECG-FM (saw PTB-XL),
    ECGFounder (saw no public corpus), supervised-from-scratch. The gap between
    the first two is the contamination measurement.
-5. **Fri 28 — exact correction vs estimated.** Mondrian against label-shift
+5. Fri 28 — exact correction vs estimated. Mondrian against label-shift
    weighting, effective sample size on both (C-9), and a reasoned answer to
    which one this shift needed.
-6. **Mon 31 — the page a cardiologist can read.** Plus the ten questions the
+6. Mon 31 — the page a cardiologist can read. Plus the ten questions the
    object will trigger, answered in writing.
 
 Compute budget (`results/timing.json`): seconds per hundred PTB-XL records
@@ -166,8 +166,8 @@ ResNet1d 12.65 · ECGFounder 38.95 · HuBERT-ECG 101.46 · ECG-FM 173.81. Every
 arm loads under the pinned torch 2.2.2 (ECG-FM in its own environment,
 `scripts/setup_ecgfm_env.sh`). A full pass over the ~67,000 records costs, at
 that speed, about 2 h, 7 h, 19 h and 33 h respectively. Each encoder's
-representations (one vector per tracing) are therefore computed **once per arm
-on `esprimo`, as overnight jobs in cost order, and cached**; every conformal
+representations (one vector per tracing) are therefore computed once per arm
+on `esprimo`, as overnight jobs in cost order, and cached; every conformal
 experiment runs on the cache in seconds. Caching a representation is within
 C-14b, which is about waveforms: a representation is a computed result, not a
 rewritten tracing.
@@ -196,8 +196,8 @@ it: its licence is CC BY-NC 4.0, which permits a public research demonstration
 but excludes anything the venture ships (D-059 excluded it on venture grounds;
 a demonstration is not a product, and that distinction is Ruben's call). And the
 claim that its pre-training included SPH is second-hand — the audit could not
-fetch medRxiv directly and relied on a search-retrieved quote. **Verify that at
-source before Thursday, because the bottom row rests entirely on it.**
+fetch medRxiv directly and relied on a search-retrieved quote. Verify that at
+source before Thursday, because the bottom row rests entirely on it.
 
 ## Hardware
 

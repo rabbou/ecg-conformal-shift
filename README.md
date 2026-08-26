@@ -2,9 +2,10 @@
 
 Split conformal prediction on 12-lead ECG, calibrated on PTB-XL and evaluated
 without re-calibration on two external hospital corpora (SPH Shandong, ACS-ECG
-Chongqing). The repository measures whether the 90% coverage guarantee survives
-the change of hospital, and compares the two standard corrections: Mondrian
-per-class calibration and label-shift weighting.
+Chongqing). The question measured is whether the 90% coverage guarantee
+survives the change of hospital; the two standard corrections, Mondrian
+per-class calibration and label-shift weighting, are compared on the same
+break.
 
 The findings, the four figures and the limitations are in
 [REPORT.md](REPORT.md). Common questions are answered in

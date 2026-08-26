@@ -11,8 +11,8 @@ memory, and a surprising result cannot be quietly re-cut.
 3. Encoder arms on the same break -- does the encoder underneath change how far
    the guarantee falls, and does an encoder that saw the calibration corpus look
    better at home for a reason other than being better.
-4. Baseline discrimination -- the reproduction of known ground that licenses
-   everything else.
+4. Baseline discrimination -- AUROC and AUPRC against the published reference
+   value.
 
 Figures 1 and 2 read ``results/shift.json``, where one PTB-XL threshold was
 spent on all three corpora at once, so the panels differ in nothing but the
@@ -204,12 +204,11 @@ def figure_1_coverage(table: dict[str, Any], out: Path, source: Path) -> Path:
         for corpus, block in _rows(table, "lac", "weighted")[1]["by_corpus"].items()
     )
     figure.suptitle(
-        "Figure 1 — one PTB-XL calibration, three hospitals, three corrections\n"
-        f"Share of infarctions inside the 90% set on PTB-XL itself: {quoted}. "
-        "Only the exact correction closes that gap, and it closes it at home too.\n"
-        f"Dashed line: the level asked for. Bars: mean over {table['n_draws']} calibration "
+        "Figure 1 — coverage per hospital and correction\n"
+        f"Share of infarctions inside the 90% set on PTB-XL: {quoted}.\n"
+        f"Dashed line: the requested level. Bars: mean over {table['n_draws']} calibration "
         "draws on PTB-XL, whiskers one standard deviation.\n"
-        f"The weighted thresholds read each corpus's unlabelled class mix: {estimated}.",
+        f"The weighted thresholds use each corpus's estimated class mix: {estimated}.",
         fontsize=9,
         y=0.995,
         va="top",
@@ -268,9 +267,9 @@ def figure_2_set_sizes(table: dict[str, Any], out: Path, source: Path) -> Path:
         )
     axes[0][-1].legend(loc="lower left", fontsize=8, framealpha=0.9)
     figure.suptitle(
-        "Figure 2 — what the model returns as the confidence asked for rises\n"
-        "One threshold, fitted on PTB-XL and spent on all three. “both” and “no label” are the "
-        "same thing in a clinic: the tracing goes to a human.",
+        "Figure 2 — output composition against requested confidence\n"
+        "One threshold, fitted on PTB-XL and applied to all three corpora. Tracings with "
+        "both labels or no label go to a human reader.",
         fontsize=10,
     )
     figure.tight_layout(rect=(0, 0.03, 1, 0.94))
@@ -368,7 +367,7 @@ def figure_3_arms(arms: dict[str, Any], out: Path, source: Path) -> Path:
     worst = max(ARM_ORDER, key=lambda a: _headline_row(arms, a)["coverage_gap"]["acs"]["mean"])
     best = min(ARM_ORDER, key=lambda a: _headline_row(arms, a)["coverage_gap"]["acs"]["mean"])
     figure.suptitle(
-        "Figure 3 — four encoders, one break\n"
+        "Figure 3 — coverage gap per encoder arm\n"
         f"Gap to Chongqing runs from {plain[best]} "
         f"{_headline_row(arms, best)['coverage_gap']['acs']['mean']:+.3f} to {plain[worst]} "
         f"{_headline_row(arms, worst)['coverage_gap']['acs']['mean']:+.3f}.\n"
@@ -428,7 +427,7 @@ def figure_4_discrimination(
     axis.set_ylim(0, 1.12)
     axis.set_ylabel("PTB-XL fold 10, infarction against the rest")
     axis.set_title(
-        "Figure 4 — the baseline reproduces known ground\n"
+        "Figure 4 — baseline discrimination against the published reference\n"
         f"{metrics['n_test']} tracings, {metrics['n_test_positive']} of them infarction; "
         "whiskers are 95% bootstrap intervals.\n"
         "The published figure averages five diagnostic superclasses, not infarction alone.",

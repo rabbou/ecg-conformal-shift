@@ -9,6 +9,11 @@ theorem assumes calibration and test patients are exchangeable. Hospitals are
 not exchangeable. This measures what the promise is actually worth when they are
 not, and which of the two standard corrections repairs it.
 
+**Start with [REPORT.md](REPORT.md)** — the findings in plain language, with the
+four figures and what they do and do not claim. The questions the study tends to
+raise are answered in [QUESTIONS.md](QUESTIONS.md). This file is the technical
+front door: the corpora as they sit on disk, the layout, and how to reproduce.
+
 ## The cohorts
 
 | Cohort | Country, years | Records | Patients | MI prevalence | Role |
@@ -104,6 +109,14 @@ PTB-XL is read in place from `ECS_PTBXL_DIR`; SPH and ACS-ECG land in `data/`.
 
 `ruff` (lint + format), `mypy --disallow-untyped-defs`, `pytest` — on every
 commit via `pre-commit`, tests at pre-push.
+
+## Licence
+
+MIT ([LICENSE](LICENSE)). The vendored ECGFounder architecture in
+`third_party/ecgfounder/` is MIT, PKUDigitalHealth. The corpora keep their own
+licences (CC BY 4.0 and CC0) and are fetched, never redistributed here. The
+HuBERT-ECG weights are CC BY-NC 4.0: that encoder arm is a research
+demonstration and nothing commercial can ship with it.
 
 ## Sources
 

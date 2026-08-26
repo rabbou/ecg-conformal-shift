@@ -14,12 +14,12 @@
   },
   "n_draws": 200,
   "seed": 0,
-  "git_commit": "b1db63773b1832d8d668187dc7c090cc23ef1905",
+  "git_commit": "8f377728aa98b1b8baf74c5dbd1942c8d724ef86",
   "corpora": {
     "sph": {
       "title": "Shandong Provincial Hospital",
       "checkpoint": "results/baseline/model.pt",
-      "git_commit": "13a43574bd481d2cf562eb44a7e9d928fa5d1dbc",
+      "git_commit": "fd844e9aa2e842dad81035d2ead4575391c032e4",
       "seed": 0,
       "n_scored": 25770,
       "n_excluded": 0
@@ -27,7 +27,7 @@
     "acs": {
       "title": "Chongqing ACS-ECG",
       "checkpoint": "results/baseline/model.pt",
-      "git_commit": "13a43574bd481d2cf562eb44a7e9d928fa5d1dbc",
+      "git_commit": "fd844e9aa2e842dad81035d2ead4575391c032e4",
       "seed": 0,
       "n_scored": 17955,
       "n_excluded": 5
@@ -35,7 +35,7 @@
     "ptbxl": {
       "title": "PTB-XL fold 10, the half not used to calibrate at each draw",
       "checkpoint": "results/baseline/scores.npz",
-      "git_commit": "8cefa979acc717c076a49416699999807476c10c",
+      "git_commit": "d8ee57f59a303228ee20fcade59cd9e8db4ed1cc",
       "seed": 0,
       "n_scored": 2198,
       "n_excluded": 0

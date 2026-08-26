@@ -6,7 +6,7 @@
   "preprocessing": "none beyond the common ingestion: (12, 5000) float32 millivolts at 500 Hz goes into the network unchanged; the model card's config.json asks for 500 Hz, which the canonical form already is. Not applied: the band-pass and per-record z-scoring in the authors' fine-tuning code, which their model card does not require for feature extraction",
   "notes": "Net1D per the authors' finetune_model.py; 1024-d features before the dense head; input (B, 12, 5000) at 500 Hz per config.json; load_state_dict missing=0 unexpected=0",
   "n_params": 30819014,
-  "git_commit": "8d1f9fbd76f88516dc8a32aa7752e15a7291b7b2",
+  "git_commit": "75e50cde6c2c103026f19ab506bbcf1bb58646d2",
   "n_records": 21799,
   "n_kept": 21799,
   "n_excluded": 0,

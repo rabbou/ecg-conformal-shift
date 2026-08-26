@@ -6,7 +6,7 @@
   "preprocessing": "none beyond the common ingestion: (12, 5000) float32 millivolts at 500 Hz goes into the network unchanged",
   "notes": "ResNet1d from src/ecs/models.py, input (B, 12, 5000) mV, 256-d embedding",
   "n_params": 4082306,
-  "git_commit": "8d1f9fbd76f88516dc8a32aa7752e15a7291b7b2",
+  "git_commit": "75e50cde6c2c103026f19ab506bbcf1bb58646d2",
   "n_records": 19955,
   "n_kept": 19950,
   "n_excluded": 5,

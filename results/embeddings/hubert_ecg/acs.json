@@ -6,7 +6,7 @@
   "preprocessing": "zero-phase Butterworth band-pass of order 3 between 0.05 and 47.0 Hz applied per lead at 500 Hz; first 5 seconds kept; the twelve leads flattened into one sequence and decimated to 100 Hz, in that order, as the authors' dataset.py does. Not applied: the per-record rescaling to [-1, 1] the paper also describes, which would change the scale the other arms see",
   "notes": "transformers AutoModel with the repo's hubert_ecg.py (custom code); input (B, 6000): 5 s x 12 leads flattened then decimated by 5; 768-d mean-pooled last hidden state",
   "n_params": 93123712,
-  "git_commit": "8d1f9fbd76f88516dc8a32aa7752e15a7291b7b2",
+  "git_commit": "75e50cde6c2c103026f19ab506bbcf1bb58646d2",
   "n_records": 19955,
   "n_kept": 19950,
   "n_excluded": 5,

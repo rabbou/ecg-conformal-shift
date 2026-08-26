@@ -39,7 +39,7 @@
   },
   "seed": 0,
   "max_records": null,
-  "git_commit": "13a43574bd481d2cf562eb44a7e9d928fa5d1dbc",
+  "git_commit": "fd844e9aa2e842dad81035d2ead4575391c032e4",
   "n_scored": 17955,
   "n_positive": 2679,
   "prevalence": 0.1492063492063492,

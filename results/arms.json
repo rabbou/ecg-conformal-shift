@@ -75,7 +75,7 @@
   "n_draws": 200,
   "bootstrap_draws": 1000,
   "seed": 0,
-  "git_commit": "bc61c8dd538db3ea0e42eb3ef375fe45209bdbde",
+  "git_commit": "7ce240aff373f0b3de6d85f5306427348a4c58b6",
   "discrimination": {
     "random_init": {
       "ptbxl": {

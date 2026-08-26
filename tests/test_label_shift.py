@@ -11,14 +11,17 @@ import pytest
 
 from ecs.conformal import (
     bbse_target_prior,
+    class_prior,
     conformal_quantile,
     label_shift_quantiles,
+    label_shift_weights,
     lac_scores,
     lac_scores_all,
     mondrian_quantiles,
     predict_sets,
     predict_sets_per_class,
 )
+from ecs.metrics import effective_sample_size
 
 K = 2
 MI, HEALTHY = 1, 0
@@ -125,3 +128,51 @@ class TestBBSE:
         cal_y = np.array([0] * 400 + [1] * 100)
         with pytest.raises(ValueError, match="singular"):
             bbse_target_prior(np.zeros(200, dtype=int), cal_pred, cal_y, n_classes=K)
+
+
+class TestWhatTheWeightingCosts:
+    """C-9's arithmetic, on a sample whose answer can be worked out by hand.
+
+    A thousand calibration points at the source's mix, reweighted to the target's:
+    750 healthy carry 0.99/0.75 = 1.32 each and 250 sick carry 0.01/0.25 = 0.04
+    each, so the Kish effective size is 1000^2 / (750 * 1.32^2 + 250 * 0.04^2) =
+    764.99.  That is the number the report has to print beside a weighted cell --
+    a quarter of the sample gone, before any coverage figure is read.
+    """
+
+    SOURCE_PREVALENCE = 0.25
+    TARGET_PREVALENCE = 0.01
+    N = 1000
+    EXPECTED_ESS = 764.99
+
+    @staticmethod
+    def _labels() -> np.ndarray:
+        return np.array([0] * 750 + [1] * 250)
+
+    def test_the_weights_are_the_target_mix_over_the_source_mix(self) -> None:
+        labels = self._labels()
+        source = class_prior(labels, K)
+        target = np.array([1 - self.TARGET_PREVALENCE, self.TARGET_PREVALENCE])
+        weights = label_shift_weights(source, target)
+        np.testing.assert_allclose(weights, [0.99 / 0.75, 0.01 / 0.25])
+
+    def test_the_effective_sample_size_is_the_one_worked_out_by_hand(self) -> None:
+        labels = self._labels()
+        weights = label_shift_weights(
+            class_prior(labels, K),
+            np.array([1 - self.TARGET_PREVALENCE, self.TARGET_PREVALENCE]),
+        )
+        assert effective_sample_size(weights[labels]) == pytest.approx(self.EXPECTED_ESS, abs=0.01)
+
+    def test_an_unchanged_mix_costs_nothing(self) -> None:
+        """The control: weights of one leave the whole sample, so any drop the
+        report shows is the shift and not the machinery."""
+        labels = self._labels()
+        source = class_prior(labels, K)
+        weights = label_shift_weights(source, source)
+        np.testing.assert_allclose(weights, np.ones(K))
+        assert effective_sample_size(weights[labels]) == pytest.approx(float(self.N))
+
+    def test_a_class_the_source_never_saw_cannot_be_reweighted_into_existence(self) -> None:
+        with pytest.raises(ValueError, match="absent from the source"):
+            label_shift_weights(np.array([1.0, 0.0]), np.array([0.5, 0.5]))

@@ -28,7 +28,11 @@ from numpy.typing import NDArray
 
 from .conformal import (
     aps_scores_all,
+    bbse_target_prior,
+    class_prior,
     conformal_quantile,
+    label_shift_quantiles,
+    label_shift_weights,
     lac_scores_all,
     mondrian_quantiles,
     predict_sets,
@@ -49,6 +53,7 @@ IntArray = NDArray[np.int_]
 
 __all__ = [
     "CORRECTIONS",
+    "REDRAW_CORRECTIONS",
     "SCORES",
     "Source",
     "Spread",
@@ -60,7 +65,27 @@ __all__ = [
 ]
 
 SCORES = ("lac", "aps")
-CORRECTIONS = ("none", "mondrian")
+
+# The three corrections the table reports, in the order the argument runs:
+# no correction, the exact one, the estimated one.
+#
+#   none      one threshold shared by both classes.  Marginal coverage only, so a
+#             change in the share of sick patients moves it.
+#   mondrian  one threshold per class, each fitted inside that class.  Exact in
+#             finite samples under any change of class proportions, with nothing
+#             to estimate -- Podkopaev & Ramdas, UAI 2021 (arXiv:2103.03323).
+#   weighted  each calibration point reweighted by w(y) = q(y)/p(y), the target
+#             prior over the source prior, in the weighted-exchangeability form of
+#             Tibshirani et al. (NeurIPS 2019).  q is not known and is estimated
+#             from the target's UNLABELLED predictions by BBSE (Lipton, Wang &
+#             Smola, ICML 2018), so the guarantee is only as good as that estimate
+#             and the reweighting costs effective sample size (C-9).
+CORRECTIONS = ("none", "mondrian", "weighted")
+
+# The re-draw harness has one population and therefore no target to estimate a
+# prior from; the weighted correction is meaningless there rather than merely
+# unimplemented.
+REDRAW_CORRECTIONS = ("none", "mondrian")
 
 
 @dataclass(frozen=True)
@@ -103,8 +128,11 @@ def repeated_split_report(
     """
     if score not in SCORES:
         raise ValueError(f"score must be one of {SCORES}, got {score!r}")
-    if correction not in CORRECTIONS:
-        raise ValueError(f"correction must be one of {CORRECTIONS}, got {correction!r}")
+    if correction not in REDRAW_CORRECTIONS:
+        raise ValueError(
+            f"correction must be one of {REDRAW_CORRECTIONS}, got {correction!r}; a weighted "
+            "correction needs a target population to estimate a prior from"
+        )
     probs = np.asarray(probs, dtype=np.float64)
     labels = np.asarray(labels)
     n_classes = probs.shape[1]
@@ -192,12 +220,16 @@ def frozen_threshold(
     alpha: float,
     correction: str,
     n_classes: int,
+    target_prior: Array | None = None,
 ) -> Array:
     """The threshold, fitted on the calibration sample and nothing else.
 
-    The signature is the guarantee C-20 asks for: no target corpus is in scope
-    here, so the threshold cannot be re-fitted on the corpus it will be spent
-    on, whatever anyone later adds to the caller.
+    No target corpus is in scope here: the target reaches this function only as
+    ``target_prior``, a vector of class shares, so the scores and labels a
+    threshold is computed from can only ever be the calibration sample's (C-20).
+    That is what makes the weighted correction reportable beside the other two --
+    it reads the target's estimated class mix, never a target label and never a
+    target score.
 
     Returns one threshold per candidate class -- the same value repeated when
     the correction shares one across classes -- so that applying it is the same
@@ -208,7 +240,12 @@ def frozen_threshold(
     if correction == "none":
         shared = conformal_quantile(calibration_scores, alpha)
         return np.full(n_classes, shared, dtype=np.float64)
-    return mondrian_quantiles(calibration_scores, calibration_labels, alpha, n_classes)
+    if correction == "mondrian":
+        return mondrian_quantiles(calibration_scores, calibration_labels, alpha, n_classes)
+    if target_prior is None:
+        raise ValueError("the weighted correction needs an estimated target prior")
+    weights = label_shift_weights(class_prior(calibration_labels, n_classes), target_prior)
+    return label_shift_quantiles(calibration_scores, calibration_labels, weights, alpha)
 
 
 @dataclass(frozen=True)
@@ -298,7 +335,17 @@ class _Accumulator:
             self.per_class[klass].append(value)
 
     def as_dict(self, keep_draws: bool = False) -> dict[str, object]:
-        drawn = {"coverage_by_draw": list(self.covered)} if keep_draws else {}
+        drawn: dict[str, object] = (
+            {
+                "coverage_by_draw": list(self.covered),
+                "coverage_by_class_by_draw": {
+                    str(klass): list(values) for klass, values in self.per_class.items()
+                },
+                "mean_set_size_by_draw": list(self.sizes),
+            }
+            if keep_draws
+            else {}
+        )
         return {
             **drawn,
             "coverage": spread(self.covered).as_dict(),
@@ -313,6 +360,94 @@ class _Accumulator:
         }
 
 
+WEIGHTING_NOTE = {
+    "none": "uniform: one threshold shared by both classes reweights nothing",
+    "mondrian": "uniform: each class is calibrated on its own points, not on reweighted ones",
+    "weighted": (
+        "w(y) = q(y)/p(y), the estimated target prior over the source prior, carried by every "
+        "calibration point of label y; q is estimated by BBSE from this corpus's unlabelled "
+        "predictions alone"
+    ),
+}
+
+
+def _spread_of(values: list[float]) -> dict[str, float | int]:
+    """The spread of a quantity that some draws may not have produced at all.
+
+    A cell whose target prior was never identified has no weights and therefore
+    no effective sample size: zero over zero draws is the reading, and it is
+    reported rather than raised so the rest of the table -- the corpora that were
+    identified, and the two corrections that estimate nothing -- still gets out.
+    """
+    if not values:
+        return {"mean": 0.0, "sd": 0.0, "n_draws": 0}
+    return spread(values).as_dict()
+
+
+class _Calibration:
+    """What the calibration sample was worth for one corpus at one setting.
+
+    Under the two unweighted corrections this is the same object for every corpus
+    -- the same threshold, the same points at weight one -- and holding it per
+    corpus anyway is what lets the file be read without knowing which correction
+    varies by target and which does not (C-20's falsifier, on the file itself).
+
+    A draw whose target prior could not be identified leaves no weight and no
+    effective size behind: it is counted in ``n_unidentified`` and its threshold
+    is infinite, which widens every set to the full label set rather than
+    quietly spending a threshold built on an estimate that does not exist.
+    """
+
+    def __init__(self) -> None:
+        self.thresholds: list[list[float]] = []
+        self.ess: list[float] = []
+        self.weight_by_class: list[list[float]] = []
+        self.estimated_prevalence: list[float] = []
+        self.n_unidentified = 0
+
+    def as_dict(self, correction: str, n_classes: int) -> dict[str, object]:
+        drawn = np.asarray(self.thresholds, dtype=np.float64)
+        block: dict[str, object] = {
+            "weighting": WEIGHTING_NOTE[correction],
+            "effective_sample_size": _spread_of(self.ess),
+            "weight_by_class": {
+                str(c): _spread_of([row[c] for row in self.weight_by_class])
+                for c in range(n_classes)
+            },
+        }
+        if correction == "weighted":
+            block["estimated_prevalence"] = _spread_of(self.estimated_prevalence)
+            block["n_unidentified"] = self.n_unidentified
+        return {
+            "threshold_by_class": {
+                str(c): _threshold_spread(list(drawn[:, c])) for c in range(n_classes)
+            },
+            "calibration": block,
+        }
+
+
+def _estimated_prior(
+    predictions: IntArray,
+    calibration_predictions: IntArray,
+    calibration_labels: IntArray,
+    n_classes: int,
+) -> Array | None:
+    """The target's class mix, read off its predictions, or None when unidentified.
+
+    ``bbse_target_prior`` refuses two situations -- a confusion matrix it cannot
+    invert, and a solution outside the simplex -- and both mean the same thing:
+    label shift does not explain what this corpus looks like, so its estimated
+    prior must not be spent.  Returning None carries that refusal to the caller
+    instead of substituting a number.
+    """
+    try:
+        return bbse_target_prior(
+            predictions, calibration_predictions, calibration_labels, n_classes
+        )
+    except ValueError:
+        return None
+
+
 def frozen_calibration_table(
     source: Source,
     targets: Mapping[str, Target],
@@ -320,21 +455,32 @@ def frozen_calibration_table(
     n_draws: int = 200,
     seed: int = 0,
     keep_draws: bool = False,
+    corrections: Sequence[str] = CORRECTIONS,
 ) -> list[dict[str, object]]:
-    """Coverage on every corpus under one PTB-XL threshold, over ``n_draws`` draws.
+    """Coverage on every corpus under one PTB-XL calibration, over ``n_draws`` draws.
 
-    One row per (level, score, correction).  Each row carries the threshold that
-    was spent, the calibration sample it came from with that sample's effective
-    size (C-9), and a block per corpus holding coverage, coverage per class
-    (C-11) and the set-size shares -- each a mean over the draws with its
-    standard deviation (C-10).
+    One row per (level, score, correction).  Each row carries the calibration
+    sample the thresholds came from -- its size and the points each class was
+    left with (C-9) -- and a block per corpus holding coverage, coverage per
+    class (C-11), the set-size shares, the threshold actually spent there and
+    what that threshold cost in effective sample size (C-9).  Every figure is a
+    mean over the draws with its standard deviation (C-10).
 
-    ``keep_draws`` additionally writes each corpus's coverage draw by draw.  The
-    summary alone cannot answer a paired question -- the gap between two corpora
-    within one draw, or the gap between two encoder arms on the same draw -- and
-    subtracting two means throws away the fact that the draws were shared.  It
-    is off by default because the series is two hundred numbers per corpus per
-    row and only the caller asking a paired question needs them.
+    The threshold sits inside the corpus block rather than on the row because
+    one of the three corrections makes it depend on the corpus: ``weighted``
+    reads each target's estimated class mix.  It reads nothing else of the
+    target -- no label, no score -- so no corpus is ever calibrated on itself
+    (C-20), and under the other two corrections all three blocks carry the same
+    threshold, which is that claim made checkable on the file.
+
+    ``keep_draws`` additionally writes each corpus's coverage, per-class coverage
+    and mean set size draw by draw.  The summary alone cannot answer a paired
+    question -- the gap between two corpora within one draw, the gap between two
+    encoder arms on the same draw, or what one correction cost against another on
+    the draw they shared -- and subtracting two means throws away the fact that
+    the draws were shared.  It is off by default because the series is two
+    hundred numbers per corpus per row and only the caller asking a paired
+    question needs them.
     """
     n_classes = source.probs.shape[1]
     keys = pd.Series(list(source.patients), index=range(len(source.labels)))
@@ -343,14 +489,13 @@ def frozen_calibration_table(
         (alpha, score, correction)
         for alpha in alphas
         for score in SCORES
-        for correction in CORRECTIONS
+        for correction in corrections
     ]
     gathered = {
         setting: {name: _Accumulator(n_classes) for name in corpora} for setting in settings
     }
-    thresholds: dict[tuple[float, str, str], list[list[float]]] = {s: [] for s in settings}
+    calibrations = {setting: {name: _Calibration() for name in corpora} for setting in settings}
     calibration_n: dict[tuple[float, str, str], list[float]] = {s: [] for s in settings}
-    calibration_ess: dict[tuple[float, str, str], list[float]] = {s: [] for s in settings}
     calibration_by_class: dict[tuple[float, str, str], list[list[float]]] = {
         s: [] for s in settings
     }
@@ -370,19 +515,59 @@ def frozen_calibration_table(
                     for name, target in targets.items()
                 },
             }
+            # The predicted-label marginal is read off the probabilities, so the
+            # estimated prior is the same whichever non-conformity score is used.
+            calibration_predictions = source.probs[is_calibration].argmax(axis=1)
+            priors: dict[str, Array | None] = (
+                {
+                    name: _estimated_prior(
+                        probs.argmax(axis=1),
+                        calibration_predictions,
+                        calibration_labels,
+                        n_classes,
+                    )
+                    for name, probs in {
+                        source.name: source.probs[~is_calibration],
+                        **{name: target.probs for name, target in targets.items()},
+                    }.items()
+                }
+                if "weighted" in corrections
+                else dict.fromkeys(corpora)
+            )
+            source_prior = class_prior(calibration_labels, n_classes)
             per_class_n = [float((calibration_labels == c).sum()) for c in range(n_classes)]
-            uniform = np.ones(calibration_true.size, dtype=np.float64)
-            for correction in CORRECTIONS:
+            uniform = np.ones(n_classes, dtype=np.float64)
+
+            for correction in corrections:
                 for alpha in alphas:
                     setting = (alpha, score, correction)
-                    qhat = frozen_threshold(
-                        calibration_true, calibration_labels, alpha, correction, n_classes
-                    )
-                    thresholds[setting].append([float(v) for v in qhat])
                     calibration_n[setting].append(float(calibration_true.size))
-                    calibration_ess[setting].append(effective_sample_size(uniform))
                     calibration_by_class[setting].append(per_class_n)
                     for name, (all_scores, labels) in evaluated.items():
+                        record = calibrations[setting][name]
+                        prior = priors[name] if correction == "weighted" else None
+                        if correction == "weighted" and prior is None:
+                            record.n_unidentified += 1
+                            qhat = np.full(n_classes, np.inf, dtype=np.float64)
+                        else:
+                            qhat = frozen_threshold(
+                                calibration_true,
+                                calibration_labels,
+                                alpha,
+                                correction,
+                                n_classes,
+                                prior,
+                            )
+                            weights = (
+                                label_shift_weights(source_prior, prior)
+                                if prior is not None
+                                else uniform
+                            )
+                            record.ess.append(effective_sample_size(weights[calibration_labels]))
+                            record.weight_by_class.append([float(v) for v in weights])
+                            if prior is not None:
+                                record.estimated_prevalence.append(float(prior[-1]))
+                        record.thresholds.append([float(v) for v in qhat])
                         gathered[setting][name].add(
                             predict_sets_per_class(all_scores, qhat), labels, n_classes
                         )
@@ -397,7 +582,6 @@ def frozen_calibration_table(
     rows: list[dict[str, object]] = []
     for alpha, score, correction in settings:
         setting = (alpha, score, correction)
-        drawn = np.asarray(thresholds[setting], dtype=np.float64)
         rows.append(
             {
                 "alpha": alpha,
@@ -405,13 +589,15 @@ def frozen_calibration_table(
                 "score": score,
                 "correction": correction,
                 "calibrated_on": source.name,
-                "threshold_by_class": {
-                    str(c): _threshold_spread(list(drawn[:, c])) for c in range(n_classes)
-                },
+                "threshold_depends_on_target": correction == "weighted",
+                "target_information_used": (
+                    "the target's unlabelled predicted-label marginal; never a target label "
+                    "and never a target score"
+                    if correction == "weighted"
+                    else "none: the same threshold is spent on every corpus"
+                ),
                 "calibration": {
-                    "weighting": "uniform: no correction here reweights the calibration sample",
                     "n": spread(calibration_n[setting]).as_dict(),
-                    "effective_sample_size": spread(calibration_ess[setting]).as_dict(),
                     "n_by_class": {
                         str(c): spread([row[c] for row in calibration_by_class[setting]]).as_dict()
                         for c in range(n_classes)
@@ -425,6 +611,7 @@ def frozen_calibration_table(
                             np.mean(source.labels if name == source.name else targets[name].labels)
                         ),
                         "deviations": list(supports[name][2]),
+                        **calibrations[setting][name].as_dict(correction, n_classes),
                         **gathered[setting][name].as_dict(keep_draws),
                     }
                     for name in corpora

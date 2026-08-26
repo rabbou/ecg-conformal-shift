@@ -107,28 +107,51 @@ def _panel_title(table: dict[str, Any], corpus: str) -> str:
     )
 
 
-def figure_1_coverage(table: dict[str, Any], out: Path, source: Path) -> Path:
-    """Coverage against the level asked for, at each hospital and inside each class.
+CORRECTION_ORDER = ("none", "mondrian", "weighted")
+CORRECTION_NAMES = {
+    "none": "no correction\none threshold for both classes",
+    "mondrian": "Mondrian\none threshold per class, exact",
+    "weighted": "label-shift weighted\ntarget prior estimated",
+}
+# The three readings inside a panel: the marginal figure, then the class it is
+# bought from and the class it is bought for.
+GROUP_ORDER = ("overall", "0", "1")
+GROUP_NAMES = {"overall": "every tracing", "0": CLASS_NAMES["0"], "1": CLASS_NAMES["1"]}
+GROUP_COLOUR = {"overall": "#adb5bd", "0": "#219ebc", "1": "#bf4342"}
 
-    One row per corpus, all under the same PTB-XL threshold: the first row is the
-    population the threshold was fitted on, the two below it are populations it
-    was merely spent on.
+
+def corrections_on(table: dict[str, Any]) -> list[str]:
+    """The corrections the table holds, in the order the argument runs."""
+    present = {row["correction"] for row in table["rows"]}
+    return [name for name in CORRECTION_ORDER if name in present]
+
+
+def figure_1_coverage(table: dict[str, Any], out: Path, source: Path) -> Path:
+    """Coverage against the level asked for, at each hospital and under each correction.
+
+    One row per corpus, one column per correction, all from the same PTB-XL
+    calibration: the first row is the population the threshold was fitted on, the
+    two below it are populations it was merely spent on.  Reading a row left to
+    right is reading what each repair does to that hospital; reading the red bar
+    down a column is reading whether the sick are covered at all.
     """
     corpora = corpora_on(table)
-    corrections = ["none", "mondrian"]
-    labels = {"none": "one threshold for both classes", "mondrian": "one threshold per class"}
-    colours = {"none": "#219ebc", "mondrian": "#fb8500"}
-    groups = ["overall", "0", "1"]
-    titles = {"overall": "every tracing", "0": CLASS_NAMES["0"], "1": CLASS_NAMES["1"]}
+    corrections = corrections_on(table)
     figure, axes = plt.subplots(
-        len(corpora), 3, figsize=(12.5, 3.9 * len(corpora)), sharey=True, sharex=True, squeeze=False
+        len(corpora),
+        len(corrections),
+        figsize=(4.4 * len(corrections), 3.7 * len(corpora)),
+        sharey=True,
+        sharex=True,
+        squeeze=False,
     )
 
     for row_index, corpus in enumerate(corpora):
-        for axis, group in zip(axes[row_index], groups, strict=True):
-            width = 0.35
-            for offset, correction in zip((-width / 2, width / 2), corrections, strict=True):
-                rows = _rows(table, "lac", correction)
+        for column, correction in enumerate(corrections):
+            axis = axes[row_index][column]
+            rows = _rows(table, "lac", correction)
+            width = 0.26
+            for offset, group in zip((-width, 0.0, width), GROUP_ORDER, strict=True):
                 pairs = []
                 for row in rows:
                     block = row["by_corpus"][corpus]
@@ -144,11 +167,11 @@ def figure_1_coverage(table: dict[str, Any], out: Path, source: Path) -> Path:
                     width,
                     yerr=[sd for _, sd in pairs],
                     capsize=3,
-                    label=labels[correction],
-                    color=colours[correction],
+                    label=GROUP_NAMES[group],
+                    color=GROUP_COLOUR[group],
                     edgecolor="white",
                 )
-            for index, row in enumerate(_rows(table, "lac", "none")):
+            for index, row in enumerate(rows):
                 axis.hlines(
                     row["target_coverage"],
                     index - 0.5,
@@ -156,33 +179,42 @@ def figure_1_coverage(table: dict[str, Any], out: Path, source: Path) -> Path:
                     colors="#333333",
                     linestyles="--",
                 )
-            axis.set_xticks(range(len(LEVELS)))
-            axis.set_xticklabels([f"{1 - a:.0%}" for a in LEVELS])
+            axis.set_xticks(range(len(rows)))
+            axis.set_xticklabels([f"{1 - float(r['alpha']):.0%}" for r in rows])
             axis.set_ylim(0.0, 1.05)
             if row_index == 0:
-                axis.set_title(titles[group])
+                axis.set_title(CORRECTION_NAMES[correction], fontsize=9)
             if row_index == len(corpora) - 1:
                 axis.set_xlabel("confidence asked for")
         axes[row_index][0].set_ylabel(
             f"{_panel_title(table, corpus)}\nshare whose set holds the true label", fontsize=8
         )
-    axes[0][2].legend(loc="lower right", fontsize=8, framealpha=0.95)
+    axes[0][-1].legend(loc="lower right", fontsize=8, framealpha=0.95)
 
-    sick = {
-        corpus: _rows(table, "lac", "none")[1]["by_corpus"][corpus]["coverage_by_class"]["1"][
-            "mean"
-        ]
-        for corpus in corpora
-    }
-    reading = " · ".join(f"{CORPUS_NAMES[c].split(' (')[0]} {v:.0%}" for c, v in sick.items())
-    figure.suptitle(
-        "Figure 1 — one PTB-XL threshold, spent on three hospitals\n"
-        f"Share of infarctions inside the 90% set, one shared threshold: {reading}.\n"
-        f"Dashed line: the level asked for. Bars: mean over {table['n_draws']} "
-        "calibration draws on PTB-XL, whiskers one standard deviation.",
-        fontsize=10,
+    headline = _rows(table, "lac", "none")[1]["by_corpus"]
+    quoted = " · ".join(
+        f"{CORRECTION_NAMES[c].splitlines()[0]} "
+        f"{_rows(table, 'lac', c)[1]['by_corpus']['ptbxl']['coverage_by_class']['1']['mean']:.0%}"
+        for c in corrections
     )
-    figure.tight_layout(rect=(0, 0.03, 1, 0.93))
+    estimated = "; ".join(
+        f"{CORPUS_NAMES[corpus].split(' (')[0]} "
+        f"{block['calibration']['estimated_prevalence']['mean']:.1%} estimated for "
+        f"{headline[corpus]['prevalence']:.1%} true"
+        for corpus, block in _rows(table, "lac", "weighted")[1]["by_corpus"].items()
+    )
+    figure.suptitle(
+        "Figure 1 — one PTB-XL calibration, three hospitals, three corrections\n"
+        f"Share of infarctions inside the 90% set on PTB-XL itself: {quoted}. "
+        "Only the exact correction closes that gap, and it closes it at home too.\n"
+        f"Dashed line: the level asked for. Bars: mean over {table['n_draws']} calibration "
+        "draws on PTB-XL, whiskers one standard deviation.\n"
+        f"The weighted thresholds read each corpus's unlabelled class mix: {estimated}.",
+        fontsize=9,
+        y=0.995,
+        va="top",
+    )
+    figure.tight_layout(rect=(0, 0.02, 1, 0.945))
     _source_note(figure, source)
     figure.savefig(out, dpi=200)
     plt.close(figure)

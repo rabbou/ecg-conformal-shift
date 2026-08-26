@@ -31,8 +31,10 @@ __all__ = [
     "aps_scores",
     "aps_scores_all",
     "bbse_target_prior",
+    "class_prior",
     "conformal_quantile",
     "label_shift_quantiles",
+    "label_shift_weights",
     "lac_scores",
     "lac_scores_all",
     "mondrian_quantiles",
@@ -297,6 +299,33 @@ def bbse_target_prior(
         raise ValueError(f"BBSE returned a negative class prior {prior}; label shift is violated")
     prior = np.clip(prior, 0.0, None)
     return prior / prior.sum()
+
+
+def class_prior(labels: IntArray, n_classes: int) -> Array:
+    """The empirical share of each class, as a vector that sums to one."""
+    counts = np.bincount(np.asarray(labels), minlength=n_classes).astype(np.float64)
+    total = counts.sum()
+    if total == 0.0:
+        raise ValueError("cannot read a class prior off an empty label vector")
+    return counts / total
+
+
+def label_shift_weights(source_prior: Array, target_prior: Array) -> Array:
+    """w(y) = q(y) / p(y), the weight each calibration point carries by its label.
+
+    A class the source never saw cannot be reweighted into existence: its source
+    share is zero and the ratio is undefined.  Raising is the honest answer,
+    because the alternative -- an infinite or a silently zeroed weight -- would
+    put the whole of the calibration mass on one class without saying so.
+    """
+    source_prior = np.asarray(source_prior, dtype=np.float64)
+    target_prior = np.asarray(target_prior, dtype=np.float64)
+    if source_prior.shape != target_prior.shape:
+        raise ValueError(f"priors must match: {source_prior.shape} vs {target_prior.shape}")
+    if np.any(source_prior <= 0.0):
+        raise ValueError(f"a class absent from the source cannot be reweighted: {source_prior}")
+    weights: Array = target_prior / source_prior
+    return weights
 
 
 def predict_sets_per_class(all_scores: Array, qhats: Array) -> NDArray[np.bool_]:

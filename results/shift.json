@@ -14,7 +14,7 @@
   },
   "n_draws": 200,
   "seed": 0,
-  "git_commit": "c95f76803bd5fd7ca332ece7286379c8005b548f",
+  "git_commit": "b1db63773b1832d8d668187dc7c090cc23ef1905",
   "corpora": {
     "sph": {
       "title": "Shandong Provincial Hospital",
@@ -41,7 +41,7 @@
       "n_excluded": 0
     }
   },
-  "seconds": 40.4,
+  "seconds": 27.9,
   "reading": {
     "asked_at": "the 90% set on the lac score, over 200 draws",
     "restored_within": 0.02,

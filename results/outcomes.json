@@ -1,0 +1,402 @@
+{
+  "question": "For a patient of each label, what does the model return: the correct label alone, no decision, or the wrong label alone -- under a single tuned threshold, pooled conformal calibration, and label conditional conformal calibration.",
+  "protocol": "Every threshold is fitted on a PTB-XL calibration half drawn by patient and spent unchanged on the held-out half and on both external corpora. No external label reaches any threshold.",
+  "alpha": 0.1,
+  "plain_sensitivity": 0.9,
+  "matched_operating_point": "The plain threshold's target is a sensitivity and the two conformal targets are coverages. They are set to the same number so the schemes meet at a comparable miss rate on the source corpus.",
+  "outcome_definitions": {
+    "correct": "the set holds that label alone",
+    "deferred": "the set holds both labels or neither; no machine answer",
+    "wrong": "the set holds the other label alone",
+    "denominator": "every case carrying the label, so the three shares sum to one"
+  },
+  "n_draws": 200,
+  "seed": 0,
+  "git_commit": "5a80601f854db05c34b9bcce19e3377bc180c55c",
+  "seconds": 1.1,
+  "by_corpus": {
+    "ptbxl": {
+      "name": "PTB-XL",
+      "n_points": 1099,
+      "prevalence": 0.2502,
+      "schemes": {
+        "plain": {
+          "0": {
+            "correct": {
+              "mean": 0.8098,
+              "sd": 0.0233,
+              "n_draws": 200
+            },
+            "deferred": {
+              "mean": 0.0,
+              "sd": 0.0,
+              "n_draws": 200
+            },
+            "wrong": {
+              "mean": 0.1902,
+              "sd": 0.0233,
+              "n_draws": 200
+            }
+          },
+          "1": {
+            "correct": {
+              "mean": 0.8957,
+              "sd": 0.0282,
+              "n_draws": 200
+            },
+            "deferred": {
+              "mean": 0.0,
+              "sd": 0.0,
+              "n_draws": 200
+            },
+            "wrong": {
+              "mean": 0.1043,
+              "sd": 0.0282,
+              "n_draws": 200
+            }
+          }
+        },
+        "pooled": {
+          "0": {
+            "correct": {
+              "mean": 0.9192,
+              "sd": 0.0076,
+              "n_draws": 200
+            },
+            "deferred": {
+              "mean": 0.0354,
+              "sd": 0.0122,
+              "n_draws": 200
+            },
+            "wrong": {
+              "mean": 0.0453,
+              "sd": 0.0086,
+              "n_draws": 200
+            }
+          },
+          "1": {
+            "correct": {
+              "mean": 0.6326,
+              "sd": 0.0189,
+              "n_draws": 200
+            },
+            "deferred": {
+              "mean": 0.0996,
+              "sd": 0.033,
+              "n_draws": 200
+            },
+            "wrong": {
+              "mean": 0.2678,
+              "sd": 0.0313,
+              "n_draws": 200
+            }
+          }
+        },
+        "perlabel": {
+          "0": {
+            "correct": {
+              "mean": 0.8028,
+              "sd": 0.0241,
+              "n_draws": 200
+            },
+            "deferred": {
+              "mean": 0.097,
+              "sd": 0.0239,
+              "n_draws": 200
+            },
+            "wrong": {
+              "mean": 0.1002,
+              "sd": 0.0157,
+              "n_draws": 200
+            }
+          },
+          "1": {
+            "correct": {
+              "mean": 0.7736,
+              "sd": 0.0279,
+              "n_draws": 200
+            },
+            "deferred": {
+              "mean": 0.1266,
+              "sd": 0.0273,
+              "n_draws": 200
+            },
+            "wrong": {
+              "mean": 0.0999,
+              "sd": 0.0275,
+              "n_draws": 200
+            }
+          }
+        }
+      }
+    },
+    "sph": {
+      "name": "Shandong",
+      "n_points": 25770,
+      "prevalence": 0.0101,
+      "schemes": {
+        "plain": {
+          "0": {
+            "correct": {
+              "mean": 0.8286,
+              "sd": 0.0142,
+              "n_draws": 200
+            },
+            "deferred": {
+              "mean": 0.0,
+              "sd": 0.0,
+              "n_draws": 200
+            },
+            "wrong": {
+              "mean": 0.1714,
+              "sd": 0.0142,
+              "n_draws": 200
+            }
+          },
+          "1": {
+            "correct": {
+              "mean": 0.9733,
+              "sd": 0.0012,
+              "n_draws": 200
+            },
+            "deferred": {
+              "mean": 0.0,
+              "sd": 0.0,
+              "n_draws": 200
+            },
+            "wrong": {
+              "mean": 0.0267,
+              "sd": 0.0012,
+              "n_draws": 200
+            }
+          }
+        },
+        "pooled": {
+          "0": {
+            "correct": {
+              "mean": 0.9176,
+              "sd": 0.0047,
+              "n_draws": 200
+            },
+            "deferred": {
+              "mean": 0.0297,
+              "sd": 0.0083,
+              "n_draws": 200
+            },
+            "wrong": {
+              "mean": 0.0526,
+              "sd": 0.0035,
+              "n_draws": 200
+            }
+          },
+          "1": {
+            "correct": {
+              "mean": 0.9183,
+              "sd": 0.0024,
+              "n_draws": 200
+            },
+            "deferred": {
+              "mean": 0.0173,
+              "sd": 0.0048,
+              "n_draws": 200
+            },
+            "wrong": {
+              "mean": 0.0644,
+              "sd": 0.0028,
+              "n_draws": 200
+            }
+          }
+        },
+        "perlabel": {
+          "0": {
+            "correct": {
+              "mean": 0.8237,
+              "sd": 0.0156,
+              "n_draws": 200
+            },
+            "deferred": {
+              "mean": 0.0805,
+              "sd": 0.0164,
+              "n_draws": 200
+            },
+            "wrong": {
+              "mean": 0.0958,
+              "sd": 0.0059,
+              "n_draws": 200
+            }
+          },
+          "1": {
+            "correct": {
+              "mean": 0.9495,
+              "sd": 0.0057,
+              "n_draws": 200
+            },
+            "deferred": {
+              "mean": 0.0244,
+              "sd": 0.006,
+              "n_draws": 200
+            },
+            "wrong": {
+              "mean": 0.0261,
+              "sd": 0.0018,
+              "n_draws": 200
+            }
+          }
+        }
+      }
+    },
+    "acs": {
+      "name": "Chongqing",
+      "n_points": 17955,
+      "prevalence": 0.1492,
+      "schemes": {
+        "plain": {
+          "0": {
+            "correct": {
+              "mean": 0.5789,
+              "sd": 0.0187,
+              "n_draws": 200
+            },
+            "deferred": {
+              "mean": 0.0,
+              "sd": 0.0,
+              "n_draws": 200
+            },
+            "wrong": {
+              "mean": 0.4211,
+              "sd": 0.0187,
+              "n_draws": 200
+            }
+          },
+          "1": {
+            "correct": {
+              "mean": 0.8365,
+              "sd": 0.0101,
+              "n_draws": 200
+            },
+            "deferred": {
+              "mean": 0.0,
+              "sd": 0.0,
+              "n_draws": 200
+            },
+            "wrong": {
+              "mean": 0.1635,
+              "sd": 0.0101,
+              "n_draws": 200
+            }
+          }
+        },
+        "pooled": {
+          "0": {
+            "correct": {
+              "mean": 0.7191,
+              "sd": 0.0089,
+              "n_draws": 200
+            },
+            "deferred": {
+              "mean": 0.0597,
+              "sd": 0.0173,
+              "n_draws": 200
+            },
+            "wrong": {
+              "mean": 0.2212,
+              "sd": 0.0084,
+              "n_draws": 200
+            }
+          },
+          "1": {
+            "correct": {
+              "mean": 0.6578,
+              "sd": 0.0103,
+              "n_draws": 200
+            },
+            "deferred": {
+              "mean": 0.0662,
+              "sd": 0.0185,
+              "n_draws": 200
+            },
+            "wrong": {
+              "mean": 0.276,
+              "sd": 0.0082,
+              "n_draws": 200
+            }
+          }
+        },
+        "perlabel": {
+          "0": {
+            "correct": {
+              "mean": 0.5725,
+              "sd": 0.0201,
+              "n_draws": 200
+            },
+            "deferred": {
+              "mean": 0.1204,
+              "sd": 0.0227,
+              "n_draws": 200
+            },
+            "wrong": {
+              "mean": 0.3071,
+              "sd": 0.0117,
+              "n_draws": 200
+            }
+          },
+          "1": {
+            "correct": {
+              "mean": 0.7462,
+              "sd": 0.0097,
+              "n_draws": 200
+            },
+            "deferred": {
+              "mean": 0.0936,
+              "sd": 0.0141,
+              "n_draws": 200
+            },
+            "wrong": {
+              "mean": 0.1602,
+              "sd": 0.0107,
+              "n_draws": 200
+            }
+          }
+        }
+      }
+    }
+  },
+  "thresholds": {
+    "plain:single": {
+      "mean": 0.2201,
+      "sd": 0.0209,
+      "n_draws": 200
+    },
+    "pooled:lower": {
+      "mean": 0.4356,
+      "sd": 0.0183,
+      "n_draws": 200
+    },
+    "pooled:upper": {
+      "mean": 0.5644,
+      "sd": 0.0183,
+      "n_draws": 200
+    },
+    "perlabel:lower": {
+      "mean": 0.2132,
+      "sd": 0.0216,
+      "n_draws": 200
+    },
+    "perlabel:upper": {
+      "mean": 0.3866,
+      "sd": 0.0198,
+      "n_draws": 200
+    },
+    "quantile:0": {
+      "mean": 0.3866,
+      "sd": 0.0198,
+      "n_draws": 200
+    },
+    "quantile:1": {
+      "mean": 0.7868,
+      "sd": 0.0216,
+      "n_draws": 200
+    }
+  },
+  "threshold_note": "Boundaries are on the model's probability axis. A case below the lower boundary gets the non-MI label alone, above the upper boundary the MI label alone, and between them both labels: a deferral. The 'quantile:*' entries are the raw LAC quantiles the boundaries come from."
+}

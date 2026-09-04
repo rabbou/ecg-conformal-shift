@@ -76,7 +76,8 @@ corrections are implemented:
 
 - Mondrian (class-conditional) conformal: one threshold per class. Exactly
   valid in finite samples under any change of class proportions, with nothing
-  to estimate.
+  to estimate. Vovk (ACML 2012) calls this label conditional validity and
+  proves it in his Proposition 3.
 - Label-shift weighting: reweight by `w(y) = q(y)/p(y)` in the Tibshirani
   form, with the target prior estimated by BBSE. The guarantee is asymptotic
   and depends on that estimate, so effective sample size is reported next to
@@ -125,5 +126,7 @@ PTB-XL: Wagner et al., *Sci Data* 2020, 10.1038/s41597-020-0495-6 · SPH: Liu et
 al., *Sci Data* 2022, 10.1038/s41597-022-01403-5 · ACS-ECG: *Sci Data* 2026,
 10.1038/s41597-026-07278-0 · Split conformal: Angelopoulos & Bates,
 arXiv:2107.07511 · APS: Romano, Sesia & Candès, NeurIPS 2020 · Covariate shift:
-Tibshirani, Barber, Candès & Ramdas, NeurIPS 2019 · Label shift: Podkopaev &
-Ramdas, UAI 2021, arXiv:2103.03323 · BBSE: Lipton, Wang & Smola, ICML 2018.
+Tibshirani, Barber, Candès & Ramdas, NeurIPS 2019 · Label conditional
+validity: Vovk, ACML 2012, PMLR 25:475-490 · Conformal prediction under label
+shift: Podkopaev & Ramdas, UAI 2021, arXiv:2103.03323 · BBSE: Lipton, Wang &
+Smola, ICML 2018.

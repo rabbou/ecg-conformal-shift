@@ -11,14 +11,15 @@ is wrong.
 from __future__ import annotations
 
 import json
-from pathlib import Path
+import re
 from typing import Any
 
 import numpy as np
 import pytest
-from outcomes import OUTCOMES, SCHEMES, _plain_sets, _split_outcomes
+from outcomes import ALPHA, OUTCOMES, SCHEMES, _plain_sets, _split_outcomes, collect
 
 from ecs.config import RESULTS_DIR
+from ecs.conformal import conformal_quantile, lac_scores
 
 TABLE = RESULTS_DIR / "outcomes.json"
 
@@ -122,8 +123,40 @@ class TestTheCommittedOutcomeTable:
     def test_the_denominator_is_named_in_the_file(self, table: dict[str, Any]) -> None:
         assert "sum to one" in table["outcome_definitions"]["denominator"]
 
-    def test_no_external_label_reached_a_threshold(self, table: dict[str, Any]) -> None:
-        assert "No external label reaches any threshold." in table["protocol"]
+    def test_no_external_label_reached_a_threshold(self) -> None:
+        """Invert the target labels; every threshold must come back unchanged.
+
+        The claim the whole transfer rests on is that a target corpus is scored
+        and never calibrated on.  Asserting the sentence that says so in the
+        file would pass just as happily if ``collect`` were fitting on
+        Chongqing, so the check inverts both targets' labels and demands the
+        fitted thresholds be identical: a threshold that had read a target
+        label could not survive that.
+        """
+        rng = np.random.default_rng(11)
+        source = {
+            "probs": np.column_stack([1 - (p := rng.random(240)), p]),
+            "labels": rng.integers(0, 2, 240),
+        }
+        target = {
+            "probs": np.column_stack([1 - (q := rng.random(160)), q]),
+            "labels": rng.integers(0, 2, 160),
+        }
+        patients = [str(i // 2) for i in range(240)]
+        flipped = {"probs": target["probs"], "labels": 1 - target["labels"]}
+
+        straight = collect({"ptbxl": source, "acs": target}, patients, 8, 3)
+        inverted = collect({"ptbxl": source, "acs": flipped}, patients, 8, 3)
+        assert straight["thresholds"] == inverted["thresholds"]
+
+    def test_a_target_label_reaching_a_threshold_would_be_caught(self) -> None:
+        """The inversion test above is only worth its name if it can fail."""
+        rng = np.random.default_rng(12)
+        labels = rng.integers(0, 2, 200)
+        probs = np.column_stack([1 - (p := rng.random(200)), p])
+        honest = conformal_quantile(lac_scores(probs, labels), ALPHA)
+        leaked = conformal_quantile(lac_scores(probs, 1 - labels), ALPHA)
+        assert honest != leaked
 
 
 class TestTheFiguresDrawnFromIt:
@@ -135,5 +168,21 @@ class TestTheFiguresDrawnFromIt:
         for figure in figures:
             assert figure.exists(), figure
             assert figure.stat().st_size > 10_000
-        assert TABLE.exists()
-        assert isinstance(TABLE, Path)
+        assert TABLE.stat().st_mtime <= min(f.stat().st_mtime for f in figures)
+
+    def test_the_report_shows_exactly_the_figures_it_names(self) -> None:
+        """C-20 on the report itself: no figure in it that a script cannot redraw.
+
+        The criterion says the report carries exactly the planned figures. Until
+        something opened REPORT.md, that half of C-20 was a promise about a file
+        no test read.
+        """
+        report = (RESULTS_DIR.parent / "REPORT.md").read_text()
+        shown = re.findall(r"!\[[^\]]*\]\(([^)]+)\)", report)
+        assert shown == [
+            "results/figures/fig1_thresholds.png",
+            "results/figures/fig2_outcomes.png",
+            "results/figures/fig1_coverage.png",
+        ]
+        for relative in shown:
+            assert (RESULTS_DIR.parent / relative).exists(), relative

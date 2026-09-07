@@ -12,12 +12,21 @@
   },
   "n_draws": 200,
   "seed": 0,
-  "git_commit": "5a80601f854db05c34b9bcce19e3377bc180c55c",
+  "git_commit": "3fe75bddb1e4eef212c34cf67dbe18c3e271048b",
   "seconds": 1.1,
   "by_corpus": {
     "ptbxl": {
       "name": "PTB-XL",
-      "n_points": 1099,
+      "n_scored": {
+        "mean": 1099.14,
+        "sd": 10.0656,
+        "n_draws": 200
+      },
+      "n_positive": {
+        "mean": 275.91,
+        "sd": 11.3899,
+        "n_draws": 200
+      },
       "prevalence": 0.2502,
       "schemes": {
         "plain": {
@@ -132,7 +141,16 @@
     },
     "sph": {
       "name": "Shandong",
-      "n_points": 25770,
+      "n_scored": {
+        "mean": 25770.0,
+        "sd": 0.0,
+        "n_draws": 200
+      },
+      "n_positive": {
+        "mean": 260.0,
+        "sd": 0.0,
+        "n_draws": 200
+      },
       "prevalence": 0.0101,
       "schemes": {
         "plain": {
@@ -247,7 +265,16 @@
     },
     "acs": {
       "name": "Chongqing",
-      "n_points": 17955,
+      "n_scored": {
+        "mean": 17955.0,
+        "sd": 0.0,
+        "n_draws": 200
+      },
+      "n_positive": {
+        "mean": 2679.0,
+        "sd": 0.0,
+        "n_draws": 200
+      },
       "prevalence": 0.1492,
       "schemes": {
         "plain": {

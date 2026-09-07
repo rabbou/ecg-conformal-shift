@@ -531,7 +531,8 @@ def figure_5_thresholds(
     figure.text(
         0.5,
         0.034,
-        "Deferred: share of all tracings returning both labels or neither, sent to a specialist.",
+        "Deferred: share of all tracings returning both labels or neither, sent to a specialist. "
+        "Histograms show all of fold 10; the rates are means over the test halves.",
         ha="center",
         fontsize=8.5,
         color="#555",
@@ -546,13 +547,13 @@ def figure_5_thresholds(
 def figure_6_outcomes(outcomes: dict[str, Any], out: Path, source: Path) -> Path:
     """What a case of each label gets, under each of the three schemes."""
     source_block = outcomes["by_corpus"]["ptbxl"]
+    # The halving is by patient, so the test half's size varies by draw; the
+    # counts are the means the table recorded, not a nominal half.
+    scored = source_block["n_scored"]["mean"]
+    positive = source_block["n_positive"]["mean"]
     panels = (
-        ("1", f"{int(round(source_block['n_points'] * source_block['prevalence'])):,} MI cases"),
-        (
-            "0",
-            f"{int(round(source_block['n_points'] * (1 - source_block['prevalence']))):,} "
-            "non-MI cases",
-        ),
+        ("1", f"MI cases (mean {positive:,.0f} per draw)"),
+        ("0", f"non-MI cases (mean {scored - positive:,.0f} per draw)"),
     )
     figure, axes = plt.subplots(1, 2, figsize=(13, 4.3), sharex=True)
     positions = np.arange(len(SCHEME_ORDER))[::-1]

@@ -114,6 +114,10 @@ def collect(
     rng = np.random.default_rng(seed)
     tally: dict[tuple[str, str, str, str], list[float]] = {}
     thresholds: dict[tuple[str, str], list[float]] = {}
+    # The halving is by patient, so the record counts on each side vary from
+    # draw to draw.  Recorded rather than assumed, because the figures print it.
+    scored: dict[str, list[float]] = {}
+    positives: dict[str, list[float]] = {}
 
     for _ in range(draws):
         rng.shuffle(unique)
@@ -148,6 +152,8 @@ def collect(
             labels = bundle["labels"]
             if corpus == "ptbxl":
                 probs, labels = probs[~is_calibration], labels[~is_calibration]
+            scored.setdefault(corpus, []).append(float(labels.size))
+            positives.setdefault(corpus, []).append(float((labels == 1).sum()))
             all_scores = lac_scores_all(probs)
             built = {
                 "plain": _plain_sets(probs, plain_q),
@@ -163,12 +169,10 @@ def collect(
     by_corpus: dict[str, Any] = {}
     for corpus, bundle in scores_by_corpus.items():
         prevalence = float(np.mean(bundle["labels"] == 1))
-        n_points = int(bundle["labels"].size)
-        if corpus == "ptbxl":
-            n_points = int(round(n_points / 2))
         by_corpus[corpus] = {
             "name": CORPUS_NAMES[corpus],
-            "n_points": n_points,
+            "n_scored": _summary(scored[corpus]),
+            "n_positive": _summary(positives[corpus]),
             "prevalence": round(prevalence, 4),
             "schemes": {
                 scheme: {

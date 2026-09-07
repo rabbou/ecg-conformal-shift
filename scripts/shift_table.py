@@ -357,7 +357,7 @@ def main(argv: list[str] | None = None) -> int:
             "mondrian": (
                 "one threshold per class, each fitted inside that class on PTB-XL; exact in "
                 "finite samples under any change of class proportions, with nothing estimated "
-                "(Podkopaev & Ramdas, UAI 2021, arXiv:2103.03323)"
+                "(label conditional validity, Vovk, ACML 2012, PMLR 25:475-490, Prop. 3)"
             ),
             "weighted": (
                 "each PTB-XL calibration point reweighted by w(y) = q(y)/p(y) in the "

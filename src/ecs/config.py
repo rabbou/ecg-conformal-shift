@@ -21,6 +21,11 @@ CHALLENGE2021_DIR = Path(
     os.environ.get("ECS_CHALLENGE2021_DIR", Path.home() / "data/challenge2021")
 )
 
+# The published code tables the label mapping joins on, copied into the
+# repository so the table can be rebuilt without a network.  Provenance,
+# licence and digest of each are in mappings/NOTICE.md.
+MAPPINGS_DIR = Path(os.environ.get("ECS_MAPPINGS_DIR", REPO_ROOT / "mappings"))
+
 # PTB-XL ships the MI superclass with five subendocardial-injury statements
 # folded in.  They are a different clinical entity from an infarct pattern, so
 # the mapping keeps them separable rather than deciding for the caller.

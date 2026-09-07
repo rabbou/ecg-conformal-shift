@@ -16,6 +16,7 @@ results/baseline/model.pt
 !results/perturbations.npz
 !results/seen_target.json
 !results/arms.json
+!results/label_map.json
 !results/embeddings/
 results/embeddings/**/*.npz
 !results/figures/

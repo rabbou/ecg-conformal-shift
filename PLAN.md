@@ -130,8 +130,9 @@ being re-cut. Each is drawn by `scripts/figures.py` from a results file.
 3. Encoder arms on the same break. Coverage gap (source minus target) per
    arm, with bootstrapped intervals and paired differences: random-init frozen,
    ECGFounder, ECG-FM, HuBERT-ECG if its contamination claim verifies.
-4. Baseline discrimination. AUROC and AUPRC per corpus with intervals; the
-   reproduction of a published value that validates the setup.
+4. Baseline discrimination. AUROC and AUPRC per corpus with intervals, set
+   beside the published macro figure as the plausibility check C-19 defines --
+   a different quantity, so not a reproduction.
 5. Threshold placement. Where each of the three schemes puts its decision
    boundaries on the model's probability axis, over the source score
    distribution of each class, with the resulting miss rate, false-alarm rate

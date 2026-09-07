@@ -12,7 +12,7 @@ A set with both labels, or with none. With the smallest-set score at 90% confide
 
 ## 3. Why believe the underlying model is any good? (clinician)
 
-Its first task was to reproduce a published number, and it did: AUROC 0.932, 95% CI 0.921 to 0.943, on the PTB-XL benchmark split where the published figure for the same architecture is 0.930 (`results/figures/fig4_discrimination.png`, `results/baseline.json`; the published figure averages five diagnostic superclasses, and the file records why the infarction-only column is unavailable). The baseline is deliberately ordinary and well documented. The study is about what calibration promises survive a change of site, and that question is only worth asking on a model of known quality.
+Its MI AUROC on the PTB-XL benchmark split is 0.932, 95% CI 0.921 to 0.943, which sits beside the 0.930 published for the same architecture and split (`results/figures/fig4_discrimination.png`, `results/baseline.json`; the published figure averages five diagnostic superclasses, and the file records why the infarction-only column is unavailable). The baseline is deliberately ordinary and well documented. The study is about what calibration promises survive a change of site, and that question is only worth asking on a model of known quality.
 
 ## 4. Would this hold at my site? (clinician, commercial)
 

@@ -1,9 +1,14 @@
-"""The four encoder arms, in one place, with the chain each one demands.
+"""The five encoder arms, in one place, with the chain each one demands.
 
 An *arm* is a way of turning a canonical (12, 5000) tracing into one vector.
-Three are pre-trained encoders published by other groups; the fourth is our own
+Four are pre-trained encoders published by other groups; the fifth is our own
 ResNet1d left at its random initialisation, the floor the others have to clear
 (C-17).
+
+Two of the four saw PTB-XL at pre-training and one saw Shandong as well, so
+their figures on those corpora are partly memory rather than transfer.  What
+each one saw is in ``PRETRAINING``, read off its authors' own description, and
+it travels into every result file that uses the arm.
 
 The common ingestion chain (``ecs.ingest``) is identical for every corpus and
 stops at the canonical form.  What each encoder needs on top of that -- a
@@ -28,12 +33,12 @@ from pathlib import Path
 
 import numpy as np
 import torch
-from scipy.signal import butter, decimate, filtfilt
+from scipy.signal import butter, decimate, filtfilt, resample
 
 from .config import REPO_ROOT
 from .models import ResNet1d
 
-__all__ = ["ARMS", "PRETRAINING", "WEIGHTS", "Arm", "machine_info"]
+__all__ = ["ARMS", "PRETRAINING", "SAW", "WEIGHTS", "Arm", "machine_info"]
 
 WEIGHTS = REPO_ROOT / "data/weights"
 
@@ -100,6 +105,22 @@ PRETRAINING = {
         "(medRxiv 10.1101/2024.11.14.24317328v3, Methods - Data and Preprocessing, "
         "read 2026-08-23)"
     ),
+    "ecg_jepa": (
+        "Chapman-Shaoxing with Ningbo (PhysioNet ecg-arrhythmia 1.0.0) and CODE-15; not "
+        "PTB-XL, not Shandong, not Chongqing (ECG_JEPA README, Pretraining, read "
+        "2026-09-07; arXiv:2410.08559)"
+    ),
+}
+
+# Which corpora of this study an arm saw at pre-training, read off the sources
+# quoted in PRETRAINING.  The prose says it in a sentence; a figure that has to
+# be read as an upper bound rather than as transfer needs the fact itself.
+SAW: dict[str, tuple[str, ...]] = {
+    "random_init": (),
+    "ecgfounder": (),
+    "ecgfm": ("ptbxl",),
+    "hubert_ecg": ("ptbxl", "sph"),
+    "ecg_jepa": ("chapman_ningbo",),
 }
 
 NO_EXTRA_PREPROCESSING = (
@@ -270,11 +291,81 @@ def ecgfm() -> Arm:
     )
 
 
+# ECG-JEPA's published chain: eight of the twelve leads, at 250 Hz.
+JEPA_LEADS = (0, 1, 6, 7, 8, 9, 10, 11)  # I, II, V1-V6 in the canonical order
+JEPA_SAMPLES = 2500
+JEPA_EMBED_DIM = 768
+JEPA_HEADS = 12
+JEPA_PATCHES = 50
+JEPA_PATCH_SAMPLES = 50
+
+
+def ecg_jepa() -> Arm:
+    """The joint-embedding predictive encoder, the one arm that never saw PTB-XL.
+
+    Its checkpoint holds the encoder alone -- the predictor and the target
+    encoder are training machinery -- so the arm builds the published
+    ``MaskTransformer`` and loads that key.  The depth is read off the
+    checkpoint rather than assumed.
+    """
+    sys.path.insert(0, str(REPO_ROOT / "third_party/ecg_jepa"))
+    from ecg_jepa import MaskTransformer  # vendored, MIT
+
+    path = WEIGHTS / "ecg_jepa/ecg_jepa_random.pth"
+    checkpoint = torch.load(path, map_location="cpu")
+    state = checkpoint["encoder"]
+    depth = 1 + max(
+        int(key.split(".")[2]) for key in state if key.startswith("encoder_blocks.blocks.")
+    )
+    model = MaskTransformer(
+        embed_dim=JEPA_EMBED_DIM,
+        depth=depth,
+        num_heads=JEPA_HEADS,
+        c=len(JEPA_LEADS),
+        p=JEPA_PATCHES,
+        t=JEPA_PATCH_SAMPLES,
+        leads=list(range(len(JEPA_LEADS))),
+        pos_type="sincos",
+    )
+    missing, unexpected = model.load_state_dict(state, strict=False)
+    model.eval()
+
+    def embed(x: np.ndarray) -> torch.Tensor:
+        # Keep the eight leads the authors keep, then resample ten seconds from
+        # 500 Hz to 250 Hz with the Fourier method their ecg_data.py uses.
+        reduced = x[:, list(JEPA_LEADS), :]
+        at_250 = resample(reduced, JEPA_SAMPLES, axis=-1).astype(np.float32)
+        return model.representation(torch.from_numpy(at_250))
+
+    return (
+        embed,
+        {
+            "n_params": sum(p.numel() for p in model.parameters()),
+            "weights_source": (
+                "ECG_JEPA repository, random-masking checkpoint from the README download "
+                f"link (MIT), epoch {int(checkpoint.get('epoch', -1))}"
+            ),
+            "preprocessing": (
+                "eight of the twelve leads (I, II, V1-V6) kept and the ten seconds "
+                "resampled from 500 to 250 Hz by scipy.signal.resample, as the authors' "
+                "ecg_data.py does. Not applied: nothing else -- their chain adds no filter "
+                "and no normalisation"
+            ),
+            "notes": (
+                f"published MaskTransformer, depth {depth} read off the checkpoint, "
+                f"{JEPA_EMBED_DIM}-d mean-pooled representation; input (B, 8, 2500); "
+                f"load_state_dict missing={len(missing)} unexpected={len(unexpected)}"
+            ),
+        },
+    )
+
+
 ARMS: dict[str, Callable[[], Arm]] = {
     "random_init": random_init,
     "ecgfounder": ecgfounder,
     "ecgfm": ecgfm,
     "hubert_ecg": hubert_ecg,
+    "ecg_jepa": ecg_jepa,
 }
 
 

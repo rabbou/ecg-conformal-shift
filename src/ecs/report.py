@@ -58,6 +58,7 @@ __all__ = [
     "Source",
     "Spread",
     "Target",
+    "estimated_prior",
     "frozen_calibration_table",
     "frozen_threshold",
     "repeated_split_report",
@@ -427,7 +428,7 @@ class _Calibration:
         }
 
 
-def _estimated_prior(
+def estimated_prior(
     predictions: IntArray,
     calibration_predictions: IntArray,
     calibration_labels: IntArray,
@@ -521,7 +522,7 @@ def frozen_calibration_table(
             calibration_predictions = source.probs[is_calibration].argmax(axis=1)
             priors: dict[str, Array | None] = (
                 {
-                    name: _estimated_prior(
+                    name: estimated_prior(
                         probs.argmax(axis=1),
                         calibration_predictions,
                         calibration_labels,

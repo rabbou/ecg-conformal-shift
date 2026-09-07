@@ -17,6 +17,10 @@ results/baseline/model.pt
 !results/seen_target.json
 !results/arms.json
 !results/label_map.json
+!results/target_scale.json
+!results/rotation.json
+!results/rotation/
+results/rotation/**/model.pt
 !results/embeddings/
 results/embeddings/**/*.npz
 !results/figures/
@@ -29,3 +33,4 @@ __pycache__/
 .DS_Store
 results/baseline/train.log
 .claude/
+results/rotation/**/train.log

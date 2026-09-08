@@ -10,6 +10,7 @@ results/baseline/model.pt
 !results/external/
 !results/shift.json
 !results/outcomes.json
+!results/subgroups.json
 !results/seen_target.json
 !results/arms.json
 !results/embeddings/

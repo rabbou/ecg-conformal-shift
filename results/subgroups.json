@@ -1,0 +1,732 @@
+{
+  "question": "Inside each label, is coverage flat across sex and age, or does the scheme this report recommends deliver a different coverage to the oldest patients and to women than to the label as a whole.",
+  "protocol": "Same halving of PTB-XL fold 10 by patient as outcomes.py, same seed, same three schemes. Coverage is the set holding the true label. Intervals are percentile intervals over bootstrap replicates that resample the patients of fold 10 with replacement before halving, so they carry the subgroup's sampling error and not only the calibration draw. Differences are taken inside each replicate.",
+  "sex_encoding": "PTB-XL sex: 0 male, 1 female (Wagner et al. 2020).",
+  "age_note": "PTB-XL stores every age above 89 as 300 for privacy (v1.0.2 changelog); those 293 records of the release, 34 of fold 10, sit in the oldest band.",
+  "alpha": 0.1,
+  "n_draws": 200,
+  "n_bootstrap": 2000,
+  "seed": 0,
+  "counts": {
+    "sex:male": {
+      "n": 1132,
+      "n_mi": 297
+    },
+    "sex:female": {
+      "n": 1066,
+      "n_mi": 253
+    },
+    "age:0-49": {
+      "n": 521,
+      "n_mi": 38
+    },
+    "age:50-64": {
+      "n": 629,
+      "n_mi": 133
+    },
+    "age:65-74": {
+      "n": 496,
+      "n_mi": 147
+    },
+    "age:75+": {
+      "n": 552,
+      "n_mi": 232
+    }
+  },
+  "git_commit": "09037bdd0f564c787a2060c003e342f797d05338",
+  "seconds": 21.9,
+  "coverage": {
+    "plain": {
+      "age:0-49:all": {
+        "mean": 0.9428,
+        "sd": 0.0111,
+        "ci95": [
+          0.9084,
+          0.9707
+        ],
+        "n_draws": 200,
+        "n_bootstrap": 2000
+      },
+      "age:0-49:mi": {
+        "mean": 0.8755,
+        "sd": 0.0683,
+        "ci95": [
+          0.6842,
+          1.0
+        ],
+        "n_draws": 200,
+        "n_bootstrap": 2000
+      },
+      "age:0-49:non_mi": {
+        "mean": 0.9481,
+        "sd": 0.0121,
+        "ci95": [
+          0.9072,
+          0.9784
+        ],
+        "n_draws": 200,
+        "n_bootstrap": 2000
+      },
+      "age:50-64:all": {
+        "mean": 0.8323,
+        "sd": 0.0206,
+        "ci95": [
+          0.769,
+          0.8851
+        ],
+        "n_draws": 200,
+        "n_bootstrap": 2000
+      },
+      "age:50-64:mi": {
+        "mean": 0.8813,
+        "sd": 0.0341,
+        "ci95": [
+          0.7826,
+          0.9516
+        ],
+        "n_draws": 200,
+        "n_bootstrap": 2000
+      },
+      "age:50-64:non_mi": {
+        "mean": 0.819,
+        "sd": 0.03,
+        "ci95": [
+          0.7395,
+          0.8889
+        ],
+        "n_draws": 200,
+        "n_bootstrap": 2000
+      },
+      "age:65-74:all": {
+        "mean": 0.786,
+        "sd": 0.0201,
+        "ci95": [
+          0.7216,
+          0.8491
+        ],
+        "n_draws": 200,
+        "n_bootstrap": 2000
+      },
+      "age:65-74:mi": {
+        "mean": 0.8706,
+        "sd": 0.0439,
+        "ci95": [
+          0.7727,
+          0.9546
+        ],
+        "n_draws": 200,
+        "n_bootstrap": 2000
+      },
+      "age:65-74:non_mi": {
+        "mean": 0.7504,
+        "sd": 0.0369,
+        "ci95": [
+          0.6495,
+          0.8391
+        ],
+        "n_draws": 200,
+        "n_bootstrap": 2000
+      },
+      "age:75+:all": {
+        "mean": 0.7663,
+        "sd": 0.0202,
+        "ci95": [
+          0.6961,
+          0.8216
+        ],
+        "n_draws": 200,
+        "n_bootstrap": 2000
+      },
+      "age:75+:mi": {
+        "mean": 0.923,
+        "sd": 0.0279,
+        "ci95": [
+          0.8559,
+          0.976
+        ],
+        "n_draws": 200,
+        "n_bootstrap": 2000
+      },
+      "age:75+:non_mi": {
+        "mean": 0.6521,
+        "sd": 0.0428,
+        "ci95": [
+          0.5228,
+          0.7546
+        ],
+        "n_draws": 200,
+        "n_bootstrap": 2000
+      },
+      "sex:female:all": {
+        "mean": 0.8181,
+        "sd": 0.0148,
+        "ci95": [
+          0.7635,
+          0.8604
+        ],
+        "n_draws": 200,
+        "n_bootstrap": 2000
+      },
+      "sex:female:mi": {
+        "mean": 0.8697,
+        "sd": 0.0394,
+        "ci95": [
+          0.7938,
+          0.9362
+        ],
+        "n_draws": 200,
+        "n_bootstrap": 2000
+      },
+      "sex:female:non_mi": {
+        "mean": 0.8022,
+        "sd": 0.0273,
+        "ci95": [
+          0.7216,
+          0.8639
+        ],
+        "n_draws": 200,
+        "n_bootstrap": 2000
+      },
+      "sex:male:all": {
+        "mean": 0.8439,
+        "sd": 0.0139,
+        "ci95": [
+          0.8018,
+          0.8838
+        ],
+        "n_draws": 200,
+        "n_bootstrap": 2000
+      },
+      "sex:male:mi": {
+        "mean": 0.9178,
+        "sd": 0.0245,
+        "ci95": [
+          0.8595,
+          0.966
+        ],
+        "n_draws": 200,
+        "n_bootstrap": 2000
+      },
+      "sex:male:non_mi": {
+        "mean": 0.8173,
+        "sd": 0.0234,
+        "ci95": [
+          0.754,
+          0.8776
+        ],
+        "n_draws": 200,
+        "n_bootstrap": 2000
+      }
+    },
+    "pooled": {
+      "age:0-49:all": {
+        "mean": 0.9637,
+        "sd": 0.0097,
+        "ci95": [
+          0.9375,
+          0.9876
+        ],
+        "n_draws": 200,
+        "n_bootstrap": 2000
+      },
+      "age:0-49:mi": {
+        "mean": 0.5959,
+        "sd": 0.0886,
+        "ci95": [
+          0.3333,
+          0.8333
+        ],
+        "n_draws": 200,
+        "n_bootstrap": 2000
+      },
+      "age:0-49:non_mi": {
+        "mean": 0.9929,
+        "sd": 0.0044,
+        "ci95": [
+          0.9789,
+          1.0
+        ],
+        "n_draws": 200,
+        "n_bootstrap": 2000
+      },
+      "age:50-64:all": {
+        "mean": 0.9088,
+        "sd": 0.0155,
+        "ci95": [
+          0.8667,
+          0.9433
+        ],
+        "n_draws": 200,
+        "n_bootstrap": 2000
+      },
+      "age:50-64:mi": {
+        "mean": 0.7146,
+        "sd": 0.0489,
+        "ci95": [
+          0.5694,
+          0.8272
+        ],
+        "n_draws": 200,
+        "n_bootstrap": 2000
+      },
+      "age:50-64:non_mi": {
+        "mean": 0.9613,
+        "sd": 0.011,
+        "ci95": [
+          0.933,
+          0.9878
+        ],
+        "n_draws": 200,
+        "n_bootstrap": 2000
+      },
+      "age:65-74:all": {
+        "mean": 0.8733,
+        "sd": 0.02,
+        "ci95": [
+          0.8243,
+          0.9213
+        ],
+        "n_draws": 200,
+        "n_bootstrap": 2000
+      },
+      "age:65-74:mi": {
+        "mean": 0.6906,
+        "sd": 0.0498,
+        "ci95": [
+          0.5714,
+          0.8182
+        ],
+        "n_draws": 200,
+        "n_bootstrap": 2000
+      },
+      "age:65-74:non_mi": {
+        "mean": 0.9498,
+        "sd": 0.0141,
+        "ci95": [
+          0.9086,
+          0.984
+        ],
+        "n_draws": 200,
+        "n_bootstrap": 2000
+      },
+      "age:75+:all": {
+        "mean": 0.8494,
+        "sd": 0.0239,
+        "ci95": [
+          0.8015,
+          0.9027
+        ],
+        "n_draws": 200,
+        "n_bootstrap": 2000
+      },
+      "age:75+:mi": {
+        "mean": 0.791,
+        "sd": 0.0365,
+        "ci95": [
+          0.7025,
+          0.8776
+        ],
+        "n_draws": 200,
+        "n_bootstrap": 2000
+      },
+      "age:75+:non_mi": {
+        "mean": 0.892,
+        "sd": 0.0225,
+        "ci95": [
+          0.8353,
+          0.9484
+        ],
+        "n_draws": 200,
+        "n_bootstrap": 2000
+      },
+      "sex:female:all": {
+        "mean": 0.8905,
+        "sd": 0.0154,
+        "ci95": [
+          0.8577,
+          0.9229
+        ],
+        "n_draws": 200,
+        "n_bootstrap": 2000
+      },
+      "sex:female:mi": {
+        "mean": 0.6693,
+        "sd": 0.0398,
+        "ci95": [
+          0.5839,
+          0.7679
+        ],
+        "n_draws": 200,
+        "n_bootstrap": 2000
+      },
+      "sex:female:non_mi": {
+        "mean": 0.9594,
+        "sd": 0.0097,
+        "ci95": [
+          0.9331,
+          0.9809
+        ],
+        "n_draws": 200,
+        "n_bootstrap": 2000
+      },
+      "sex:male:all": {
+        "mean": 0.9066,
+        "sd": 0.0139,
+        "ci95": [
+          0.8745,
+          0.9377
+        ],
+        "n_draws": 200,
+        "n_bootstrap": 2000
+      },
+      "sex:male:mi": {
+        "mean": 0.7854,
+        "sd": 0.0327,
+        "ci95": [
+          0.6933,
+          0.864
+        ],
+        "n_draws": 200,
+        "n_bootstrap": 2000
+      },
+      "sex:male:non_mi": {
+        "mean": 0.95,
+        "sd": 0.01,
+        "ci95": [
+          0.9269,
+          0.9751
+        ],
+        "n_draws": 200,
+        "n_bootstrap": 2000
+      }
+    },
+    "perlabel": {
+      "age:0-49:all": {
+        "mean": 0.9726,
+        "sd": 0.0101,
+        "ci95": [
+          0.9458,
+          0.9922
+        ],
+        "n_draws": 200,
+        "n_bootstrap": 2000
+      },
+      "age:0-49:mi": {
+        "mean": 0.8887,
+        "sd": 0.0694,
+        "ci95": [
+          0.6923,
+          1.0
+        ],
+        "n_draws": 200,
+        "n_bootstrap": 2000
+      },
+      "age:0-49:non_mi": {
+        "mean": 0.9792,
+        "sd": 0.0087,
+        "ci95": [
+          0.9542,
+          0.9959
+        ],
+        "n_draws": 200,
+        "n_bootstrap": 2000
+      },
+      "age:50-64:all": {
+        "mean": 0.8928,
+        "sd": 0.0156,
+        "ci95": [
+          0.8553,
+          0.931
+        ],
+        "n_draws": 200,
+        "n_bootstrap": 2000
+      },
+      "age:50-64:mi": {
+        "mean": 0.8822,
+        "sd": 0.0336,
+        "ci95": [
+          0.7884,
+          0.9529
+        ],
+        "n_draws": 200,
+        "n_bootstrap": 2000
+      },
+      "age:50-64:non_mi": {
+        "mean": 0.8955,
+        "sd": 0.0191,
+        "ci95": [
+          0.8534,
+          0.939
+        ],
+        "n_draws": 200,
+        "n_bootstrap": 2000
+      },
+      "age:65-74:all": {
+        "mean": 0.8864,
+        "sd": 0.0205,
+        "ci95": [
+          0.835,
+          0.9303
+        ],
+        "n_draws": 200,
+        "n_bootstrap": 2000
+      },
+      "age:65-74:mi": {
+        "mean": 0.877,
+        "sd": 0.0432,
+        "ci95": [
+          0.7766,
+          0.9583
+        ],
+        "n_draws": 200,
+        "n_bootstrap": 2000
+      },
+      "age:65-74:non_mi": {
+        "mean": 0.8902,
+        "sd": 0.0225,
+        "ci95": [
+          0.8269,
+          0.9398
+        ],
+        "n_draws": 200,
+        "n_bootstrap": 2000
+      },
+      "age:75+:all": {
+        "mean": 0.8518,
+        "sd": 0.0222,
+        "ci95": [
+          0.7993,
+          0.9021
+        ],
+        "n_draws": 200,
+        "n_bootstrap": 2000
+      },
+      "age:75+:mi": {
+        "mean": 0.9268,
+        "sd": 0.026,
+        "ci95": [
+          0.8657,
+          0.9804
+        ],
+        "n_draws": 200,
+        "n_bootstrap": 2000
+      },
+      "age:75+:non_mi": {
+        "mean": 0.7972,
+        "sd": 0.0332,
+        "ci95": [
+          0.7152,
+          0.8771
+        ],
+        "n_draws": 200,
+        "n_bootstrap": 2000
+      },
+      "sex:female:all": {
+        "mean": 0.8909,
+        "sd": 0.0156,
+        "ci95": [
+          0.856,
+          0.9242
+        ],
+        "n_draws": 200,
+        "n_bootstrap": 2000
+      },
+      "sex:female:mi": {
+        "mean": 0.8759,
+        "sd": 0.0372,
+        "ci95": [
+          0.7982,
+          0.9416
+        ],
+        "n_draws": 200,
+        "n_bootstrap": 2000
+      },
+      "sex:female:non_mi": {
+        "mean": 0.8956,
+        "sd": 0.0175,
+        "ci95": [
+          0.8564,
+          0.9342
+        ],
+        "n_draws": 200,
+        "n_bootstrap": 2000
+      },
+      "sex:male:all": {
+        "mean": 0.9084,
+        "sd": 0.0142,
+        "ci95": [
+          0.8788,
+          0.9369
+        ],
+        "n_draws": 200,
+        "n_bootstrap": 2000
+      },
+      "sex:male:mi": {
+        "mean": 0.9207,
+        "sd": 0.0246,
+        "ci95": [
+          0.8684,
+          0.9702
+        ],
+        "n_draws": 200,
+        "n_bootstrap": 2000
+      },
+      "sex:male:non_mi": {
+        "mean": 0.9039,
+        "sd": 0.0172,
+        "ci95": [
+          0.869,
+          0.9393
+        ],
+        "n_draws": 200,
+        "n_bootstrap": 2000
+      }
+    }
+  },
+  "differences": {
+    "plain:age:75+-0-49:mi": {
+      "mean": 0.0475,
+      "ci95": [
+        -0.0901,
+        0.2375
+      ],
+      "n_bootstrap": 2000
+    },
+    "pooled:age:75+-0-49:mi": {
+      "mean": 0.195,
+      "ci95": [
+        -0.0514,
+        0.4658
+      ],
+      "n_bootstrap": 2000
+    },
+    "perlabel:age:75+-0-49:mi": {
+      "mean": 0.0381,
+      "ci95": [
+        -0.0923,
+        0.2251
+      ],
+      "n_bootstrap": 2000
+    },
+    "plain:age:75+-0-49:non_mi": {
+      "mean": -0.296,
+      "ci95": [
+        -0.4128,
+        -0.2006
+      ],
+      "n_bootstrap": 2000
+    },
+    "pooled:age:75+-0-49:non_mi": {
+      "mean": -0.1009,
+      "ci95": [
+        -0.1585,
+        -0.047
+      ],
+      "n_bootstrap": 2000
+    },
+    "perlabel:age:75+-0-49:non_mi": {
+      "mean": -0.1821,
+      "ci95": [
+        -0.263,
+        -0.102
+      ],
+      "n_bootstrap": 2000
+    },
+    "plain:age:75+-0-49:all": {
+      "mean": -0.1764,
+      "ci95": [
+        -0.2461,
+        -0.1184
+      ],
+      "n_bootstrap": 2000
+    },
+    "pooled:age:75+-0-49:all": {
+      "mean": -0.1143,
+      "ci95": [
+        -0.1652,
+        -0.0584
+      ],
+      "n_bootstrap": 2000
+    },
+    "perlabel:age:75+-0-49:all": {
+      "mean": -0.1207,
+      "ci95": [
+        -0.1729,
+        -0.0685
+      ],
+      "n_bootstrap": 2000
+    },
+    "plain:sex:female-male:mi": {
+      "mean": -0.0482,
+      "ci95": [
+        -0.1258,
+        0.0255
+      ],
+      "n_bootstrap": 2000
+    },
+    "pooled:sex:female-male:mi": {
+      "mean": -0.1161,
+      "ci95": [
+        -0.2264,
+        0.0025
+      ],
+      "n_bootstrap": 2000
+    },
+    "perlabel:sex:female-male:mi": {
+      "mean": -0.0447,
+      "ci95": [
+        -0.1228,
+        0.0255
+      ],
+      "n_bootstrap": 2000
+    },
+    "plain:sex:female-male:non_mi": {
+      "mean": -0.0151,
+      "ci95": [
+        -0.0775,
+        0.0358
+      ],
+      "n_bootstrap": 2000
+    },
+    "pooled:sex:female-male:non_mi": {
+      "mean": 0.0094,
+      "ci95": [
+        -0.0222,
+        0.0362
+      ],
+      "n_bootstrap": 2000
+    },
+    "perlabel:sex:female-male:non_mi": {
+      "mean": -0.0083,
+      "ci95": [
+        -0.0531,
+        0.036
+      ],
+      "n_bootstrap": 2000
+    },
+    "plain:sex:female-male:all": {
+      "mean": -0.0258,
+      "ci95": [
+        -0.0751,
+        0.0163
+      ],
+      "n_bootstrap": 2000
+    },
+    "pooled:sex:female-male:all": {
+      "mean": -0.0161,
+      "ci95": [
+        -0.0561,
+        0.0206
+      ],
+      "n_bootstrap": 2000
+    },
+    "perlabel:sex:female-male:all": {
+      "mean": -0.0174,
+      "ci95": [
+        -0.0545,
+        0.017
+      ],
+      "n_bootstrap": 2000
+    }
+  }
+}

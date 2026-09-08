@@ -903,7 +903,9 @@ class TestTheCommittedBreakTable:
     def test_every_corpus_names_the_commit_that_scored_it(self, table: dict) -> None:
         for corpus in ("ptbxl", "sph", "acs"):
             assert len(table["corpora"][corpus]["git_commit"]) == 40, corpus
-        assert len(table["git_commit"]) == 40
+        # The table's own commit moved into the provenance block, which also
+        # carries the digest of every producer; tests/test_provenance.py checks it.
+        assert len(table["provenance"]["commit"]) == 40
 
     def test_every_corpus_was_scored_whole_against_what_ingestion_kept(self, table: dict) -> None:
         """The external corpora are not subsampled: the row count on the table is

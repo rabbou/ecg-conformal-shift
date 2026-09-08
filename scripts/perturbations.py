@@ -39,7 +39,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import subprocess
 import time
 from collections.abc import Callable
 from pathlib import Path
@@ -63,6 +62,7 @@ from ecs.conformal import (
 )
 from ecs.ingest import load_ptbxl
 from ecs.labels import MILabelSpec, ptbxl_mi_label
+from ecs.provenance import provenance_block
 from ecs.splits import ptbxl_benchmark_split
 
 ALPHA = 0.10
@@ -274,9 +274,17 @@ def build(
             "tolerance": 1e-6,
             "passed": bool(largest < 1e-6),
         },
-        "git_commit": subprocess.run(
-            ["git", "rev-parse", "HEAD"], capture_output=True, text=True, check=False
-        ).stdout.strip(),
+        "provenance": provenance_block(
+            [
+                "scripts/perturbations.py",
+                "scripts/score_external.py",
+                "src/ecs/conformal.py",
+                "src/ecs/ingest.py",
+                "src/ecs/labels.py",
+                "src/ecs/models.py",
+                "src/ecs/splits.py",
+            ]
+        ),
         "seconds": round(time.time() - started, 1),
         "conditions": measure(scored["clean"], scored, labels, patients, draws, seed),
     }, {

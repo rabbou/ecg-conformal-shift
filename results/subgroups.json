@@ -33,8 +33,14 @@
       "n_mi": 232
     }
   },
-  "git_commit": "09037bdd0f564c787a2060c003e342f797d05338",
-  "seconds": 21.9,
+  "provenance": {
+    "commit": "40bffc58b28c7ed685af6305daa921aedfc6119e",
+    "producers": {
+      "scripts/subgroups.py": "d4849aa28d57845e49bf6b34d636909643a3c7868783c511c8085100ae03e2ea",
+      "src/ecs/conformal.py": "c434998b704a551d55bc2206a1a3ada6d42309947b0b92db11607746dcd068dc"
+    }
+  },
+  "seconds": 38.6,
   "coverage": {
     "plain": {
       "age:0-49:all": {

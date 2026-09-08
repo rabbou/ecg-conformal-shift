@@ -10,8 +10,16 @@
   "n_positive": 550,
   "n_draws": 200,
   "seed": 0,
-  "git_commit": "75e50cde6c2c103026f19ab506bbcf1bb58646d2",
-  "seconds": 9.6,
+  "provenance": {
+    "commit": "40bffc58b28c7ed685af6305daa921aedfc6119e",
+    "producers": {
+      "scripts/abstention_table.py": "2cd9252e1c06343a1299620cc406c479fb5166c2cd1aee7ac8057193e3ec5503",
+      "src/ecs/conformal.py": "c434998b704a551d55bc2206a1a3ada6d42309947b0b92db11607746dcd068dc",
+      "src/ecs/metrics.py": "bf1271d4ffc6d61751ff0b6a384745a7c0fa3d1462df6634acd6c08ed30129e2",
+      "src/ecs/splits.py": "17f1d2fea5970c37b989ad0df925b3d19f355012bfca02aed6983ce142b5a946"
+    }
+  },
+  "seconds": 11.2,
   "rows": [
     {
       "alpha": 0.2,

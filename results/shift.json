@@ -14,7 +14,15 @@
   },
   "n_draws": 200,
   "seed": 0,
-  "git_commit": "3fe75bddb1e4eef212c34cf67dbe18c3e271048b",
+  "provenance": {
+    "commit": "40bffc58b28c7ed685af6305daa921aedfc6119e",
+    "producers": {
+      "scripts/shift_table.py": "2a86eab993d284b62d57e722ebafb458b525d40dcec6cfc9247f97f2779a7439",
+      "src/ecs/conformal.py": "c434998b704a551d55bc2206a1a3ada6d42309947b0b92db11607746dcd068dc",
+      "src/ecs/metrics.py": "bf1271d4ffc6d61751ff0b6a384745a7c0fa3d1462df6634acd6c08ed30129e2",
+      "src/ecs/splits.py": "17f1d2fea5970c37b989ad0df925b3d19f355012bfca02aed6983ce142b5a946"
+    }
+  },
   "corpora": {
     "sph": {
       "title": "Shandong Provincial Hospital",
@@ -41,7 +49,7 @@
       "n_excluded": 0
     }
   },
-  "seconds": 17.3,
+  "seconds": 33.2,
   "reading": {
     "asked_at": "the 90% set on the lac score, over 200 draws",
     "restored_within": 0.02,

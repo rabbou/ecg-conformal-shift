@@ -35,7 +35,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import subprocess
 import time
 from pathlib import Path
 from typing import Any
@@ -53,6 +52,7 @@ from ecs.conformal import (
     predict_sets,
     predict_sets_per_class,
 )
+from ecs.provenance import provenance_block
 
 # The setting the reading is written at, matching shift_table.py.
 ALPHA = 0.10
@@ -234,9 +234,14 @@ def build(draws: int, seed: int) -> dict[str, Any]:
         },
         "n_draws": draws,
         "seed": seed,
-        "git_commit": subprocess.run(
-            ["git", "rev-parse", "HEAD"], capture_output=True, text=True, check=False
-        ).stdout.strip(),
+        "provenance": provenance_block(
+            [
+                "scripts/outcomes.py",
+                "scripts/shift_table.py",
+                "src/ecs/conformal.py",
+                "src/ecs/splits.py",
+            ]
+        ),
         "seconds": round(time.time() - started, 1),
         **body,
     }

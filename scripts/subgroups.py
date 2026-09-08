@@ -37,7 +37,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import subprocess
 import time
 from pathlib import Path
 from typing import Any
@@ -55,6 +54,7 @@ from ecs.conformal import (
     predict_sets,
     predict_sets_per_class,
 )
+from ecs.provenance import provenance_block
 
 ALPHA = 0.10
 PLAIN_SENSITIVITY = 1.0 - ALPHA
@@ -296,9 +296,12 @@ def build(draws: int, bootstrap: int, seed: int) -> dict[str, Any]:
         "n_bootstrap": bootstrap,
         "seed": seed,
         "counts": counts(labels, meta),
-        "git_commit": subprocess.run(
-            ["git", "rev-parse", "HEAD"], capture_output=True, text=True, check=False
-        ).stdout.strip(),
+        "provenance": provenance_block(
+            [
+                "scripts/subgroups.py",
+                "src/ecs/conformal.py",
+            ]
+        ),
         "seconds": round(time.time() - started, 1),
         **body,
     }

@@ -33,6 +33,7 @@ import numpy as np
 import pandas as pd
 
 from ecs.config import ACS_DIR, ACS_LABELLED_SPLIT, PTBXL_DIR, RESULTS_DIR, SPH_DIR
+from ecs.provenance import provenance_block
 from ecs.report import CORRECTIONS, Source, Target, frozen_calibration_table
 
 # Confidence levels from the plan, loosest first.
@@ -377,7 +378,14 @@ def main(argv: list[str] | None = None) -> int:
         "classes": {"0": "no infarction", "1": "infarction"},
         "n_draws": args.draws,
         "seed": args.seed,
-        "git_commit": git_commit(),
+        "provenance": provenance_block(
+            [
+                "scripts/shift_table.py",
+                "src/ecs/conformal.py",
+                "src/ecs/metrics.py",
+                "src/ecs/splits.py",
+            ]
+        ),
         "corpora": provenance,
         "seconds": round(time.perf_counter() - started, 1),
         "reading": reading(rows, [source.name, *targets]),

@@ -12,8 +12,16 @@
   },
   "n_draws": 200,
   "seed": 0,
-  "git_commit": "fbc90c8c1c53b9e7d29c8b67fcb4dd7957199fe0",
-  "seconds": 1.3,
+  "provenance": {
+    "commit": "40bffc58b28c7ed685af6305daa921aedfc6119e",
+    "producers": {
+      "scripts/outcomes.py": "ce96ec07b71253b17697330d87d9bda8afafab2191b20d51435c3f24a67e997f",
+      "scripts/shift_table.py": "2a86eab993d284b62d57e722ebafb458b525d40dcec6cfc9247f97f2779a7439",
+      "src/ecs/conformal.py": "c434998b704a551d55bc2206a1a3ada6d42309947b0b92db11607746dcd068dc",
+      "src/ecs/splits.py": "17f1d2fea5970c37b989ad0df925b3d19f355012bfca02aed6983ce142b5a946"
+    }
+  },
+  "seconds": 2.2,
   "by_corpus": {
     "ptbxl": {
       "name": "PTB-XL",

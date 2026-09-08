@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import io
 import json
+import re
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from pathlib import Path
@@ -232,3 +233,48 @@ class TestTheUntrainedControlIsOneNetwork:
             np.testing.assert_array_equal(embed_a(x).numpy(), embed_b(x).numpy())
         assert meta_a["weights_source"] == meta_b["weights_source"]
         assert "seed unset" not in str(meta_a["weights_source"])
+
+
+class TestNoThirdPartyWeightOpensUnchecked:
+    """A .pth is a pickle, so opening one runs what it says to run. Every
+    third-party weight file is checked against the digest it had when it was
+    fetched, and the ECGFounder checkpoint really does carry the opcodes that
+    make that matter (GLOBAL resolves a name the file chooses, REDUCE calls it).
+    """
+
+    def test_no_load_site_opens_a_file_that_was_neither_checked_nor_restricted(self) -> None:
+        """Either torch is told to read weights only, or the digest was checked
+        first. ECGFounder needs the second: weights_only=True refuses that
+        checkpoint on torch 2.2.2, so the manifest is what guards it."""
+        for module in (
+            "src/ecs/encoders.py",
+            "scripts/score_external.py",
+            "scripts/timing_probe.py",
+        ):
+            source = (Path(__file__).resolve().parents[1] / module).read_text()
+            for match in re.finditer(r"torch\.load\(([^)]*)\)", source):
+                call = match.group(1)
+                preceding = source[max(0, match.start() - 400) : match.start()]
+                assert "weights_only=True" in call or "verified(" in preceding, (module, call)
+
+    def test_the_file_transformers_executes_is_in_the_manifest(self) -> None:
+        from ecs import encoders
+
+        for member in encoders.HUBERT_FILES:
+            assert member in encoders.WEIGHT_SHA256
+        assert "hubert-ecg-base/hubert_ecg.py" in encoders.HUBERT_FILES
+
+    def test_a_changed_file_is_refused_rather_than_opened(self, tmp_path: Path) -> None:
+        from ecs import encoders
+
+        name = "ecgfounder/12_lead_ECGFounder.pth"
+        planted = tmp_path / name
+        planted.parent.mkdir(parents=True)
+        planted.write_bytes(b"not the published checkpoint")
+        monkey = encoders.WEIGHTS
+        try:
+            encoders.WEIGHTS = tmp_path
+            with pytest.raises(RuntimeError, match="expected"):
+                encoders.verified(name)
+        finally:
+            encoders.WEIGHTS = monkey

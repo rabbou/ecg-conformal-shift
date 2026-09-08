@@ -19,6 +19,7 @@ the arm's factory is called.
 
 from __future__ import annotations
 
+import hashlib
 import platform
 import subprocess
 import sys
@@ -35,6 +36,48 @@ from .models import ResNet1d
 __all__ = ["ARMS", "PRETRAINING", "WEIGHTS", "Arm", "machine_info"]
 
 WEIGHTS = REPO_ROOT / "data/weights"
+
+# A .pth or .pt file is a pickle: opening one runs whatever the file says to
+# run, under the identity of whoever opened it.  The ECGFounder checkpoint does
+# carry GLOBAL and REDUCE opcodes, so nothing here opens a third-party weight
+# file before its digest matches the one recorded when it was first fetched.
+# These are the files as published on Hugging Face; a mismatch means the
+# download changed, and the load stops rather than asking.
+WEIGHT_SHA256 = {
+    "ecgfounder/12_lead_ECGFounder.pth": (
+        "ee199f3781f4ae1f732973267f003da0a759ea12bddb0dd28a77faa60aca7997"
+    ),
+    "ecgfm/mimic_iv_ecg_physionet_pretrained.pt": (
+        "4d0142bcb485eb9f0c7845e0c19ff3463f6ae9d0e458eab69136efe90ceb9b7e"
+    ),
+    "hubert-ecg-base/model.safetensors": (
+        "05bc1b1317f8e3063811a03fb840f5bf8a85968191e209c0cfbaa0c52c8aa1ae"
+    ),
+    # Not weights: the model's own architecture file, which transformers
+    # executes under trust_remote_code. It is the one file here that is code.
+    "hubert-ecg-base/hubert_ecg.py": (
+        "8a76a50e0e107167023544eecd5444cb6a9bb4eee75fd8d0d5a03dbe9f8034d9"
+    ),
+}
+
+HUBERT_FILES = ("hubert-ecg-base/model.safetensors", "hubert-ecg-base/hubert_ecg.py")
+
+
+def verified(relative: str) -> Path:
+    """The weight file at ``relative``, or an error naming the digest it has."""
+    path = WEIGHTS / relative
+    expected = WEIGHT_SHA256[relative]
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for block in iter(lambda: handle.read(1 << 20), b""):
+            digest.update(block)
+    if digest.hexdigest() != expected:
+        raise RuntimeError(
+            f"{path}: sha256 {digest.hexdigest()}, expected {expected}. "
+            "This is not the published file; it is not opened."
+        )
+    return path
+
 
 # One arm: the function that embeds a (B, 12, 5000) float32 batch, and what has
 # to be said about it in any result file that uses it.
@@ -108,8 +151,11 @@ def ecgfounder() -> Arm:
         n_classes=150,
         return_features=True,
     )
-    path = WEIGHTS / "ecgfounder/12_lead_ECGFounder.pth"
-    state = torch.load(path, map_location="cpu")["state_dict"]
+    # weights_only=True refuses this checkpoint on torch 2.2.2 -- it holds a
+    # numpy scalar, and add_safe_globals to allow one only arrives in 2.4. The
+    # digest check above is what stands in for the flag here, deliberately.
+    path = verified("ecgfounder/12_lead_ECGFounder.pth")
+    state = torch.load(path, map_location="cpu", weights_only=False)["state_dict"]
     missing, unexpected = model.load_state_dict(state, strict=False)
     model.eval()
     return (
@@ -145,8 +191,14 @@ HUBERT_TARGET_HZ = 100
 def hubert_ecg() -> Arm:
     from transformers import AutoModel
 
+    # This arm needs the model's own hubert_ecg.py: the architecture is not in
+    # transformers. trust_remote_code=True runs that file, so it is read from
+    # the copy already on disk, whose digest is checked, and never fetched from
+    # the hub at load time -- an upstream edit cannot reach this process.
+    for member in HUBERT_FILES:
+        verified(member)
     path = WEIGHTS / "hubert-ecg-base"
-    model = AutoModel.from_pretrained(path, trust_remote_code=True).eval()
+    model = AutoModel.from_pretrained(path, trust_remote_code=True, local_files_only=True).eval()
     b, a = butter(HUBERT_FILTER_ORDER, HUBERT_BAND_HZ, btype="bandpass", fs=500.0)
 
     def embed(x: np.ndarray) -> torch.Tensor:
@@ -190,7 +242,8 @@ def ecgfm() -> Arm:
     # lives in a scratch venv and this arm is run with that interpreter.
     from fairseq_signals.utils import checkpoint_utils
 
-    path = WEIGHTS / "ecgfm/mimic_iv_ecg_physionet_pretrained.pt"
+    # fairseq unpickles this itself, so the digest is the only gate before it.
+    path = verified("ecgfm/mimic_iv_ecg_physionet_pretrained.pt")
     model, cfg, _task = checkpoint_utils.load_model_and_task(str(path))
     model.eval()
 

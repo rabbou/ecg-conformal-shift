@@ -155,11 +155,16 @@ What each arm was pre-trained on is written into every result file that uses
 it (C-12), sourced to the authors' own description, so the caveat travels with
 the number.
 
-ECG-JEPA is wired, loads its published checkpoint whole and embeds a batch, and
-is covered by `tests/test_encoder_arms.py`. Its representations are not yet
-cached, so `results/arms.json` still compares four arms: the encoder runs at
-296 ms per record on this machine's four threads, which is 5.6 hours for the
-67,519 records the grid covers, and that job has not been run.
+Which corpus an arm saw is a field on every result file that uses it, not only a
+sentence: ECG-JEPA's pre-training reads "not PTB-XL, not Shandong, not
+Chongqing", so a reader matching on the name of a corpus would count it as
+having seen all three.
+
+On this break the two contaminated arms do not come out ahead. ECGFounder, which
+saw no public corpus, reaches 0.919 [0.907, 0.932] on PTB-XL fold 10 against
+0.891 for ECG-FM and 0.838 for HuBERT-ECG; ECG-JEPA reaches 0.858 [0.841,
+0.876]. Extracting ECG-JEPA over the three corpora took 6 h 53 on this machine's
+four threads.
 
 ## Reproduce
 

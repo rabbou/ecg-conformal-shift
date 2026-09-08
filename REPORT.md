@@ -42,7 +42,7 @@ Three public datasets were used, with PTB-XL serving as the training and calibra
 | SPH, Shandong [10] | China, 2019–20 | 25,770 | 1.0% | transfer target |
 | ACS-ECG, Chongqing [11] | China, 2015–24 | 17,955 | 14.9% | transfer target |
 
-Two properties differ between source and targets. MI prevalence falls from 25.0% to 1.0% in the Shandong dataset and to 14.9% in the Chongqing dataset, and the label definition differs as well: Chongqing annotates acute MI confirmed by angiography, whereas PTB-XL annotates ECG diagnoses, predominantly of older infarct patterns. Because the Shandong dataset annotates chronic infarct patterns comparable to those of PTB-XL, its shift approximates a pure change in prevalence, while the Chongqing shift involves the definition of the positive class as well.
+Two properties differ between source and targets. MI prevalence falls from 25.0% to 1.0% in the Shandong dataset and to 14.9% in the Chongqing dataset, and the label definition differs as well. The Chongqing positive is that dataset's `AMI` column, set when the discharge diagnosis names an acute myocardial infarction, in a cohort every patient of which underwent coronary angiography; PTB-XL annotates ECG diagnoses, predominantly of older infarct patterns. Shandong codes infarction in the AHA scheme with separate modifiers for acute, recent and old, and 89.6% of its positives carry the old modifier, so its labels sit closer to PTB-XL's than Chongqing's do, though the remaining 10.4% are acute, recent or unmodified. Its shift is therefore the nearer of the two to a change in prevalence alone, while the Chongqing shift moves the definition of the positive class as well.
 
 ### 2.2 Model and calibration
 

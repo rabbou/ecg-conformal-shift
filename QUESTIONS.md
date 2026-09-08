@@ -28,7 +28,7 @@ The weighted correction needs the target's class mix, which is unknown and must 
 
 ## 7. Why does the exact correction not fix Chongqing? (technical peer)
 
-More than the class mix moved. Both corrections assume that the appearance of each class is stable across sites and only the proportions change. Chongqing's infarction label refers to a different clinical event, acute and angiography-confirmed, where PTB-XL's is an ECG diagnosis, mostly of older infarcts. When the appearance of the positive class changes, reweighting source calibration data cannot follow it. Mondrian lifts Chongqing's infarction coverage from 72.5% to 84.0% (sd 1.0) and stops short of the requested 90%. The residual gap is the part of the shift that calibration cannot absorb, and it is reported rather than tuned away.
+More than the class mix moved. Both corrections assume that the appearance of each class is stable across sites and only the proportions change. Chongqing's infarction label refers to a different clinical event: its `AMI` column is set from the discharge diagnosis, in a cohort every patient of which underwent coronary angiography, where PTB-XL's label is an ECG diagnosis, mostly of older infarcts. When the appearance of the positive class changes, reweighting source calibration data cannot follow it. Mondrian lifts Chongqing's infarction coverage from 72.5% to 84.0% (sd 1.0) and stops short of the requested 90%. The residual gap is the part of the shift that calibration cannot absorb, and it is reported rather than tuned away.
 
 ## 8. Two encoders saw the test data during pre-training. Did that flatter them? (technical peer)
 

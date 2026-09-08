@@ -83,9 +83,10 @@ corrections are implemented:
   and depends on that estimate, so effective sample size is reported next to
   every result.
 
-Chongqing is the harder target: its label is angiographically confirmed acute
-infarction, a different clinical event, so the label definition changes as
-well as the prevalence.
+Chongqing is the harder target: its positive is the dataset's `AMI` column, set
+from the discharge diagnosis, in a cohort every patient of which underwent
+coronary angiography. That is a different clinical event from an ECG diagnosis
+of an old infarct, so the label definition changes as well as the prevalence.
 
 ## Layout
 
@@ -93,7 +94,7 @@ well as the prevalence.
 |---|---|
 | `src/ecs/conformal.py` | split conformal (LAC + APS scores), Mondrian quantiles, covariate- and label-shift weighting, BBSE |
 | `src/ecs/metrics.py` | coverage, Wilson intervals, class-conditional coverage, set size, abstention, effective sample size |
-| `src/ecs/labels.py` | one comparable MI label across three annotation schemes (SCP-ECG, AHA, angiographic) |
+| `src/ecs/labels.py` | one comparable MI label across three annotation schemes (SCP-ECG, AHA, discharge diagnosis) |
 | `src/ecs/config.py` | corpus paths and the label vocabulary |
 
 ## Reproduce

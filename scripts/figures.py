@@ -59,11 +59,12 @@ CORPUS_NAMES = {
 # The arms in contamination order: the control, then the arms that saw no public
 # corpus, then the one that saw the calibration corpus, then the one that saw a
 # target too.  Reading the figure left to right is reading that order.
-ARM_ORDER = ("random_init", "ecgfounder", "ecgfm", "hubert_ecg")
+ARM_ORDER = ("random_init", "ecgfounder", "ecg_jepa", "ecgfm", "hubert_ecg")
 ARM_NAMES = {
     "random_init": "random init,\nfrozen",
     "ecgfounder": "ECGFounder",
     "ecgfm": "ECG-FM",
+    "ecg_jepa": "ECG-JEPA",
     "hubert_ecg": "HuBERT-ECG",
 }
 # Grey for the arms that saw neither corpus, warm for the ones that saw PTB-XL,
@@ -72,6 +73,7 @@ ARM_COLOUR = {
     "random_init": "#adb5bd",
     "ecgfounder": "#6c757d",
     "ecgfm": "#fb8500",
+    "ecg_jepa": "#8d99ae",
     "hubert_ecg": "#bf4342",
 }
 
@@ -291,9 +293,14 @@ def _headline_row(arms: dict[str, Any], arm: str) -> dict[str, Any]:
     raise KeyError(f"{arm} has no row for {wanted}")
 
 
-def _saw(arms: dict[str, Any], arm: str, corpus_name: str) -> bool:
-    """Whether this arm's own sidecar names ``corpus_name`` among its pre-training."""
-    return corpus_name.lower() in arms["arms"][arm]["pretraining_corpora"].lower()
+def _saw(arms: dict[str, Any], arm: str, corpus: str) -> bool:
+    """Whether this arm saw ``corpus`` at pre-training, read off the fact.
+
+    Not off the sentence beside it: ECG-JEPA's pre-training is described as
+    "not PTB-XL, not Shandong, not Chongqing", which contains the name of every
+    corpus it did not see.
+    """
+    return corpus in arms["arms"][arm].get("saw", [])
 
 
 def figure_3_arms(arms: dict[str, Any], out: Path, source: Path) -> Path:
@@ -366,7 +373,7 @@ def figure_3_arms(arms: dict[str, Any], out: Path, source: Path) -> Path:
     home_axis.set_ylabel("PTB-XL fold 10 AUROC, infarction against the rest", fontsize=9)
 
     plain = {a: ARM_NAMES[a].replace("\n", " ") for a in ARM_ORDER}
-    saw_source = [plain[a] for a in ARM_ORDER if _saw(arms, a, "PTB-XL")]
+    saw_source = [plain[a] for a in ARM_ORDER if _saw(arms, a, "ptbxl")]
     worst = max(ARM_ORDER, key=lambda a: _headline_row(arms, a)["coverage_gap"]["acs"]["mean"])
     best = min(ARM_ORDER, key=lambda a: _headline_row(arms, a)["coverage_gap"]["acs"]["mean"])
     figure.suptitle(

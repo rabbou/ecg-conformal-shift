@@ -10,10 +10,15 @@ The grid the arms fill:
     arm            saw PTB-XL (calibration)   saw Shandong (target)
     random_init    no                         no
     ecgfounder     no                         no
+    ecg_jepa       no                         no
     ecgfm          yes                        no
     hubert_ecg     yes                        yes
 
-Everything downstream of the encoder is identical across the four: the same
+ECG-JEPA saw neither, but it did see Chapman-Shaoxing with Ningbo, which is a
+source of the rotation and no corpus of this grid; the caveat belongs to the
+rotation's table, not to this one.
+
+Everything downstream of the encoder is identical across the five: the same
 cached representations protocol, the same PTB-XL folds in the same roles, the
 same conformal draws with the same seed, so a difference between two rows is a
 difference between two pre-trainings.
@@ -58,7 +63,7 @@ from numpy.typing import NDArray
 
 from ecs.arms import auprc, auroc, fit_probe, paired_difference
 from ecs.config import ACS_DIR, ACS_LABELLED_SPLIT, PTBXL_DIR, RESULTS_DIR, SPH_DIR
-from ecs.encoders import PRETRAINING
+from ecs.encoders import PRETRAINING, SAW
 from ecs.labels import MILabelSpec, acs_mi_label, ptbxl_mi_label, sph_mi_label
 from ecs.metrics import bootstrap_ci
 from ecs.report import Source, Target, frozen_calibration_table
@@ -67,7 +72,7 @@ from ecs.splits import ptbxl_benchmark_split
 # The arms, in the order the grid reads: the control first, then the arms that
 # saw nothing public, then the ones that saw the calibration corpus, then the
 # one that saw a target too.  Reading order is the contamination order.
-ARM_ORDER = ("random_init", "ecgfounder", "ecgfm", "hubert_ecg")
+ARM_ORDER = ("random_init", "ecgfounder", "ecg_jepa", "ecgfm", "hubert_ecg")
 
 # The level the headline is quoted at, and the level day 3's break was quoted
 # at, so the two are read side by side.  The file carries every level.
@@ -385,7 +390,15 @@ def main(argv: list[str] | None = None) -> int:
             "and on both external corpora, exactly as in results/shift.json"
         ),
         "arms": {
-            arm: {"pretraining_corpora": PRETRAINING[arm], **probes[arm]} for arm in ARM_ORDER
+            # "saw" is the fact, "pretraining_corpora" the sentence it came
+            # from. A reader asking which arm saw a corpus of this study needs
+            # the first: ECG-JEPA's sentence contains the string "not PTB-XL".
+            arm: {
+                "pretraining_corpora": PRETRAINING[arm],
+                "saw": list(SAW[arm]),
+                **probes[arm],
+            }
+            for arm in ARM_ORDER
         },
         "headline": HEADLINE,
         "n_draws": args.draws,

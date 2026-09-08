@@ -172,7 +172,13 @@ class TestTheEncoderArmsOnRecord:
 
     def test_every_arm_covers_the_three_corpora(self, sidecars: list[dict]) -> None:
         pairs = {(s["arm"], s["corpus"]) for s in sidecars}
-        assert {a for a, _ in pairs} == {"random_init", "ecgfounder", "hubert_ecg", "ecgfm"}
+        assert {a for a, _ in pairs} == {
+            "random_init",
+            "ecgfounder",
+            "ecg_jepa",
+            "hubert_ecg",
+            "ecgfm",
+        }
         for arm in {a for a, _ in pairs}:
             assert {c for a, c in pairs if a == arm} == {"ptbxl", "sph", "acs"}
 
@@ -275,6 +281,23 @@ class TestTheFigures:
         assert set(figures.ARM_ORDER) == set(grid["arms"])
         drawn = figures.figure_3_arms(grid, tmp_path / "fig3.png", RESULTS_DIR / "arms.json")
         assert drawn.stat().st_size > 10_000
+
+    def test_figure_three_names_the_contaminated_arms_from_the_fact_not_the_prose(
+        self,
+    ) -> None:
+        """The caption says which arms saw PTB-XL. Read off the sentence, it
+        would name ECG-JEPA too: its pre-training reads "not PTB-XL, not
+        Shandong, not Chongqing" and contains all three names."""
+        import figures
+
+        path = RESULTS_DIR / "arms.json"
+        if not path.exists():
+            pytest.skip(f"{path} has not been written yet")
+        grid = json.loads(path.read_text())
+        saw = {a for a in figures.ARM_ORDER if figures._saw(grid, a, "ptbxl")}
+        assert saw == {"ecgfm", "hubert_ecg"}
+        assert "not PTB-XL" in grid["arms"]["ecg_jepa"]["pretraining_corpora"]
+        assert not figures._saw(grid, "ecg_jepa", "ptbxl")
 
     def test_figure_seven_carries_every_diagnosis_and_every_correction(
         self, tmp_path: Path
@@ -978,10 +1001,10 @@ class TestTheCommittedBreakTable:
 
 
 class TestTheCommittedArmGrid:
-    """C-12, C-17 and C-18 on ``results/arms.json``: four arms on one break,
+    """C-12, C-17 and C-18 on ``results/arms.json``: five arms on one break,
     each with intervals, and every arm-versus-arm claim made pairwise."""
 
-    ARMS = ("random_init", "ecgfounder", "ecgfm", "hubert_ecg")
+    ARMS = ("random_init", "ecgfounder", "ecg_jepa", "ecgfm", "hubert_ecg")
     CORPORA = ("ptbxl", "sph", "acs")
     TARGETS = ("sph", "acs")
 
@@ -1006,9 +1029,14 @@ class TestTheCommittedArmGrid:
             assert grid["arms"][arm]["pretraining_corpora"].strip(), arm
 
     def test_the_arms_that_saw_the_calibration_corpus_say_so(self, grid: dict) -> None:
-        saw = {a for a in self.ARMS if "ptb-xl" in grid["arms"][a]["pretraining_corpora"].lower()}
+        """Read off the fact each arm records, not off its prose: ECG-JEPA's
+        sentence contains the string "not PTB-XL", which a substring test would
+        count as having seen it."""
+        saw = {a for a in self.ARMS if "ptbxl" in grid["arms"][a]["saw"]}
         assert saw == {"ecgfm", "hubert_ecg"}
-        assert "shandong" in grid["arms"]["hubert_ecg"]["pretraining_corpora"].lower()
+        assert "sph" in grid["arms"]["hubert_ecg"]["saw"]
+        assert grid["arms"]["ecg_jepa"]["saw"] == ["chapman_ningbo"]
+        assert "not PTB-XL" in grid["arms"]["ecg_jepa"]["pretraining_corpora"]
 
     def test_every_arm_and_corpus_carries_auroc_and_auprc_with_an_interval(
         self, grid: dict

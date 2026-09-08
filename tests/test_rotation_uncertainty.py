@@ -9,6 +9,10 @@ C-32, the comparator: Chow's rule is one plain empirical quantile per class,
 which is Mondrian without the finite-sample ``(n+1)`` correction.  If the two
 agree everywhere then the conformal formalism is a rename, and the file has to
 show that rather than the reader having to assume otherwise.
+
+C-33, the subgroups: a coverage that holds over a cohort can fail over half of
+it, so every row is repeated by sex and by age band, and a cell resting on too
+few positives is flagged rather than read.
 """
 
 from __future__ import annotations
@@ -23,7 +27,7 @@ import pytest
 from rotation_uncertainty import bootstrap_by_patient, chow_quantiles
 
 from ecs.config import RESULTS_DIR
-from ecs.rotation import SOURCES, usable_classes
+from ecs.rotation import AGE_BANDS, SOURCES, usable_classes
 
 GRID = Path(RESULTS_DIR) / "rotation_uncertainty.csv"
 SUMMARY = Path(RESULTS_DIR) / "rotation_uncertainty.json"
@@ -103,6 +107,11 @@ class TestChowIsMondrianWithoutTheCorrection:
 
 
 class TestTheCommittedUncertainty:
+    @staticmethod
+    def _whole(rows: list[dict[str, str]]) -> list[dict[str, str]]:
+        """The rows about a whole cohort rather than a slice of one."""
+        return [r for r in rows if r["subgroup_kind"] == "all"]
+
     def test_every_source_and_diagnosis_it_carries_is_measured(
         self, rows: list[dict[str, str]]
     ) -> None:
@@ -129,7 +138,9 @@ class TestTheCommittedUncertainty:
     def test_the_interval_widens_as_the_class_thins(self, rows: list[dict[str, str]]) -> None:
         """The point of resampling the cohort: 23 positives cannot support the
         same precision as 800, whatever the threshold does."""
-        away = [r for r in rows if r["role"] == "away" and r["correction"] == "mondrian"]
+        away = [
+            r for r in self._whole(rows) if r["role"] == "away" and r["correction"] == "mondrian"
+        ]
         thin = [r for r in away if int(r["n_positive"]) < 120]
         thick = [r for r in away if int(r["n_positive"]) > 400]
         assert thin and thick
@@ -151,7 +162,9 @@ class TestTheCommittedUncertainty:
         """The finding this file exists for: on a populated class the conformal
         rule and a plain per-class rejection rule land in the same place, and the
         gap opens only where the conformal rule refuses."""
-        away = [r for r in rows if r["role"] == "away" and r["correction"] == "mondrian"]
+        away = [
+            r for r in self._whole(rows) if r["role"] == "away" and r["correction"] == "mondrian"
+        ]
         gaps = sorted(away, key=lambda r: -abs(float(r["conformal_minus_chow"])))
         assert abs(float(gaps[0]["conformal_minus_chow"])) > 0.2
         assert {r["label"] for r in gaps[:5]} == {"LBBB"}
@@ -164,3 +177,82 @@ class TestTheCommittedUncertainty:
         assert reading["median_draw_spread"] > 0
         assert summary["settings"]["n_bootstrap"] >= 2000
         assert summary["settings"]["bootstrap_unit"].startswith("patient")
+
+
+class TestTheSubgroups:
+    """C-33. A figure that holds over a cohort can fail over half of it."""
+
+    def test_every_cohort_row_is_repeated_by_sex_and_by_age(
+        self, rows: list[dict[str, str]]
+    ) -> None:
+        kinds = {r["subgroup_kind"] for r in rows}
+        assert kinds == {"all", "sex", "age"}
+        assert {r["subgroup"] for r in rows if r["subgroup_kind"] == "sex"} == {
+            "male",
+            "female",
+        }
+        assert {r["subgroup"] for r in rows if r["subgroup_kind"] == "age"} == {
+            name for name, _low, _high in AGE_BANDS
+        }
+
+    def test_a_subgroup_never_holds_more_positives_than_the_cohort_it_slices(
+        self, rows: list[dict[str, str]]
+    ) -> None:
+        whole = {
+            (r["source"], r["label"], r["corpus"], r["correction"]): int(r["n_positive"])
+            for r in rows
+            if r["subgroup_kind"] == "all"
+        }
+        for row in rows:
+            if row["subgroup_kind"] == "all":
+                continue
+            key = (row["source"], row["label"], row["corpus"], row["correction"])
+            assert int(row["n_positive"]) <= whole[key], row
+
+    def test_the_sexes_partition_the_cohort_up_to_what_the_corpus_does_not_record(
+        self, rows: list[dict[str, str]]
+    ) -> None:
+        """Chapman-Shaoxing with Ningbo records 22 records with an unknown sex.
+        They stay in the cohort row and belong to neither sex row, which is why
+        the two do not have to add up to it."""
+        by_key: dict[tuple[str, ...], dict[str, int]] = {}
+        for row in rows:
+            key: tuple[str, ...] = (
+                row["source"],
+                row["label"],
+                row["corpus"],
+                row["correction"],
+            )
+            if row["subgroup_kind"] in {"all", "sex"}:
+                by_key.setdefault(key, {})[row["subgroup"]] = int(row["n_positive"])
+        for key, counts in by_key.items():
+            named = counts.get("male", 0) + counts.get("female", 0)
+            assert named <= counts["all"], key
+
+    def test_a_cell_too_thin_to_read_says_so(self, rows: list[dict[str, str]]) -> None:
+        for row in rows:
+            assert (row["thin"] == "True") == (int(row["n_positive"]) < 25), row
+        assert any(r["thin"] == "True" for r in rows), "no cell was ever flagged thin"
+
+    def test_no_cell_is_reported_with_no_positives_behind_it(
+        self, rows: list[dict[str, str]]
+    ) -> None:
+        """A subgroup a corpus has none of is left out, not reported as zero."""
+        for row in rows:
+            assert int(row["n_positive"]) > 0, row
+
+    def test_every_subgroup_cell_carries_its_own_interval(self, rows: list[dict[str, str]]) -> None:
+        """The point of measuring a subgroup is to see it is imprecise."""
+        slices = [r for r in rows if r["subgroup_kind"] != "all"]
+        assert slices
+        for row in slices:
+            assert float(row["bootstrap_hi"]) >= float(row["bootstrap_lo"])
+            assert int(row["n_positive_patients"]) > 0
+
+    def test_the_summary_reports_the_gap_between_the_sexes(self, summary: dict[str, Any]) -> None:
+        between = summary["reading"]["between_the_sexes"]
+        assert between["n_pairs_compared"] > 0
+        assert between["median_absolute_gap"] is not None
+        assert between["widest_gap"] >= between["median_absolute_gap"]
+        assert summary["reading"]["n_rows_too_thin_to_read"] > 0
+        assert summary["settings"]["thin_below"] == 25

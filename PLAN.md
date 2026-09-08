@@ -63,6 +63,8 @@ Each maps to a named test. Unchecked means unverified, not done.
 | C-31 | THE rotation SHALL report, beside the spread over calibration draws, a 95% interval obtained by resampling each target cohort by patient, so that a coverage read on a thin class carries the uncertainty of the class being thin. | `test_rotation_uncertainty.py::TestTheCommittedUncertainty`, on `results/rotation_uncertainty.csv`; the resampling unit itself by `TestTheBootstrapItself` |
 | C-32 | THE rotation SHALL report, for every pair, the coverage a per-class rejection rule with one plain empirical quantile per class reaches on the same scores, and the difference from the conformal figure. | `test_rotation_uncertainty.py::TestChowIsMondrianWithoutTheCorrection` on the rule, `TestTheCommittedUncertainty::test_the_two_rules_agree_except_where_the_class_is_starved` on the committed file |
 
+| C-33 | THE rotation SHALL repeat every coverage cell by sex and by age band wherever the corpus records them, with the number of positives behind each cell and its patient bootstrap interval, and SHALL flag a cell resting on fewer than 25 positives rather than let it read as a result. | `test_rotation_uncertainty.py::TestTheSubgroups`, on `results/rotation_uncertainty.csv` |
+
 ## The ingestion contract
 
 Every corpus is reduced to one canonical form before anything else touches it:
@@ -209,6 +211,15 @@ the variability of the population. A coverage read on Shandong's 23 left
 bundle-branch blocks is uncertain because there are 23 of them. The uncertainty
 file resamples each target cohort by patient and reports a percentile interval
 beside the draw spread.
+
+*A figure that holds over a cohort can fail over half of it.* Every row is
+repeated by sex and by age band. Coverage of sinus rhythm away from home falls
+from 0.841 under 50 to 0.619 at 75 and over, against the 0.90 promised; right
+bundle-branch block runs the other way, 0.714 to 0.906. The widest gap between
+the sexes on a single pair is left bundle-branch block from PTB-XL to
+Chapman-Shaoxing with Ningbo, 0.505 for men against 0.821 for women. A cell
+resting on fewer than 25 positives is flagged, because a 95% interval on twenty
+cases is wider than any difference the rotation looks for.
 
 *A rejection rule may do the same work.* One plain empirical quantile per class
 — Chow, *IEEE Trans Inf Theory* 1970 — is Mondrian minus the finite-sample

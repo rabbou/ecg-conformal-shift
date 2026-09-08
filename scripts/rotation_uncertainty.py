@@ -1,27 +1,30 @@
-"""Two things the rotation table cannot say on its own.
+"""Three things the rotation table cannot say on its own.
 
 **What the interval carries.** Every spread in ``results/rotation.csv`` is taken
 over the two hundred calibration draws, on a target cohort that never moves. It
-is the variability of the threshold, not of the population, and the second is
-the same size or larger: a coverage read on Shandong's 23 left bundle-branch
-blocks is uncertain because there are 23 of them, whatever the threshold does.
-This script resamples the target cohort by patient (B bootstrap resamples) and
-reports a percentile interval around the same coverage, so a difference between
-two cells can be read against the uncertainty the study actually has.
+is the variability of the threshold, not of the population, and a coverage read
+on Shandong's 23 left bundle-branch blocks is uncertain because there are 23 of
+them, whatever the threshold does. Each target cohort is resampled by patient
+here, and the percentile interval is reported beside the draw spread rather than
+instead of it.
 
 **What the conformal formalism adds.** A rejection rule with one plain empirical
-quantile per class — Chow's rule, 1970 — is the same construction minus the
+quantile per class -- Chow, 1970 -- is the same construction minus the
 finite-sample correction: Mondrian takes the ``ceil((n+1)(1-alpha))``-th
 smallest calibration score, Chow takes the ``(1-alpha)`` quantile. If the two
 land in the same place, the conformal machinery is a rename of a per-class
-rejection rule and the paper has to say so. This measures the gap, per pair,
-against the spread the table already reports.
+rejection rule and the object has to say so. The gap is measured per row.
 
-Written for the headline setting only — the 90% level on the LAC score — because
-that is where the reading is made.
+**Who the coverage holds for.** A figure that holds over a cohort can fail over
+half of it. Every row is repeated by sex and by age band wherever the corpus
+carries them, with the number of positives the cell rests on, so a cell too thin
+to support a reading says so instead of reading as a result.
+
+Written for the headline setting only -- the 90% level on the LAC score --
+because that is where the reading is made.
 
 Output: ``results/rotation_uncertainty.csv``, one row per (source, diagnosis,
-corpus, correction).
+corpus, correction, subgroup), and a summary in the matching ``.json``.
 
 Usage: .venv/bin/python scripts/rotation_uncertainty.py [--draws 200] [--boot 2000]
 """
@@ -49,7 +52,7 @@ from ecs.conformal import (
     predict_sets_per_class,
 )
 from ecs.encoders import machine_info
-from ecs.rotation import SOURCES, class_keys, corpus_index, usable_classes
+from ecs.rotation import AGE_BANDS, SOURCES, class_keys, corpus_index, usable_classes
 from ecs.splits import patient_split
 
 ALPHA = 0.10
@@ -57,14 +60,23 @@ SCORE = "lac"
 POSITIVE = 1
 N_CLASSES = 2
 CORRECTIONS = ("none", "mondrian")
+
+# A cell resting on fewer positives than this is reported with its count and
+# flagged, not hidden and not read as a result: a 95% interval on twenty cases
+# is wider than any difference the rotation is looking for.
+THIN_BELOW = 25
+
 COLUMNS = (
     "source",
     "label",
     "corpus",
     "role",
     "correction",
+    "subgroup_kind",
+    "subgroup",
     "n_positive",
     "n_positive_patients",
+    "thin",
     "coverage",
     "sd_over_calibration_draws",
     "bootstrap_lo",
@@ -120,6 +132,23 @@ def bootstrap_by_patient(
     return (float(np.nanpercentile(means, 2.5)), float(np.nanpercentile(means, 97.5)))
 
 
+def subgroup_masks(
+    sex: NDArray[np.str_], band: NDArray[np.str_]
+) -> list[tuple[str, str, NDArray[np.bool_]]]:
+    """Every slice a row is repeated over: the whole cohort, then sex, then age.
+
+    A subgroup the corpus does not record -- an unknown sex, a missing age -- is
+    left out rather than gathered into a bucket of its own, and the cohort row
+    above it still holds those records.
+    """
+    out: list[tuple[str, str, NDArray[np.bool_]]] = [("all", "all", np.ones(len(sex), dtype=bool))]
+    for value in ("male", "female"):
+        out.append(("sex", value, sex == value))
+    for name, _low, _high in AGE_BANDS:
+        out.append(("age", name, band == name))
+    return out
+
+
 class Scored:
     """One model's probabilities for one part of one corpus."""
 
@@ -158,26 +187,34 @@ def run(draws: int, boot: int, seed: int) -> list[dict[str, Any]]:
             cal_probs, cal_labels = calibration.binary(label)
             cal_all = lac_scores_all(cal_probs)
 
-            targets = {}
+            # Everything about a target that does not change between draws.
+            targets: dict[str, dict[str, Any]] = {}
             for corpus in SOURCES:
                 if label not in usable_classes(corpus):
                     continue
                 test = scores[(source, corpus, "test")]
                 probs, labels = test.binary(label)
-                patients = np.array(
-                    [str(p) for p in indices[corpus].frame.loc[test.ids, "patient"]]
-                )
-                targets[corpus] = (lac_scores_all(probs), labels, patients)
+                frame = indices[corpus].frame.loc[test.ids]
+                sick = labels == POSITIVE
+                targets[corpus] = {
+                    "all_scores": lac_scores_all(probs),
+                    "sick": sick,
+                    "patients": np.array([str(p) for p in frame["patient"]])[sick],
+                    "groups": subgroup_masks(
+                        np.array([str(v) for v in frame["sex"]])[sick],
+                        np.array([str(v) for v in frame["age_band"]])[sick],
+                    ),
+                }
 
-            # Per-record coverage of the diagnosis, averaged over the draws, plus
-            # the per-draw coverage the table reports, for both rules.
-            covered = {
-                (corpus, correction): np.zeros(int((labels == POSITIVE).sum()))
-                for corpus, (_, labels, _) in targets.items()
+            keys = [
+                (corpus, correction, kind, name)
+                for corpus, target in targets.items()
                 for correction in CORRECTIONS
-            }
-            per_draw: dict[tuple[str, str], list[float]] = {key: [] for key in covered}
-            chow_per_draw: dict[tuple[str, str], list[float]] = {key: [] for key in covered}
+                for kind, name, _mask in target["groups"]
+            ]
+            covered = {key: np.zeros(int(targets[key[0]]["sick"].sum())) for key in keys}
+            chow_covered = {key: np.zeros_like(covered[key]) for key in keys}
+            per_draw: dict[tuple[str, str, str, str], list[float]] = {k: [] for k in keys}
 
             for draw in range(draws):
                 part = patient_split(
@@ -198,48 +235,121 @@ def run(draws: int, boot: int, seed: int) -> list[dict[str, Any]]:
                     ),
                     "mondrian": chow_quantiles(true_scores, fitted_labels, ALPHA),
                 }
-                for corpus, (all_scores, labels, _patients) in targets.items():
-                    sick = labels == POSITIVE
+                for corpus, target in targets.items():
+                    sick = target["sick"]
                     for correction in CORRECTIONS:
-                        inside = predict_sets_per_class(all_scores, thresholds[correction])
-                        hit = inside[sick, POSITIVE].astype(np.float64)
-                        covered[(corpus, correction)] += hit
-                        per_draw[(corpus, correction)].append(float(hit.mean()))
-                        chow_inside = predict_sets_per_class(all_scores, chow[correction])
-                        chow_per_draw[(corpus, correction)].append(
-                            float(chow_inside[sick, POSITIVE].mean())
-                        )
+                        hit = predict_sets_per_class(target["all_scores"], thresholds[correction])[
+                            sick, POSITIVE
+                        ].astype(np.float64)
+                        chow_hit = predict_sets_per_class(target["all_scores"], chow[correction])[
+                            sick, POSITIVE
+                        ].astype(np.float64)
+                        for kind, name, mask in target["groups"]:
+                            key = (corpus, correction, kind, name)
+                            covered[key] += np.where(mask, hit, 0.0)
+                            chow_covered[key] += np.where(mask, chow_hit, 0.0)
+                            per_draw[key].append(
+                                float(hit[mask].mean()) if mask.any() else float("nan")
+                            )
 
             rng = np.random.default_rng(seed)
-            for corpus, (_all_scores, labels, patients) in targets.items():
-                sick = labels == POSITIVE
+            for corpus, target in targets.items():
                 for correction in CORRECTIONS:
-                    mean_covered = covered[(corpus, correction)] / draws
-                    lo, hi = bootstrap_by_patient(mean_covered, patients[sick], boot, rng)
-                    conformal = float(np.mean(per_draw[(corpus, correction)]))
-                    chow_coverage = float(np.mean(chow_per_draw[(corpus, correction)]))
-                    rows.append(
-                        {
-                            "source": source,
-                            "label": label,
-                            "corpus": corpus,
-                            "role": "home" if corpus == source else "away",
-                            "correction": correction,
-                            "n_positive": int(sick.sum()),
-                            "n_positive_patients": int(len(set(patients[sick]))),
-                            "coverage": round(conformal, 4),
-                            "sd_over_calibration_draws": round(
-                                float(np.std(per_draw[(corpus, correction)], ddof=1)), 4
-                            ),
-                            "bootstrap_lo": round(lo, 4),
-                            "bootstrap_hi": round(hi, 4),
-                            "bootstrap_width": round(hi - lo, 4),
-                            "chow_coverage": round(chow_coverage, 4),
-                            "conformal_minus_chow": round(conformal - chow_coverage, 4),
-                        }
-                    )
+                    for kind, name, mask in target["groups"]:
+                        key = (corpus, correction, kind, name)
+                        n_positive = int(mask.sum())
+                        if n_positive == 0:
+                            continue
+                        inside = covered[key][mask] / draws
+                        chow_inside = chow_covered[key][mask] / draws
+                        patients = target["patients"][mask]
+                        lo, hi = bootstrap_by_patient(inside, patients, boot, rng)
+                        conformal = float(np.nanmean(per_draw[key]))
+                        chow_coverage = float(chow_inside.mean())
+                        rows.append(
+                            {
+                                "source": source,
+                                "label": label,
+                                "corpus": corpus,
+                                "role": "home" if corpus == source else "away",
+                                "correction": correction,
+                                "subgroup_kind": kind,
+                                "subgroup": name,
+                                "n_positive": n_positive,
+                                "n_positive_patients": int(len(set(patients))),
+                                "thin": n_positive < THIN_BELOW,
+                                "coverage": round(conformal, 4),
+                                "sd_over_calibration_draws": round(
+                                    float(np.nanstd(per_draw[key], ddof=1)), 4
+                                ),
+                                "bootstrap_lo": round(lo, 4),
+                                "bootstrap_hi": round(hi, 4),
+                                "bootstrap_width": round(hi - lo, 4),
+                                "chow_coverage": round(chow_coverage, 4),
+                                "conformal_minus_chow": round(conformal - chow_coverage, 4),
+                            }
+                        )
             print(f"  {source} / {label}: {time.time() - started:.0f} s", flush=True)
     return rows
+
+
+def summarise(rows: list[dict[str, Any]], draws: int, boot: int) -> dict[str, Any]:
+    whole = [r for r in rows if r["subgroup_kind"] == "all" and r["role"] == "away"]
+    by_sex = [r for r in rows if r["subgroup_kind"] == "sex" and r["role"] == "away"]
+    by_age = [r for r in rows if r["subgroup_kind"] == "age" and r["role"] == "away"]
+    thin = [r for r in rows if r["thin"]]
+    spread = []
+    for row in whole:
+        pair = [
+            r
+            for r in by_sex
+            if (r["source"], r["label"], r["corpus"], r["correction"])
+            == (row["source"], row["label"], row["corpus"], row["correction"])
+            and not r["thin"]
+        ]
+        if len(pair) == 2:
+            spread.append(abs(pair[0]["coverage"] - pair[1]["coverage"]))
+    return {
+        "written_by": "scripts/rotation_uncertainty.py",
+        "commit": commit(),
+        "machine": machine_info(),
+        "settings": {
+            "alpha": ALPHA,
+            "score": SCORE,
+            "n_draws": draws,
+            "n_bootstrap": boot,
+            "bootstrap_unit": "patient of the target test part",
+            "corrections": list(CORRECTIONS),
+            "classes": class_keys(),
+            "age_bands": [name for name, _low, _high in AGE_BANDS],
+            "thin_below": THIN_BELOW,
+        },
+        "reading": {
+            "bootstrap_width_against_draw_spread": {
+                "median_bootstrap_width": round(
+                    float(np.median([r["bootstrap_width"] for r in whole])), 4
+                ),
+                "median_draw_spread": round(
+                    float(np.median([r["sd_over_calibration_draws"] for r in whole])), 4
+                ),
+            },
+            "conformal_minus_chow": {
+                "median": round(
+                    float(np.median([abs(r["conformal_minus_chow"]) for r in whole])), 4
+                ),
+                "max": round(float(np.max([abs(r["conformal_minus_chow"]) for r in whole])), 4),
+            },
+            "between_the_sexes": {
+                "median_absolute_gap": round(float(np.median(spread)), 4) if spread else None,
+                "widest_gap": round(float(np.max(spread)), 4) if spread else None,
+                "n_pairs_compared": len(spread),
+            },
+            "n_rows": len(rows),
+            "n_rows_by_sex": len(by_sex),
+            "n_rows_by_age": len(by_age),
+            "n_rows_too_thin_to_read": len(thin),
+        },
+    }
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -258,39 +368,8 @@ def main(argv: list[str] | None = None) -> int:
         writer.writeheader()
         writer.writerows(rows)
 
-    away = [r for r in rows if r["role"] == "away"]
-    summary = {
-        "written_by": "scripts/rotation_uncertainty.py",
-        "commit": commit(),
-        "machine": machine_info(),
-        "settings": {
-            "alpha": ALPHA,
-            "score": SCORE,
-            "n_draws": args.draws,
-            "n_bootstrap": args.boot,
-            "bootstrap_unit": "patient of the target test part",
-            "corrections": list(CORRECTIONS),
-            "classes": class_keys(),
-        },
-        "reading": {
-            "bootstrap_width_against_draw_spread": {
-                "median_bootstrap_width": round(
-                    float(np.median([r["bootstrap_width"] for r in away])), 4
-                ),
-                "median_draw_spread": round(
-                    float(np.median([r["sd_over_calibration_draws"] for r in away])), 4
-                ),
-            },
-            "conformal_minus_chow": {
-                "median": round(
-                    float(np.median([abs(r["conformal_minus_chow"]) for r in away])), 4
-                ),
-                "max": round(float(np.max([abs(r["conformal_minus_chow"]) for r in away])), 4),
-            },
-            "n_rows": len(rows),
-        },
-        "seconds": round(time.time() - started, 1),
-    }
+    summary = summarise(rows, args.draws, args.boot)
+    summary["seconds"] = round(time.time() - started, 1)
     (results / "rotation_uncertainty.json").write_text(json.dumps(summary, indent=2) + "\n")
     print(f"written {path} ({len(rows)} rows) in {summary['seconds']} s")
     return 0

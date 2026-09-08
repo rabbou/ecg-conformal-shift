@@ -50,6 +50,8 @@ __all__ = [
     "TRAIN_CAP",
     "VAL_CAP",
     "CorpusIndex",
+    "AGE_BANDS",
+    "age_band",
     "class_keys",
     "corpus_index",
     "labels_of",
@@ -75,6 +77,44 @@ CAL_CAP = 2000
 TEST_CAP = 8000
 
 SPLIT_SEED = 27  # the task this rotation belongs to
+
+
+# Age bands, wide enough that a diagnosis still has cases inside one.  PTB-XL
+# de-identifies every patient older than 89 by recording the age as 300, so
+# those 293 records land in the oldest band and the substitution is named in the
+# corpus's deviations rather than passed off as a real age.
+AGE_BANDS: tuple[tuple[str, float, float], ...] = (
+    ("<50", -np.inf, 50.0),
+    ("50-64", 50.0, 65.0),
+    ("65-74", 65.0, 75.0),
+    (">=75", 75.0, np.inf),
+)
+PTBXL_AGE_PLACEHOLDER = 300.0
+
+
+def age_band(age: float) -> str:
+    """Which band an age falls in, or ``unknown`` when the corpus does not say."""
+    if age is None or not np.isfinite(age):
+        return "unknown"
+    for name, low, high in AGE_BANDS:
+        if low <= age < high:
+            return name
+    return "unknown"
+
+
+def _sex(value: object) -> str:
+    """One vocabulary for three conventions: male, female, or unknown.
+
+    PTB-XL codes sex 0 and 1 in its own database; that 0 is male and 1 is female
+    is not assumed here but read off the Challenge bundle's own header for the
+    same 21,799 records, which agrees on every one of them.
+    """
+    text = str(value).strip().lower()
+    if text in {"0", "m", "male"}:
+        return "male"
+    if text in {"1", "f", "female"}:
+        return "female"
+    return "unknown"
 
 
 @dataclass
@@ -158,10 +198,20 @@ def corpus_index(corpus: str) -> CorpusIndex:
             },
             index=[str(i) for i in joined.index],
         )
+        ages = database.loc[joined.index, "age"].to_numpy(dtype=float)
+        n_placeholder = int((ages == PTBXL_AGE_PLACEHOLDER).sum())
+        ages = np.where(ages == PTBXL_AGE_PLACEHOLDER, 90.0, ages)
+        frame["age"] = ages
+        frame["sex"] = [_sex(v) for v in database.loc[joined.index, "sex"]]
         deviations = [
             "waveforms and patient identifiers from the PTB-XL distribution, SNOMED codes "
             "from the Challenge-2021 bundle's PTB-XL partition"
         ]
+        if n_placeholder:
+            deviations.append(
+                f"{n_placeholder} patients older than 89 are recorded as age 300 by PTB-XL's "
+                "de-identification and are read into the oldest band"
+            )
     elif corpus == "sph":
         metadata = pd.read_csv(SPH_DIR / "metadata.csv")
         labels = sph_small_set_labels(metadata)
@@ -172,6 +222,8 @@ def corpus_index(corpus: str) -> CorpusIndex:
             },
             index=[str(i) for i in metadata["ECG_ID"]],
         )
+        frame["age"] = metadata["Age"].to_numpy(dtype=float)
+        frame["sex"] = [_sex(v) for v in metadata["Sex"]]
         deviations = [
             "diagnoses are AHA codes bridged to SNOMED by Leinonen et al.'s table",
             "records run from ten to sixty seconds; the first ten are kept",
@@ -191,6 +243,8 @@ def corpus_index(corpus: str) -> CorpusIndex:
             {"patient": [str(i) for i in table.index], "path": table["path"].to_numpy()},
             index=[str(i) for i in table.index],
         )
+        frame["age"] = table["age"].to_numpy(dtype=float)
+        frame["sex"] = [_sex(v) for v in table["sex"]]
         deviations = partition_deviations(corpus, table)
         if dropped:
             deviations.append(
@@ -198,6 +252,7 @@ def corpus_index(corpus: str) -> CorpusIndex:
             )
     for key in class_keys():
         frame[key] = labels[key].to_numpy().astype(bool)
+    frame["age_band"] = [age_band(float(a)) for a in frame["age"]]
     return CorpusIndex(corpus, _split(frame), deviations)
 
 

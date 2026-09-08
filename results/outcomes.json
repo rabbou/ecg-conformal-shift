@@ -12,8 +12,8 @@
   },
   "n_draws": 200,
   "seed": 0,
-  "git_commit": "3fe75bddb1e4eef212c34cf67dbe18c3e271048b",
-  "seconds": 1.1,
+  "git_commit": "fbc90c8c1c53b9e7d29c8b67fcb4dd7957199fe0",
+  "seconds": 1.3,
   "by_corpus": {
     "ptbxl": {
       "name": "PTB-XL",

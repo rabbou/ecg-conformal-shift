@@ -600,7 +600,8 @@ def figure_6_outcomes(outcomes: dict[str, Any], out: Path, source: Path) -> Path
         0.5,
         0.012,
         f"PTB-XL fold 10, {outcomes['n_draws']} patient-level calibration draws. "
-        "The three schemes sit at a comparable MI miss rate by construction.",
+        "The single threshold and per-label calibration meet at a ~10% MI miss rate "
+        "by construction; pooled calibration is matched to neither and lands at 27%.",
         ha="center",
         fontsize=8.5,
         color="#555",

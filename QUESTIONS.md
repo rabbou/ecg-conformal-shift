@@ -16,7 +16,7 @@ Its MI AUROC on the PTB-XL benchmark split is 0.932, 95% CI 0.921 to 0.943, whic
 
 ## 4. Would this hold at my site? (clinician, commercial)
 
-Unknown. The two sites measured here moved in opposite directions: coverage rose in Shandong and fell in Chongqing. Neither direction nor magnitude can be extrapolated to a third site. What transfers is the harness. The measurement needs a few hundred labelled tracings from the target site and answers the question directly, per class, with its spread. The repository offers a way to measure the promise at a given site, not an assurance that it holds there.
+Unknown. The two sites measured here moved in opposite directions: coverage rose in Shandong and fell in Chongqing. Neither direction nor magnitude can be extrapolated to a third site. What transfers is the harness. The measurement is per class, so what it needs is cases of the rarer class, not tracings: about 864 infarctions to pin per-class coverage to within two points, which is roughly 5,800 tracings at Chongqing's prevalence and 86,000 at Shandong's. The repository offers a way to measure the promise at a given site, not an assurance that it holds there.
 
 ## 5. Is the good Shandong number just prevalence? (technical peer)
 

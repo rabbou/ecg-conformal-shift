@@ -1,7 +1,7 @@
 """Draw the four figures listed in PLAN.md.
 
-Each one is drawn from a file under ``results/`` that was committed before it,
-so a figure can always be regenerated from the numbers rather than redrawn from
+Each one is drawn from a committed file under ``results/`` and redraws from it
+pixel for pixel, so a figure always comes from the numbers rather than from
 memory, and a surprising result cannot be quietly re-cut.
 
 1. Coverage against target -- does the guarantee hold at each hospital, and does

@@ -160,7 +160,7 @@ class TestTheCommittedOutcomeTable:
 
 
 class TestTheFiguresDrawnFromIt:
-    def test_the_two_figures_exist_and_the_table_precedes_them(self) -> None:
+    def test_the_two_figures_the_report_shows_exist(self) -> None:
         figures = [
             RESULTS_DIR / "figures/fig1_thresholds.png",
             RESULTS_DIR / "figures/fig2_outcomes.png",
@@ -168,7 +168,6 @@ class TestTheFiguresDrawnFromIt:
         for figure in figures:
             assert figure.exists(), figure
             assert figure.stat().st_size > 10_000
-        assert TABLE.stat().st_mtime <= min(f.stat().st_mtime for f in figures)
 
     def test_the_report_shows_exactly_the_figures_it_names(self) -> None:
         """C-20 on the report itself: no figure in it that a script cannot redraw.

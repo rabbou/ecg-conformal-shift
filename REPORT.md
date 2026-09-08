@@ -129,4 +129,4 @@ Every reference above was read in full: the AIME 2025 chapter [8] on 7 September
 
 ## Data and code
 
-Numbers: `results/outcomes.json` (per-label outcomes and decision boundaries), `results/shift.json` (coverage per site and correction), `results/arms.json` (encoders), `results/abstention.json`, `results/baseline.json`. `scripts/outcomes.py` builds the outcome table and `scripts/figures.py` regenerates every figure from a results file committed before it. Reproduction: `uv sync`, `uv run pytest`, `uv run python scripts/outcomes.py`, `uv run python scripts/figures.py`.
+Numbers: `results/outcomes.json` (per-label outcomes and decision boundaries), `results/shift.json` (coverage per site and correction), `results/arms.json` (encoders), `results/abstention.json`, `results/baseline.json`. `scripts/outcomes.py` builds the outcome table and `scripts/figures.py` redraws every figure, pixel for pixel, from a committed results file. Reproduction: `uv sync`, `uv run pytest`, `uv run python scripts/outcomes.py`, `uv run python scripts/figures.py`.

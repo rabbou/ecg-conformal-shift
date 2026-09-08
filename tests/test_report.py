@@ -205,19 +205,38 @@ class TestTheFigures:
         2: ("fig2_set_sizes.png", RESULTS_DIR / "shift.json"),
         3: ("fig3_arms.png", RESULTS_DIR / "arms.json"),
         4: ("fig4_discrimination.png", RESULTS_DIR / "baseline/metrics.json"),
+        5: ("fig1_thresholds.png", RESULTS_DIR / "outcomes.json"),
+        6: ("fig2_outcomes.png", RESULTS_DIR / "outcomes.json"),
     }
 
     def test_each_figure_redraws_from_the_committed_numbers(self, tmp_path: Path) -> None:
         import figures
 
-        assert figures.main(["--figure", "1", "2", "3", "4", "--out", str(tmp_path)]) == 0
+        numbers = [str(n) for n in sorted(self.NAMED)]
+        assert figures.main(["--figure", *numbers, "--out", str(tmp_path)]) == 0
         for number, (name, _source) in self.NAMED.items():
             drawn = tmp_path / name
             assert drawn.exists(), number
             assert drawn.stat().st_size > 10_000, f"{name} is too small to hold a plot"
 
-    def test_the_file_each_one_is_drawn_from_is_already_committed(self) -> None:
-        for number, (_name, source) in self.NAMED.items():
+    def test_each_figure_redraws_pixel_for_pixel(self, tmp_path: Path) -> None:
+        """The committed PNG is the one the script draws from the committed numbers.
+
+        The plan's claim is that no figure was hand-cut: every one of them comes
+        out of ``scripts/figures.py`` and the file it names.  Checking that the
+        source is tracked cannot fail on that -- ``git ls-files`` succeeds for any
+        tracked file whatever the commit order -- so the property is checked the
+        only way that can fail: redraw all six into a scratch directory and
+        compare them to the committed images pixel by pixel.  PNG bytes differ
+        with the zlib level, so the pixels are compared, not the file.
+        """
+        import figures
+        from PIL import Image
+
+        numbers = [str(n) for n in sorted(self.NAMED)]
+        assert figures.main(["--figure", *numbers, "--out", str(tmp_path)]) == 0
+        for number, (name, source) in self.NAMED.items():
+            committed = RESULTS_DIR / "figures" / name
             tracked = subprocess.run(
                 ["git", "ls-files", "--error-unmatch", str(source)],
                 capture_output=True,
@@ -226,6 +245,12 @@ class TestTheFigures:
                 check=False,
             )
             assert tracked.returncode == 0, f"figure {number} draws from an uncommitted {source}"
+            with Image.open(committed) as a, Image.open(tmp_path / name) as b:
+                before = np.asarray(a.convert("RGBA"))
+                after = np.asarray(b.convert("RGBA"))
+            assert before.shape == after.shape, f"{name} changed size"
+            differing = int(np.count_nonzero(np.any(before != after, axis=-1)))
+            assert differing == 0, f"{name} redraws to {differing} different pixels"
 
     def test_figure_one_carries_a_panel_per_corpus_and_per_correction(self, tmp_path: Path) -> None:
         """A figure with two of the three hospitals on it, or with a correction

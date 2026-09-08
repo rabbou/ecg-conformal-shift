@@ -8,7 +8,7 @@ No. The guarantee is marginal: an average over patients and over draws of the ca
 
 ## 2. What does a clinician see when the model is unsure? (clinician)
 
-A set with both labels, or with none. With the smallest-set score at 90% confidence, about 95 of 100 tracings get a single label at the source site; most of the rest get both labels. The both-label share grows with the requested confidence: 18% at 95% at the source, 22% in Chongqing (`results/figures/fig2_set_sizes.png`, `results/shift.json`). At lower confidence the model returns empty sets instead, for tracings unlike anything in the calibration data. Both outcomes mean the same thing in practice: no machine answer, a human reads the ECG. Abstention rates per corpus and per confidence level are in `results/abstention.json`.
+A set with both labels. With the smallest-set score at 90% confidence, about 95 of 100 tracings get a single label at the source site, and every one of the rest gets both labels: the calibration quantile there is 0.568, and because two label probabilities sum to one, a set can come back empty only when that quantile is below 0.5. The both-label share grows with the requested confidence: 18% at 95% at the source, 22% in Chongqing (`results/figures/fig2_set_sizes.png`, `results/shift.json`). Empty sets do appear at confidence levels low enough to push the quantile under 0.5, for tracings unlike anything in the calibration data, but not at the 90% this study reports. Both outcomes mean the same thing in practice: no machine answer, a human reads the ECG. Abstention rates per corpus and per confidence level are in `results/abstention.json`.
 
 ## 3. Why believe the underlying model is any good? (clinician)
 

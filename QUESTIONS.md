@@ -20,7 +20,7 @@ Unknown. The two sites measured here moved in opposite directions: coverage rose
 
 ## 5. Is the good Shandong number just prevalence? (technical peer)
 
-Yes. 99% of Shandong's tracings have no infarction, the healthy class is the easy one, and the marginal average is dominated by it; the uncorrected threshold over-covers there (infarctions at 93.6%, sd 0.3, against 90% requested). The same mechanism hides the 73.2% infarction coverage at the source. This is why every coverage figure in the repository is reported per class (criterion C-11 in [PLAN.md](PLAN.md)), and why a single-number coverage claim on an imbalanced cohort deserves suspicion in general.
+Partly, and not in the way the overall figure suggests. Prevalence is what makes Shandong's *marginal* coverage look healthy: 99% of its tracings have no infarction, so the average is dominated by the easy class. But the 93.6% (sd 0.3) for infarctions is not that effect. At a fixed threshold, coverage within a class depends only on that class's scores, and Shandong's infarctions simply score further from the threshold than PTB-XL's do. Both classes over-cover there, the healthy one at 94.8%. What prevalence does hide is the 73.2% infarction coverage at the source, where the marginal figure still reads 90.0%. This is why every coverage figure in the repository is reported per class (criterion C-11 in [PLAN.md](PLAN.md)), and why a single-number coverage claim on an imbalanced cohort deserves suspicion in general.
 
 ## 6. Why did the estimated correction fail where the exact one worked? (technical peer)
 

@@ -1,0 +1,41 @@
+{
+  "written_by": "scripts/rotation_uncertainty.py",
+  "commit": "9fc50187ffcdd5d86e04fd41572299fcd2333d6c",
+  "machine": {
+    "cpu": "Intel(R) Core(TM) i7-8700 CPU @ 3.20GHz",
+    "platform": "Linux-6.8.0-139-generic-x86_64-with-glibc2.39",
+    "python": "3.11.15",
+    "torch": "2.2.2+cu121",
+    "torch_threads": 4
+  },
+  "settings": {
+    "alpha": 0.1,
+    "score": "lac",
+    "n_draws": 200,
+    "n_bootstrap": 2000,
+    "bootstrap_unit": "patient of the target test part",
+    "corrections": [
+      "none",
+      "mondrian"
+    ],
+    "classes": [
+      "NSR",
+      "AF",
+      "LBBB",
+      "RBBB",
+      "IAVB"
+    ]
+  },
+  "reading": {
+    "bootstrap_width_against_draw_spread": {
+      "median_bootstrap_width": 0.0447,
+      "median_draw_spread": 0.0161
+    },
+    "conformal_minus_chow": {
+      "median": 0.004,
+      "max": 0.3037
+    },
+    "n_rows": 232
+  },
+  "seconds": 21.8
+}

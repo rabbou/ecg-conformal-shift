@@ -175,6 +175,17 @@ class TestNoThresholdReadsATargetLabel:
         assert _thresholds(before) == _thresholds(after)
 
 
+def _fake_block(covered: float, n_infinite: int = 0) -> dict[str, Any]:
+    """One corpus block of a row, carrying what bias_summary reads off it."""
+    return {
+        "coverage_by_class": {"1": {"mean": covered}},
+        "prevalence": 0.2,
+        "n_points": 1000,
+        "mean_set_size": {"mean": 1.0 if n_infinite == 0 else 2.0},
+        "threshold_by_class": {"1": {"n_infinite": n_infinite, "n_draws": 200}},
+    }
+
+
 def _fake_cell(source: str, label: str, by_corpus: dict[str, float]) -> dict[str, Any]:
     """One (source, diagnosis) block with the coverage each corpus is to report."""
     return {
@@ -187,19 +198,8 @@ def _fake_cell(source: str, label: str, by_corpus: dict[str, float]) -> dict[str
                 "score": "lac",
                 "correction": correction,
                 "by_corpus": {
-                    f"{source}-calibration-holdout": {
-                        "coverage_by_class": {"1": {"mean": 0.9}},
-                        "prevalence": 0.2,
-                        "n_points": 1000,
-                    },
-                    **{
-                        corpus: {
-                            "coverage_by_class": {"1": {"mean": covered}},
-                            "prevalence": 0.2,
-                            "n_points": 1000,
-                        }
-                        for corpus, covered in by_corpus.items()
-                    },
+                    f"{source}-calibration-holdout": _fake_block(0.9),
+                    **{corpus: _fake_block(covered) for corpus, covered in by_corpus.items()},
                 },
             }
             for correction in CORRECTIONS
@@ -431,6 +431,68 @@ class TestTheCommittedRotation:
                 assert sum(away) / len(away) == pytest.approx(
                     block["away_bias"]["mean"], abs=5e-4
                 ), (label, correction)
+
+    def test_a_pair_that_covers_by_abstaining_is_marked_as_one(self, table: dict[str, Any]) -> None:
+        """An infinite threshold puts both labels in every set. The class is then
+        covered because nothing was ruled out, and a mean that folded those cells
+        in with calibrated ones would read as a repair that did not happen."""
+        for label, corrections in table["bias"].items():
+            for correction, block in corrections.items():
+                for entry in [*block["away"], *block["home"]]:
+                    infinite = entry["n_draws_threshold_infinite"]
+                    flagged = entry["covers_by_abstaining"]
+                    assert flagged == (infinite > 100), (label, correction, entry)
+                    if flagged:
+                        assert entry["mean_set_size"] > 1.3, entry
+
+    def test_the_bias_is_reported_again_over_the_calibrated_pairs_alone(
+        self, table: dict[str, Any]
+    ) -> None:
+        for label, corrections in table["bias"].items():
+            for correction, block in corrections.items():
+                finite = block["away_bias_where_the_threshold_was_finite"]
+                degenerate = finite["n_pairs_covering_by_abstaining"]
+                assert finite["n_pairs"] + degenerate == block["away_bias"]["n_pairs"], (
+                    label,
+                    correction,
+                )
+                assert degenerate == sum(1 for a in block["away"] if a["covers_by_abstaining"])
+
+    def test_the_sources_whose_mondrian_threshold_runs_out_of_class_are_named(
+        self, grid: list[dict[str, str]]
+    ) -> None:
+        """Class-conditional calibration needs ceil(1/alpha) - 1 records of the
+        class in the calibration half. Three source-diagnosis pairs do not have
+        them, and their coverage is abstention rather than a threshold."""
+        starved = {
+            (row["source"], row["label"])
+            for row in grid
+            if row["alpha"] == "0.1"
+            and row["score"] == "lac"
+            and row["correction"] == "mondrian"
+            and int(row["threshold_diagnosis_n_infinite"]) > 0
+        }
+        assert starved == {
+            ("sph", "LBBB"),
+            ("sph", "IAVB"),
+            ("chapman_ningbo", "LBBB"),
+        }
+
+    def test_the_weighted_rows_say_how_often_the_target_prior_was_unidentified(
+        self, grid: list[dict[str, str]]
+    ) -> None:
+        """BBSE refuses when label shift does not explain the target. The refusal
+        widens every set to both labels, and the count is what separates a
+        coverage bought that way from one a threshold earned."""
+        unidentified = [
+            int(row["n_draws_target_prior_unidentified"])
+            for row in grid
+            if row["correction"] == "weighted"
+        ]
+        assert any(n > 0 for n in unidentified), "BBSE never refused on any cell"
+        for row in grid:
+            if row["correction"] != "weighted":
+                assert int(row["n_draws_target_prior_unidentified"]) == 0, row
 
     def test_the_classes_a_corpus_refuses_never_appear_in_its_rows(
         self, grid: list[dict[str, str]]

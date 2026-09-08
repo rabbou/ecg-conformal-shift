@@ -20,6 +20,8 @@ results/baseline/model.pt
 !results/target_scale.json
 !results/rotation.json
 !results/rotation.csv
+!results/rotation_uncertainty.csv
+!results/rotation_uncertainty.json
 !results/rotation/
 results/rotation/**/model.pt
 !results/embeddings/

@@ -56,7 +56,9 @@ CHALLENGE_PARTITIONS: dict[str, tuple[str, ...]] = {
 }
 
 # The bundle names each PTB-XL record HR<ecg_id zero-padded to five digits>.
-# `test_challenge.py` checks that against the waveform rather than assuming it.
+# The join is not taken on trust: `test_label_map.py` compares the SNOMED labels
+# it produces against PTB-XL's own SCP-ECG statements class by class, and a
+# misaligned join would break that agreement rather than pass it.
 PTBXL_RECORD_PREFIX = "HR"
 
 NO_PATIENT_KEY = (
@@ -249,11 +251,17 @@ def join_ptbxl_to_challenge(
     ``strat_fold``, ``filename_hr`` and ``dx``, together with what fell out of
     each side.
     """
-    ecg_id = pd.Series(
-        [int(str(r).removeprefix(PTBXL_RECORD_PREFIX)) for r in challenge.index],
-        index=challenge.index,
-        name="ecg_id",
-    )
+    numbers = []
+    for record in challenge.index:
+        text = str(record)
+        rest = text.removeprefix(PTBXL_RECORD_PREFIX)
+        if rest == text or not rest.isdigit():
+            raise ValueError(
+                f"{text!r} is not of the form {PTBXL_RECORD_PREFIX}<digits>; the join from the "
+                "bundle's record names to PTB-XL's ecg_id assumes that form"
+            )
+        numbers.append(int(rest))
+    ecg_id = pd.Series(numbers, index=challenge.index, name="ecg_id")
     dx_by_ecg_id = pd.Series(list(challenge["dx"]), index=np.asarray(ecg_id), name="dx")
     kept = database.index.intersection(dx_by_ecg_id.index)
     joined = database.loc[kept, ["patient_id", "strat_fold", "filename_hr"]].copy()

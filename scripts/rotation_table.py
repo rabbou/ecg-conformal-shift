@@ -54,6 +54,14 @@ HEADLINE_ALPHA = 0.10
 HEADLINE_SCORE = "lac"
 POSITIVE = "1"  # the class index, as the table's keys spell it: the diagnosis present
 
+# A threshold that is infinite puts every label in the set: the class is covered
+# because nothing was ruled out, not because a threshold was calibrated.  It
+# happens when the calibration half holds fewer than ceil(1/alpha) - 1 records of
+# the class, and when BBSE cannot identify a target prior.  A cell whose
+# threshold was infinite in more than this share of the draws is reported
+# separately rather than averaged in with the rest.
+DEGENERATE_ABOVE = 0.5
+
 CORPUS_NAMES = {
     "ptbxl": "PTB-XL",
     "sph": "Shandong",
@@ -155,19 +163,20 @@ def bias_summary(cells: list[dict[str, Any]]) -> dict[str, Any]:
                 # with a handful of positives is noise however many draws it is
                 # averaged over, and the count is what says so.
                 positives = int(round(cell_block["prevalence"] * cell_block["n_points"]))
+                threshold = cell_block["threshold_by_class"][POSITIVE]
+                infinite = int(threshold["n_infinite"])
+                entry = {
+                    "source": source,
+                    "bias": round(bias, 4),
+                    "n_positive": positives,
+                    "n_draws_threshold_infinite": infinite,
+                    "mean_set_size": round(cell_block["mean_set_size"]["mean"], 3),
+                    "covers_by_abstaining": infinite > DEGENERATE_ABOVE * int(threshold["n_draws"]),
+                }
                 if corpus == source:
-                    block["home"].append(
-                        {"source": source, "bias": round(bias, 4), "n_positive": positives}
-                    )
+                    block["home"].append(entry)
                 else:
-                    away.append(
-                        {
-                            "source": source,
-                            "target": corpus,
-                            "bias": round(bias, 4),
-                            "n_positive": positives,
-                        }
-                    )
+                    away.append({**entry, "target": corpus})
             block["away"].extend(away)
             if away:
                 block["by_source"][source] = round(float(np.mean([a["bias"] for a in away])), 4)
@@ -176,6 +185,12 @@ def bias_summary(cells: list[dict[str, Any]]) -> dict[str, Any]:
             values = np.asarray([a["bias"] for a in block["away"]], dtype=float)
             by_source = np.asarray(list(block["by_source"].values()), dtype=float)
             homes = np.asarray([h["bias"] for h in block["home"]], dtype=float)
+            # The pairs whose threshold was finite in most draws: the ones whose
+            # coverage was bought by a calibrated threshold rather than by
+            # returning both labels.
+            calibrated = np.asarray(
+                [a["bias"] for a in block["away"] if not a["covers_by_abstaining"]], dtype=float
+            )
             block["away_bias"] = {
                 "mean": round(float(values.mean()), 4) if values.size else None,
                 "sd_across_pairs": round(float(values.std(ddof=1)), 4) if values.size > 1 else None,
@@ -189,6 +204,14 @@ def bias_summary(cells: list[dict[str, Any]]) -> dict[str, Any]:
             block["fewest_positives_behind_a_pair"] = (
                 min(int(a["n_positive"]) for a in block["away"]) if block["away"] else None
             )
+            block["away_bias_where_the_threshold_was_finite"] = {
+                "mean": round(float(calibrated.mean()), 4) if calibrated.size else None,
+                "sd_across_pairs": round(float(calibrated.std(ddof=1)), 4)
+                if calibrated.size > 1
+                else None,
+                "n_pairs": int(calibrated.size),
+                "n_pairs_covering_by_abstaining": int(values.size - calibrated.size),
+            }
             block["home_bias"] = {
                 "mean": round(float(homes.mean()), 4) if homes.size else None,
                 "sd_across_sources": round(float(homes.std(ddof=1)), 4) if homes.size > 1 else None,
@@ -223,6 +246,7 @@ GRID_COLUMNS = (
     "threshold_no_diagnosis_mean",
     "threshold_diagnosis_mean",
     "threshold_diagnosis_n_infinite",
+    "n_draws_target_prior_unidentified",
     "calibration_n_mean",
     "calibration_effective_size_mean",
     "n_draws",
@@ -267,6 +291,9 @@ def grid_rows(cells: list[dict[str, Any]]) -> Iterator[dict[str, Any]]:
                     "threshold_no_diagnosis_mean": round(thresholds["0"]["mean"], 5),
                     "threshold_diagnosis_mean": round(thresholds[POSITIVE]["mean"], 5),
                     "threshold_diagnosis_n_infinite": thresholds[POSITIVE]["n_infinite"],
+                    "n_draws_target_prior_unidentified": block["calibration"].get(
+                        "n_unidentified", 0
+                    ),
                     "calibration_n_mean": round(row["calibration"]["n"]["mean"], 1),
                     "calibration_effective_size_mean": round(
                         block["calibration"]["effective_sample_size"]["mean"], 1

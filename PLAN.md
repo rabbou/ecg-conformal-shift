@@ -60,6 +60,9 @@ Each maps to a named test. Unchecked means unverified, not done.
 | C-29 | THE target-scale file SHALL report coverage on Chongqing after recalibration on 0, 100, 500 and 2,000 labelled target records, measured on one held-out half that no rung calibrates on. | `test_target_scale.py` |
 | C-30 | THE encoder arms SHALL include ECG-JEPA, and THE README SHALL name which arms saw PTB-XL at pre-training and HuBERT-ECG's non-commercial licence. | `test_encoder_arms.py`; the README's "Encoder arms" table |
 
+| C-31 | THE rotation SHALL report, beside the spread over calibration draws, a 95% interval obtained by resampling each target cohort by patient, so that a coverage read on a thin class carries the uncertainty of the class being thin. | `test_rotation_uncertainty.py::TestTheCommittedUncertainty`, on `results/rotation_uncertainty.csv`; the resampling unit itself by `TestTheBootstrapItself` |
+| C-32 | THE rotation SHALL report, for every pair, the coverage a per-class rejection rule with one plain empirical quantile per class reaches on the same scores, and the difference from the conformal figure. | `test_rotation_uncertainty.py::TestChowIsMondrianWithoutTheCorrection` on the rule, `TestTheCommittedUncertainty::test_the_two_rules_agree_except_where_the_class_is_starved` on the committed file |
+
 ## The ingestion contract
 
 Every corpus is reduced to one canonical form before anything else touches it:
@@ -192,6 +195,43 @@ had".
 annotation schemes onto five classes, its counts checked against the
 Challenge's own published table, and the five joins that could not be made
 cleanly written down rather than decided in passing.
+
+### What the coverage table cannot say on its own
+
+Two objections apply to the rotation as much as to the infarction axis, and
+both are answered by `results/rotation_uncertainty.csv` rather than left to the
+reader.
+
+*The spread in the table is the wrong uncertainty.* Every figure in
+`results/rotation.csv` is a mean over 200 calibration draws on a target cohort
+that never moves, so it carries the variability of the threshold and none of
+the variability of the population. A coverage read on Shandong's 23 left
+bundle-branch blocks is uncertain because there are 23 of them. The uncertainty
+file resamples each target cohort by patient and reports a percentile interval
+beside the draw spread.
+
+*A rejection rule may do the same work.* One plain empirical quantile per class
+— Chow, *IEEE Trans Inf Theory* 1970 — is Mondrian minus the finite-sample
+`(n+1)` correction. If the two land in the same place, the conformal formalism
+is a rename of a per-class rejection rule, and the object has to say so. The
+uncertainty file reports both coverages and their difference, per pair, so what
+conformal prediction adds here is a number rather than a claim.
+
+### The nearest prior work, and what is not known about it
+
+El Allam and Hamlich, "Quantization-aware Mondrian conformal prediction for
+embedded ECG classification", *Biomed Signal Process Control*, November 2026,
+10.1016/j.bspc.2026.111217. Title, authors, journal and date were read from
+Crossref on 2026-09-08; the DOI resolves.
+
+**The paper itself has not been read here.** It is closed access, and neither
+Crossref nor Semantic Scholar carries its abstract. So what corpora it uses,
+what diagnosis, and whether it reports coverage on a target site are unknown to
+this repository. That matters directly: it applies Mondrian conformal prediction
+to ECG, which is the correction this rotation reports, so if it already carries
+external per-label coverage then the novelty claim falls and this section is
+rewritten. Obtaining the full text, by library or by writing to the authors, is
+a dependency on the reading and not on the code.
 
 ## Days
 

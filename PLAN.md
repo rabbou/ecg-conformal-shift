@@ -23,7 +23,7 @@ It is tracked as task T-001 in `~/Developer/lab/program/`.
 | SPH / Shandong | `metadata.csv` | 25,770 HDF5 files, 4.3 GB | 25,770 / 25,770 | `data/sph/records` |
 | ACS-ECG / Chongqing | `data/acs/CSV` | 19,955 WFDB records, 1.3 GB | 19,950 / 19,955 | `data/acs/row_data` |
 
-Sources: PTB-XL and SPH from PhysioNet and Springer Nature figshare respectively (licences CC BY 4.0 and CC0); ACS-ECG from figshare 10.6084/m9.figshare.29925314 (CC0, `ECG_row_data.zip`, 1.28 GB, no account) [verified 2026-08-23 — api.figshare.com/v2/articles/29925314]. `scripts/fetch_open_corpora.sh` fetches them with their checksums. The five Chongqing records excluded carry a non-finite sample (3) or are shorter than their header says (2); `results/ingest_report.json` lists them by id.
+Sources: PTB-XL and SPH from PhysioNet and Springer Nature figshare respectively (licences CC BY 4.0 and CC0); ACS-ECG from figshare 10.6084/m9.figshare.29925314 (CC0, `ECG_row_data.zip`, 1.28 GB, no account) [verified 2026-08-23 — api.figshare.com/v2/articles/29925314]. `scripts/fetch_open_corpora.sh` fetches ACS-ECG and the four auxiliary PhysioNet corpora, verifying each against the checksums their publishers give; PTB-XL and SPH are not fetched by it and were downloaded by hand. The five Chongqing records excluded carry a non-finite sample (3) or are shorter than their header says (2); `results/ingest_report.json` lists them by id.
 
 ## Acceptance criteria
 

@@ -14,7 +14,21 @@ ENV="${1:-$HOME/.venvs/ecgfm}"
 SRC="$(dirname "$ENV")/fairseq-signals"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 
-[ -d "$SRC" ] || git clone --depth 1 https://github.com/Jwoo5/fairseq-signals.git "$SRC"
+# Pinned: installing this repository runs its setup.py and builds its Cython
+# extensions, so cloning whatever HEAD happens to be would run whatever upstream
+# pushed last.  This is the commit the ECG-FM numbers in results/ were produced
+# with; a moved branch cannot change it.
+FAIRSEQ_SIGNALS_COMMIT=f8f0ff1c788a82c2059cb452cd5462898867489e
+
+if [ ! -d "$SRC" ]; then
+    git clone https://github.com/Jwoo5/fairseq-signals.git "$SRC"
+    git -C "$SRC" checkout --quiet "$FAIRSEQ_SIGNALS_COMMIT"
+fi
+have="$(git -C "$SRC" rev-parse HEAD)"
+if [ "$have" != "$FAIRSEQ_SIGNALS_COMMIT" ]; then
+    echo "$SRC is at $have, expected $FAIRSEQ_SIGNALS_COMMIT; not installing it" >&2
+    exit 1
+fi
 uv venv "$ENV" --python 3.11
 uv pip install --python "$ENV/bin/python" "torch==2.2.2" "numpy<2" scipy pandas wfdb h5py \
     cython "setuptools<70" wheel

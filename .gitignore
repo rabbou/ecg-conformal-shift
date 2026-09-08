@@ -11,6 +11,8 @@ results/baseline/model.pt
 !results/shift.json
 !results/outcomes.json
 !results/subgroups.json
+!results/perturbations.json
+!results/perturbations.npz
 !results/seen_target.json
 !results/arms.json
 !results/embeddings/

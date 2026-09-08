@@ -1,0 +1,631 @@
+{
+  "question": "When an acquisition fault changes the input, does coverage fall, and does the deferral rate -- the only thing a deployed scheme can see without labels -- move enough to signal it.",
+  "protocol": "Every threshold is fitted on a clean PTB-XL calibration half drawn by patient, the same 200 halves outcomes.py draws under the same seed, and spent on the perturbed held-out half. AUROC is over the whole perturbed fold. The clean condition is scored through this path and checked against results/baseline/scores.npz.",
+  "alpha": 0.1,
+  "n_draws": 200,
+  "seed": 0,
+  "n_records": 2198,
+  "n_positive": 550,
+  "torch_threads": 4,
+  "clean_matches_published_scores": {
+    "largest_absolute_difference": 1.1920928955078125e-07,
+    "tolerance": 1e-06,
+    "passed": true
+  },
+  "git_commit": "60308eb07396dfcf392fd1dff8d5cc2a6e7ba2fb",
+  "seconds": 285.1,
+  "conditions": {
+    "clean": {
+      "description": "the tracings as recorded; the row that must reproduce results/baseline/scores.npz",
+      "auroc": 0.9322,
+      "schemes": {
+        "plain": {
+          "coverage_mi": {
+            "mean": 0.8957,
+            "sd": 0.0282,
+            "n_draws": 200
+          },
+          "deferred_mi": {
+            "mean": 0.0,
+            "sd": 0.0,
+            "n_draws": 200
+          },
+          "coverage_non_mi": {
+            "mean": 0.8098,
+            "sd": 0.0233,
+            "n_draws": 200
+          },
+          "deferred_non_mi": {
+            "mean": 0.0,
+            "sd": 0.0,
+            "n_draws": 200
+          },
+          "coverage_all": {
+            "mean": 0.8314,
+            "sd": 0.0117,
+            "n_draws": 200
+          },
+          "deferred_all": {
+            "mean": 0.0,
+            "sd": 0.0,
+            "n_draws": 200
+          }
+        },
+        "pooled": {
+          "coverage_mi": {
+            "mean": 0.7322,
+            "sd": 0.0313,
+            "n_draws": 200
+          },
+          "deferred_mi": {
+            "mean": 0.0996,
+            "sd": 0.033,
+            "n_draws": 200
+          },
+          "coverage_non_mi": {
+            "mean": 0.9547,
+            "sd": 0.0086,
+            "n_draws": 200
+          },
+          "deferred_non_mi": {
+            "mean": 0.0354,
+            "sd": 0.0122,
+            "n_draws": 200
+          },
+          "coverage_all": {
+            "mean": 0.8988,
+            "sd": 0.0134,
+            "n_draws": 200
+          },
+          "deferred_all": {
+            "mean": 0.0515,
+            "sd": 0.0165,
+            "n_draws": 200
+          }
+        },
+        "perlabel": {
+          "coverage_mi": {
+            "mean": 0.9001,
+            "sd": 0.0275,
+            "n_draws": 200
+          },
+          "deferred_mi": {
+            "mean": 0.1266,
+            "sd": 0.0273,
+            "n_draws": 200
+          },
+          "coverage_non_mi": {
+            "mean": 0.8998,
+            "sd": 0.0157,
+            "n_draws": 200
+          },
+          "deferred_non_mi": {
+            "mean": 0.097,
+            "sd": 0.0239,
+            "n_draws": 200
+          },
+          "coverage_all": {
+            "mean": 0.8999,
+            "sd": 0.0134,
+            "n_draws": 200
+          },
+          "deferred_all": {
+            "mean": 0.1044,
+            "sd": 0.023,
+            "n_draws": 200
+          }
+        }
+      }
+    },
+    "limb_reversal": {
+      "description": "left and right arm electrodes exchanged",
+      "auroc": 0.7266,
+      "schemes": {
+        "plain": {
+          "coverage_mi": {
+            "mean": 0.983,
+            "sd": 0.0073,
+            "n_draws": 200
+          },
+          "deferred_mi": {
+            "mean": 0.0,
+            "sd": 0.0,
+            "n_draws": 200
+          },
+          "coverage_non_mi": {
+            "mean": 0.0867,
+            "sd": 0.0167,
+            "n_draws": 200
+          },
+          "deferred_non_mi": {
+            "mean": 0.0,
+            "sd": 0.0,
+            "n_draws": 200
+          },
+          "coverage_all": {
+            "mean": 0.3117,
+            "sd": 0.0145,
+            "n_draws": 200
+          },
+          "deferred_all": {
+            "mean": 0.0,
+            "sd": 0.0,
+            "n_draws": 200
+          }
+        },
+        "pooled": {
+          "coverage_mi": {
+            "mean": 0.9331,
+            "sd": 0.0148,
+            "n_draws": 200
+          },
+          "deferred_mi": {
+            "mean": 0.0706,
+            "sd": 0.0206,
+            "n_draws": 200
+          },
+          "coverage_non_mi": {
+            "mean": 0.4329,
+            "sd": 0.0253,
+            "n_draws": 200
+          },
+          "deferred_non_mi": {
+            "mean": 0.1455,
+            "sd": 0.0429,
+            "n_draws": 200
+          },
+          "coverage_all": {
+            "mean": 0.5585,
+            "sd": 0.0203,
+            "n_draws": 200
+          },
+          "deferred_all": {
+            "mean": 0.1268,
+            "sd": 0.0367,
+            "n_draws": 200
+          }
+        },
+        "perlabel": {
+          "coverage_mi": {
+            "mean": 0.9845,
+            "sd": 0.0078,
+            "n_draws": 200
+          },
+          "deferred_mi": {
+            "mean": 0.0328,
+            "sd": 0.0096,
+            "n_draws": 200
+          },
+          "coverage_non_mi": {
+            "mean": 0.2335,
+            "sd": 0.025,
+            "n_draws": 200
+          },
+          "deferred_non_mi": {
+            "mean": 0.152,
+            "sd": 0.0273,
+            "n_draws": 200
+          },
+          "coverage_all": {
+            "mean": 0.422,
+            "sd": 0.0199,
+            "n_draws": 200
+          },
+          "deferred_all": {
+            "mean": 0.122,
+            "sd": 0.022,
+            "n_draws": 200
+          }
+        }
+      }
+    },
+    "gain_080": {
+      "description": "every lead scaled by 0.8",
+      "auroc": 0.9322,
+      "schemes": {
+        "plain": {
+          "coverage_mi": {
+            "mean": 0.9191,
+            "sd": 0.026,
+            "n_draws": 200
+          },
+          "deferred_mi": {
+            "mean": 0.0,
+            "sd": 0.0,
+            "n_draws": 200
+          },
+          "coverage_non_mi": {
+            "mean": 0.7501,
+            "sd": 0.0249,
+            "n_draws": 200
+          },
+          "deferred_non_mi": {
+            "mean": 0.0,
+            "sd": 0.0,
+            "n_draws": 200
+          },
+          "coverage_all": {
+            "mean": 0.7925,
+            "sd": 0.0136,
+            "n_draws": 200
+          },
+          "deferred_all": {
+            "mean": 0.0,
+            "sd": 0.0,
+            "n_draws": 200
+          }
+        },
+        "pooled": {
+          "coverage_mi": {
+            "mean": 0.787,
+            "sd": 0.0288,
+            "n_draws": 200
+          },
+          "deferred_mi": {
+            "mean": 0.0882,
+            "sd": 0.0345,
+            "n_draws": 200
+          },
+          "coverage_non_mi": {
+            "mean": 0.9364,
+            "sd": 0.0099,
+            "n_draws": 200
+          },
+          "deferred_non_mi": {
+            "mean": 0.043,
+            "sd": 0.0131,
+            "n_draws": 200
+          },
+          "coverage_all": {
+            "mean": 0.8989,
+            "sd": 0.0131,
+            "n_draws": 200
+          },
+          "deferred_all": {
+            "mean": 0.0543,
+            "sd": 0.0175,
+            "n_draws": 200
+          }
+        },
+        "perlabel": {
+          "coverage_mi": {
+            "mean": 0.9239,
+            "sd": 0.0259,
+            "n_draws": 200
+          },
+          "deferred_mi": {
+            "mean": 0.0957,
+            "sd": 0.0211,
+            "n_draws": 200
+          },
+          "coverage_non_mi": {
+            "mean": 0.8755,
+            "sd": 0.0162,
+            "n_draws": 200
+          },
+          "deferred_non_mi": {
+            "mean": 0.1327,
+            "sd": 0.0254,
+            "n_draws": 200
+          },
+          "coverage_all": {
+            "mean": 0.8877,
+            "sd": 0.0136,
+            "n_draws": 200
+          },
+          "deferred_all": {
+            "mean": 0.1234,
+            "sd": 0.0227,
+            "n_draws": 200
+          }
+        }
+      }
+    },
+    "gain_125": {
+      "description": "every lead scaled by 1.25",
+      "auroc": 0.9276,
+      "schemes": {
+        "plain": {
+          "coverage_mi": {
+            "mean": 0.8587,
+            "sd": 0.0308,
+            "n_draws": 200
+          },
+          "deferred_mi": {
+            "mean": 0.0,
+            "sd": 0.0,
+            "n_draws": 200
+          },
+          "coverage_non_mi": {
+            "mean": 0.8424,
+            "sd": 0.0203,
+            "n_draws": 200
+          },
+          "deferred_non_mi": {
+            "mean": 0.0,
+            "sd": 0.0,
+            "n_draws": 200
+          },
+          "coverage_all": {
+            "mean": 0.8465,
+            "sd": 0.01,
+            "n_draws": 200
+          },
+          "deferred_all": {
+            "mean": 0.0,
+            "sd": 0.0,
+            "n_draws": 200
+          }
+        },
+        "pooled": {
+          "coverage_mi": {
+            "mean": 0.6758,
+            "sd": 0.0348,
+            "n_draws": 200
+          },
+          "deferred_mi": {
+            "mean": 0.1079,
+            "sd": 0.0345,
+            "n_draws": 200
+          },
+          "coverage_non_mi": {
+            "mean": 0.9674,
+            "sd": 0.0074,
+            "n_draws": 200
+          },
+          "deferred_non_mi": {
+            "mean": 0.0286,
+            "sd": 0.0081,
+            "n_draws": 200
+          },
+          "coverage_all": {
+            "mean": 0.8941,
+            "sd": 0.0136,
+            "n_draws": 200
+          },
+          "deferred_all": {
+            "mean": 0.0484,
+            "sd": 0.0139,
+            "n_draws": 200
+          }
+        },
+        "perlabel": {
+          "coverage_mi": {
+            "mean": 0.8634,
+            "sd": 0.0304,
+            "n_draws": 200
+          },
+          "deferred_mi": {
+            "mean": 0.1439,
+            "sd": 0.0264,
+            "n_draws": 200
+          },
+          "coverage_non_mi": {
+            "mean": 0.9213,
+            "sd": 0.0142,
+            "n_draws": 200
+          },
+          "deferred_non_mi": {
+            "mean": 0.085,
+            "sd": 0.021,
+            "n_draws": 200
+          },
+          "coverage_all": {
+            "mean": 0.9068,
+            "sd": 0.0129,
+            "n_draws": 200
+          },
+          "deferred_all": {
+            "mean": 0.0997,
+            "sd": 0.0206,
+            "n_draws": 200
+          }
+        }
+      }
+    },
+    "baseline_wander": {
+      "description": "a 0.3 Hz sinusoid of 0.5 mV added to every lead",
+      "auroc": 0.8855,
+      "schemes": {
+        "plain": {
+          "coverage_mi": {
+            "mean": 0.9745,
+            "sd": 0.0115,
+            "n_draws": 200
+          },
+          "deferred_mi": {
+            "mean": 0.0,
+            "sd": 0.0,
+            "n_draws": 200
+          },
+          "coverage_non_mi": {
+            "mean": 0.3752,
+            "sd": 0.053,
+            "n_draws": 200
+          },
+          "deferred_non_mi": {
+            "mean": 0.0,
+            "sd": 0.0,
+            "n_draws": 200
+          },
+          "coverage_all": {
+            "mean": 0.5257,
+            "sd": 0.0374,
+            "n_draws": 200
+          },
+          "deferred_all": {
+            "mean": 0.0,
+            "sd": 0.0,
+            "n_draws": 200
+          }
+        },
+        "pooled": {
+          "coverage_mi": {
+            "mean": 0.8047,
+            "sd": 0.033,
+            "n_draws": 200
+          },
+          "deferred_mi": {
+            "mean": 0.1975,
+            "sd": 0.0583,
+            "n_draws": 200
+          },
+          "coverage_non_mi": {
+            "mean": 0.9259,
+            "sd": 0.016,
+            "n_draws": 200
+          },
+          "deferred_non_mi": {
+            "mean": 0.1248,
+            "sd": 0.039,
+            "n_draws": 200
+          },
+          "coverage_all": {
+            "mean": 0.8954,
+            "sd": 0.0195,
+            "n_draws": 200
+          },
+          "deferred_all": {
+            "mean": 0.1429,
+            "sd": 0.0429,
+            "n_draws": 200
+          }
+        },
+        "perlabel": {
+          "coverage_mi": {
+            "mean": 0.9764,
+            "sd": 0.0105,
+            "n_draws": 200
+          },
+          "deferred_mi": {
+            "mean": 0.1196,
+            "sd": 0.0216,
+            "n_draws": 200
+          },
+          "coverage_non_mi": {
+            "mean": 0.7258,
+            "sd": 0.0414,
+            "n_draws": 200
+          },
+          "deferred_non_mi": {
+            "mean": 0.3674,
+            "sd": 0.0636,
+            "n_draws": 200
+          },
+          "coverage_all": {
+            "mean": 0.7887,
+            "sd": 0.0308,
+            "n_draws": 200
+          },
+          "deferred_all": {
+            "mean": 0.3052,
+            "sd": 0.0502,
+            "n_draws": 200
+          }
+        }
+      }
+    },
+    "polarity": {
+      "description": "every lead multiplied by -1",
+      "auroc": 0.3742,
+      "schemes": {
+        "plain": {
+          "coverage_mi": {
+            "mean": 0.9997,
+            "sd": 0.0011,
+            "n_draws": 200
+          },
+          "deferred_mi": {
+            "mean": 0.0,
+            "sd": 0.0,
+            "n_draws": 200
+          },
+          "coverage_non_mi": {
+            "mean": 0.0006,
+            "sd": 0.0006,
+            "n_draws": 200
+          },
+          "deferred_non_mi": {
+            "mean": 0.0,
+            "sd": 0.0,
+            "n_draws": 200
+          },
+          "coverage_all": {
+            "mean": 0.2514,
+            "sd": 0.0099,
+            "n_draws": 200
+          },
+          "deferred_all": {
+            "mean": 0.0,
+            "sd": 0.0,
+            "n_draws": 200
+          }
+        },
+        "pooled": {
+          "coverage_mi": {
+            "mean": 0.9965,
+            "sd": 0.0026,
+            "n_draws": 200
+          },
+          "deferred_mi": {
+            "mean": 0.0057,
+            "sd": 0.0041,
+            "n_draws": 200
+          },
+          "coverage_non_mi": {
+            "mean": 0.009,
+            "sd": 0.0027,
+            "n_draws": 200
+          },
+          "deferred_non_mi": {
+            "mean": 0.006,
+            "sd": 0.0024,
+            "n_draws": 200
+          },
+          "coverage_all": {
+            "mean": 0.2569,
+            "sd": 0.0095,
+            "n_draws": 200
+          },
+          "deferred_all": {
+            "mean": 0.0059,
+            "sd": 0.0023,
+            "n_draws": 200
+          }
+        },
+        "perlabel": {
+          "coverage_mi": {
+            "mean": 0.9998,
+            "sd": 0.0008,
+            "n_draws": 200
+          },
+          "deferred_mi": {
+            "mean": 0.0033,
+            "sd": 0.0026,
+            "n_draws": 200
+          },
+          "coverage_non_mi": {
+            "mean": 0.0029,
+            "sd": 0.0014,
+            "n_draws": 200
+          },
+          "deferred_non_mi": {
+            "mean": 0.0023,
+            "sd": 0.0012,
+            "n_draws": 200
+          },
+          "coverage_all": {
+            "mean": 0.2531,
+            "sd": 0.0099,
+            "n_draws": 200
+          },
+          "deferred_all": {
+            "mean": 0.0025,
+            "sd": 0.0011,
+            "n_draws": 200
+          }
+        }
+      }
+    }
+  }
+}

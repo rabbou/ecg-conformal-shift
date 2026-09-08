@@ -4,7 +4,7 @@ Ten questions about this study, from three kinds of reader: clinician, technical
 
 ## 1. Does "90%" apply to my patient? (clinician)
 
-No. The guarantee is marginal: an average over patients and over draws of the calibration data. It is compatible with systematic failure inside a subgroup, and the measurement shows this at the source site: 90.0% of all sets contain the truth while 73.5% (sd 3.0) of infarction sets do (`results/shift.json`). Per-class calibration narrows the promise to 90% within each class, which is still conditional on the patient's true class, unknown at the point of care. A per-patient guarantee does not exist in this framework, and a tool that implies one is overclaiming.
+No. The guarantee is marginal: an average over patients and over draws of the calibration data. It is compatible with systematic failure inside a subgroup, and the measurement shows this at the source site: 90.0% of all sets contain the truth while 73.2% of infarction sets do (`results/outcomes.json`). Per-class calibration narrows the promise to 90% within each class, which is still conditional on the patient's true class, unknown at the point of care. A per-patient guarantee does not exist in this framework, and a tool that implies one is overclaiming.
 
 ## 2. What does a clinician see when the model is unsure? (clinician)
 
@@ -20,7 +20,7 @@ Unknown. The two sites measured here moved in opposite directions: coverage rose
 
 ## 5. Is the good Shandong number just prevalence? (technical peer)
 
-Yes. 99% of Shandong's tracings have no infarction, the healthy class is the easy one, and the marginal average is dominated by it; the uncorrected threshold over-covers there (infarctions at 93.6%, sd 0.3, against 90% requested). The same mechanism hides the 73.5% infarction coverage at the source. This is why every coverage figure in the repository is reported per class (criterion C-11 in [PLAN.md](PLAN.md)), and why a single-number coverage claim on an imbalanced cohort deserves suspicion in general.
+Yes. 99% of Shandong's tracings have no infarction, the healthy class is the easy one, and the marginal average is dominated by it; the uncorrected threshold over-covers there (infarctions at 93.6%, sd 0.3, against 90% requested). The same mechanism hides the 73.2% infarction coverage at the source. This is why every coverage figure in the repository is reported per class (criterion C-11 in [PLAN.md](PLAN.md)), and why a single-number coverage claim on an imbalanced cohort deserves suspicion in general.
 
 ## 6. Why did the estimated correction fail where the exact one worked? (technical peer)
 

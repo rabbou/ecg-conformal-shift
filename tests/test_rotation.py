@@ -20,6 +20,7 @@ marginal, which a permutation of the labels leaves alone.
 
 from __future__ import annotations
 
+import csv
 import itertools
 import json
 from pathlib import Path
@@ -46,6 +47,7 @@ from ecs.rotation import (
 
 CAPS = {"train": TRAIN_CAP, "val": VAL_CAP, "cal": CAL_CAP, "test": TEST_CAP}
 ROTATION = Path(RESULTS_DIR) / "rotation.json"
+GRID = Path(RESULTS_DIR) / "rotation.csv"
 
 
 @pytest.fixture(scope="module")
@@ -272,94 +274,171 @@ class TestTheBiasSummary:
 
 @pytest.mark.data
 class TestTheCommittedRotation:
+    """The committed table: results/rotation.json for the answer, rotation.csv for
+    the grid it was read off. The grid is a table of 2,520 coverage cells and is
+    written as one; nesting it in JSON costs seven megabytes for the same numbers."""
+
+    @staticmethod
+    def _grid() -> list[dict[str, str]]:
+        if not GRID.exists():
+            pytest.skip(f"{GRID} is not built; run scripts/rotation_table.py")
+        with GRID.open(newline="") as handle:
+            return list(csv.DictReader(handle))
+
     @pytest.fixture(scope="class")
     def table(self) -> dict[str, Any]:
         if not ROTATION.exists():
             pytest.skip(f"{ROTATION} is not built; run scripts/rotation_table.py")
         return json.loads(ROTATION.read_text())
 
-    def test_every_source_and_every_class_it_can_carry_has_a_cell(
-        self, table: dict[str, Any]
+    @pytest.fixture(scope="class")
+    def grid(self) -> list[dict[str, str]]:
+        return self._grid()
+
+    def test_the_summary_and_the_grid_describe_the_same_run(
+        self, table: dict[str, Any], grid: list[dict[str, str]]
     ) -> None:
-        present = {(cell["source"], cell["label"]) for cell in table["cells"]}
+        assert table["grid"]["file"] == "results/rotation.csv"
+        assert table["grid"]["n_rows"] == len(grid)
+        assert list(grid[0]) == table["grid"]["columns"]
+
+    def test_every_source_and_every_class_it_can_carry_is_on_the_grid(
+        self, grid: list[dict[str, str]]
+    ) -> None:
+        present = {(row["source"], row["label"]) for row in grid}
         wanted = {(source, label) for source in SOURCES for label in usable_classes(source)}
         assert present == wanted
 
-    def test_every_ordered_pair_is_measured(self, table: dict[str, Any]) -> None:
-        """Twenty ordered pairs, minus the ones a refused class removes."""
-        pairs = set()
-        for cell in table["cells"]:
-            for corpus in cell["rows"][0]["by_corpus"]:
-                if corpus.endswith("-calibration-holdout") or corpus == cell["source"]:
-                    continue
-                pairs.add((cell["source"], corpus, cell["label"]))
+    def test_every_ordered_pair_is_measured(self, grid: list[dict[str, str]]) -> None:
+        """Twenty ordered pairs per diagnosis, twelve where a refusal removes one."""
+        pairs = {
+            (row["source"], row["corpus"], row["label"]) for row in grid if row["role"] == "away"
+        }
         for source, target in itertools.permutations(SOURCES, 2):
-            shared = set(usable_classes(source)) & set(usable_classes(target))
-            for label in shared:
+            for label in set(usable_classes(source)) & set(usable_classes(target)):
                 assert (source, target, label) in pairs, (source, target, label)
+        assert len(pairs) == sum(
+            len(set(usable_classes(a)) & set(usable_classes(b)))
+            for a, b in itertools.permutations(SOURCES, 2)
+        )
+
+    def test_every_corpus_reads_at_home_as_well_as_away(self, grid: list[dict[str, str]]) -> None:
+        """A source with no home reading could not be compared against itself."""
+        for source in SOURCES:
+            home = {
+                row["label"] for row in grid if row["source"] == source and row["role"] == "home"
+            }
+            assert home == set(usable_classes(source)), source
 
     def test_every_figure_is_a_mean_over_two_hundred_draws_with_its_spread(
-        self, table: dict[str, Any]
+        self, table: dict[str, Any], grid: list[dict[str, str]]
     ) -> None:
         """C-27, and C-10 carried over to the rotation."""
         assert table["settings"]["n_draws"] >= 200
-        for cell in table["cells"]:
-            for row in cell["rows"]:
-                for corpus, block in row["by_corpus"].items():
-                    for klass, spread in block["coverage_by_class"].items():
-                        assert spread["n_draws"] >= 200, (cell["source"], corpus, klass)
-                        assert "sd" in spread
+        for row in grid:
+            assert int(row["n_draws"]) >= 200
+            assert row["coverage_sd"] != ""
+            assert row["coverage_diagnosis_sd"] != ""
 
     def test_every_cell_reports_the_effective_size_of_what_calibrated_it(
-        self, table: dict[str, Any]
+        self, grid: list[dict[str, str]]
     ) -> None:
         """C-9, carried over: a weighting that costs sample size says what it cost."""
-        for cell in table["cells"]:
-            for row in cell["rows"]:
-                for corpus, block in row["by_corpus"].items():
-                    ess = block["calibration"]["effective_sample_size"]
-                    assert ess["n_draws"] >= 0
-                    if row["correction"] != "weighted":
-                        assert ess["mean"] > 0, (cell["source"], corpus)
+        for row in grid:
+            effective = float(row["calibration_effective_size_mean"])
+            drawn = float(row["calibration_n_mean"])
+            assert drawn > 0
+            if row["correction"] == "weighted":
+                assert effective <= drawn + 1e-6, row
+            else:
+                assert effective == pytest.approx(drawn, abs=0.5), row
 
-    def test_the_three_corrections_are_all_reported(self, table: dict[str, Any]) -> None:
-        for cell in table["cells"]:
-            present = {row["correction"] for row in cell["rows"]}
-            assert present == set(CORRECTIONS), cell["source"]
+    def test_the_three_corrections_and_three_levels_are_all_reported(
+        self, grid: list[dict[str, str]]
+    ) -> None:
+        assert {row["correction"] for row in grid} == set(CORRECTIONS)
+        assert {row["alpha"] for row in grid} == {"0.2", "0.1", "0.05"}
 
     def test_an_unweighted_threshold_does_not_depend_on_which_corpus_it_is_spent_on(
-        self, table: dict[str, Any]
+        self, grid: list[dict[str, str]]
     ) -> None:
-        for cell in table["cells"]:
-            for row in cell["rows"]:
-                if row["correction"] == "weighted":
-                    continue
-                seen = {
-                    json.dumps(block["threshold_by_class"], sort_keys=True)
-                    for block in row["by_corpus"].values()
-                }
-                assert len(seen) == 1, (cell["source"], cell["label"], row["correction"])
+        """C-26 on the committed grid: one threshold, spent everywhere unchanged."""
+        seen: dict[tuple[str, str, str, str, str], set[str]] = {}
+        for row in grid:
+            if row["correction"] == "weighted":
+                continue
+            key = (
+                row["source"],
+                row["label"],
+                row["alpha"],
+                row["score"],
+                row["correction"],
+            )
+            thresholds = f"{row['threshold_no_diagnosis_mean']}/{row['threshold_diagnosis_mean']}"
+            seen.setdefault(key, set()).add(thresholds)
+        for key, values in seen.items():
+            assert len(values) == 1, (key, values)
+
+    def test_the_weighted_threshold_is_the_one_that_moves_by_corpus(
+        self, grid: list[dict[str, str]]
+    ) -> None:
+        """It reads the target's unlabelled predicted-label marginal and nothing
+        else of it, which is why it is the only family that varies by target."""
+        moved = 0
+        for source in SOURCES:
+            for label in usable_classes(source):
+                rows = [
+                    r
+                    for r in grid
+                    if r["source"] == source
+                    and r["label"] == label
+                    and r["correction"] == "weighted"
+                    and r["alpha"] == "0.1"
+                    and r["score"] == "lac"
+                ]
+                if len({r["threshold_diagnosis_mean"] for r in rows}) > 1:
+                    moved += 1
+        assert moved > 0, "no weighted threshold differed by target; BBSE read nothing"
 
     def test_the_bias_carries_its_spread_across_sources(self, table: dict[str, Any]) -> None:
-        """C-28. One pair is an anecdote; the spread across five sources is the estimate."""
+        """C-28. One pair is an anecdote; the spread across sources is the estimate."""
         for label, corrections in table["bias"].items():
             assert set(corrections) == set(CORRECTIONS), label
             for correction, block in corrections.items():
                 away = block["away_bias"]
                 assert away["n_pairs"] > 0, (label, correction)
                 assert away["mean"] is not None
-                if away["n_sources"] > 1:
-                    assert away["sd_across_sources"] is not None
+                assert away["sd_across_sources"] is not None
+                assert block["fewest_positives_behind_a_pair"] > 0
+
+    def test_the_bias_agrees_with_the_grid_it_was_read_off(
+        self, table: dict[str, Any], grid: list[dict[str, str]]
+    ) -> None:
+        """The answer and the table cannot drift apart: the summary is recomputed
+        here from the committed rows and has to land on the same number."""
+        for label, corrections in table["bias"].items():
+            for correction, block in corrections.items():
+                away = [
+                    float(r["coverage_diagnosis_mean"]) - 0.90
+                    for r in grid
+                    if r["label"] == label
+                    and r["correction"] == correction
+                    and r["role"] == "away"
+                    and r["alpha"] == "0.1"
+                    and r["score"] == "lac"
+                ]
+                assert len(away) == block["away_bias"]["n_pairs"], (label, correction)
+                assert sum(away) / len(away) == pytest.approx(
+                    block["away_bias"]["mean"], abs=5e-4
+                ), (label, correction)
 
     def test_the_classes_a_corpus_refuses_never_appear_in_its_rows(
-        self, table: dict[str, Any]
+        self, grid: list[dict[str, str]]
     ) -> None:
-        for cell in table["cells"]:
-            for row in cell["rows"]:
-                for corpus in row["by_corpus"]:
-                    if corpus.endswith("-calibration-holdout"):
-                        continue
-                    assert cell["label"] in usable_classes(corpus), (corpus, cell["label"])
+        for row in grid:
+            if row["role"] == "calibration holdout":
+                continue
+            assert row["label"] in usable_classes(row["corpus"]), (row["corpus"], row["label"])
 
     def test_every_source_names_what_it_trained_on(self, table: dict[str, Any]) -> None:
         for source in SOURCES:

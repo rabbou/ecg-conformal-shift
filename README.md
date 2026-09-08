@@ -155,6 +155,12 @@ What each arm was pre-trained on is written into every result file that uses
 it (C-12), sourced to the authors' own description, so the caveat travels with
 the number.
 
+ECG-JEPA is wired, loads its published checkpoint whole and embeds a batch, and
+is covered by `tests/test_encoder_arms.py`. Its representations are not yet
+cached, so `results/arms.json` still compares four arms: the encoder runs at
+296 ms per record on this machine's four threads, which is 5.6 hours for the
+67,519 records the grid covers, and that job has not been run.
+
 ## Reproduce
 
 Every number and every figure the report prints is redrawn from the scores

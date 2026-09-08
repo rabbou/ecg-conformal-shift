@@ -1,0 +1,111 @@
+{
+  "epoch_kept": 5,
+  "val_macro_auroc": 0.9373,
+  "history": [
+    {
+      "epoch": 0,
+      "train_loss": 0.15494,
+      "val_auroc": {
+        "NSR": 0.8543,
+        "AF": 0.7451,
+        "LBBB": 0.8506,
+        "RBBB": 0.9693,
+        "IAVB": 0.713
+      },
+      "val_macro_auroc": 0.8265,
+      "seconds": 1031.1
+    },
+    {
+      "epoch": 1,
+      "train_loss": 0.10075,
+      "val_auroc": {
+        "NSR": 0.9469,
+        "AF": 0.7979,
+        "LBBB": 0.8608,
+        "RBBB": 0.9836,
+        "IAVB": 0.8342
+      },
+      "val_macro_auroc": 0.8847,
+      "seconds": 191.3
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.08788,
+      "val_auroc": {
+        "NSR": 0.9718,
+        "AF": 0.8911,
+        "LBBB": 0.8637,
+        "RBBB": 0.975,
+        "IAVB": 0.8914
+      },
+      "val_macro_auroc": 0.9186,
+      "seconds": 206.6
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.08115,
+      "val_auroc": {
+        "NSR": 0.9709,
+        "AF": 0.8787,
+        "LBBB": 0.8784,
+        "RBBB": 0.9946,
+        "IAVB": 0.9218
+      },
+      "val_macro_auroc": 0.9289,
+      "seconds": 203.4
+    },
+    {
+      "epoch": 4,
+      "train_loss": 0.07559,
+      "val_auroc": {
+        "NSR": 0.9746,
+        "AF": 0.8587,
+        "LBBB": 0.8605,
+        "RBBB": 0.9794,
+        "IAVB": 0.9193
+      },
+      "val_macro_auroc": 0.9185,
+      "seconds": 220.5
+    },
+    {
+      "epoch": 5,
+      "train_loss": 0.07319,
+      "val_auroc": {
+        "NSR": 0.9808,
+        "AF": 0.9009,
+        "LBBB": 0.8574,
+        "RBBB": 0.9683,
+        "IAVB": 0.9794
+      },
+      "val_macro_auroc": 0.9373,
+      "seconds": 313.3
+    },
+    {
+      "epoch": 6,
+      "train_loss": 0.06993,
+      "val_auroc": {
+        "NSR": 0.9757,
+        "AF": 0.8776,
+        "LBBB": 0.8666,
+        "RBBB": 0.9726,
+        "IAVB": 0.9215
+      },
+      "val_macro_auroc": 0.9228,
+      "seconds": 277.3
+    },
+    {
+      "epoch": 7,
+      "train_loss": 0.06421,
+      "val_auroc": {
+        "NSR": 0.9799,
+        "AF": 0.88,
+        "LBBB": 0.8629,
+        "RBBB": 0.9783,
+        "IAVB": 0.985
+      },
+      "val_macro_auroc": 0.9372,
+      "seconds": 395.9
+    }
+  ],
+  "seconds": 2916.0
+}

@@ -25,10 +25,12 @@ Usage: .venv/bin/python scripts/rotation_table.py [--draws 200]
 from __future__ import annotations
 
 import argparse
+import csv
 import json
 import subprocess
 import sys
 import time
+from collections.abc import Iterator
 from pathlib import Path
 from typing import Any
 
@@ -37,7 +39,14 @@ from numpy.typing import NDArray
 
 from ecs.config import RESULTS_DIR
 from ecs.encoders import machine_info
-from ecs.report import CORRECTIONS, SCORES, Source, Target, frozen_calibration_table
+from ecs.report import (
+    CORRECTIONS,
+    SCORES,
+    WEIGHTING_NOTE,
+    Source,
+    Target,
+    frozen_calibration_table,
+)
 from ecs.rotation import SOURCES, CorpusIndex, class_keys, corpus_index, usable_classes
 
 ALPHAS = (0.20, 0.10, 0.05)
@@ -188,6 +197,95 @@ def bias_summary(cells: list[dict[str, Any]]) -> dict[str, Any]:
     return out
 
 
+# One row of results/rotation.csv per (source, diagnosis, corpus, level, score,
+# correction). The grid is a table and is written as one: the same numbers
+# nested in JSON run to seven megabytes, and a coverage table is read by column.
+GRID_COLUMNS = (
+    "source",
+    "label",
+    "corpus",
+    "role",
+    "alpha",
+    "score",
+    "correction",
+    "n_points",
+    "n_patients",
+    "prevalence",
+    "n_positive",
+    "coverage_mean",
+    "coverage_sd",
+    "coverage_diagnosis_mean",
+    "coverage_diagnosis_sd",
+    "coverage_no_diagnosis_mean",
+    "coverage_no_diagnosis_sd",
+    "mean_set_size_mean",
+    "mean_set_size_sd",
+    "threshold_no_diagnosis_mean",
+    "threshold_diagnosis_mean",
+    "threshold_diagnosis_n_infinite",
+    "calibration_n_mean",
+    "calibration_effective_size_mean",
+    "n_draws",
+)
+
+
+def grid_rows(cells: list[dict[str, Any]]) -> Iterator[dict[str, Any]]:
+    """Flatten every (source, diagnosis, corpus, setting) cell into one row."""
+    for entry in cells:
+        source, label = entry["source"], entry["label"]
+        for row in entry["rows"]:
+            for corpus, block in row["by_corpus"].items():
+                if corpus.endswith("-calibration-holdout"):
+                    role = "calibration holdout"
+                elif corpus == source:
+                    role = "home"
+                else:
+                    role = "away"
+                thresholds = block["threshold_by_class"]
+                yield {
+                    "source": source,
+                    "label": label,
+                    "corpus": corpus,
+                    "role": role,
+                    "alpha": row["alpha"],
+                    "score": row["score"],
+                    "correction": row["correction"],
+                    "n_points": block["n_points"],
+                    "n_patients": block["n_patients"],
+                    "prevalence": round(block["prevalence"], 5),
+                    "n_positive": int(round(block["prevalence"] * block["n_points"])),
+                    "coverage_mean": round(block["coverage"]["mean"], 4),
+                    "coverage_sd": round(block["coverage"]["sd"], 4),
+                    "coverage_diagnosis_mean": round(
+                        block["coverage_by_class"][POSITIVE]["mean"], 4
+                    ),
+                    "coverage_diagnosis_sd": round(block["coverage_by_class"][POSITIVE]["sd"], 4),
+                    "coverage_no_diagnosis_mean": round(block["coverage_by_class"]["0"]["mean"], 4),
+                    "coverage_no_diagnosis_sd": round(block["coverage_by_class"]["0"]["sd"], 4),
+                    "mean_set_size_mean": round(block["mean_set_size"]["mean"], 4),
+                    "mean_set_size_sd": round(block["mean_set_size"]["sd"], 4),
+                    "threshold_no_diagnosis_mean": round(thresholds["0"]["mean"], 5),
+                    "threshold_diagnosis_mean": round(thresholds[POSITIVE]["mean"], 5),
+                    "threshold_diagnosis_n_infinite": thresholds[POSITIVE]["n_infinite"],
+                    "calibration_n_mean": round(row["calibration"]["n"]["mean"], 1),
+                    "calibration_effective_size_mean": round(
+                        block["calibration"]["effective_sample_size"]["mean"], 1
+                    ),
+                    "n_draws": block["coverage"]["n_draws"],
+                }
+
+
+def write_grid(cells: list[dict[str, Any]], path: Path) -> int:
+    with path.open("w", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=list(GRID_COLUMNS))
+        writer.writeheader()
+        written = 0
+        for row in grid_rows(cells):
+            writer.writerow(row)
+            written += 1
+    return written
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--draws", type=int, default=200)
@@ -231,7 +329,7 @@ def main() -> int:
         source: json.loads((results / "rotation" / source / "config.json").read_text())
         for source in SOURCES
     }
-    out = {
+    out: dict[str, Any] = {
         "written_by": "scripts/rotation_table.py",
         "commit": commit(),
         "machine": machine_info(),
@@ -259,13 +357,28 @@ def main() -> int:
             }
             for source, config in configs.items()
         },
-        "cells": cells,
+        "grid": {
+            "file": "results/rotation.csv",
+            "columns": list(GRID_COLUMNS),
+            "roles": {
+                "home": "the source's own test part, scored with its own model and threshold",
+                "away": "another corpus's test part, scored with this source's model and "
+                "threshold, never re-calibrated on itself",
+                "calibration holdout": "the half of the source's calibration part that did "
+                "not fit the threshold on that draw",
+            },
+            "weighting": {correction: note for correction, note in WEIGHTING_NOTE.items()},
+        },
         "bias": bias_summary(cells),
         "seconds": round(time.time() - started, 1),
     }
+    grid_path = results / "rotation.csv"
+    grid: dict[str, Any] = out["grid"]
+    grid["n_rows"] = write_grid(cells, grid_path)
+    n_rows = grid["n_rows"]
     path = results / "rotation.json"
     path.write_text(json.dumps(out, indent=2) + "\n")
-    print(f"written {path} in {out['seconds']} s")
+    print(f"written {path} and {grid_path} ({n_rows:,} rows) in {out['seconds']} s")
     return 0
 
 

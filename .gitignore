@@ -19,6 +19,7 @@ results/baseline/model.pt
 !results/label_map.json
 !results/target_scale.json
 !results/rotation.json
+!results/rotation.csv
 !results/rotation/
 results/rotation/**/model.pt
 !results/embeddings/

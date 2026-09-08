@@ -1,0 +1,52 @@
+{
+  "epochs": 8,
+  "learning_rate": 0.001,
+  "batch_size": 64,
+  "weight_decay": 0.01,
+  "patience": 3,
+  "seed": 0,
+  "source": "chapman_ningbo",
+  "classes": [
+    "NSR",
+    "AF",
+    "LBBB",
+    "RBBB",
+    "IAVB"
+  ],
+  "usable_classes": [
+    "NSR",
+    "AF",
+    "LBBB",
+    "RBBB",
+    "IAVB"
+  ],
+  "caps": {
+    "train": 3500,
+    "val": 600,
+    "cal": 2000,
+    "test": 8000
+  },
+  "split_sizes": {
+    "train": 3500,
+    "val": 600,
+    "cal": 2000,
+    "test": 8000,
+    "unused": 31052
+  },
+  "n_train": 3489,
+  "n_validation": 598,
+  "standardisation": {
+    "centre_mv": 0.0014107405440881848,
+    "scale_mv": 0.2664737403392792
+  },
+  "deviations": [
+    "the Challenge bundle ships no patient identifier, so each record is its own patient for splitting"
+  ],
+  "machine": {
+    "cpu": "Intel(R) Core(TM) i7-8700 CPU @ 3.20GHz",
+    "platform": "Linux-6.8.0-139-generic-x86_64-with-glibc2.39",
+    "python": "3.11.15",
+    "torch": "2.2.2+cu121",
+    "torch_threads": 4
+  }
+}

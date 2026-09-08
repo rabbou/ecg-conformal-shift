@@ -58,6 +58,7 @@ __all__ = [
     "Source",
     "Spread",
     "Target",
+    "WEIGHTING_NOTE",
     "estimated_prior",
     "frozen_calibration_table",
     "frozen_threshold",

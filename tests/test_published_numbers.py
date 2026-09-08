@@ -260,3 +260,100 @@ class TestTheShippedCodeAgreesWithTheDefinition:
         rank = math.ceil((scores.size + 1) * (1.0 - ALPHA))
         assert scores[rank - 2] != correct
         assert scores[rank] != correct
+
+
+def _subgroup_masks(ids: np.ndarray) -> dict[str, np.ndarray]:
+    """The sex and age-band membership of each scored record, written out here.
+
+    The band edges and the treatment of PTB-XL's privacy age of 300 are restated
+    from the dataset's own changelog rather than imported, so that changing them
+    in ``scripts/subgroups.py`` cannot quietly move the expectation.
+    """
+    database = pd.read_csv(PTBXL_DIR / "ptbxl_database.csv", index_col="ecg_id")
+    rows = database.loc[[int(i) for i in ids]]
+    age, sex = rows["age"].to_numpy(), rows["sex"].to_numpy()
+    masks = {"sex:male": sex == 0, "sex:female": sex == 1}
+    for low, high, name in (
+        (0, 50, "0-49"),
+        (50, 65, "50-64"),
+        (65, 75, "65-74"),
+        (75, 301, "75+"),
+    ):
+        masks[f"age:{name}"] = (age >= low) & (age < high)
+    return masks
+
+
+@pytest.fixture(scope="module")
+def recomputed_subgroups() -> dict[str, float]:
+    """Coverage in every subgroup cell, over the same 200 halves as outcomes.py."""
+    bundle = dict(np.load(RESULTS_DIR / "baseline/scores.npz", allow_pickle=False))
+    database = pd.read_csv(PTBXL_DIR / "ptbxl_database.csv", index_col="ecg_id")
+    patients = np.array([str(database.loc[int(i), "patient_id"]) for i in bundle["ids"]])
+    masks = _subgroup_masks(bundle["ids"])
+
+    tally: dict[str, list[float]] = {}
+    for is_cal in halves_outcomes(patients, DRAWS, SEED):
+        probs, labels = bundle["probs"][is_cal], bundle["labels"][is_cal]
+        true = 1.0 - probs[np.arange(labels.size), labels]
+        pooled_q = conformal_quantile(true, ALPHA)
+        per_q = np.array([conformal_quantile(true[labels == c], ALPHA) for c in (0, 1)])
+        plain_q = float(np.quantile(probs[:, 1][labels == 1], ALPHA))
+
+        probs_t, labels_t = bundle["probs"][~is_cal], bundle["labels"][~is_cal]
+        covered_by = {
+            scheme: sets[np.arange(labels_t.size), labels_t]
+            for scheme, sets in _sets(probs_t, plain_q, pooled_q, per_q).items()
+        }
+        for group, mask in masks.items():
+            held = mask[~is_cal]
+            for klass, name in ((1, "mi"), (0, "non_mi"), (None, "all")):
+                cell = held if klass is None else held & (labels_t == klass)
+                if not cell.any():
+                    continue
+                for scheme, covered in covered_by.items():
+                    tally.setdefault(f"{scheme}|{group}:{name}", []).append(
+                        float(covered[cell].mean())
+                    )
+    return {key: float(np.mean(values)) for key, values in tally.items()}
+
+
+@pytest.mark.data
+class TestSubgroupCoverage:
+    """Every cell of results/subgroups.json, recomputed without importing it."""
+
+    @pytest.fixture(scope="class")
+    def published(self) -> dict:
+        return json.loads((RESULTS_DIR / "subgroups.json").read_text())
+
+    def test_every_cell_matches_the_file(
+        self, published: dict, recomputed_subgroups: dict[str, float]
+    ) -> None:
+        checked = 0
+        for scheme, cells in published["coverage"].items():
+            for key, cell in cells.items():
+                mine = recomputed_subgroups[f"{scheme}|{key}"]
+                assert abs(mine - cell["mean"]) < TOLERANCE, (
+                    f"{scheme} {key}: file {cell['mean']}, recomputed {mine:.6f}"
+                )
+                checked += 1
+        assert checked == 54, f"expected 3 schemes by 18 cells, checked {checked}"
+
+    def test_the_counts_are_the_fold_and_not_a_draw(self, published: dict) -> None:
+        """The cell sizes quoted beside the coverages are whole-fold counts."""
+        bundle = dict(np.load(RESULTS_DIR / "baseline/scores.npz", allow_pickle=False))
+        masks = _subgroup_masks(bundle["ids"])
+        labels = bundle["labels"]
+        for group, count in published["counts"].items():
+            assert int(masks[group].sum()) == count["n"]
+            assert int((masks[group] & (labels == 1)).sum()) == count["n_mi"]
+        assert sum(c["n"] for k, c in published["counts"].items() if k.startswith("age:")) == (
+            labels.size
+        ), "the age bands must account for every scored record, privacy age included"
+
+    def test_a_cell_the_report_quotes_is_not_flat_across_age(
+        self, recomputed_subgroups: dict[str, float]
+    ) -> None:
+        """The non-MI age gradient under the recommended scheme is real, not rounding."""
+        young = recomputed_subgroups["perlabel|age:0-49:non_mi"]
+        old = recomputed_subgroups["perlabel|age:75+:non_mi"]
+        assert young - old > 0.15, f"gradient collapsed to {young - old:.4f}"

@@ -65,13 +65,24 @@ NO_EXTRA_PREPROCESSING = (
 )
 
 
+# The untrained control has to be one network, not one per call.  Every other
+# arm loads the same weights from disk whenever it is built; this one draws
+# them, and extract_embeddings.py builds the arm once per corpus.  Unseeded,
+# each corpus went through a different random network and the probe fitted on
+# PTB-XL was spent in someone else's feature space.
+RANDOM_INIT_SEED = 0
+
+
 def random_init() -> Arm:
+    torch.manual_seed(RANDOM_INIT_SEED)
     model = ResNet1d().eval()
     return (
         lambda x: model.embed(torch.from_numpy(x)),
         {
             "n_params": sum(p.numel() for p in model.parameters()),
-            "weights_source": "torch default initialisation, seed unset",
+            "weights_source": (
+                f"torch default initialisation, torch.manual_seed({RANDOM_INIT_SEED})"
+            ),
             "preprocessing": NO_EXTRA_PREPROCESSING,
             "notes": "ResNet1d from src/ecs/models.py, input (B, 12, 5000) mV, 256-d embedding",
         },

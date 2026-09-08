@@ -206,3 +206,29 @@ class TestRerunning:
         out = _run(corpus)
         assert out.exists()
         assert not out.with_suffix(".partial").exists()
+
+
+class TestTheUntrainedControlIsOneNetwork:
+    """The random-init arm is the only one that draws its weights instead of
+    loading them, and ``extract`` builds an arm once per corpus.  If the draw
+    is not pinned, every corpus goes through a different network and the probe
+    fitted on one corpus is spent in another corpus's feature space -- which is
+    how that arm came to score below chance on a corpus it had never seen.
+    """
+
+    def test_two_builds_give_the_same_weights(self) -> None:
+        from ecs.encoders import ARMS
+
+        # Whatever consumed the global generator before a build must not reach
+        # the weights: the two builds below are seeded differently on purpose.
+        torch.manual_seed(12345)
+        embed_a, meta_a = ARMS["random_init"]()
+        torch.manual_seed(999)
+        embed_b, meta_b = ARMS["random_init"]()
+
+        x = np.zeros((2, 12, 5000), dtype=np.float32)
+        x[1] = 1.0
+        with torch.no_grad():
+            np.testing.assert_array_equal(embed_a(x).numpy(), embed_b(x).numpy())
+        assert meta_a["weights_source"] == meta_b["weights_source"]
+        assert "seed unset" not in str(meta_a["weights_source"])

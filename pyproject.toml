@@ -33,9 +33,9 @@ dev = ["ruff", "mypy", "pytest", "pre-commit", "pandas-stubs", "types-tqdm"]
 [tool.ruff]
 line-length = 100
 target-version = "py311"
-# third_party is upstream code kept as published.  .claude holds session
-# scratch, including git worktrees of this repository, whose copies of these
-# same files would otherwise be linted and reformatted from here.
+# third_party is upstream code kept as published.  .claude is a local scratch
+# directory that may hold git worktrees of this repository, whose copies of
+# these same files would otherwise be linted and reformatted from here.
 extend-exclude = ["third_party", ".claude"]
 force-exclude = true  # also when a hook passes the path explicitly
 

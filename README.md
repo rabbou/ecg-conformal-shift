@@ -105,8 +105,8 @@ Everything the report prints is redrawn from files committed here, so the
 figures and the outcome table need no corpus at all:
 
 ```bash
-uv sync                                  # 1 min, 86 packages
-uv run pytest -m "not data"              # unit tests, no corpora needed, 4 min
+uv sync                                  # 1 min
+uv run pytest -m "not data"              # unit tests, no corpora needed, 2 min
 uv run python scripts/outcomes.py        # rebuilds results/outcomes.json, 2 s
 uv run python scripts/figures.py         # redraws all six figures, 4 s
 ```
@@ -116,8 +116,9 @@ cold clone, where every test module is imported for the first time, took 28
 minutes.
 
 The corpora are only needed to re-score from the raw tracings, which the
-committed `.npz` files make unnecessary for reproducing the report. They take
-9.5 GB on disk:
+committed `.npz` files make unnecessary for reproducing the report. The three
+of them take 7.3 GB on disk, and the four auxiliary PhysioNet corpora the
+script also fetches take roughly 21 GB more:
 
 ```bash
 ./scripts/fetch_open_corpora.sh          # ACS-ECG and four PhysioNet corpora

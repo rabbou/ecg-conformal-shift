@@ -56,9 +56,44 @@ Three public datasets were used, with PTB-XL serving as the training and calibra
 
 Two properties differ between source and targets. MI prevalence falls from 25.0% to 1.0% in the Shandong dataset and to 14.9% in the Chongqing dataset, and the label definition differs as well. The Chongqing positive is that dataset's `AMI` column, set when the discharge diagnosis names an acute myocardial infarction, in a cohort every patient of which underwent coronary angiography; PTB-XL annotates ECG diagnoses, predominantly of older infarct patterns. Shandong codes infarction in the AHA scheme with separate modifiers for acute, recent and old, and 89.6% of its positives carry the old modifier, so its labels sit closer to PTB-XL's than Chongqing's do, though the remaining 10.4% are acute, recent or unmodified. Its shift is therefore the nearer of the two to a change in prevalence alone, while the Chongqing shift moves the definition of the positive class as well.
 
+The counts above are what remained after reading. Each release is larger, and the difference is accounted for record by record rather than left to the reader.
+
+| | PTB-XL | Shandong | Chongqing |
+|---|---|---|---|
+| Records in the release | 21,799 | 25,770 | 19,955 |
+| No label released | 0 | 0 | 1,995 |
+| Unreadable, or holding a non-finite sample | 0 | 0 | 5 |
+| Read into canonical form | 21,799 | 25,770 | 17,955 |
+| Held out for training, folds 1 to 8 | 17,418 | — | — |
+| Held out for validation, fold 9 | 2,183 | — | — |
+| **Scored** | **2,198** | **25,770** | **17,955** |
+| MI cases among those scored | 550 | 260 | 2,679 |
+
+Chongqing releases its labels for 17,960 of its 19,955 tracings; the remaining 1,995 form the corpus's own held-out split and carry no diagnosis column, so nothing here can be measured on them. Of the 17,960 labelled, three hold a non-finite sample and two do not decode, and all five are MI-negative, which is why the positive count is the release's own. Shandong loses no record: 6,928 of its tracings run longer than ten seconds and are cropped to the first ten. PTB-XL loses none either, and the three counts of its own benchmark split account for all 21,799. Every exclusion above is listed by identifier in `results/ingest_report.json`.
+
+
 ### 2.2 Model and calibration
 
 A supervised residual network was trained on PTB-XL folds 1 to 8 and scored on fold 10, where its discrimination on the MI label is an area under the receiver operating characteristic curve (AUROC) of 0.932, with a 95% confidence interval of 0.921 to 0.943. The nearest published anchor for this architecture and split is 0.930, but that is a macro average over the five PTB-XL diagnostic superclasses rather than the MI column, which the benchmark does not report separately and whose archived predictions no longer resolve (`results/baseline.json` records both the anchor and the three routes tried to obtain the MI-only figure). The two are different quantities, so their agreement is a plausibility check on an ordinary baseline and not a reproduction. AUROC, the probability that a randomly selected MI tracing receives a higher score than a randomly selected non-MI tracing, is reported here to certify that the baseline is of ordinary and documented quality, and is not itself a study endpoint. The model was frozen thereafter, so that all three schemes operate on identical scores and any difference between them is a difference in threshold placement alone.
+
+The model itself is a baseline and not a contribution, so it is described here in full and not discussed again.
+
+| | |
+|---|---|
+| Architecture | one-dimensional ResNet after Wang et al. 2017, the shape the PTB-XL benchmark uses: a stem of one 15-wide convolution to 64 channels at stride 2 with batch normalisation and max pooling, then four stages of two residual blocks at widths 64, 128, 256 and 256 with 7-wide kernels, each stage after the first halving the time axis, then global average pooling and a linear head to two classes. 4,082,306 parameters |
+| Input | 12 leads in the order I, II, III, aVR, aVL, aVF, V1 to V6, 500 Hz, ten seconds, 5,000 samples, in millivolts. One centre and one spread over all leads, taken from the training fold alone and applied unchanged everywhere: -0.00078 mV and 0.23707 mV |
+| Objective | cross-entropy, unweighted. No class weighting, no resampling, no augmentation of any kind |
+| Optimiser | AdamW, learning rate 10⁻³, weight decay 10⁻², batch size 64 |
+| Stopping | at most 15 epochs, stopping after 3 without a better validation AUROC on fold 9. Epoch 7 was the best and was kept, so the run stopped at epoch 10 |
+| Seed | 0, for the weights and for the batch order |
+| Hardware and time | six-core Intel i7-8700, CPU only, six threads, PyTorch 2.2.2 on Python 3.11.15; 9,470 seconds, two hours thirty-eight |
+| Determinism | the seed fixes a run at a given thread count, and the thread count is part of the seed. Two runs of the training step agree bit for bit at one thread and at four; a one-thread run and a four-thread run of the same seed differ in every one of the 62 parameter tensors after six batches, by up to 4·10⁻³. Reproducing the checkpoint therefore needs the six threads the machine line records, and reproducing the AUROC to its third decimal does not |
+| What it reports | one probability per class for the MI label. AUROC 0.932, 95% interval 0.921 to 0.943; area under the precision-recall curve 0.844, 0.815 to 0.869; on fold 10, 2,198 tracings, 550 of them MI |
+| What it is for | supplying frozen scores so that three threshold placements can be compared on identical inputs |
+| What it is not for | any clinical use, any diagnosis other than MI, and any site: it was fitted on one German research corpus recorded between 1989 and 1996, and section 3.3 measures what happens when its thresholds are carried elsewhere |
+
+Every value above is recorded in `results/baseline/config.json` and `results/baseline/metrics.json`, or is the setting `scripts/train_baseline.py` applies.
+
 
 The three schemes were as follows. The **single tuned threshold** places one threshold on the calibration half to achieve 90% sensitivity, with every case receiving a label; this represents current practice. Its 90% is a sensitivity, whereas the 90% of the two conformal schemes is a coverage. The single threshold and class-conditional calibration meet at a comparable MI miss rate by construction and not by measurement: the class-conditional MI threshold is the 90% quantile of the calibration half's MI scores, which is the single threshold's 90%-sensitivity point, the two differing only by the finite-sample (n+1) correction. Pooled calibration is matched to neither, and where it lands is the result reported below. Both conformal schemes score a case by one minus the probability the model gives its label, the least-ambiguous-set score, and admit a label when that score falls at or below the ⌈(n+1)(1−α)⌉/n empirical quantile of the calibration scores, the (n+1) being what makes the guarantee hold in finite samples rather than asymptotically. Since two label probabilities sum to one, a set comes back empty only when the two thresholds admitting each label sum to less than one. At α = 0.10 on this model they do not: the pooled scheme puts a single threshold at 0.566, and the class-conditional pair at 0.388 and 0.787, summing to 1.18. Every deferral in the two schemes discussed below is therefore a both-label set. The weighted scheme is the exception, and section 3.3 says where. An adaptive-prediction-sets score is also computed in the results files and behaves differently, as section 5 notes. **Pooled conformal calibration** fits one threshold pair on all calibration cases, such that 90% of them receive a set containing the true label. **Class-conditional conformal calibration** fits one threshold within the MI cases of the calibration half and one within the remainder, so that the 90% holds separately within each label. A fourth scheme, label-shift weighting with the target prior estimated by black-box shift estimation, was also evaluated. Its result is reported in section 3.3 rather than set aside, because a correction that has to estimate something failing where one that estimates nothing holds is part of the answer and not an aside.
 

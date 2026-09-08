@@ -27,21 +27,22 @@
     "test": 8000
   },
   "split_sizes": {
-    "train": 3499,
+    "train": 3492,
     "val": 600,
     "cal": 2000,
-    "test": 4117,
-    "unused": 76
+    "test": 4123,
+    "unused": 77
   },
-  "n_train": 3497,
-  "n_validation": 598,
+  "n_train": 3489,
+  "n_validation": 600,
   "standardisation": {
-    "centre_mv": -0.002294862177222967,
-    "scale_mv": 0.19851897656917572
+    "centre_mv": -0.00231633591465652,
+    "scale_mv": 0.19954797625541687
   },
   "deviations": [
     "the Challenge bundle ships no patient identifier, so each record is its own patient for splitting",
-    "52 records shorter than ten seconds, dropped before the split"
+    "52 records shorter than ten seconds, dropped before the split",
+    "89 groups of identical tracings, 180 records, split as one unit: the corpus repeats a tracing under more than one record identifier"
   ],
   "machine": {
     "cpu": "Intel(R) Core(TM) i7-8700 CPU @ 3.20GHz",

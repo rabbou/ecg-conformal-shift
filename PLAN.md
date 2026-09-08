@@ -65,6 +65,9 @@ Each maps to a named test. Unchecked means unverified, not done.
 
 | C-33 | THE rotation SHALL repeat every coverage cell by sex and by age band wherever the corpus records them, with the number of positives behind each cell and its patient bootstrap interval, and SHALL flag a cell resting on fewer than 25 positives rather than let it read as a result. | `test_rotation_uncertainty.py::TestTheSubgroups`, on `results/rotation_uncertainty.csv` |
 
+| C-34 | WHERE a corpus files one tracing under more than one record identifier, THE splitter SHALL place every record of that group on one side of every boundary, and no group SHALL sit in two parts a figure is read across. | `test_duplicates.py::TestTheSplitNoLongerLeaks`, on `results/split_leak.json`; the key itself by `TestTheWidenedKey` |
+| C-35 | THE results SHALL record, per corpus, how many groups of identical tracings straddled a boundary before the splitter was widened and how many straddle it after. | `test_duplicates.py::TestTheSplitNoLongerLeaks::test_the_leak_it_closed_is_on_the_record` |
+
 ## The ingestion contract
 
 Every corpus is reduced to one canonical form before anything else touches it:
@@ -211,6 +214,16 @@ the variability of the population. A coverage read on Shandong's 23 left
 bundle-branch blocks is uncertain because there are 23 of them. The uncertainty
 file resamples each target cohort by patient and reports a percentile interval
 beside the draw spread.
+
+*A split by patient does not hold a repeated tracing.* Three of the five corpora
+file one tracing under several record identifiers, and the Challenge bundle
+names no patient, so each record was its own patient and the copies went
+wherever the shuffle sent them: 485 groups straddled a boundary a figure is read
+across, 421 of them in CPSC, and some of those boundaries were train against
+test. The screen is the delivery corpus's own (`ecg-data-chain` 4bff859): the
+first ten seconds of the twelve leads quantised to ten microvolts, SHA-256. On
+the 49,199 records both repositories digest, the two agree on every one. A group
+is now one splitting unit and the count after is zero.
 
 *A figure that holds over a cohort can fail over half of it.* Every row is
 repeated by sex and by age band. Coverage of sinus rhythm away from home falls

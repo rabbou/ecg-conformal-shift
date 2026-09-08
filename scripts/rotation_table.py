@@ -376,7 +376,11 @@ def main() -> int:
                 "split_sizes": config["split_sizes"],
                 "usable_classes": config["usable_classes"],
                 "standardisation": config["standardisation"],
-                "deviations": config["deviations"],
+                # Read off the corpus, not off the training run's config: a model
+                # whose split did not change is not retrained when the chain
+                # learns something new about its corpus, and its config would
+                # then describe an older reading of the same corpus.
+                "deviations": indices[source].deviations,
                 "epochs": config["epochs"],
                 "val_macro_auroc": json.loads(
                     (results / "rotation" / source / "metrics.json").read_text()

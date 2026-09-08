@@ -22,6 +22,8 @@ results/baseline/model.pt
 !results/rotation.csv
 !results/rotation_uncertainty.csv
 !results/rotation_uncertainty.json
+!results/duplicate_groups.json
+!results/split_leak.json
 !results/rotation/
 results/rotation/**/model.pt
 !results/embeddings/
@@ -37,3 +39,4 @@ __pycache__/
 results/baseline/train.log
 .claude/
 results/rotation/**/train.log
+/relearn.log

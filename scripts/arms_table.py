@@ -62,7 +62,14 @@ import pandas as pd
 from numpy.typing import NDArray
 
 from ecs.arms import auprc, auroc, fit_probe, paired_difference
-from ecs.config import ACS_DIR, ACS_LABELLED_SPLIT, PTBXL_DIR, RESULTS_DIR, SPH_DIR
+from ecs.config import (
+    ACS_DIR,
+    ACS_LABELLED_SPLIT,
+    EMBEDDINGS_DIR,
+    PTBXL_DIR,
+    RESULTS_DIR,
+    SPH_DIR,
+)
 from ecs.encoders import PRETRAINING, SAW
 from ecs.labels import MILabelSpec, acs_mi_label, ptbxl_mi_label, sph_mi_label
 from ecs.metrics import bootstrap_ci
@@ -207,7 +214,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--draws", type=int, default=200)
     parser.add_argument("--bootstrap-draws", type=int, default=1000)
     parser.add_argument("--seed", type=int, default=0)
-    parser.add_argument("--embeddings", default=str(RESULTS_DIR / "embeddings"))
+    parser.add_argument("--embeddings", default=str(EMBEDDINGS_DIR))
     parser.add_argument("--out", default=str(RESULTS_DIR / "arms.json"))
     args = parser.parse_args(argv)
     started = time.perf_counter()

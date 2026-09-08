@@ -502,6 +502,23 @@ class TestTheCommittedRotation:
                 continue
             assert row["label"] in usable_classes(row["corpus"]), (row["corpus"], row["label"])
 
+    def test_the_table_was_built_on_the_splits_the_code_draws_now(
+        self, table: dict[str, Any], indices: dict[str, Any]
+    ) -> None:
+        """A results file outlives the code that wrote it. When the splitter
+        changes -- a repeated tracing becoming one unit with its copies, say --
+        every number in the table describes a split that no longer exists, and
+        nothing in its shape says so. This compares the part sizes the table
+        recorded against the ones the current code draws."""
+        for source in SOURCES:
+            recorded = table["sources"][source]["split_sizes"]
+            drawn = {part: int((indices[source].frame["part"] == part).sum()) for part in recorded}
+            assert recorded == drawn, (
+                f"{source}: the committed table was built on a different split "
+                f"({recorded} against {drawn}); rebuild it with "
+                "scripts/score_rotation.py and scripts/rotation_table.py"
+            )
+
     def test_every_source_names_what_it_trained_on(self, table: dict[str, Any]) -> None:
         for source in SOURCES:
             block = table["sources"][source]

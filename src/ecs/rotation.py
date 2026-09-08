@@ -22,6 +22,7 @@ would be the better one for a reason that has nothing to do with the hospital.
 
 from __future__ import annotations
 
+import json
 from collections.abc import Iterator, Sequence
 from dataclasses import dataclass
 from pathlib import Path
@@ -37,7 +38,8 @@ from .challenge import (
     scan_source,
     sph_small_set_labels,
 )
-from .config import PTBXL_DIR, SAMPLING_RATE_HZ, SPH_DIR, WINDOW_SAMPLES
+from .config import PTBXL_DIR, RESULTS_DIR, SAMPLING_RATE_HZ, SPH_DIR, WINDOW_SAMPLES
+from .duplicates import grouping_key
 from .ingest import Record, assemble_corpus, read_or_error, read_sph, read_wfdb
 from .small_set import SMALL_SET, refusals
 from .splits import patient_split
@@ -54,6 +56,7 @@ __all__ = [
     "age_band",
     "class_keys",
     "corpus_index",
+    "duplicate_groups_of",
     "labels_of",
     "load_waveforms",
     "usable_classes",
@@ -149,6 +152,22 @@ def usable_classes(corpus: str) -> list[str]:
     return [key for key in class_keys() if key not in refused]
 
 
+def duplicate_groups_of(corpus: str) -> list[list[str]]:
+    """The groups of identical tracings this corpus holds, as scanned.
+
+    Three of the Challenge partitions repeat tracings inside themselves under
+    different record identifiers, and nothing in the corpus says the two are one
+    patient, so a patient-level split does not keep them together.
+    ``scripts/duplicate_scan.py`` writes the groups; a corpus with none, or an
+    unscanned tree, gets an empty list and splits by patient alone.
+    """
+    path = Path(RESULTS_DIR) / "duplicate_groups.json"
+    if not path.exists():
+        return []
+    scanned = json.loads(path.read_text())["corpora"].get(corpus)
+    return [list(members) for members in scanned["groups"]] if scanned else []
+
+
 def _capped(frame: pd.DataFrame, part: str, cap: int, rng: np.random.Generator) -> pd.Series:
     """Keep at most ``cap`` records of this part, dropping whole patients."""
     inside = frame["part"] == part
@@ -184,8 +203,13 @@ def _split(frame: pd.DataFrame) -> pd.DataFrame:
     return frame
 
 
-def corpus_index(corpus: str) -> CorpusIndex:
-    """The index of one corpus: patients, parts, labels, and what it deviates on."""
+def corpus_index(corpus: str, widen_duplicates: bool = True) -> CorpusIndex:
+    """The index of one corpus: patients, parts, labels, and what it deviates on.
+
+    ``widen_duplicates`` is what keeps a repeated tracing on one side of every
+    boundary. Turning it off is how ``scripts/split_leak.py`` measures what the
+    split was leaking before it was widened; nothing else should turn it off.
+    """
     if corpus == "ptbxl":
         database = pd.read_csv(PTBXL_DIR / "ptbxl_database.csv", index_col="ecg_id")
         challenge = scan_source("ptbxl")
@@ -253,6 +277,15 @@ def corpus_index(corpus: str) -> CorpusIndex:
     for key in class_keys():
         frame[key] = labels[key].to_numpy().astype(bool)
     frame["age_band"] = [age_band(float(a)) for a in frame["age"]]
+    groups = duplicate_groups_of(corpus) if widen_duplicates else []
+    if groups:
+        widened = grouping_key({str(i): str(p) for i, p in frame["patient"].items()}, groups)
+        frame["patient"] = [widened[str(i)] for i in frame.index]
+        records_in_groups = sum(len(g) for g in groups)
+        deviations.append(
+            f"{len(groups)} groups of identical tracings, {records_in_groups} records, split as "
+            "one unit: the corpus repeats a tracing under more than one record identifier"
+        )
     return CorpusIndex(corpus, _split(frame), deviations)
 
 

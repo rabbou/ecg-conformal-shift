@@ -39,6 +39,15 @@ bundle, and reuses PTB-XL and Shandong as sources in their turn.
 | Georgia | United States | 10,344 | source and target |
 | CPSC 2018 and its extension | China | 10,330 | source and target |
 
+Three of these corpora file the same tracing more than once under different
+record identifiers, and the Challenge bundle ships no patient key, so a split by
+patient did not keep those copies together: 421 groups of identical tracings in
+CPSC straddled two parts a figure is read across, 56 in Georgia, 8 in
+Chapman-Shaoxing with Ningbo. A group of identical tracings is now one splitting
+unit, and `results/split_leak.json` carries the count before and after, which is
+zero. Shandong repeats tracings too but files them under one patient, so its
+split already held them; PTB-XL's distribution repeats none.
+
 Five diagnoses: sinus rhythm, atrial fibrillation, left bundle-branch block,
 right bundle-branch block, first-degree atrioventricular block. The mapping
 that puts three annotation schemes (SNOMED CT, AHA, SCP-ECG) on those five

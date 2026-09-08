@@ -26,7 +26,9 @@ from __future__ import annotations
 
 import argparse
 import json
+import shutil
 import sys
+import tempfile
 import time
 from dataclasses import asdict, dataclass
 from pathlib import Path
@@ -38,7 +40,7 @@ from numpy.typing import NDArray
 from sklearn.metrics import roc_auc_score
 from torch import nn
 
-from ecs.config import RESULTS_DIR
+from ecs.config import N_LEADS, RESULTS_DIR, WINDOW_SAMPLES
 from ecs.encoders import machine_info
 from ecs.models import ResNet1d
 from ecs.rotation import (
@@ -56,6 +58,12 @@ from ecs.rotation import (
 
 CHUNK = 500
 
+# The name a checkpoint carries while its run is still going. A run killed
+# mid-training -- the memory guard on a shared machine does that -- leaves this
+# behind and no model.pt, so nothing downstream mistakes an interrupted run for
+# a finished one.
+PARTIAL = "model.pt.partial"
+
 
 @dataclass(frozen=True)
 class Settings:
@@ -70,18 +78,39 @@ class Settings:
 
 
 def read_part(
-    index: CorpusIndex, part: str
+    index: CorpusIndex, part: str, scratch: Path
 ) -> tuple[NDArray[np.float32], NDArray[np.int_], list[str]]:
-    """One part of a corpus in canonical form, with its labels, read in chunks."""
+    """One part of a corpus in canonical form, with its labels, read in chunks.
+
+    The array is written once to ``scratch`` and read back through a memory map.
+    The values are the same float32 the chunks produced, so nothing about the
+    training changes; what changes is that a training part of three and a half
+    thousand tracings stops holding eight hundred megabytes resident on a machine
+    several sessions share, and the kernel may drop the pages instead. The file
+    belongs to this run and is deleted with it, so no transformed waveform
+    outlives the process (C-14b).
+    """
     wanted = index.ids(part)
-    blocks: list[NDArray[np.float32]] = []
     kept: list[str] = []
+    block_of: NDArray[np.float32] | None = None
     for start in range(0, len(wanted), CHUNK):
-        x, ids = load_waveforms(index, wanted[start : start + CHUNK])
-        blocks.append(x)
+        block, ids = load_waveforms(index, wanted[start : start + CHUNK])
+        if block_of is None:
+            block_of = np.lib.format.open_memmap(
+                scratch,
+                mode="w+",
+                dtype=np.float32,
+                shape=(len(wanted), N_LEADS, WINDOW_SAMPLES),
+            )
+        block_of[len(kept) : len(kept) + len(ids)] = block
         kept.extend(ids)
         print(f"  {index.name}/{part}: {len(kept):>6} / {len(wanted)}", flush=True)
-    x = np.concatenate(blocks) if blocks else np.empty((0, 12, 5000), dtype=np.float32)
+    if block_of is None:
+        return np.empty((0, N_LEADS, WINDOW_SAMPLES), np.float32), index.labels([]), []
+    # open_memmap returns a memmap, whose flush() the ndarray stub does not know.
+    block_of.flush()  # type: ignore[attr-defined]
+    del block_of
+    x = np.lib.format.open_memmap(scratch, mode="r")[: len(kept)]
     return x, index.labels(kept), kept
 
 
@@ -126,8 +155,9 @@ def train(source: str, settings: Settings, results: Path) -> dict[str, Any]:
 
     index = corpus_index(source)
     keys = usable_classes(source)
-    x_train, y_train, ids_train = read_part(index, "train")
-    x_val, y_val, ids_val = read_part(index, "val")
+    scratch = Path(tempfile.mkdtemp(prefix="ecs-train-"))
+    x_train, y_train, ids_train = read_part(index, "train", scratch / "train.npy")
+    x_val, y_val, ids_val = read_part(index, "val", scratch / "val.npy")
     centre, scale = standardisation(x_train)
 
     model = ResNet1d(n_classes=len(class_keys()))
@@ -181,7 +211,7 @@ def train(source: str, settings: Settings, results: Path) -> dict[str, Any]:
         log.flush()
         if macro > best:
             best, best_epoch, since_best = macro, epoch, 0
-            torch.save(model.state_dict(), directory / "model.pt")
+            torch.save(model.state_dict(), directory / PARTIAL)
         else:
             since_best += 1
             if since_best >= settings.patience:
@@ -212,10 +242,14 @@ def train(source: str, settings: Settings, results: Path) -> dict[str, Any]:
         "seconds": round(time.time() - started, 1),
     }
     (directory / "metrics.json").write_text(json.dumps(metrics, indent=2) + "\n")
+    # Last, and only now: a directory holding model.pt holds a finished run.
+    (directory / PARTIAL).replace(directory / "model.pt")
     print(
         f"{source}: kept epoch {best_epoch}, macro AUROC {best:.4f}, {metrics['seconds']:.0f} s",
         flush=True,
     )
+    del x_train, x_val
+    shutil.rmtree(scratch, ignore_errors=True)
     return metrics
 
 

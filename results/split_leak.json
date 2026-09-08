@@ -1,0 +1,179 @@
+{
+  "written_by": "scripts/split_leak.py",
+  "commit": "b8d9c9ad79d26abefd1eee17134171769abf2468",
+  "reading": "before: every record is its own patient where the corpus ships no patient key, so a tracing filed twice is two patients. after: a group of identical tracings is one splitting unit.",
+  "corpora": {
+    "ptbxl": {
+      "before": {
+        "n_groups": 0,
+        "n_groups_across_any_part": 0,
+        "n_groups_across_two_used_parts": 0,
+        "n_records_in_those_groups": 0,
+        "part_sizes": {
+          "train": 3500,
+          "val": 600,
+          "cal": 2000,
+          "test": 8000,
+          "unused": 7699
+        },
+        "worst_boundary": []
+      },
+      "after": {
+        "n_groups": 0,
+        "n_groups_across_any_part": 0,
+        "n_groups_across_two_used_parts": 0,
+        "n_records_in_those_groups": 0,
+        "part_sizes": {
+          "train": 3500,
+          "val": 600,
+          "cal": 2000,
+          "test": 8000,
+          "unused": 7699
+        },
+        "worst_boundary": []
+      }
+    },
+    "sph": {
+      "before": {
+        "n_groups": 168,
+        "n_groups_across_any_part": 0,
+        "n_groups_across_two_used_parts": 0,
+        "n_records_in_those_groups": 0,
+        "part_sizes": {
+          "train": 3500,
+          "val": 600,
+          "cal": 2000,
+          "test": 8000,
+          "unused": 11670
+        },
+        "worst_boundary": []
+      },
+      "after": {
+        "n_groups": 168,
+        "n_groups_across_any_part": 0,
+        "n_groups_across_two_used_parts": 0,
+        "n_records_in_those_groups": 0,
+        "part_sizes": {
+          "train": 3500,
+          "val": 600,
+          "cal": 2000,
+          "test": 8000,
+          "unused": 11670
+        },
+        "worst_boundary": []
+      }
+    },
+    "chapman_ningbo": {
+      "before": {
+        "n_groups": 87,
+        "n_groups_across_any_part": 43,
+        "n_groups_across_two_used_parts": 8,
+        "n_records_in_those_groups": 16,
+        "part_sizes": {
+          "train": 3500,
+          "val": 600,
+          "cal": 2000,
+          "test": 8000,
+          "unused": 31052
+        },
+        "worst_boundary": [
+          "cal / test",
+          "test / train"
+        ]
+      },
+      "after": {
+        "n_groups": 87,
+        "n_groups_across_any_part": 0,
+        "n_groups_across_two_used_parts": 0,
+        "n_records_in_those_groups": 0,
+        "part_sizes": {
+          "train": 3500,
+          "val": 600,
+          "cal": 2000,
+          "test": 8000,
+          "unused": 31052
+        },
+        "worst_boundary": []
+      }
+    },
+    "georgia": {
+      "before": {
+        "n_groups": 89,
+        "n_groups_across_any_part": 56,
+        "n_groups_across_two_used_parts": 56,
+        "n_records_in_those_groups": 114,
+        "part_sizes": {
+          "train": 3499,
+          "val": 600,
+          "cal": 2000,
+          "test": 4117,
+          "unused": 76
+        },
+        "worst_boundary": [
+          "cal / test",
+          "cal / train",
+          "cal / val",
+          "test / train",
+          "test / train / val",
+          "test / val",
+          "train / val"
+        ]
+      },
+      "after": {
+        "n_groups": 89,
+        "n_groups_across_any_part": 0,
+        "n_groups_across_two_used_parts": 0,
+        "n_records_in_those_groups": 0,
+        "part_sizes": {
+          "train": 3492,
+          "val": 600,
+          "cal": 2000,
+          "test": 4123,
+          "unused": 77
+        },
+        "worst_boundary": []
+      }
+    },
+    "cpsc": {
+      "before": {
+        "n_groups": 637,
+        "n_groups_across_any_part": 432,
+        "n_groups_across_two_used_parts": 421,
+        "n_records_in_those_groups": 862,
+        "part_sizes": {
+          "train": 3500,
+          "val": 600,
+          "cal": 2000,
+          "test": 4124,
+          "unused": 84
+        },
+        "worst_boundary": [
+          "cal / test",
+          "cal / test / train",
+          "cal / train",
+          "cal / train / val",
+          "cal / val",
+          "test / train",
+          "test / train / val",
+          "test / val",
+          "train / val"
+        ]
+      },
+      "after": {
+        "n_groups": 637,
+        "n_groups_across_any_part": 0,
+        "n_groups_across_two_used_parts": 0,
+        "n_records_in_those_groups": 0,
+        "part_sizes": {
+          "train": 3500,
+          "val": 600,
+          "cal": 2000,
+          "test": 4115,
+          "unused": 93
+        },
+        "worst_boundary": []
+      }
+    }
+  },
+  "n_groups_still_across_two_used_parts": 0
+}

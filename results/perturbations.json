@@ -13,9 +13,9 @@
     "passed": true
   },
   "provenance": {
-    "commit": "40bffc58b28c7ed685af6305daa921aedfc6119e",
+    "commit": "e06f939ad45e9544ab7da4e824279d8de18fe842",
     "producers": {
-      "scripts/perturbations.py": "f336c1aede50f72c06532f41b107a79e4715d65db872167608ae780ea38a17e0",
+      "scripts/perturbations.py": "f099000142db6a185fc652ac8072676cb920286cc4dcde2d0f591aced4169ecb",
       "scripts/score_external.py": "b2c8f6bad1c72da28174927ddaf754790c5bca066f3071faef3a5201b6ff0d4d",
       "src/ecs/conformal.py": "c434998b704a551d55bc2206a1a3ada6d42309947b0b92db11607746dcd068dc",
       "src/ecs/ingest.py": "4ae7d98f31d84e1997eaa0cb62b4e3e56e6c8d9cf3d1e7766c5dd8d7f723d8b0",
@@ -24,11 +24,18 @@
       "src/ecs/splits.py": "17f1d2fea5970c37b989ad0df925b3d19f355012bfca02aed6983ce142b5a946"
     }
   },
-  "seconds": 332.0,
+  "seconds": 328.4,
   "conditions": {
     "clean": {
       "description": "the tracings as recorded; the row that must reproduce results/baseline/scores.npz",
       "auroc": 0.9322,
+      "score_shift": {
+        "kendall_tau_vs_clean": 1.0,
+        "records_whose_rank_moved": 0,
+        "n_records": 2198,
+        "median_score_clean": 0.1036,
+        "median_score": 0.1036
+      },
       "schemes": {
         "plain": {
           "coverage_mi": {
@@ -131,6 +138,13 @@
     "limb_reversal": {
       "description": "left and right arm electrodes exchanged",
       "auroc": 0.7266,
+      "score_shift": {
+        "kendall_tau_vs_clean": 0.346,
+        "records_whose_rank_moved": 2195,
+        "n_records": 2198,
+        "median_score_clean": 0.1036,
+        "median_score": 0.6866
+      },
       "schemes": {
         "plain": {
           "coverage_mi": {
@@ -233,6 +247,13 @@
     "gain_080": {
       "description": "every lead scaled by 0.8",
       "auroc": 0.9322,
+      "score_shift": {
+        "kendall_tau_vs_clean": 0.9297,
+        "records_whose_rank_moved": 2177,
+        "n_records": 2198,
+        "median_score_clean": 0.1036,
+        "median_score": 0.1402
+      },
       "schemes": {
         "plain": {
           "coverage_mi": {
@@ -335,6 +356,13 @@
     "gain_125": {
       "description": "every lead scaled by 1.25",
       "auroc": 0.9276,
+      "score_shift": {
+        "kendall_tau_vs_clean": 0.9347,
+        "records_whose_rank_moved": 2183,
+        "n_records": 2198,
+        "median_score_clean": 0.1036,
+        "median_score": 0.0834
+      },
       "schemes": {
         "plain": {
           "coverage_mi": {
@@ -437,6 +465,13 @@
     "baseline_wander": {
       "description": "a 0.3 Hz sinusoid of 0.5 mV added to every lead",
       "auroc": 0.8855,
+      "score_shift": {
+        "kendall_tau_vs_clean": 0.6345,
+        "records_whose_rank_moved": 2197,
+        "n_records": 2198,
+        "median_score_clean": 0.1036,
+        "median_score": 0.3353
+      },
       "schemes": {
         "plain": {
           "coverage_mi": {
@@ -539,6 +574,13 @@
     "polarity": {
       "description": "every lead multiplied by -1",
       "auroc": 0.3742,
+      "score_shift": {
+        "kendall_tau_vs_clean": -0.1994,
+        "records_whose_rank_moved": 2197,
+        "n_records": 2198,
+        "median_score_clean": 0.1036,
+        "median_score": 0.9592
+      },
       "schemes": {
         "plain": {
           "coverage_mi": {

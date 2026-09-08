@@ -181,7 +181,7 @@ class TestTheFiguresDrawnFromIt:
         assert shown == [
             "results/figures/fig1_thresholds.png",
             "results/figures/fig2_outcomes.png",
-            "results/figures/fig1_coverage.png",
+            "results/figures/fig3_coverage.png",
         ]
         for relative in shown:
             assert (RESULTS_DIR.parent / relative).exists(), relative

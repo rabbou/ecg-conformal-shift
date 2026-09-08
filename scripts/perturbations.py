@@ -48,6 +48,7 @@ import numpy as np
 import pandas as pd
 import torch
 from numpy.typing import NDArray
+from scipy.stats import kendalltau
 from score_external import load_model, probabilities
 from sklearn.metrics import roc_auc_score
 
@@ -172,6 +173,24 @@ def _summary(values: list[float]) -> dict[str, float | int]:
     }
 
 
+def _score_shift(clean: NDArray[np.float64], moved: NDArray[np.float64]) -> dict[str, Any]:
+    """How the fault moved the scores: the ordering, and where the mass sits.
+
+    AUROC only sees the ordering and coverage only sees a fixed cut, so a fault
+    can leave one untouched while moving the other. These are the two numbers
+    that say which happened.
+    """
+    return {
+        "kendall_tau_vs_clean": round(float(kendalltau(clean, moved).statistic), 4),
+        "records_whose_rank_moved": int(
+            (np.argsort(np.argsort(clean)) != np.argsort(np.argsort(moved))).sum()
+        ),
+        "n_records": int(clean.size),
+        "median_score_clean": round(float(np.median(clean)), 4),
+        "median_score": round(float(np.median(moved)), 4),
+    }
+
+
 def measure(
     clean: NDArray[np.float64],
     perturbed: dict[str, NDArray[np.float64]],
@@ -216,6 +235,7 @@ def measure(
         name: {
             "description": DESCRIPTIONS[name],
             "auroc": round(float(roc_auc_score(labels, perturbed[name][:, 1])), 4),
+            "score_shift": _score_shift(clean[:, 1], perturbed[name][:, 1]),
             "schemes": {
                 scheme: {
                     key: _summary(values)

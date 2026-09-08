@@ -5,15 +5,10 @@ August, when the scaffold and the corpora landed.
 
 ## Why this object exists
 
-The venture's bar is a clinician committed in writing by 31 October. The
-institutional messages that open those conversations leave on 1 September, and
-each one points at this repository as the proof that the sender can do the
-work: a model that knows when it is wrong, measured across hospitals, with the
-code open. Without it the consulting offer rests on a CV; with it, a
-cardiologist or a hospital data-science lead can inspect the method instead of
-taking it on trust. The object is therefore the gate on the whole September
-sequence, which is why it outranks every other venture task until 31 August.
-It is tracked as task T-001 in `~/Developer/lab/program/`.
+A model that knows when it is wrong, measured across hospitals, with the code
+open. The point is that a cardiologist or a hospital data-science lead can
+inspect the method rather than take it on trust, which is a thing a description
+of the work cannot do and a repository can.
 
 ## Corpora
 
@@ -34,7 +29,7 @@ Each maps to a named test. Unchecked means unverified, not done.
 | C-1 | THE PTB-XL loader SHALL return 21,799 records, 18,869 patients, 5,469 MI positives — and 5,288 with subendocardial-injury statements excluded. | `test_labels.py::TestPTBXL` |
 | C-2 | THE SPH loader SHALL return 25,770 records, 24,666 patients, 260 MI positives, 233 of them chronic. | `test_labels.py::TestSPH` |
 | C-3 | THE ACS loader SHALL return 17,960 labelled records, 17,018 patients, 1,151 OMI / 1,442 STEMI / 2,679 AMI. | `test_labels.py::TestACS` |
-| C-4 | WHERE a calibration/test boundary is drawn, THE splitter SHALL place every record of a given patient on one side only. | pending — `test_splits.py` |
+| C-4 | WHERE a calibration/test boundary is drawn, THE splitter SHALL place every record of a given patient on one side only. | met — `test_splits.py::TestPatientSplit` |
 | C-5 | WHEN the calibrator is fitted at alpha on an exchangeable sample, THE empirical coverage SHALL fall within [1-alpha-0.012, 1-alpha+0.025]. | `test_conformal.py::TestCoverageGuarantee`, `test_report.py::TestTheGuaranteeOnDataWhoseAnswerIsKnown`, `test_report.py::TestTheCommittedAbstentionTable` |
 | C-6 | WHEN a calibration sample is smaller than ceil(1/alpha)-1, THE quantile SHALL be +inf rather than a finite threshold. | `test_conformal.py::TestQuantile` |
 | C-7 | WHEN the class prior changes between calibration and test, THE Mondrian thresholds SHALL hold class-conditional coverage at 1-alpha. | `test_label_shift.py::TestMondrianUnderPrevalenceShift` |
@@ -43,10 +38,10 @@ Each maps to a named test. Unchecked means unverified, not done.
 | C-10 | THE harness SHALL report every coverage figure as a mean over >= 100 calibration/test draws, with its standard deviation. | `test_report.py::TestTheCommittedAbstentionTable`, `test_report.py::TestTheCommittedBreakTable::test_every_figure_is_a_mean_over_at_least_a_hundred_draws_with_its_spread` |
 | C-11 | THE harness SHALL report coverage separately for MI and non-MI cases. | `test_report.py::TestTheCommittedAbstentionTable::test_coverage_is_reported_for_infarction_and_for_not`, `test_report.py::TestTheCommittedBreakTable::test_coverage_is_reported_for_infarction_and_for_not_on_every_corpus` |
 | C-12 | THE results file SHALL record the encoder's pre-training corpora. | `test_report.py::TestTheEncoderArmsOnRecord` on every cached representation; `test_report.py::TestTheCommittedArmGrid::test_every_arm_names_the_corpora_it_was_pre_trained_on` on the grid the arms are compared in, where `test_the_arms_that_saw_the_calibration_corpus_say_so` pins which two saw PTB-XL and which one also saw Shandong — the sentence for HuBERT-ECG carries its address (medRxiv 10.1101/2024.11.14.24317328v3, Methods) |
-| C-13 | THE ingestion layer SHALL return, for every corpus, a float32 array of shape (N, 12, 5000): 10 seconds, 500 Hz, millivolts, leads ordered I, II, III, aVR, aVL, aVF, V1-V6. | pending — `test_ingest.py` |
+| C-13 | THE ingestion layer SHALL return, for every corpus, a float32 array of shape (N, 12, 5000): 10 seconds, 500 Hz, millivolts, leads ordered I, II, III, aVR, aVL, aVF, V1-V6. | met — `test_ingest.py::test_shape_dtype_and_identity_on_a_canonical_record` |
 | C-14 | THE ingestion layer SHALL apply an identical filter and scaling chain to every corpus, and SHALL emit, per corpus, the list of steps that could not be made identical. | `test_ingest.py::TestAssembly::test_deviations_name_what_the_chain_did_differently`; on the results file, `test_report.py::TestTheCommittedBreakTable::test_each_corpus_names_what_could_not_be_made_identical` |
 | C-14b | THE corpora SHALL be stored exactly as distributed; no transformed waveform array is persisted, and every transform is applied at read time. | pending — `test_ingest.py` |
-| C-15 | WHEN a record contains a NaN or Inf sample, THE loader SHALL exclude it and report the excluded count per corpus. | pending — `test_ingest.py` |
+| C-15 | WHEN a record contains a NaN or Inf sample, THE loader SHALL exclude it and report the excluded count per corpus. | met — `test_ingest.py::test_nan_and_inf_records_are_excluded_and_counted` |
 | C-16 | WHEN PTB-XL is round-tripped through 250 Hz and back to 500 Hz, THE resulting coverage SHALL move by less than one third of the coverage gap attributed to dataset shift. | pending — `test_resample_control.py` |
 | C-17 | THE encoder comparison SHALL include a frozen randomly-initialised encoder, reported alongside the pre-trained arms. | `test_report.py::TestTheEncoderArmsOnRecord::test_the_frozen_random_arm_is_among_them` among the representations; `test_report.py::TestTheCommittedArmGrid::test_the_frozen_random_arm_is_reported_beside_the_others` in the grid, which carries it in every block rather than mentioning it in passing |
 | C-18 | THE harness SHALL report per-task AUROC and AUPRC with bootstrapped confidence intervals, and SHALL use paired comparisons for any claim that one arm beats another. | intervals: `test_metrics.py::TestBootstrapInterval` and `test_baseline.py::TestTheReferenceValue` on the statistic, `test_report.py::TestTheCommittedArmGrid::test_every_arm_and_corpus_carries_auroc_and_auprc_with_an_interval` on every cell of the arm grid. Paired comparisons: `test_arms.py::TestPairedDifference` on the statistic itself, where `test_pairing_is_tighter_than_two_separate_intervals` is the reason the comparison is paired — it holds a pair of arms whose own intervals overlap while the paired difference excludes zero — and `test_report.py::TestTheCommittedArmGrid::test_every_pair_of_arms_is_compared_paired_on_every_corpus` on the committed grid, with `test_a_paired_difference_is_only_called_separated_when_it_excludes_zero` holding the word "separated" to the interval. Arm-versus-arm differences use a paired bootstrap over records rather than DeLong, which tests AUROC only and has no AUPRC counterpart |
@@ -207,8 +202,7 @@ The grid the arms are meant to fill:
 The bottom row is where pre-training contamination should look most flattering,
 so it is the most informative arm and is dropped last. Two conditions on
 it: its licence is CC BY-NC 4.0, which permits a public research demonstration
-but excludes anything the venture ships (D-059 excluded it on venture grounds;
-a demonstration is not a product, and that distinction is Ruben's call). And the
+but excludes commercial use, and a demonstration is not a product. And the
 claim that its pre-training included SPH is second-hand — the audit could not
 fetch medRxiv directly and relied on a search-retrieved quote. Verify that at
 source before Thursday, because the bottom row rests entirely on it.
@@ -217,10 +211,10 @@ source before Thursday, because the bottom row rests entirely on it.
 
 Laptop is a 2016 Intel Mac — 8 threads, 16 GB, ~28 GB free, and torch dropped
 macOS x86_64 wheels after 2.2.2, which is why that version is pinned. The Linux
-box `esprimo` (i7-8700, 12 threads, 15 GB, 389 GB free, no GPU, Python 3.12,
-reachable with `ssh esprimo`) carries the heavy runs: install `uv` there, clone
-this repository, rsync `data/` and the PTB-XL directory, and run with the same
-pinned environment so both machines produce the same numbers. Neither has CUDA,
+box (i7-8700, 12 threads, 15 GB, no GPU, Python 3.12) carries the heavy runs:
+install `uv` there, clone this repository, copy `data/` and the PTB-XL
+directory, and run with the same pinned environment so both machines produce
+the same numbers. Neither has CUDA,
 so encoder inference cost is the schedule's real risk and day 1 measures it
 first.
 

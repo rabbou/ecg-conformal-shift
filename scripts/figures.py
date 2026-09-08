@@ -533,14 +533,21 @@ def figure_5_thresholds(
     )
     figure.text(
         0.5,
-        0.034,
-        "Deferred: share of all tracings returning both labels or neither, sent to a specialist. "
+        0.040,
+        "Deferred: share of all tracings returning both labels or neither, sent to a specialist.",
+        ha="center",
+        fontsize=8.5,
+        color="#555",
+    )
+    figure.text(
+        0.5,
+        0.025,
         "Histograms show all of fold 10; the rates are means over the test halves.",
         ha="center",
         fontsize=8.5,
         color="#555",
     )
-    figure.tight_layout(rect=(0, 0.072, 1, 1))
+    figure.tight_layout(rect=(0, 0.085, 1, 1))
     _source_note(figure, source)
     figure.savefig(out, dpi=200)
     plt.close(figure)
@@ -601,7 +608,7 @@ def figure_6_outcomes(outcomes: dict[str, Any], out: Path, source: Path) -> Path
     )
     figure.text(
         0.5,
-        0.012,
+        0.045,
         f"PTB-XL fold 10, {outcomes['n_draws']} patient-level calibration draws. "
         "The single threshold and per-label calibration meet at a ~10% MI miss rate "
         "by construction; pooled calibration is matched to neither and lands at 27%.",
@@ -638,7 +645,7 @@ def main(argv: list[str] | None = None) -> int:
     drawn = []
     if 1 in args.figure:
         table = json.loads(shift_path.read_text())
-        drawn.append(figure_1_coverage(table, out / "fig1_coverage.png", shift_path))
+        drawn.append(figure_1_coverage(table, out / "fig3_coverage.png", shift_path))
     if 2 in args.figure:
         table = json.loads(shift_path.read_text())
         drawn.append(figure_2_set_sizes(table, out / "fig2_set_sizes.png", shift_path))

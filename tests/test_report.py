@@ -201,7 +201,7 @@ class TestTheFigures:
     redrawn by a script from a results file that is already committed."""
 
     NAMED = {
-        1: ("fig1_coverage.png", RESULTS_DIR / "shift.json"),
+        1: ("fig3_coverage.png", RESULTS_DIR / "shift.json"),
         2: ("fig2_set_sizes.png", RESULTS_DIR / "shift.json"),
         3: ("fig3_arms.png", RESULTS_DIR / "arms.json"),
         4: ("fig4_discrimination.png", RESULTS_DIR / "baseline/metrics.json"),

@@ -16,7 +16,7 @@ Its MI AUROC on the PTB-XL benchmark split is 0.932, 95% CI 0.921 to 0.943, whic
 
 ## 4. Would this hold at my site? (clinician, commercial)
 
-Unknown. The two sites measured here moved in opposite directions: coverage rose in Shandong and fell in Chongqing. Neither direction nor magnitude can be extrapolated to a third site. What transfers is the harness. The measurement is per class, so what it needs is cases of the rarer class, not tracings: about 864 infarctions to pin per-class coverage to within two points, which is roughly 5,800 tracings at Chongqing's prevalence and 86,000 at Shandong's. The repository offers a way to measure the promise at a given site, not an assurance that it holds there.
+Unknown. The two sites measured here moved in opposite directions: coverage rose in Shandong and fell in Chongqing. Neither direction nor magnitude can be extrapolated to a third site. What transfers is the harness. The measurement is per class, so what it needs is cases of the rarer class, not tracings: 865 infarctions to pin per-class coverage to within two points, which is roughly 5,800 tracings at Chongqing's prevalence and 86,000 at Shandong's. The repository offers a way to measure the promise at a given site, not an assurance that it holds there.
 
 ## 5. Is the good Shandong number just prevalence? (technical peer)
 
@@ -24,7 +24,7 @@ Partly, and not in the way the overall figure suggests. Prevalence is what makes
 
 ## 6. Why did the estimated correction fail where the exact one worked? (technical peer)
 
-The weighted correction needs the target's class mix, which is unknown and must be estimated, here by BBSE from the model's own unlabelled predictions. The estimate was poor: 40.9% infarction estimated for Chongqing against 14.9% observed, 2.4% for Shandong against 1.0% (`results/shift.json`). Reweighting also spends data: the effective calibration size drops from 1,099 points to 864 in Shandong and 967 in Chongqing (`results/shift.json`, criterion C-9). Its guarantee is asymptotic. Mondrian estimates nothing: one threshold per class, exact in finite samples under any change of class mix. Paired on the same draws, Mondrian gains +16.7 points of infarction coverage at the source where weighting gains +0.1, and in Shandong weighting loses 2.3 points.
+The weighted correction needs the target's class mix, which is unknown and must be estimated, here by BBSE from the model's own unlabelled predictions. The estimate was poor: 40.9% infarction estimated for Chongqing against 14.9% observed, 2.4% for Shandong against 1.0% (`results/shift.json`). Reweighting also spends data: the effective calibration size drops from 1,099 points to 864 in Shandong and 967 in Chongqing (`results/shift.json`, criterion C-9). Its guarantee is asymptotic. Mondrian estimates nothing: one threshold per class, exact in finite samples under any change of class mix. Paired on the same draws, Mondrian gains +16.7 points on the paired draws of infarction coverage at the source where weighting gains +0.1, and in Shandong weighting loses 2.3 points.
 
 ## 7. Why does the exact correction not fix Chongqing? (technical peer)
 

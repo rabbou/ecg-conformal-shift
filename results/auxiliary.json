@@ -1,0 +1,206 @@
+{
+  "question": "The quantities sections 4 and 5 argue from, computed from the committed scores so that each one has a file behind it.",
+  "alpha": 0.1,
+  "n_draws": 200,
+  "seed": 0,
+  "provenance": {
+    "commit": "40bffc58b28c7ed685af6305daa921aedfc6119e",
+    "producers": {
+      "scripts/auxiliary.py": "8acc434edf14cb88780b5af56b53c32abf18104a1febfa57ce0d744062a92bf0",
+      "scripts/shift_table.py": "2a86eab993d284b62d57e722ebafb458b525d40dcec6cfc9247f97f2779a7439",
+      "src/ecs/conformal.py": "c434998b704a551d55bc2206a1a3ada6d42309947b0b92db11607746dcd068dc",
+      "src/ecs/metrics.py": "bf1271d4ffc6d61751ff0b6a384745a7c0fa3d1462df6634acd6c08ed30129e2"
+    }
+  },
+  "seconds": 34.1,
+  "differences": {
+    "note": "MI coverage under class-conditional calibration minus MI coverage under pooled calibration, formed inside each replicate. The source cohort is resampled by patient and the target cohorts by record.",
+    "n_bootstrap": 2000,
+    "by_corpus": {
+      "ptbxl": {
+        "name": "PTB-XL",
+        "difference": {
+          "mean": 0.1678,
+          "ci95": [
+            0.1086,
+            0.234
+          ]
+        },
+        "pooled": {
+          "mean": 0.735,
+          "ci95": [
+            0.6602,
+            0.8017
+          ]
+        },
+        "perlabel": {
+          "mean": 0.9028,
+          "ci95": [
+            0.8459,
+            0.95
+          ]
+        }
+      },
+      "sph": {
+        "name": "Shandong",
+        "difference": {
+          "mean": 0.0373,
+          "ci95": [
+            0.015,
+            0.0645
+          ]
+        },
+        "pooled": {
+          "mean": 0.9369,
+          "ci95": [
+            0.9044,
+            0.9667
+          ]
+        },
+        "perlabel": {
+          "mean": 0.9742,
+          "ci95": [
+            0.9518,
+            0.9922
+          ]
+        }
+      },
+      "acs": {
+        "name": "Chongqing",
+        "difference": {
+          "mean": 0.116,
+          "ci95": [
+            0.0893,
+            0.1464
+          ]
+        },
+        "pooled": {
+          "mean": 0.7248,
+          "ci95": [
+            0.6941,
+            0.7529
+          ]
+        },
+        "perlabel": {
+          "mean": 0.8408,
+          "ci95": [
+            0.814,
+            0.8688
+          ]
+        }
+      }
+    }
+  },
+  "chow": {
+    "note": "MI coverage under class-conditional conformal calibration, under a per-class reject rule at the same empirical quantiles without the (n+1) correction, and under a symmetric reject rule around the single tuned threshold widened to refuse the same share of the calibration half.",
+    "n_draws": 200,
+    "by_corpus": {
+      "ptbxl": {
+        "name": "PTB-XL",
+        "conformal_perlabel": {
+          "mi": 0.9001,
+          "non_mi": 0.8998,
+          "deferred": 0.1044
+        },
+        "chow_per_class": {
+          "mi": 0.8957,
+          "non_mi": 0.8982,
+          "deferred": 0.0959
+        },
+        "chow_symmetric": {
+          "mi": 0.9289,
+          "non_mi": 0.8567,
+          "deferred": 0.1058
+        },
+        "conformal_minus_chow_per_class_mi_points": 0.44
+      },
+      "sph": {
+        "name": "Shandong",
+        "conformal_perlabel": {
+          "mi": 0.9739,
+          "non_mi": 0.9042,
+          "deferred": 0.0799
+        },
+        "chow_per_class": {
+          "mi": 0.9733,
+          "non_mi": 0.9031,
+          "deferred": 0.0739
+        },
+        "chow_symmetric": {
+          "mi": 0.9792,
+          "non_mi": 0.8616,
+          "deferred": 0.0828
+        },
+        "conformal_minus_chow_per_class_mi_points": 0.06
+      },
+      "acs": {
+        "name": "Chongqing",
+        "conformal_perlabel": {
+          "mi": 0.8398,
+          "non_mi": 0.6929,
+          "deferred": 0.1164
+        },
+        "chow_per_class": {
+          "mi": 0.8365,
+          "non_mi": 0.6907,
+          "deferred": 0.1083
+        },
+        "chow_symmetric": {
+          "mi": 0.8661,
+          "non_mi": 0.6252,
+          "deferred": 0.1007
+        },
+        "conformal_minus_chow_per_class_mi_points": 0.33
+      }
+    }
+  },
+  "correction": {
+    "note": "MI coverage with the ceil((n+1)(1-alpha)) rank against the plain empirical quantile of the same calibration scores, on the same draws.",
+    "n_draws": 200,
+    "coverage_with_correction": 0.9001,
+    "coverage_without_correction": 0.8957,
+    "correction_worth_points": 0.44,
+    "between_draw_sd_points": 2.75
+  },
+  "sample_size": {
+    "note": "Cases of the rarer label needed for a 95% normal interval of +/-0.02 on a coverage near 0.90, and the tracings that implies at each site's observed MI prevalence.",
+    "target_half_width": 0.02,
+    "mi_cases_needed": 865,
+    "tracings_needed": {
+      "ptbxl": 3457,
+      "sph": 85735,
+      "acs": 5798
+    }
+  },
+  "predictive_value": {
+    "note": "Among tracings given the MI label alone by class-conditional calibration, the share that carry it. Deferred tracings are not counted.",
+    "n_draws": 200,
+    "by_corpus": {
+      "ptbxl": {
+        "name": "PTB-XL",
+        "positive_predictive_value": 0.7226,
+        "prevalence": 0.2502
+      },
+      "sph": {
+        "name": "Shandong",
+        "positive_predictive_value": 0.092,
+        "prevalence": 0.0101
+      },
+      "acs": {
+        "name": "Chongqing",
+        "positive_predictive_value": 0.299,
+        "prevalence": 0.1492
+      }
+    }
+  },
+  "shandong_wilson": {
+    "note": "Wilson interval on an observed MI coverage of 0.936 at Shandong, on that site's own MI cases. It is the interval the site's count supports; the spread across calibration draws is a different and much smaller quantity.",
+    "n_mi_cases": 260,
+    "coverage": 0.936,
+    "wilson_ci95": [
+      0.8978,
+      0.9588
+    ],
+    "half_width_points": 3.05
+  }
+}

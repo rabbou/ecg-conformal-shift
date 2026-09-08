@@ -9,6 +9,11 @@ results/*
 results/baseline/model.pt
 !results/external/
 !results/shift.json
+!results/outcomes.json
+!results/subgroups.json
+!results/auxiliary.json
+!results/perturbations.json
+!results/perturbations.npz
 !results/seen_target.json
 !results/arms.json
 !results/embeddings/
@@ -22,3 +27,4 @@ __pycache__/
 .pytest_cache/
 .DS_Store
 results/baseline/train.log
+.claude/

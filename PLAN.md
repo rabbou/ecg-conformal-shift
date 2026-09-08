@@ -5,15 +5,10 @@ August, when the scaffold and the corpora landed.
 
 ## Why this object exists
 
-The venture's bar is a clinician committed in writing by 31 October. The
-institutional messages that open those conversations leave on 1 September, and
-each one points at this repository as the proof that the sender can do the
-work: a model that knows when it is wrong, measured across hospitals, with the
-code open. Without it the consulting offer rests on a CV; with it, a
-cardiologist or a hospital data-science lead can inspect the method instead of
-taking it on trust. The object is therefore the gate on the whole September
-sequence, which is why it outranks every other venture task until 31 August.
-It is tracked as task T-001 in `~/Developer/lab/program/`.
+A model that knows when it is wrong, measured across hospitals, with the code
+open. The point is that a cardiologist or a hospital data-science lead can
+inspect the method rather than take it on trust, which is a thing a description
+of the work cannot do and a repository can.
 
 ## Corpora
 
@@ -23,7 +18,7 @@ It is tracked as task T-001 in `~/Developer/lab/program/`.
 | SPH / Shandong | `metadata.csv` | 25,770 HDF5 files, 4.3 GB | 25,770 / 25,770 | `data/sph/records` |
 | ACS-ECG / Chongqing | `data/acs/CSV` | 19,955 WFDB records, 1.3 GB | 19,950 / 19,955 | `data/acs/row_data` |
 
-Sources: PTB-XL and SPH from PhysioNet and Springer Nature figshare respectively (licences CC BY 4.0 and CC0); ACS-ECG from figshare 10.6084/m9.figshare.29925314 (CC0, `ECG_row_data.zip`, 1.28 GB, no account) [verified 2026-08-23 — api.figshare.com/v2/articles/29925314]. `scripts/fetch_open_corpora.sh` fetches them with their checksums. The five Chongqing records excluded carry a non-finite sample (3) or are shorter than their header says (2); `results/ingest_report.json` lists them by id.
+Sources: PTB-XL and SPH from PhysioNet and Springer Nature figshare respectively (licences CC BY 4.0 and CC0); ACS-ECG from figshare 10.6084/m9.figshare.29925314 (CC0, `ECG_row_data.zip`, 1.28 GB, no account) [verified 2026-08-23 — api.figshare.com/v2/articles/29925314]. `scripts/fetch_open_corpora.sh` fetches ACS-ECG and the four auxiliary PhysioNet corpora, verifying each against the checksums their publishers give; PTB-XL and SPH are not fetched by it and were downloaded by hand. The five Chongqing records excluded carry a non-finite sample (3) or are shorter than their header says (2); `results/ingest_report.json` lists them by id.
 
 ## Acceptance criteria
 
@@ -34,7 +29,7 @@ Each maps to a named test. Unchecked means unverified, not done.
 | C-1 | THE PTB-XL loader SHALL return 21,799 records, 18,869 patients, 5,469 MI positives — and 5,288 with subendocardial-injury statements excluded. | `test_labels.py::TestPTBXL` |
 | C-2 | THE SPH loader SHALL return 25,770 records, 24,666 patients, 260 MI positives, 233 of them chronic. | `test_labels.py::TestSPH` |
 | C-3 | THE ACS loader SHALL return 17,960 labelled records, 17,018 patients, 1,151 OMI / 1,442 STEMI / 2,679 AMI. | `test_labels.py::TestACS` |
-| C-4 | WHERE a calibration/test boundary is drawn, THE splitter SHALL place every record of a given patient on one side only. | pending — `test_splits.py` |
+| C-4 | WHERE a calibration/test boundary is drawn, THE splitter SHALL place every record of a given patient on one side only. | met — `test_splits.py::TestPatientSplit` |
 | C-5 | WHEN the calibrator is fitted at alpha on an exchangeable sample, THE empirical coverage SHALL fall within [1-alpha-0.012, 1-alpha+0.025]. | `test_conformal.py::TestCoverageGuarantee`, `test_report.py::TestTheGuaranteeOnDataWhoseAnswerIsKnown`, `test_report.py::TestTheCommittedAbstentionTable` |
 | C-6 | WHEN a calibration sample is smaller than ceil(1/alpha)-1, THE quantile SHALL be +inf rather than a finite threshold. | `test_conformal.py::TestQuantile` |
 | C-7 | WHEN the class prior changes between calibration and test, THE Mondrian thresholds SHALL hold class-conditional coverage at 1-alpha. | `test_label_shift.py::TestMondrianUnderPrevalenceShift` |
@@ -43,15 +38,18 @@ Each maps to a named test. Unchecked means unverified, not done.
 | C-10 | THE harness SHALL report every coverage figure as a mean over >= 100 calibration/test draws, with its standard deviation. | `test_report.py::TestTheCommittedAbstentionTable`, `test_report.py::TestTheCommittedBreakTable::test_every_figure_is_a_mean_over_at_least_a_hundred_draws_with_its_spread` |
 | C-11 | THE harness SHALL report coverage separately for MI and non-MI cases. | `test_report.py::TestTheCommittedAbstentionTable::test_coverage_is_reported_for_infarction_and_for_not`, `test_report.py::TestTheCommittedBreakTable::test_coverage_is_reported_for_infarction_and_for_not_on_every_corpus` |
 | C-12 | THE results file SHALL record the encoder's pre-training corpora. | `test_report.py::TestTheEncoderArmsOnRecord` on every cached representation; `test_report.py::TestTheCommittedArmGrid::test_every_arm_names_the_corpora_it_was_pre_trained_on` on the grid the arms are compared in, where `test_the_arms_that_saw_the_calibration_corpus_say_so` pins which two saw PTB-XL and which one also saw Shandong — the sentence for HuBERT-ECG carries its address (medRxiv 10.1101/2024.11.14.24317328v3, Methods) |
-| C-13 | THE ingestion layer SHALL return, for every corpus, a float32 array of shape (N, 12, 5000): 10 seconds, 500 Hz, millivolts, leads ordered I, II, III, aVR, aVL, aVF, V1-V6. | pending — `test_ingest.py` |
+| C-13 | THE ingestion layer SHALL return, for every corpus, a float32 array of shape (N, 12, 5000): 10 seconds, 500 Hz, millivolts, leads ordered I, II, III, aVR, aVL, aVF, V1-V6. | met — `test_ingest.py::test_shape_dtype_and_identity_on_a_canonical_record` |
 | C-14 | THE ingestion layer SHALL apply an identical filter and scaling chain to every corpus, and SHALL emit, per corpus, the list of steps that could not be made identical. | `test_ingest.py::TestAssembly::test_deviations_name_what_the_chain_did_differently`; on the results file, `test_report.py::TestTheCommittedBreakTable::test_each_corpus_names_what_could_not_be_made_identical` |
 | C-14b | THE corpora SHALL be stored exactly as distributed; no transformed waveform array is persisted, and every transform is applied at read time. | pending — `test_ingest.py` |
-| C-15 | WHEN a record contains a NaN or Inf sample, THE loader SHALL exclude it and report the excluded count per corpus. | pending — `test_ingest.py` |
+| C-15 | WHEN a record contains a NaN or Inf sample, THE loader SHALL exclude it and report the excluded count per corpus. | met — `test_ingest.py::test_nan_and_inf_records_are_excluded_and_counted` |
 | C-16 | WHEN PTB-XL is round-tripped through 250 Hz and back to 500 Hz, THE resulting coverage SHALL move by less than one third of the coverage gap attributed to dataset shift. | pending — `test_resample_control.py` |
 | C-17 | THE encoder comparison SHALL include a frozen randomly-initialised encoder, reported alongside the pre-trained arms. | `test_report.py::TestTheEncoderArmsOnRecord::test_the_frozen_random_arm_is_among_them` among the representations; `test_report.py::TestTheCommittedArmGrid::test_the_frozen_random_arm_is_reported_beside_the_others` in the grid, which carries it in every block rather than mentioning it in passing |
 | C-18 | THE harness SHALL report per-task AUROC and AUPRC with bootstrapped confidence intervals, and SHALL use paired comparisons for any claim that one arm beats another. | intervals: `test_metrics.py::TestBootstrapInterval` and `test_baseline.py::TestTheReferenceValue` on the statistic, `test_report.py::TestTheCommittedArmGrid::test_every_arm_and_corpus_carries_auroc_and_auprc_with_an_interval` on every cell of the arm grid. Paired comparisons: `test_arms.py::TestPairedDifference` on the statistic itself, where `test_pairing_is_tighter_than_two_separate_intervals` is the reason the comparison is paired — it holds a pair of arms whose own intervals overlap while the paired difference excludes zero — and `test_report.py::TestTheCommittedArmGrid::test_every_pair_of_arms_is_compared_paired_on_every_corpus` on the committed grid, with `test_a_paired_difference_is_only_called_separated_when_it_excludes_zero` holding the word "separated" to the interval. Arm-versus-arm differences use a paired bootstrap over records rather than DeLong, which tests AUROC only and has no AUPRC counterpart |
 | C-19 | WHEN the supervised baseline is trained on PTB-XL folds 1–8 and scored on fold 10, ITS MI AUROC SHALL lie within 0.03 of the reference value recorded in `results/baseline.json`. That reference is **0.930**, the macro AUROC over the five diagnostic superclasses (NORM, MI, STTC, CD, HYP) that the benchmark repository (github.com/helme/ecg_ptbxl_benchmarking, table “PTB-XL: Diagnostic superclasses”) reports for `resnet1d_wang` on fold 10, folds 1–8 train and 9 validation — read from the repository on 2026-08-24, never from memory. It is a macro figure and not the MI column alone: the archived predictions the README links (datacloud.hhi.fraunhofer.de/s/gLkjQL94d7FXBbS) now serve a different study's `output.zip`, which holds no `preds_x.npy` or `targs_x.npy`; the repository commits only the 71-statement `exp0` outputs; and the paper text carries no per-class MI table. `results/baseline.json` records all three routes. Because MI is averaged in with four other superclasses, a gap wider than 0.03 is investigated before it is read as a broken baseline. | `test_baseline.py::TestTheReferenceValue` |
-| C-20 | THE report SHALL contain exactly the figures listed under "Figures", each regenerated by a script from a `results/` file committed before the figure, and THE external corpora SHALL each be scored once with the frozen PTB-XL calibration, never re-calibrated on themselves. | figures 1, 2, 3, 4: `test_report.py::TestTheFigures`; the one-shot half: `test_report.py::TestTheFrozenCalibrationOnDataWhoseAnswerIsKnown::test_no_target_label_ever_reaches_a_threshold` and `TestTheCommittedBreakTable::test_every_threshold_was_fitted_on_ptbxl_and_nowhere_else`. Figure 3 draws from `results/arms.json`, committed before it, and `TestTheFigures::test_figure_three_carries_every_arm_and_every_target` holds it to every arm; `test_figure_three_says_what_it_is_waiting_for_rather_than_drawing_empty` holds the behaviour when that file is absent. The weighted correction is the one row family whose threshold differs by corpus: it reads that corpus's unlabelled predicted-label marginal to estimate its class mix, and nothing else of it — the label-inversion test above is what holds that, under all three corrections. `test_an_unweighted_threshold_does_not_depend_on_which_corpus_it_is_spent_on` holds the other two to one identical threshold in every corpus block. Figure 1 carries one panel per correction and one panel row per corpus: `TestTheFigures::test_figure_one_carries_a_panel_per_corpus_and_per_correction` |
+| C-20 | THE report SHALL contain exactly the figures listed under "Figures", each redrawn pixel for pixel by a script from a committed `results/` file, and THE external corpora SHALL each be scored once with the frozen PTB-XL calibration, never re-calibrated on themselves. | all six figures, redrawn and compared pixel by pixel: `test_report.py::TestTheFigures::test_each_figure_redraws_pixel_for_pixel`; the report's own figure list: `test_outcomes.py::TestTheFiguresDrawnFromIt::test_the_report_shows_exactly_the_figures_it_names`; the one-shot half: `test_report.py::TestTheFrozenCalibrationOnDataWhoseAnswerIsKnown::test_no_target_label_ever_reaches_a_threshold` and `TestTheCommittedBreakTable::test_every_threshold_was_fitted_on_ptbxl_and_nowhere_else`. Figure 3 draws from `results/arms.json`, committed before it, and `TestTheFigures::test_figure_three_carries_every_arm_and_every_target` holds it to every arm; `test_figure_three_says_what_it_is_waiting_for_rather_than_drawing_empty` holds the behaviour when that file is absent. The weighted correction is the one row family whose threshold differs by corpus: it reads that corpus's unlabelled predicted-label marginal to estimate its class mix, and nothing else of it — the label-inversion test above is what holds that, under all three corrections. `test_an_unweighted_threshold_does_not_depend_on_which_corpus_it_is_spent_on` holds the other two to one identical threshold in every corpus block. Figure 1 carries one panel per correction and one panel row per corpus: `TestTheFigures::test_figure_one_carries_a_panel_per_corpus_and_per_correction` |
+| C-21 | THE outcome table SHALL split every case of a label into exactly three shares — the correct label alone, deferred, the wrong label alone — summing to one, so that a scheme with deferrals is comparable with one without. | `test_outcomes.py::TestTheSplitItself`, `TestTheCommittedOutcomeTable::test_every_label_and_scheme_partitions_into_the_three_outcomes` |
+| C-22 | WHERE a single tuned threshold is compared against a conformal scheme, THE results file SHALL record that its target is a sensitivity and the conformal target a coverage, and SHALL record the decision boundaries on the probability axis rather than the raw score quantiles. | `test_outcomes.py::TestTheCommittedOutcomeTable::test_the_table_says_the_two_targets_are_different_quantities`, `test_the_denominator_is_named_in_the_file` |
+
 
 ## The ingestion contract
 
@@ -127,8 +125,19 @@ being re-cut. Each is drawn by `scripts/figures.py` from a results file.
 3. Encoder arms on the same break. Coverage gap (source minus target) per
    arm, with bootstrapped intervals and paired differences: random-init frozen,
    ECGFounder, ECG-FM, HuBERT-ECG if its contamination claim verifies.
-4. Baseline discrimination. AUROC and AUPRC per corpus with intervals; the
-   reproduction of a published value that validates the setup.
+4. Baseline discrimination. AUROC and AUPRC per corpus with intervals, set
+   beside the published macro figure as the plausibility check C-19 defines --
+   a different quantity, so not a reproduction.
+5. Threshold placement. Where each of the three schemes puts its decision
+   boundaries on the model's probability axis, over the source score
+   distribution of each class, with the resulting miss rate, false-alarm rate
+   and deferral share beside each panel.
+6. Per-label outcomes. What a case of each label receives under each scheme:
+   the correct label alone, a deferral, or the wrong label alone.
+
+Figures 5 and 6 are the report's figures 1 and 2; the coverage grid is its
+figure 3. Figures 2 and 4 above are kept in `results/figures/` and cited from
+`README.md` and `QUESTIONS.md` rather than carried in the report.
 
 The numbers behind every figure live in `results/` as JSON or CSV and are
 committed before the figure. Each external corpus is scored once with the
@@ -193,8 +202,7 @@ The grid the arms are meant to fill:
 The bottom row is where pre-training contamination should look most flattering,
 so it is the most informative arm and is dropped last. Two conditions on
 it: its licence is CC BY-NC 4.0, which permits a public research demonstration
-but excludes anything the venture ships (D-059 excluded it on venture grounds;
-a demonstration is not a product, and that distinction is Ruben's call). And the
+but excludes commercial use, and a demonstration is not a product. And the
 claim that its pre-training included SPH is second-hand — the audit could not
 fetch medRxiv directly and relied on a search-retrieved quote. Verify that at
 source before Thursday, because the bottom row rests entirely on it.
@@ -203,10 +211,10 @@ source before Thursday, because the bottom row rests entirely on it.
 
 Laptop is a 2016 Intel Mac — 8 threads, 16 GB, ~28 GB free, and torch dropped
 macOS x86_64 wheels after 2.2.2, which is why that version is pinned. The Linux
-box `esprimo` (i7-8700, 12 threads, 15 GB, 389 GB free, no GPU, Python 3.12,
-reachable with `ssh esprimo`) carries the heavy runs: install `uv` there, clone
-this repository, rsync `data/` and the PTB-XL directory, and run with the same
-pinned environment so both machines produce the same numbers. Neither has CUDA,
+box (i7-8700, 12 threads, 15 GB, no GPU, Python 3.12) carries the heavy runs:
+install `uv` there, clone this repository, copy `data/` and the PTB-XL
+directory, and run with the same pinned environment so both machines produce
+the same numbers. Neither has CUDA,
 so encoder inference cost is the schedule's real risk and day 1 measures it
 first.
 

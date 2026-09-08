@@ -12,13 +12,13 @@
 #     printf 'machine physionet.org\n  login YOUR_USERNAME\n  password YOUR_PASSWORD\n' >> ~/.netrc
 #     chmod 600 ~/.netrc
 #
-# Usage:  ./scripts/fetch_echonext.sh [destination]     (default /home/ruben/data/echonext)
+# Usage:  ./scripts/fetch_echonext.sh [destination]     (default $HOME/data/echonext)
 
 set -euo pipefail
 
 VERSION="1.1.1"
 BASE="https://physionet.org/files/echonext/${VERSION}/"
-DEST="${1:-/home/ruben/data/echonext}"
+DEST="${1:-$HOME/data/echonext}"
 
 if [[ ! -f "$HOME/.netrc" ]] || ! grep -q 'physionet\.org' "$HOME/.netrc"; then
   echo "error: no physionet.org entry in ~/.netrc — see the header of this script." >&2

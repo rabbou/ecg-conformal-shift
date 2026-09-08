@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import io
 import json
+import re
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from pathlib import Path
@@ -206,3 +207,74 @@ class TestRerunning:
         out = _run(corpus)
         assert out.exists()
         assert not out.with_suffix(".partial").exists()
+
+
+class TestTheUntrainedControlIsOneNetwork:
+    """The random-init arm is the only one that draws its weights instead of
+    loading them, and ``extract`` builds an arm once per corpus.  If the draw
+    is not pinned, every corpus goes through a different network and the probe
+    fitted on one corpus is spent in another corpus's feature space -- which is
+    how that arm came to score below chance on a corpus it had never seen.
+    """
+
+    def test_two_builds_give_the_same_weights(self) -> None:
+        from ecs.encoders import ARMS
+
+        # Whatever consumed the global generator before a build must not reach
+        # the weights: the two builds below are seeded differently on purpose.
+        torch.manual_seed(12345)
+        embed_a, meta_a = ARMS["random_init"]()
+        torch.manual_seed(999)
+        embed_b, meta_b = ARMS["random_init"]()
+
+        x = np.zeros((2, 12, 5000), dtype=np.float32)
+        x[1] = 1.0
+        with torch.no_grad():
+            np.testing.assert_array_equal(embed_a(x).numpy(), embed_b(x).numpy())
+        assert meta_a["weights_source"] == meta_b["weights_source"]
+        assert "seed unset" not in str(meta_a["weights_source"])
+
+
+class TestNoThirdPartyWeightOpensUnchecked:
+    """A .pth is a pickle, so opening one runs what it says to run. Every
+    third-party weight file is checked against the digest it had when it was
+    fetched, and the ECGFounder checkpoint really does carry the opcodes that
+    make that matter (GLOBAL resolves a name the file chooses, REDUCE calls it).
+    """
+
+    def test_no_load_site_opens_a_file_that_was_neither_checked_nor_restricted(self) -> None:
+        """Either torch is told to read weights only, or the digest was checked
+        first. ECGFounder needs the second: weights_only=True refuses that
+        checkpoint on torch 2.2.2, so the manifest is what guards it."""
+        for module in (
+            "src/ecs/encoders.py",
+            "scripts/score_external.py",
+            "scripts/timing_probe.py",
+        ):
+            source = (Path(__file__).resolve().parents[1] / module).read_text()
+            for match in re.finditer(r"torch\.load\(([^)]*)\)", source):
+                call = match.group(1)
+                preceding = source[max(0, match.start() - 400) : match.start()]
+                assert "weights_only=True" in call or "verified(" in preceding, (module, call)
+
+    def test_the_file_transformers_executes_is_in_the_manifest(self) -> None:
+        from ecs import encoders
+
+        for member in encoders.HUBERT_FILES:
+            assert member in encoders.WEIGHT_SHA256
+        assert "hubert-ecg-base/hubert_ecg.py" in encoders.HUBERT_FILES
+
+    def test_a_changed_file_is_refused_rather_than_opened(self, tmp_path: Path) -> None:
+        from ecs import encoders
+
+        name = "ecgfounder/12_lead_ECGFounder.pth"
+        planted = tmp_path / name
+        planted.parent.mkdir(parents=True)
+        planted.write_bytes(b"not the published checkpoint")
+        monkey = encoders.WEIGHTS
+        try:
+            encoders.WEIGHTS = tmp_path
+            with pytest.raises(RuntimeError, match="expected"):
+                encoders.verified(name)
+        finally:
+            encoders.WEIGHTS = monkey

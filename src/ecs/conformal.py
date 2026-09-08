@@ -197,13 +197,15 @@ def _check_alpha(alpha: float) -> None:
 #
 #   mondrian_quantiles   calibrate separately within each true class.  Valid
 #                        under any change of class proportions, exactly and in
-#                        finite samples, with no ratio to estimate.
+#                        finite samples, with no ratio to estimate -- label
+#                        conditional validity, Vovk, ACML 2012 (PMLR
+#                        25:475-490), Proposition 3.
 #   label_shift_quantiles  reweight by w(y) = q(y)/p(y) in the Tibshirani form.
 #                        Needs the target prior, so the guarantee is only as
-#                        good as the estimate of it.
-#
-# Podkopaev & Ramdas, UAI 2021 (arXiv:2103.03323), adapting the weighted
-# exchangeability of Tibshirani et al. from covariates to labels.
+#                        good as the estimate of it -- Podkopaev & Ramdas, UAI
+#                        2021 (arXiv:2103.03323), adapting the weighted
+#                        exchangeability of Tibshirani et al. from covariates
+#                        to labels.
 # ---------------------------------------------------------------------------
 
 

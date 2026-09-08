@@ -8,7 +8,7 @@ infarction is the only judgement here, and it is made once, in
 SNOMED separates *infarction* -- tissue that died -- from *ischaemia* --
 tissue deprived of blood but not yet dead.  The three corpora
 already in this study label infarction (PTB-XL's MI superclass, Shandong's AHA
-category M, Chongqing's angiographic AMI column), so infarction is the class a
+category M, Chongqing's discharge-diagnosis AMI column), so infarction is the class a
 seen target would have to carry, and the ischaemia codes are counted separately
 rather than folded in to make the total look healthier.
 

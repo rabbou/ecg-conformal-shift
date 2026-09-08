@@ -4,7 +4,7 @@
   "calibrated_on": "ptbxl",
   "corrections": {
     "none": "one threshold shared by both classes",
-    "mondrian": "one threshold per class, each fitted inside that class on PTB-XL; exact in finite samples under any change of class proportions, with nothing estimated (Podkopaev & Ramdas, UAI 2021, arXiv:2103.03323)",
+    "mondrian": "one threshold per class, each fitted inside that class on PTB-XL; exact in finite samples under any change of class proportions, with nothing estimated (label conditional validity, Vovk, ACML 2012, PMLR 25:475-490, Prop. 3)",
     "weighted": "each PTB-XL calibration point reweighted by w(y) = q(y)/p(y) in the weighted-exchangeability form of Tibshirani et al. (NeurIPS 2019); q is the target's class mix, which is not known and is estimated from that corpus's unlabelled predictions by BBSE (Lipton, Wang & Smola, ICML 2018), so the guarantee is worth exactly what the estimate is worth"
   },
   "what_the_target_supplied": "under the two unweighted corrections, nothing: one PTB-XL threshold is spent unchanged on all three corpora. Under the weighted correction, each corpus's unlabelled predicted-label marginal and nothing else -- no target label and no target score enters a threshold, which is what keeps C-20 intact while the threshold is allowed to differ by corpus",
@@ -14,7 +14,15 @@
   },
   "n_draws": 200,
   "seed": 0,
-  "git_commit": "8f377728aa98b1b8baf74c5dbd1942c8d724ef86",
+  "provenance": {
+    "commit": "40bffc58b28c7ed685af6305daa921aedfc6119e",
+    "producers": {
+      "scripts/shift_table.py": "2a86eab993d284b62d57e722ebafb458b525d40dcec6cfc9247f97f2779a7439",
+      "src/ecs/conformal.py": "c434998b704a551d55bc2206a1a3ada6d42309947b0b92db11607746dcd068dc",
+      "src/ecs/metrics.py": "bf1271d4ffc6d61751ff0b6a384745a7c0fa3d1462df6634acd6c08ed30129e2",
+      "src/ecs/splits.py": "17f1d2fea5970c37b989ad0df925b3d19f355012bfca02aed6983ce142b5a946"
+    }
+  },
   "corpora": {
     "sph": {
       "title": "Shandong Provincial Hospital",
@@ -41,14 +49,14 @@
       "n_excluded": 0
     }
   },
-  "seconds": 27.9,
+  "seconds": 33.2,
   "reading": {
     "asked_at": "the 90% set on the lac score, over 200 draws",
     "restored_within": 0.02,
     "which_correction_this_shift_needed": "Mondrian, and the reason is visible before any hospital changes. Where the threshold was fitted, infarctions fall inside the 90% set only 0.735 of the time (sd 0.030) while the overall figure lands on 0.900: the guarantee was marginal all along, and it was being paid for by the healthy majority. Changing hospital does not create that gap, it only changes how much the healthy majority hides it. Away from home: Shandong the uncorrected threshold 0.936 (sd 0.003), Mondrian 0.974 (sd 0.002), weighted 0.913 (sd 0.010); Chongqing the uncorrected threshold 0.725 (sd 0.008), Mondrian 0.840 (sd 0.010), weighted 0.761 (sd 0.014). Calibrating inside the class closes it on the draw it is measured on -- Mondrian minus uncorrected, paired: PTB-XL +0.1667 (sd 0.0259); Shandong +0.0378 (sd 0.0033); Chongqing +0.1154 (sd 0.0099). Estimating the target prior instead does not: weighted minus uncorrected, paired: PTB-XL +0.0014 (sd 0.0171); Shandong -0.0233 (sd 0.0095); Chongqing +0.0362 (sd 0.0107), which on Shandong is a loss. Within 0.02 of the level asked for, the sick are reached on Shandong -- and there it holds under every correction only because 99% of that corpus is healthy and the healthy are easy.",
     "what_each_costs": "Mondrian pays in set size and in the points the minority class is left with: class 1 gets 275 of 1099 calibration points to fit its own threshold on, and the sets widen -- mean set size PTB-XL 1.052 uncorrected, 1.105 Mondrian, 1.055 weighted; Shandong 1.030 uncorrected, 1.080 Mondrian, 0.967 weighted; Chongqing 1.062 uncorrected, 1.117 Mondrian, 1.139 weighted. Nothing is estimated, so that is the whole bill. The weighted correction pays twice. First in the estimate: PTB-XL true 0.2502 against estimated 0.2524 (sd 0.0280), effective sample size 1092 of 1099; Shandong true 0.0101 against estimated 0.0241 (sd 0.0101), effective sample size 864 of 1099; Chongqing true 0.1492 against estimated 0.4087 (sd 0.0165), effective sample size 967 of 1099. Second in refusals it does not announce as set size -- Shandong 4.3% of sets empty under weighting against 0.0% uncorrected: a mean set size below one is empty sets, not tight ones, and an empty set is the model declining to answer rather than answering well. Third, in draws where the estimate does not exist at all: Shandong on 2 of 200 draws the estimated prior left the simplex, which is BBSE saying a change of class mix does not explain that corpus, and the sets widened to every label.",
     "what_neither_repairs": "On Chongqing the sick stay below the level under every correction (the uncorrected threshold 0.725, Mondrian 0.840, weighted 0.761). Both corrections assume P(X|Y) is fixed and only P(Y) moves; there it is not the mix that moved. The deviations this file carries for that corpus name the reason -- the label is a different event -- and no reweighting of a calibration set can repair a target whose positives are not the same positives.",
-    "what_cannot_be_claimed": "That class-conditional calibration 'works' in deployment. Its guarantee is conditional on the patient's true class, which is the thing that is unknown at the bedside: the set is computable without the label, but the clinician holding one cannot know which of the two promises applies to them, and pays the wider set either way. Nor that the weighted correction was given a fair estimate here and failed on its merits -- BBSE was handed the same predictor whose coverage is being measured, and the priors above are what it returned.",
+    "what_cannot_be_claimed": "That class-conditional calibration 'works' in deployment. Its guarantee is conditional on the patient's true class, which is unknown at the bedside: the set is computable without the label, but the clinician holding one cannot know which of the two promises applies to them, and pays the wider set either way. Nor that the weighted correction was given a fair estimate here and failed on its merits -- BBSE was handed the same predictor whose coverage is being measured, and the priors above are what it returned.",
     "paired": {
       "ptbxl": {
         "sick coverage": {

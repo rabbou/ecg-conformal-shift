@@ -75,7 +75,7 @@ def _ecgfm_param_count() -> int | None:
     path = WEIGHTS / "ecgfm/mimic_iv_ecg_physionet_pretrained.pt"
     if not path.exists():
         return None
-    checkpoint = torch.load(path, map_location="cpu")
+    checkpoint = torch.load(path, map_location="cpu", weights_only=True)
     return int(sum(v.numel() for v in checkpoint["model"].values()))
 
 

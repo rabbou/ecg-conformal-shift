@@ -3,14 +3,17 @@
 The three corpora use different annotation schemes.  PTB-XL annotates with
 SCP-ECG statements carrying a 0-100 likelihood; Shandong annotates with AHA
 codes carrying an acute / recent / old modifier; Chongqing annotates with one
-binary column per finding, recorded against a coronary angiogram rather than
-against the tracing.  Every decision that makes those three comparable, or
-fails to, is made in this module.
+binary column per finding, recorded from the discharge diagnosis rather than
+from the tracing.  Every decision that makes those three comparable, or fails
+to, is made in this module.
 
 One known mismatch: PTB-XL's MI superclass and Shandong's
 category-M codes are dominated by the *chronic* infarct pattern, while every
-Chongqing positive is an *acute* event by construction, because the corpus was
-assembled from patients presenting with acute coronary syndrome.  A label
+Chongqing positive is an *acute* event, its ``AMI`` column being set when the
+discharge diagnosis names one.  The corpus is preoperative ECGs from patients
+undergoing coronary angiography, about half of whom carry an acute coronary
+syndrome; the angiographic label in that dataset is ``OMI``, which is not used
+here.  A label
 learned on one is not the same clinical question as a label read off the other,
 and no re-coding here can make it so; the deviation is named in the results
 file (C-14) instead of being smoothed over.

@@ -1,5 +1,5 @@
 {
-  "bundle": "/home/ruben/data/challenge2021",
+  "bundle": "~/data/challenge2021",
   "git_commit": "ef8b501ba0713b20ac15d9e1bbc56f18e1a01e29",
   "partitions_read": [
     "chapman_shaoxing",

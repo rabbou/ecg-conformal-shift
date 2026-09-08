@@ -7,7 +7,7 @@ survives the change of hospital; the two standard corrections, Mondrian
 per-class calibration and label-shift weighting, are compared on the same
 break.
 
-The findings, the four figures and the limitations are in
+The findings, the three figures and the limitations are in
 [REPORT.md](REPORT.md). Common questions are answered in
 [QUESTIONS.md](QUESTIONS.md). This file documents the corpora, the layout and
 the reproduction commands.
@@ -67,8 +67,10 @@ Infarction is 25 times rarer in Shandong than in PTB-XL. The gap is not a
 labelling artefact: dropping PTB-XL's five subendocardial-injury statements
 moves prevalence only from 25.09% to 24.26%. PTB-XL is a research corpus
 enriched for pathology and Shandong is an unselected hospital series. 89.6% of
-Shandong's infarctions are annotated as old, the same chronic-infarct target
-that PTB-XL uses, so the labels are comparable.
+Shandong's infarctions carry the AHA modifier for an old infarct, which is the
+target PTB-XL's label mostly describes; the remaining 10.4% are marked acute,
+recent, or carry no modifier at all, so the two label sets are close but not
+the same thing.
 
 The dominant shift is therefore in the class prior P(Y) rather than in the
 feature distribution P(X), and covariate-shift weighting does not apply. Two
@@ -76,15 +78,17 @@ corrections are implemented:
 
 - Mondrian (class-conditional) conformal: one threshold per class. Exactly
   valid in finite samples under any change of class proportions, with nothing
-  to estimate.
+  to estimate. Vovk (ACML 2012) calls this label conditional validity and
+  proves it in his Proposition 3.
 - Label-shift weighting: reweight by `w(y) = q(y)/p(y)` in the Tibshirani
   form, with the target prior estimated by BBSE. The guarantee is asymptotic
   and depends on that estimate, so effective sample size is reported next to
   every result.
 
-Chongqing is the harder target: its label is angiographically confirmed acute
-infarction, a different clinical event, so the label definition changes as
-well as the prevalence.
+Chongqing is the harder target: its positive is the dataset's `AMI` column, set
+from the discharge diagnosis, in a cohort every patient of which underwent
+coronary angiography. That is a different clinical event from an ECG diagnosis
+of an old infarct, so the label definition changes as well as the prevalence.
 
 ## Layout
 
@@ -92,32 +96,88 @@ well as the prevalence.
 |---|---|
 | `src/ecs/conformal.py` | split conformal (LAC + APS scores), Mondrian quantiles, covariate- and label-shift weighting, BBSE |
 | `src/ecs/metrics.py` | coverage, Wilson intervals, class-conditional coverage, set size, abstention, effective sample size |
-| `src/ecs/labels.py` | one comparable MI label across three annotation schemes (SCP-ECG, AHA, angiographic) |
+| `src/ecs/labels.py` | one comparable MI label across three annotation schemes (SCP-ECG, AHA, discharge diagnosis) |
 | `src/ecs/config.py` | corpus paths and the label vocabulary |
 
 ## Reproduce
 
+Every number and every figure the report prints is redrawn from the scores
+committed here, so none of the raw tracings are needed. Two of the three
+scripts do need one file that is not committed: PTB-XL's `ptbxl_database.csv`,
+6.6 MB from PhysioNet, which holds the patient each record belongs to and the
+sex and age the subgroup table reports. Point `ECS_PTBXL_DIR` at the directory
+holding it. The figures redraw without it.
+
 ```bash
-uv sync
-uv run pytest -m "not data"   # unit tests, no corpora needed
-uv run pytest                 # adds the reference-value tests against the corpora
+uv sync                                  # 1 min
+uv run pytest -m "not data"              # unit tests, no corpora needed, 2 min
+uv run python scripts/figures.py         # redraws all six figures, 5 s
+export ECS_PTBXL_DIR=/path/to/ptbxl      # the directory with ptbxl_database.csv
+uv run python scripts/outcomes.py        # rebuilds results/outcomes.json, 3 s
+uv run python scripts/subgroups.py       # rebuilds results/subgroups.json, 23 s
 ```
 
-PTB-XL is read in place from `ECS_PTBXL_DIR`; SPH and ACS-ECG are stored under
-`data/`.
+Timings are wall clock on a six-core i7-8700, CPU only. The full suite on a
+cold clone, where every test module is imported for the first time, took 28
+minutes.
+
+The corpora themselves are only needed to re-score from the raw tracings,
+which the committed `.npz` files make unnecessary for reproducing the report. The three
+of them take 7.3 GB on disk, and the four auxiliary PhysioNet corpora the
+script also fetches take roughly 21 GB more:
+
+```bash
+./scripts/fetch_open_corpora.sh          # ACS-ECG and four PhysioNet corpora
+uv run pytest                            # adds the corpus-backed tests
+```
+
+`fetch_open_corpora.sh` does not fetch PTB-XL or SPH. PTB-XL is read in place
+from `ECS_PTBXL_DIR` (default `~/Developer/ptbxl5d/data`) and is downloaded
+from PhysioNet; SPH is downloaded from its figshare record and unpacked under
+`data/sph`. Without them the corpus-backed tests skip rather than fail.
 
 ## Gates
 
 `ruff` (lint + format), `mypy --disallow-untyped-defs`, `pytest` — on every
 commit via `pre-commit`, tests at pre-push.
 
+## What this is not
+
+A retrospective measurement study on public, de-identified data. No device
+claim, no outcome claim, no prospective patient contact, no regulatory status,
+and nothing here is intended to guide the care of any patient. The ethics
+approvals under which each dataset was released, and the author's competing
+interests, are stated at the top of [REPORT.md](REPORT.md).
+
 ## Licence
 
-MIT ([LICENSE](LICENSE)). The vendored ECGFounder architecture in
-`third_party/ecgfounder/` is MIT, PKUDigitalHealth. The corpora keep their own
-licences (CC BY 4.0 and CC0) and are fetched by script, not redistributed
-here. The HuBERT-ECG weights are CC BY-NC 4.0, so that encoder arm is limited
-to research use and is excluded from any commercial product.
+The code is MIT ([LICENSE](LICENSE)), with three exceptions.
+
+`third_party/ecgfounder/net1d.py` is vendored from PKUDigitalHealth's
+ECGFounder release under MIT, and is itself derived from `hsd1503/resnet1d` by
+Shenda Hong under the Apache License 2.0. Both notices and the chain between
+them are in
+[`third_party/ecgfounder/PROVENANCE.md`](third_party/ecgfounder/PROVENANCE.md).
+The root MIT licence does not cover that directory.
+
+The HuBERT-ECG weights are CC BY-NC 4.0. That restriction reaches further than
+the arm itself: any number in this repository computed from those weights is a
+derivative of them, so `results/embeddings/hubert_ecg/` and the HuBERT-ECG rows
+of `results/arms.json` are limited to research use, whatever the root licence
+says about the code that produced them.
+
+No raw tracing is redistributed here, but the repository is not free of corpus
+data either. `results/baseline/scores.npz` and `results/external/*.npz` carry
+one row per record — the record identifier, its label and its model score, for
+45,923 records across the three corpora — which is derived data under each
+corpus's licence and joinable against the public patient tables. PTB-XL is
+CC BY 4.0, which requires attribution: cite Wagner et al. 2020
+(doi:10.1038/s41597-020-0495-6), the PhysioNet resource
+(doi:10.13026/kfzx-aw45) and PhysioNet itself (Goldberger et al., Circulation
+2000;101(23):e215–e220). The Shandong and Chongqing datasets are CC0. The
+PhysioNet/CinC Challenge 2021 collection (CC BY 4.0), read only to count how
+much infarction its non-PTB-XL partitions carry for
+`results/seen_target.json`, is Reyna et al., Computing in Cardiology 2021.
 
 ## Sources
 
@@ -125,5 +185,7 @@ PTB-XL: Wagner et al., *Sci Data* 2020, 10.1038/s41597-020-0495-6 · SPH: Liu et
 al., *Sci Data* 2022, 10.1038/s41597-022-01403-5 · ACS-ECG: *Sci Data* 2026,
 10.1038/s41597-026-07278-0 · Split conformal: Angelopoulos & Bates,
 arXiv:2107.07511 · APS: Romano, Sesia & Candès, NeurIPS 2020 · Covariate shift:
-Tibshirani, Barber, Candès & Ramdas, NeurIPS 2019 · Label shift: Podkopaev &
-Ramdas, UAI 2021, arXiv:2103.03323 · BBSE: Lipton, Wang & Smola, ICML 2018.
+Tibshirani, Barber, Candès & Ramdas, NeurIPS 2019 · Label conditional
+validity: Vovk, ACML 2012, PMLR 25:475-490 · Conformal prediction under label
+shift: Podkopaev & Ramdas, UAI 2021, arXiv:2103.03323 · BBSE: Lipton, Wang &
+Smola, ICML 2018.

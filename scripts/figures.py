@@ -1,7 +1,7 @@
-"""Draw the four figures listed in PLAN.md.
+"""Draw the six figures the plan and the report name.
 
-Each one is drawn from a file under ``results/`` that was committed before it,
-so a figure can always be regenerated from the numbers rather than redrawn from
+Each one is drawn from a committed file under ``results/`` and redraws from it
+pixel for pixel, so a figure always comes from the numbers rather than from
 memory, and a surprising result cannot be quietly re-cut.
 
 1. Coverage against target -- does the guarantee hold at each hospital, and does
@@ -24,7 +24,10 @@ calibration, so a difference between two arms is a difference between two
 pre-trainings.  Until that file exists this script says what it is waiting for
 rather than drawing an empty frame.
 
-Usage: .venv/bin/python scripts/figures.py [--figure 1 2 3 4]
+The report numbers its own figures in its own text; the images carry titles,
+not numbers, so the two cannot drift apart.
+
+Usage: .venv/bin/python scripts/figures.py [--figure 1 2 3 4 5 6]
 """
 
 from __future__ import annotations
@@ -204,7 +207,7 @@ def figure_1_coverage(table: dict[str, Any], out: Path, source: Path) -> Path:
         for corpus, block in _rows(table, "lac", "weighted")[1]["by_corpus"].items()
     )
     figure.suptitle(
-        "Figure 1 — coverage per hospital and correction\n"
+        "Coverage per hospital and correction\n"
         f"Share of infarctions inside the 90% set on PTB-XL: {quoted}.\n"
         f"Dashed line: the requested level. Bars: mean over {table['n_draws']} calibration "
         "draws on PTB-XL, whiskers one standard deviation.\n"
@@ -267,7 +270,7 @@ def figure_2_set_sizes(table: dict[str, Any], out: Path, source: Path) -> Path:
         )
     axes[0][-1].legend(loc="lower left", fontsize=8, framealpha=0.9)
     figure.suptitle(
-        "Figure 2 — output composition against requested confidence\n"
+        "Output composition against requested confidence\n"
         "One threshold, fitted on PTB-XL and applied to all three corpora. Tracings with "
         "both labels or no label go to a human reader.",
         fontsize=10,
@@ -367,7 +370,7 @@ def figure_3_arms(arms: dict[str, Any], out: Path, source: Path) -> Path:
     worst = max(ARM_ORDER, key=lambda a: _headline_row(arms, a)["coverage_gap"]["acs"]["mean"])
     best = min(ARM_ORDER, key=lambda a: _headline_row(arms, a)["coverage_gap"]["acs"]["mean"])
     figure.suptitle(
-        "Figure 3 — coverage gap per encoder arm\n"
+        "Coverage gap per encoder arm\n"
         f"Gap to Chongqing runs from {plain[best]} "
         f"{_headline_row(arms, best)['coverage_gap']['acs']['mean']:+.3f} to {plain[worst]} "
         f"{_headline_row(arms, worst)['coverage_gap']['acs']['mean']:+.3f}.\n"
@@ -427,7 +430,7 @@ def figure_4_discrimination(
     axis.set_ylim(0, 1.12)
     axis.set_ylabel("PTB-XL fold 10, infarction against the rest")
     axis.set_title(
-        "Figure 4 — baseline discrimination against the published reference\n"
+        "Baseline discrimination against the published reference\n"
         f"{metrics['n_test']} tracings, {metrics['n_test_positive']} of them infarction; "
         "whiskers are 95% bootstrap intervals.\n"
         "The published figure averages five diagnostic superclasses, not infarction alone.",
@@ -440,9 +443,195 @@ def figure_4_discrimination(
     return out
 
 
+# The three schemes of the outcome table, in the order the report reads them.
+SCHEME_ORDER = ("plain", "pooled", "perlabel")
+SCHEME_NAMES = {
+    "plain": "Single tuned threshold\n90% sensitivity, no deferral",
+    "pooled": "Pooled conformal calibration\n90% coverage, all cases",
+    "perlabel": "Class-conditional calibration\n90% coverage within each label",
+}
+# Correct, deferred, wrong -- the three things that can happen to a case.
+OUTCOME_COLOURS = {"correct": "#4a7c59", "deferred": "#e0a458", "wrong": "#b4423a"}
+
+
+def figure_5_thresholds(
+    outcomes: dict[str, Any], scores: dict[str, Any], out: Path, source: Path
+) -> Path:
+    """Where each scheme puts its thresholds, and what that costs per label.
+
+    The score axis is the same in all three panels; only the thresholds move.
+    Each panel carries the consequence beside the placement, so the figure does
+    not need the table to be read.
+    """
+    probs = scores["probs"][:, 1]
+    labels = scores["labels"]
+    source_block = outcomes["by_corpus"]["ptbxl"]
+    prevalence = source_block["prevalence"]
+    thresholds = outcomes["thresholds"]
+    bands: dict[str, tuple[float, ...]] = {
+        "plain": (thresholds["plain:single"]["mean"],),
+        "pooled": (thresholds["pooled:lower"]["mean"], thresholds["pooled:upper"]["mean"]),
+        "perlabel": (thresholds["perlabel:lower"]["mean"], thresholds["perlabel:upper"]["mean"]),
+    }
+    bins = np.linspace(0.0, 1.0, 41)
+    figure, axes = plt.subplots(3, 1, figsize=(8.8, 8.4), sharex=True)
+    for axis, scheme in zip(axes, SCHEME_ORDER, strict=True):
+        for klass, colour, name in ((0, "#7d8a93", "non-MI"), (1, "#b4423a", "MI")):
+            of_class = labels == klass
+            axis.hist(
+                probs[of_class],
+                bins=bins,
+                weights=np.full(int(of_class.sum()), 100.0 / int(of_class.sum())),
+                color=colour,
+                alpha=0.7,
+                label=f"{name} (n={int(of_class.sum()):,})",
+            )
+        cuts = bands[scheme]
+        low, high = cuts[0], cuts[-1]
+        if high > low:
+            axis.axvspan(low, high, color="#e0a458", alpha=0.30, zorder=0)
+            axis.text((low + high) / 2, 52, "deferred", ha="center", fontsize=9.5, color="#8a5b1c")
+        for cut in dict.fromkeys(cuts):
+            axis.axvline(cut, color="black", lw=1.2, ls="--")
+            axis.text(cut + 0.009, 44, f"{cut:.2f}", fontsize=8.5, color="#333", va="top")
+        axis.text(low / 2, 52, "labelled non-MI", ha="center", fontsize=9.5, color="#3d474d")
+        axis.text((high + 1) / 2, 52, "labelled MI", ha="center", fontsize=9.5, color="#7a2f2a")
+        sick = source_block["schemes"][scheme]["1"]
+        healthy = source_block["schemes"][scheme]["0"]
+        deferred = (
+            prevalence * sick["deferred"]["mean"] + (1 - prevalence) * healthy["deferred"]["mean"]
+        )
+        axis.text(
+            0.985,
+            0.72,
+            f"MI missed  {sick['wrong']['mean'] * 100:.0f}%\n"
+            f"false alarms  {healthy['wrong']['mean'] * 100:.0f}%\n"
+            f"deferred  {deferred * 100:.0f}%",
+            transform=axis.transAxes,
+            ha="right",
+            va="top",
+            fontsize=10,
+            linespacing=1.55,
+            bbox={"boxstyle": "round,pad=0.5", "fc": "#f6f4ef", "ec": "#cfc9bd", "lw": 0.8},
+        )
+        axis.set_ylim(0, 58)
+        axis.set_title(SCHEME_NAMES[scheme].replace("\n", " -- "), fontsize=11.5, loc="left", pad=6)
+        axis.set_ylabel("% of that class", fontsize=9.5)
+        for spine in ("top", "right"):
+            axis.spines[spine].set_visible(False)
+    axes[0].legend(fontsize=9, frameon=False, loc="upper left", bbox_to_anchor=(0.30, 1.02))
+    axes[-1].set_xlabel("model score for MI", fontsize=10)
+    axes[-1].set_xlim(0, 1)
+    figure.text(
+        0.5,
+        0.055,
+        "MI missed: share of MI cases given the non-MI label alone.   "
+        "False alarms: share of non-MI cases given the MI label alone.",
+        ha="center",
+        fontsize=8.5,
+        color="#555",
+    )
+    figure.text(
+        0.5,
+        0.040,
+        "Deferred: share of all tracings returning both labels or neither, sent to a specialist.",
+        ha="center",
+        fontsize=8.5,
+        color="#555",
+    )
+    figure.text(
+        0.5,
+        0.025,
+        "Histograms show all of fold 10; the rates are means over the test halves.",
+        ha="center",
+        fontsize=8.5,
+        color="#555",
+    )
+    figure.tight_layout(rect=(0, 0.085, 1, 1))
+    _source_note(figure, source)
+    figure.savefig(out, dpi=200)
+    plt.close(figure)
+    return out
+
+
+def figure_6_outcomes(outcomes: dict[str, Any], out: Path, source: Path) -> Path:
+    """What a case of each label gets, under each of the three schemes."""
+    source_block = outcomes["by_corpus"]["ptbxl"]
+    # The halving is by patient, so the test half's size varies by draw; the
+    # counts are the means the table recorded, not a nominal half.
+    scored = source_block["n_scored"]["mean"]
+    positive = source_block["n_positive"]["mean"]
+    panels = (
+        ("1", f"MI cases (mean {positive:,.0f} per draw)"),
+        ("0", f"non-MI cases (mean {scored - positive:,.0f} per draw)"),
+    )
+    figure, axes = plt.subplots(1, 2, figsize=(13, 4.3), sharex=True)
+    positions = np.arange(len(SCHEME_ORDER))[::-1]
+    for axis, (klass, title) in zip(axes, panels, strict=True):
+        for position, scheme in zip(positions, SCHEME_ORDER, strict=True):
+            cell = source_block["schemes"][scheme][klass]
+            left = 0.0
+            for name in ("correct", "deferred", "wrong"):
+                width = cell[name]["mean"] * 100
+                axis.barh(position, width, left=left, color=OUTCOME_COLOURS[name], height=0.5)
+                if width > 5:
+                    axis.text(
+                        left + width / 2,
+                        position,
+                        f"{width:.0f}%",
+                        ha="center",
+                        va="center",
+                        color="#3a2c10" if name == "deferred" else "white",
+                        fontsize=10.5,
+                    )
+                left += width
+        axis.set_yticks(positions)
+        axis.set_yticklabels([SCHEME_NAMES[s] for s in SCHEME_ORDER], fontsize=9)
+        axis.set_xlim(0, 100)
+        axis.set_title(title, fontsize=11.5, pad=10)
+        axis.set_xlabel("share of cases carrying this label (%)", fontsize=9.5)
+        for spine in ("top", "right", "left"):
+            axis.spines[spine].set_visible(False)
+        axis.tick_params(axis="y", length=0)
+    handles = [
+        plt.Rectangle((0, 0), 1, 1, color=OUTCOME_COLOURS[name])
+        for name in ("correct", "deferred", "wrong")
+    ]
+    figure.legend(
+        handles,
+        ["correct label returned", "deferred to a specialist", "incorrect label returned"],
+        fontsize=10,
+        loc="lower center",
+        bbox_to_anchor=(0.5, 0.055),
+        ncol=3,
+        frameon=False,
+    )
+    figure.text(
+        0.5,
+        0.045,
+        f"PTB-XL fold 10, {outcomes['n_draws']} patient-level calibration draws. "
+        "The single threshold and per-label calibration meet at a ~10% MI miss rate "
+        "by construction; pooled calibration is matched to neither and lands at 27%.",
+        ha="center",
+        fontsize=8.5,
+        color="#555",
+    )
+    figure.tight_layout(rect=(0, 0.15, 1, 0.97))
+    _source_note(figure, source)
+    figure.savefig(out, dpi=200)
+    plt.close(figure)
+    return out
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--figure", nargs="+", type=int, default=[1, 2, 3, 4], choices=[1, 2, 3, 4])
+    parser.add_argument(
+        "--figure",
+        nargs="+",
+        type=int,
+        default=[1, 2, 3, 4, 5, 6],
+        choices=[1, 2, 3, 4, 5, 6],
+    )
     parser.add_argument("--out", default=str(RESULTS_DIR / "figures"))
     args = parser.parse_args(argv)
     out = Path(args.out)
@@ -456,7 +645,7 @@ def main(argv: list[str] | None = None) -> int:
     drawn = []
     if 1 in args.figure:
         table = json.loads(shift_path.read_text())
-        drawn.append(figure_1_coverage(table, out / "fig1_coverage.png", shift_path))
+        drawn.append(figure_1_coverage(table, out / "fig3_coverage.png", shift_path))
     if 2 in args.figure:
         table = json.loads(shift_path.read_text())
         drawn.append(figure_2_set_sizes(table, out / "fig2_set_sizes.png", shift_path))
@@ -481,6 +670,16 @@ def main(argv: list[str] | None = None) -> int:
                 metrics_path,
             )
         )
+    outcomes_path = RESULTS_DIR / "outcomes.json"
+    if 5 in args.figure or 6 in args.figure:
+        outcomes = json.loads(outcomes_path.read_text())
+        if 5 in args.figure:
+            scores = dict(np.load(RESULTS_DIR / "baseline/scores.npz"))
+            drawn.append(
+                figure_5_thresholds(outcomes, scores, out / "fig1_thresholds.png", outcomes_path)
+            )
+        if 6 in args.figure:
+            drawn.append(figure_6_outcomes(outcomes, out / "fig2_outcomes.png", outcomes_path))
     for path in drawn:
         print(path, flush=True)
     return 0

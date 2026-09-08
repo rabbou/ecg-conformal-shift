@@ -73,7 +73,8 @@ SCORES = ("lac", "aps")
 #             change in the share of sick patients moves it.
 #   mondrian  one threshold per class, each fitted inside that class.  Exact in
 #             finite samples under any change of class proportions, with nothing
-#             to estimate -- Podkopaev & Ramdas, UAI 2021 (arXiv:2103.03323).
+#             to estimate -- label conditional validity, Vovk, ACML 2012
+#             (PMLR 25:475-490), Proposition 3.
 #   weighted  each calibration point reweighted by w(y) = q(y)/p(y), the target
 #             prior over the source prior, in the weighted-exchangeability form of
 #             Tibshirani et al. (NeurIPS 2019).  q is not known and is estimated

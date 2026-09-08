@@ -25,6 +25,7 @@ import numpy as np
 import pandas as pd
 
 from ecs.config import PTBXL_DIR, RESULTS_DIR
+from ecs.provenance import provenance_block
 from ecs.report import REDRAW_CORRECTIONS, SCORES, repeated_split_report
 
 # Confidence levels from the plan, loosest first.
@@ -73,7 +74,14 @@ def main(argv: list[str] | None = None) -> int:
         "n_positive": int(labels.sum()),
         "n_draws": args.draws,
         "seed": args.seed,
-        "git_commit": git_commit(),
+        "provenance": provenance_block(
+            [
+                "scripts/abstention_table.py",
+                "src/ecs/conformal.py",
+                "src/ecs/metrics.py",
+                "src/ecs/splits.py",
+            ]
+        ),
         "seconds": round(time.perf_counter() - started, 1),
         "rows": rows,
     }

@@ -73,7 +73,7 @@ class Scored:
 
 def load_model(checkpoint: Path) -> tuple[ResNet1d, float, float]:
     """The trained baseline and the standardisation it was trained under."""
-    saved = torch.load(checkpoint, map_location="cpu")
+    saved = torch.load(checkpoint, map_location="cpu", weights_only=True)
     model = ResNet1d(n_classes=2)
     model.load_state_dict(saved["state_dict"])
     model.eval()

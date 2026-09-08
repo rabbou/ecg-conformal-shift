@@ -204,15 +204,30 @@ class TestCoveragePerSite:
                     ), (corpus, scheme, klass)
 
 
-def test_no_empty_set_arises_at_this_alpha() -> None:
-    """Section 2.2 tells the reader every deferral here is a both-label set."""
+def test_no_empty_set_arises_in_the_two_schemes_the_report_discusses() -> None:
+    """Section 2.2 tells the reader which deferral each scheme can produce.
+
+    With two labels the probabilities sum to one, so a set is empty only when
+    the two thresholds admitting each label sum to less than one.  For the
+    pooled scheme both thresholds are the same number, which makes the
+    condition "below 0.5"; for the class-conditional pair it is the sum that
+    matters, and the two are not interchangeable.  The weighted scheme, which
+    the report reports but does not recommend, does produce empty sets at
+    Shandong, so this covers only the two schemes section 2.2 speaks for.
+    """
     scores = dict(np.load(RESULTS_DIR / "baseline/scores.npz", allow_pickle=False))
     probs, labels = scores["probs"], scores["labels"]
     true = 1.0 - probs[np.arange(labels.size), labels]
-    quantile = conformal_quantile(true, ALPHA)
-    assert quantile > 0.5, "an empty set becomes possible once the quantile drops below 0.5"
-    sizes = ((1.0 - probs) <= quantile).sum(axis=1)
-    assert sizes.min() >= 1
+
+    pooled = conformal_quantile(true, ALPHA)
+    per_label = np.array([conformal_quantile(true[labels == c], ALPHA) for c in (0, 1)])
+
+    for name, pair in (("pooled", np.array([pooled, pooled])), ("perlabel", per_label)):
+        assert pair.sum() >= 1.0, (
+            f"{name}: an empty set becomes possible once the pair sums below 1"
+        )
+        sizes = ((1.0 - probs) <= pair[None, :]).sum(axis=1)
+        assert sizes.min() >= 1, name
 
 
 class TestTheShippedCodeAgreesWithTheDefinition:

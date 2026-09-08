@@ -67,8 +67,10 @@ Infarction is 25 times rarer in Shandong than in PTB-XL. The gap is not a
 labelling artefact: dropping PTB-XL's five subendocardial-injury statements
 moves prevalence only from 25.09% to 24.26%. PTB-XL is a research corpus
 enriched for pathology and Shandong is an unselected hospital series. 89.6% of
-Shandong's infarctions are annotated as old, the same chronic-infarct target
-that PTB-XL uses, so the labels are comparable.
+Shandong's infarctions carry the AHA modifier for an old infarct, which is the
+target PTB-XL's label mostly describes; the remaining 10.4% are marked acute,
+recent, or carry no modifier at all, so the two label sets are close but not
+the same thing.
 
 The dominant shift is therefore in the class prior P(Y) rather than in the
 feature distribution P(X), and covariate-shift weighting does not apply. Two

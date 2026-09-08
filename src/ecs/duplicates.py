@@ -16,9 +16,23 @@ function is copied rather than imported because this repository has to build
 from its own checkout; ``test_duplicates.py`` holds the copy to the digests that
 repository published, so the two cannot drift apart silently.
 
-What this does *not* claim: that two records with one digest are one patient.
-That is a different question.  What it establishes is narrower and enough --
-they are one recording, so they belong on one side of any boundary.
+What this does *not* claim, in two directions.
+
+It does not claim that two records with one digest are one patient.  That is a
+different question.  What it establishes is narrower and enough -- they are one
+recording, so they belong on one side of any boundary.
+
+And it finds exact copies, not near ones.  A digest separates two recordings
+that differ by more than the quantum anywhere in the window, so a copy that was
+filtered or resampled between packagings escapes it; catching those needs a
+correlation pass, which is quadratic.  The delivery corpus runs one and
+publishes both sieves.  Read against it, no link of either sieve joins two of
+the five rotation corpora: of the 434 links with both ends in a rotation corpus,
+every one is a digest match inside a single corpus (results/split_leak.json for
+the split counts; ecg-data-chain 233bbfd, results/delivery/duplicate_link.parquet
+for the links).  Shandong is the gap: it is not in that corpus, so only the
+digest sieve has been run between it and the other four, and a near-copy shared
+with them would not have been seen.
 """
 
 from __future__ import annotations

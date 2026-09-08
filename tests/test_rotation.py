@@ -173,6 +173,103 @@ class TestNoThresholdReadsATargetLabel:
         assert _thresholds(before) == _thresholds(after)
 
 
+def _fake_cell(source: str, label: str, by_corpus: dict[str, float]) -> dict[str, Any]:
+    """One (source, diagnosis) block with the coverage each corpus is to report."""
+    return {
+        "source": source,
+        "label": label,
+        "rows": [
+            {
+                "alpha": 0.10,
+                "target_coverage": 0.90,
+                "score": "lac",
+                "correction": correction,
+                "by_corpus": {
+                    f"{source}-calibration-holdout": {
+                        "coverage_by_class": {"1": {"mean": 0.9}},
+                        "prevalence": 0.2,
+                        "n_points": 1000,
+                    },
+                    **{
+                        corpus: {
+                            "coverage_by_class": {"1": {"mean": covered}},
+                            "prevalence": 0.2,
+                            "n_points": 1000,
+                        }
+                        for corpus, covered in by_corpus.items()
+                    },
+                },
+            }
+            for correction in CORRECTIONS
+        ],
+    }
+
+
+@pytest.fixture(scope="module")
+def summary() -> dict[str, Any]:
+    """Two sources, one diagnosis, coverage chosen so the answer is arithmetic."""
+    import rotation_table
+
+    cells = [
+        _fake_cell("a", "AF", {"a": 0.90, "b": 0.80, "c": 0.80}),
+        _fake_cell("b", "AF", {"b": 0.90, "a": 0.70, "c": 0.70}),
+    ]
+    return rotation_table.bias_summary(cells)
+
+
+class TestTheBiasSummary:
+    """C-28: what the rotation exists to produce, on numbers whose answer is known.
+
+    Two sources, one diagnosis. The first source lands 10 points low on both its
+    targets, the second 20 points low on both, and each reads the level exactly at
+    home. The away bias is then -0.15, the spread across the four pairs is the
+    spread of two -0.10s and two -0.20s, and the spread across the two sources is
+    the spread of -0.10 and -0.20 -- a wider number, which is the reason the
+    rotation reports it rather than the pair spread alone.
+    """
+
+    def test_the_away_pairs_exclude_the_source_reading_at_home(
+        self, summary: dict[str, Any]
+    ) -> None:
+        block = summary["AF"]["none"]
+        assert block["away_bias"]["n_pairs"] == 4
+        assert {(a["source"], a["target"]) for a in block["away"]} == {
+            ("a", "b"),
+            ("a", "c"),
+            ("b", "a"),
+            ("b", "c"),
+        }
+        assert [h["source"] for h in block["home"]] == ["a", "b"]
+
+    def test_the_home_reading_is_the_source_on_its_own_test_part(
+        self, summary: dict[str, Any]
+    ) -> None:
+        assert summary["AF"]["none"]["home_bias"]["mean"] == 0.0
+
+    def test_the_mean_away_bias_is_the_mean_over_the_pairs(self, summary: dict[str, Any]) -> None:
+        assert summary["AF"]["none"]["away_bias"]["mean"] == pytest.approx(-0.15)
+        assert summary["AF"]["none"]["away_bias"]["worst"] == pytest.approx(-0.20)
+
+    def test_the_spread_across_sources_is_wider_than_the_spread_across_pairs(
+        self, summary: dict[str, Any]
+    ) -> None:
+        """Averaging inside a source first is what makes the second number the
+        one to quote: it asks how much the break depends on where you started."""
+        block = summary["AF"]["none"]["away_bias"]
+        assert block["sd_across_pairs"] == pytest.approx(0.0577, abs=1e-3)
+        assert block["sd_across_sources"] == pytest.approx(0.0707, abs=1e-3)
+        assert block["sd_across_sources"] > block["sd_across_pairs"]
+        assert block["n_sources"] == 2
+
+    def test_the_thinnest_pair_behind_the_label_is_reported(self, summary: dict[str, Any]) -> None:
+        """A class-conditional figure resting on a handful of positives is noise,
+        and the count is what lets a reader see it."""
+        assert summary["AF"]["none"]["fewest_positives_behind_a_pair"] == 200
+
+    def test_every_correction_gets_its_own_summary(self, summary: dict[str, Any]) -> None:
+        assert set(summary["AF"]) == set(CORRECTIONS)
+
+
 @pytest.mark.data
 class TestTheCommittedRotation:
     @pytest.fixture(scope="class")

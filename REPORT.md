@@ -101,7 +101,7 @@ Thresholds fitted on PTB-XL were applied unchanged to both target datasets, wher
 
 ![Figure 3](results/figures/fig1_coverage.png)
 
-Figure 3. Coverage by site (rows) and calibration scheme (columns). Grey: all cases. Red: MI cases. Dashed line: requested coverage. Bars are means over 200 calibration draws, with whiskers at one standard deviation.
+Figure 3. Coverage by site (rows: PTB-XL 2,198 tracings, Shandong 25,770, Chongqing 17,955) and calibration scheme (columns: no correction, class-conditional, label-shift weighted; the third is not discussed in the text and is shown for completeness). Within each panel the horizontal axis is the confidence asked for. Grey: all cases. Blue: non-MI cases. Red: MI cases. Dashed line: requested coverage. Bars are means over 200 calibration draws of PTB-XL, and the whiskers are one standard deviation across those draws, which is the spread of the calibration and not the sampling error of the site.
 
 Class-conditional calibration did not restore the Chongqing site to the requested coverage because both corrections assume that only the label proportions change between sites. At Chongqing more than the proportions changed: the positive label is drawn from a discharge diagnosis of acute infarction rather than from the tracing, and both score distributions sit elsewhere than they do at the source, the negative one having moved the further of the two. A threshold fitted on German data tracks neither. This report does not separate the contributions of the label definition, the population, the recording hardware and the era, which differ together between the two sites; it measures the resulting gap. The score distributions per site that would show the movement directly are not plotted here.
 

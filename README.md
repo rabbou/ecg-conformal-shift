@@ -7,7 +7,7 @@ survives the change of hospital; the two standard corrections, Mondrian
 per-class calibration and label-shift weighting, are compared on the same
 break.
 
-The findings, the four figures and the limitations are in
+The findings, the three figures and the limitations are in
 [REPORT.md](REPORT.md). Common questions are answered in
 [QUESTIONS.md](QUESTIONS.md). This file documents the corpora, the layout and
 the reproduction commands.
@@ -99,14 +99,33 @@ of an old infarct, so the label definition changes as well as the prevalence.
 
 ## Reproduce
 
+Everything the report prints is redrawn from files committed here, so the
+figures and the outcome table need no corpus at all:
+
 ```bash
-uv sync
-uv run pytest -m "not data"   # unit tests, no corpora needed
-uv run pytest                 # adds the reference-value tests against the corpora
+uv sync                                  # 1 min, 86 packages
+uv run pytest -m "not data"              # unit tests, no corpora needed, 4 min
+uv run python scripts/outcomes.py        # rebuilds results/outcomes.json, 2 s
+uv run python scripts/figures.py         # redraws all six figures, 4 s
 ```
 
-PTB-XL is read in place from `ECS_PTBXL_DIR`; SPH and ACS-ECG are stored under
-`data/`.
+Timings are wall clock on a six-core i7-8700, CPU only. The full suite on a
+cold clone, where every test module is imported for the first time, took 28
+minutes.
+
+The corpora are only needed to re-score from the raw tracings, which the
+committed `.npz` files make unnecessary for reproducing the report. They take
+9.5 GB on disk:
+
+```bash
+./scripts/fetch_open_corpora.sh          # ACS-ECG and four PhysioNet corpora
+uv run pytest                            # adds the corpus-backed tests
+```
+
+`fetch_open_corpora.sh` does not fetch PTB-XL or SPH. PTB-XL is read in place
+from `ECS_PTBXL_DIR` (default `~/Developer/ptbxl5d/data`) and is downloaded
+from PhysioNet; SPH is downloaded from its figshare record and unpacked under
+`data/sph`. Without them the corpus-backed tests skip rather than fail.
 
 ## Gates
 

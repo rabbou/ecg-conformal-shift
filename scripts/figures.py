@@ -1,4 +1,4 @@
-"""Draw the four figures listed in PLAN.md.
+"""Draw the six figures the plan and the report name.
 
 Each one is drawn from a committed file under ``results/`` and redraws from it
 pixel for pixel, so a figure always comes from the numbers rather than from
@@ -23,6 +23,9 @@ went through the same linear probe, the same folds and the same frozen
 calibration, so a difference between two arms is a difference between two
 pre-trainings.  Until that file exists this script says what it is waiting for
 rather than drawing an empty frame.
+
+The report numbers its own figures in its own text; the images carry titles,
+not numbers, so the two cannot drift apart.
 
 Usage: .venv/bin/python scripts/figures.py [--figure 1 2 3 4 5 6]
 """
@@ -204,7 +207,7 @@ def figure_1_coverage(table: dict[str, Any], out: Path, source: Path) -> Path:
         for corpus, block in _rows(table, "lac", "weighted")[1]["by_corpus"].items()
     )
     figure.suptitle(
-        "Figure 1 — coverage per hospital and correction\n"
+        "Coverage per hospital and correction\n"
         f"Share of infarctions inside the 90% set on PTB-XL: {quoted}.\n"
         f"Dashed line: the requested level. Bars: mean over {table['n_draws']} calibration "
         "draws on PTB-XL, whiskers one standard deviation.\n"
@@ -267,7 +270,7 @@ def figure_2_set_sizes(table: dict[str, Any], out: Path, source: Path) -> Path:
         )
     axes[0][-1].legend(loc="lower left", fontsize=8, framealpha=0.9)
     figure.suptitle(
-        "Figure 2 — output composition against requested confidence\n"
+        "Output composition against requested confidence\n"
         "One threshold, fitted on PTB-XL and applied to all three corpora. Tracings with "
         "both labels or no label go to a human reader.",
         fontsize=10,
@@ -367,7 +370,7 @@ def figure_3_arms(arms: dict[str, Any], out: Path, source: Path) -> Path:
     worst = max(ARM_ORDER, key=lambda a: _headline_row(arms, a)["coverage_gap"]["acs"]["mean"])
     best = min(ARM_ORDER, key=lambda a: _headline_row(arms, a)["coverage_gap"]["acs"]["mean"])
     figure.suptitle(
-        "Figure 3 — coverage gap per encoder arm\n"
+        "Coverage gap per encoder arm\n"
         f"Gap to Chongqing runs from {plain[best]} "
         f"{_headline_row(arms, best)['coverage_gap']['acs']['mean']:+.3f} to {plain[worst]} "
         f"{_headline_row(arms, worst)['coverage_gap']['acs']['mean']:+.3f}.\n"
@@ -427,7 +430,7 @@ def figure_4_discrimination(
     axis.set_ylim(0, 1.12)
     axis.set_ylabel("PTB-XL fold 10, infarction against the rest")
     axis.set_title(
-        "Figure 4 — baseline discrimination against the published reference\n"
+        "Baseline discrimination against the published reference\n"
         f"{metrics['n_test']} tracings, {metrics['n_test_positive']} of them infarction; "
         "whiskers are 95% bootstrap intervals.\n"
         "The published figure averages five diagnostic superclasses, not infarction alone.",

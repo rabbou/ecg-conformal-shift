@@ -1,6 +1,18 @@
-# Per-label conformal calibration of an ECG classifier under prevalence shift
+# Per-label conformal calibration of an ECG classifier across hospitals
 
-PTB-XL · SPH · ACS-ECG · 45,923 tracings scored · working draft, 4 September 2026
+Ruben Abbou
+
+PTB-XL · SPH · ACS-ECG · 45,923 tracings scored · draft of 8 September 2026
+
+**Competing interests.** The author is employed by Idoven, which develops ECG analysis software. Idoven had no part in the design, conduct, funding or reporting of this study, took no view on its results, and none of its data, models or software were used.
+
+**Funding.** None.
+
+**Data.** All three datasets are public. PTB-XL and the four auxiliary PhysioNet corpora were downloaded on 23 August 2026; the Shandong dataset and the Chongqing dataset from figshare on the same date. Access dates and checksums are recorded in `scripts/fetch_open_corpora.sh` and `results/ingest_report.json`.
+
+**Ethics.** This is a secondary analysis of three publicly released, de-identified ECG datasets, with no patient contact, and no further approval was sought. The approvals under which each dataset was released are as follows. PTB-XL: the Institutional Ethics Committee approved publication of the anonymous data in an open-access database, reference PTB-2020-1; the source publication states no participant consent procedure. SPH: approved by the Institutional Review Board of Shandong Provincial Hospital, with the requirement for individual patient consent waived and public sharing permitted after de-identification; no approval number is given. ACS-ECG: approved by the ethics committee of the First Affiliated Hospital of Chongqing Medical University, approval number 2024-256-01, with written informed consent waived as the study is retrospective and all patient identifiers removed. No attempt was made to re-identify any patient, and nothing this repository publishes would permit it.
+
+**Not a device.** See section 5.
 
 ## Abstract
 

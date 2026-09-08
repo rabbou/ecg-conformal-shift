@@ -1,0 +1,21 @@
+cff-version: 1.2.0
+title: Per-label conformal calibration of an ECG classifier across hospitals
+message: If you use this repository, please cite it as below.
+type: software
+authors:
+  - family-names: Abbou
+    given-names: Ruben
+repository-code: https://github.com/rubenabbou/ecg-conformal-shift
+license: MIT
+abstract: >-
+  Measures what three ways of turning the same frozen ECG classifier scores
+  into a clinical output deliver per label, and what happens to each when its
+  calibration threshold is carried unchanged to hospitals of different
+  myocardial infarction prevalence. PTB-XL as source, SPH (Shandong) and
+  ACS-ECG (Chongqing) as targets.
+keywords:
+  - conformal prediction
+  - electrocardiography
+  - myocardial infarction
+  - distribution shift
+  - class-conditional coverage

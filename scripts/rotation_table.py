@@ -142,10 +142,23 @@ def bias_summary(cells: list[dict[str, Any]]) -> dict[str, Any]:
                     continue
                 covered = cell_block["coverage_by_class"][POSITIVE]["mean"]
                 bias = covered - row["target_coverage"]
+                # How many records the class-conditional figure rests on. A cell
+                # with a handful of positives is noise however many draws it is
+                # averaged over, and the count is what says so.
+                positives = int(round(cell_block["prevalence"] * cell_block["n_points"]))
                 if corpus == source:
-                    block["home"].append({"source": source, "bias": round(bias, 4)})
+                    block["home"].append(
+                        {"source": source, "bias": round(bias, 4), "n_positive": positives}
+                    )
                 else:
-                    away.append({"source": source, "target": corpus, "bias": round(bias, 4)})
+                    away.append(
+                        {
+                            "source": source,
+                            "target": corpus,
+                            "bias": round(bias, 4),
+                            "n_positive": positives,
+                        }
+                    )
             block["away"].extend(away)
             if away:
                 block["by_source"][source] = round(float(np.mean([a["bias"] for a in away])), 4)
@@ -164,6 +177,9 @@ def bias_summary(cells: list[dict[str, Any]]) -> dict[str, Any]:
                 "n_sources": int(by_source.size),
                 "worst": round(float(values.min()), 4) if values.size else None,
             }
+            block["fewest_positives_behind_a_pair"] = (
+                min(int(a["n_positive"]) for a in block["away"]) if block["away"] else None
+            )
             block["home_bias"] = {
                 "mean": round(float(homes.mean()), 4) if homes.size else None,
                 "sd_across_sources": round(float(homes.std(ddof=1)), 4) if homes.size > 1 else None,

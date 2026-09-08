@@ -37,7 +37,7 @@ from .challenge import (
     scan_source,
     sph_small_set_labels,
 )
-from .config import PTBXL_DIR, SPH_DIR
+from .config import PTBXL_DIR, SAMPLING_RATE_HZ, SPH_DIR, WINDOW_SAMPLES
 from .ingest import Record, assemble_corpus, read_or_error, read_sph, read_wfdb
 from .small_set import SMALL_SET, refusals
 from .splits import patient_split
@@ -178,12 +178,24 @@ def corpus_index(corpus: str) -> CorpusIndex:
         ]
     else:
         table = scan_source(corpus)
+        # Georgia ships 52 records of five seconds and CPSC 22 that fall short of
+        # ten by as little as one sample. They cannot reach the canonical window,
+        # so they leave before the split rather than thinning a part unevenly
+        # once it is drawn.
+        seconds = WINDOW_SAMPLES / SAMPLING_RATE_HZ
+        short = table["n_samples"] < table["sampling_rate_hz"] * seconds
+        dropped = int(short.sum())
+        table = table[~short]
         labels = challenge_small_set_labels(table)
         frame = pd.DataFrame(
             {"patient": [str(i) for i in table.index], "path": table["path"].to_numpy()},
             index=[str(i) for i in table.index],
         )
         deviations = partition_deviations(corpus, table)
+        if dropped:
+            deviations.append(
+                f"{dropped} records shorter than ten seconds, dropped before the split"
+            )
     for key in class_keys():
         frame[key] = labels[key].to_numpy().astype(bool)
     return CorpusIndex(corpus, _split(frame), deviations)

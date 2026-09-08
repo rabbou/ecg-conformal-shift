@@ -207,6 +207,8 @@ class TestTheFigures:
         4: ("fig4_discrimination.png", RESULTS_DIR / "baseline/metrics.json"),
         5: ("fig1_thresholds.png", RESULTS_DIR / "outcomes.json"),
         6: ("fig2_outcomes.png", RESULTS_DIR / "outcomes.json"),
+        7: ("fig7_rotation.png", RESULTS_DIR / "rotation.json"),
+        8: ("fig8_target_scale.png", RESULTS_DIR / "target_scale.json"),
     }
 
     def test_each_figure_redraws_from_the_committed_numbers(self, tmp_path: Path) -> None:
@@ -273,6 +275,54 @@ class TestTheFigures:
         assert set(figures.ARM_ORDER) == set(grid["arms"])
         drawn = figures.figure_3_arms(grid, tmp_path / "fig3.png", RESULTS_DIR / "arms.json")
         assert drawn.stat().st_size > 10_000
+
+    def test_figure_seven_carries_every_diagnosis_and_every_correction(
+        self, tmp_path: Path
+    ) -> None:
+        """A rotation figure with a correction or a diagnosis left off would read
+        as a result. Both counts come off the table rather than out of this test."""
+        import figures
+
+        path = RESULTS_DIR / "rotation.json"
+        if not path.exists():
+            pytest.skip(f"{path} is not built; run scripts/rotation_table.py")
+        table = json.loads(path.read_text())
+        assert set(figures.ROTATION_LABEL_NAMES) >= set(table["bias"])
+        assert set(table["settings"]["corrections"]) == {"none", "mondrian", "weighted"}
+        drawn = figures.figure_7_rotation(table, tmp_path / "fig7.png", path)
+        assert drawn.stat().st_size > 10_000
+
+    def test_figure_seven_draws_every_pair_the_table_measured(self, tmp_path: Path) -> None:
+        """Every away pair on the table is a point on the figure, so a pair that
+        went missing between the two would be a difference in the count."""
+        path = RESULTS_DIR / "rotation.json"
+        if not path.exists():
+            pytest.skip(f"{path} is not built; run scripts/rotation_table.py")
+        table = json.loads(path.read_text())
+        for label, corrections in table["bias"].items():
+            for correction, block in corrections.items():
+                assert len(block["away"]) == block["away_bias"]["n_pairs"], (label, correction)
+                assert block["away_bias"]["n_pairs"] > 0, (label, correction)
+
+    def test_figure_eight_carries_every_rung_and_both_families(self, tmp_path: Path) -> None:
+        import figures
+
+        path = RESULTS_DIR / "target_scale.json"
+        ladder = json.loads(path.read_text())
+        assert ladder["settings"]["rungs"] == [0, 100, 500, 2000]
+        assert set(ladder["settings"]["families"]) == {"recalibrated", "pooled"}
+        drawn = figures.figure_8_target_scale(ladder, tmp_path / "fig8.png", path)
+        assert drawn.stat().st_size > 10_000
+
+    def test_figure_eight_says_what_it_is_waiting_for_rather_than_drawing_empty(
+        self, tmp_path: Path, capsys: pytest.CaptureFixture[str], monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        import figures
+
+        monkeypatch.setattr(figures, "RESULTS_DIR", tmp_path / "empty")
+        assert figures.main(["--figure", "8", "--out", str(tmp_path)]) == 0
+        assert not (tmp_path / "fig8_target_scale.png").exists()
+        assert "does not exist yet" in capsys.readouterr().err
 
     def test_figure_three_says_what_it_is_waiting_for_rather_than_drawing_empty(
         self, tmp_path: Path, capsys: pytest.CaptureFixture[str], monkeypatch: pytest.MonkeyPatch

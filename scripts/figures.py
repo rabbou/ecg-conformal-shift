@@ -623,14 +623,254 @@ def figure_6_outcomes(outcomes: dict[str, Any], out: Path, source: Path) -> Path
     return out
 
 
+# The rotation's five diagnoses, named as a cardiologist reads them, and the five
+# corpora that take turns as the source.
+ROTATION_LABEL_NAMES = {
+    "NSR": "sinus\nrhythm",
+    "AF": "atrial\nfibrillation",
+    "LBBB": "left bundle-\nbranch block",
+    "RBBB": "right bundle-\nbranch block",
+    "IAVB": "first-degree\nAV block",
+}
+SOURCE_ORDER = ("ptbxl", "sph", "chapman_ningbo", "georgia", "cpsc")
+SOURCE_NAMES = {
+    "ptbxl": "PTB-XL",
+    "sph": "Shandong",
+    "chapman_ningbo": "Chapman and Ningbo",
+    "georgia": "Georgia",
+    "cpsc": "CPSC",
+}
+SOURCE_COLOUR = {
+    "ptbxl": "#023047",
+    "sph": "#219ebc",
+    "chapman_ningbo": "#8ecae6",
+    "georgia": "#fb8500",
+    "cpsc": "#bf4342",
+}
+FAMILY_NAMES = {
+    "recalibrated": "recalibrated on the target records alone",
+    "pooled": "target records added to the source calibration half",
+}
+FAMILY_COLOUR = {"recalibrated": "#5f8d4e", "pooled": "#bf4342"}
+
+
+def _headline(table: dict[str, Any]) -> tuple[float, str]:
+    headline = table["settings"]["headline"]
+    return float(headline["alpha"]), str(headline["score"])
+
+
+def figure_7_rotation(table: dict[str, Any], out: Path, source: Path) -> Path:
+    """Coverage of each diagnosis under each correction, every source-target pair drawn.
+
+    One panel per correction, one column per diagnosis.  Each away pair is a dot
+    coloured by the source its threshold came from, and the source's reading on
+    its own held-out records is the hollow marker beside it, so the gap between
+    home and away is read down a column rather than across two figures.  The bar
+    is the mean over the away pairs with the spread across sources, which is what
+    turns two hospitals into an estimate.
+    """
+    alpha, score = _headline(table)
+    target = 1.0 - alpha
+    corrections = [c for c in CORRECTION_ORDER if c in table["settings"]["corrections"]]
+    labels = [key for key in ROTATION_LABEL_NAMES if key in table["bias"]]
+    figure, axes = plt.subplots(
+        1, len(corrections), figsize=(4.6 * len(corrections), 5.2), sharey=True
+    )
+    axes = np.atleast_1d(axes)
+    # One offset per (diagnosis, source, target), drawn once and reused in every
+    # panel, so the same pair sits at the same place under each correction and
+    # can be followed across them.
+    rng = np.random.default_rng(0)
+    offsets: dict[tuple[str, str, str], float] = {}
+    for label in labels:
+        for entry in table["bias"][label][corrections[0]]["away"]:
+            offsets[(label, entry["source"], entry["target"])] = float(rng.uniform(-0.22, 0.22))
+
+    for index, correction in enumerate(corrections):
+        axis = axes[index]
+        for column, label in enumerate(labels):
+            block = table["bias"][label][correction]
+            away = block["away"]
+            for entry in away:
+                jitter = offsets[(label, entry["source"], entry["target"])]
+                axis.plot(
+                    column + jitter,
+                    target + entry["bias"],
+                    "o",
+                    color=SOURCE_COLOUR[entry["source"]],
+                    markersize=4,
+                    alpha=0.75,
+                    zorder=3,
+                )
+            for entry in block["home"]:
+                axis.plot(
+                    column - 0.34,
+                    target + entry["bias"],
+                    "o",
+                    markerfacecolor="none",
+                    markeredgecolor=SOURCE_COLOUR[entry["source"]],
+                    markersize=6,
+                    markeredgewidth=1.2,
+                    zorder=4,
+                )
+            mean = target + float(block["away_bias"]["mean"])
+            spread = block["away_bias"]["sd_across_sources"]
+            axis.errorbar(
+                column,
+                mean,
+                yerr=0.0 if spread is None else float(spread),
+                fmt="_",
+                color="#111111",
+                markersize=22,
+                elinewidth=1.4,
+                capsize=5,
+                zorder=5,
+            )
+        axis.axhline(target, color="#111111", linestyle="--", linewidth=1.0, zorder=1)
+        axis.set_xticks(range(len(labels)))
+        axis.set_xticklabels([ROTATION_LABEL_NAMES[key] for key in labels], fontsize=8)
+        axis.set_title(CORRECTION_NAMES[correction], fontsize=9)
+        axis.set_ylim(0.0, 1.02)
+        axis.grid(axis="y", color="#eeeeee", zorder=0)
+    axes[0].set_ylabel(f"coverage of the diagnosis at the {target:.0%} level")
+
+    handles = [
+        plt.Line2D([], [], marker="o", linestyle="", color=SOURCE_COLOUR[s], label=SOURCE_NAMES[s])
+        for s in SOURCE_ORDER
+        if s in {e["source"] for lab in labels for e in table["bias"][lab][corrections[0]]["away"]}
+    ]
+    handles.append(
+        plt.Line2D(
+            [],
+            [],
+            marker="o",
+            linestyle="",
+            markerfacecolor="none",
+            markeredgecolor="#111111",
+            label="the source on its own held-out records",
+        )
+    )
+    handles.append(
+        plt.Line2D(
+            [],
+            [],
+            marker="_",
+            linestyle="",
+            color="#111111",
+            markersize=14,
+            label="mean over the away pairs, spread across sources",
+        )
+    )
+    figure.legend(handles=handles, loc="lower center", ncol=4, frameon=False, fontsize=8)
+    # Sinus rhythm is refused on Shandong, so it carries twelve ordered pairs
+    # where the other four carry twenty. Stating one number would be wrong for
+    # four columns of the figure.
+    counted = {table["bias"][label][corrections[0]]["away_bias"]["n_pairs"] for label in labels}
+    pairs = (
+        f"{min(counted)} to {max(counted)} ordered pairs"
+        if len(counted) > 1
+        else f"{min(counted)} ordered pairs"
+    )
+    figure.suptitle(
+        f"Five sources, {pairs} per diagnosis, "
+        f"{table['settings']['n_draws']} calibration draws, {score.upper()} score",
+        fontsize=10,
+    )
+    figure.tight_layout(rect=(0, 0.10, 1, 0.96))
+    _source_note(figure, source)
+    figure.savefig(out, dpi=200)
+    plt.close(figure)
+    return out
+
+
+def figure_8_target_scale(ladder: dict[str, Any], out: Path, source: Path) -> Path:
+    """What a hospital's own labelled tracings buy, against pooling them with the source.
+
+    One panel per correction the ladder can carry above rung zero.  The x axis is
+    how many labelled target records the threshold saw; the two lines are the two
+    ways of spending them.  Rung zero is the frozen source threshold and is the
+    same point on both lines, which is where the break table left off.
+    """
+    alpha, score = _headline(ladder)
+    target = 1.0 - alpha
+    rungs = list(ladder["settings"]["rungs"])
+    corrections = [
+        c
+        for c in CORRECTION_ORDER
+        if c in {r["correction"] for r in ladder["rows"] if r["n_target_records"] > 0}
+    ]
+    figure, axes = plt.subplots(
+        1, len(corrections), figsize=(4.4 * len(corrections), 4.4), sharey=True
+    )
+    axes = np.atleast_1d(axes)
+    positions = np.arange(len(rungs))
+
+    for index, correction in enumerate(corrections):
+        axis = axes[index]
+        for family in ("recalibrated", "pooled"):
+            means, spreads = [], []
+            for rung in rungs:
+                row = next(
+                    r
+                    for r in ladder["rows"]
+                    if r["alpha"] == alpha
+                    and r["score"] == score
+                    and r["correction"] == correction
+                    and r["family"] == family
+                    and r["n_target_records"] == rung
+                )
+                means.append(row["coverage_by_class"]["1"]["mean"])
+                spreads.append(row["coverage_by_class"]["1"]["sd"])
+            means_array = np.asarray(means)
+            spreads_array = np.asarray(spreads)
+            axis.plot(
+                positions,
+                means_array,
+                "-o",
+                color=FAMILY_COLOUR[family],
+                markersize=5,
+                label=FAMILY_NAMES[family],
+                zorder=3,
+            )
+            axis.fill_between(
+                positions,
+                means_array - spreads_array,
+                means_array + spreads_array,
+                color=FAMILY_COLOUR[family],
+                alpha=0.15,
+                zorder=2,
+            )
+        axis.axhline(target, color="#111111", linestyle="--", linewidth=1.0, zorder=1)
+        axis.set_xticks(positions)
+        axis.set_xticklabels([f"{r:,}" for r in rungs])
+        axis.set_xlabel("labelled target tracings the threshold saw")
+        axis.set_title(CORRECTION_NAMES[correction], fontsize=9)
+        axis.grid(axis="y", color="#eeeeee", zorder=0)
+    axes[0].set_ylabel(f"coverage of the diagnosis at the {target:.0%} level")
+    axes[0].legend(loc="lower right", frameon=False, fontsize=8)
+    pair = ladder["pair"]
+    plain = {"ptbxl": "PTB-XL", "sph": "Shandong", "acs": "Chongqing"}
+    figure.suptitle(
+        f"{plain.get(pair['source'], pair['source'])} to "
+        f"{plain.get(pair['target'], pair['target'])}, {pair['label']}, "
+        f"{ladder['settings']['n_draws']} draws, {score.upper()} score",
+        fontsize=10,
+    )
+    figure.tight_layout(rect=(0, 0, 1, 0.94))
+    _source_note(figure, source)
+    figure.savefig(out, dpi=200)
+    plt.close(figure)
+    return out
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--figure",
         nargs="+",
         type=int,
-        default=[1, 2, 3, 4, 5, 6],
-        choices=[1, 2, 3, 4, 5, 6],
+        default=[1, 2, 3, 4, 5, 6, 7, 8],
+        choices=[1, 2, 3, 4, 5, 6, 7, 8],
     )
     parser.add_argument("--out", default=str(RESULTS_DIR / "figures"))
     args = parser.parse_args(argv)
@@ -641,6 +881,8 @@ def main(argv: list[str] | None = None) -> int:
     metrics_path = RESULTS_DIR / "baseline/metrics.json"
     baseline_path = RESULTS_DIR / "baseline.json"
     arms_path = RESULTS_DIR / "arms.json"
+    rotation_path = RESULTS_DIR / "rotation.json"
+    ladder_path = RESULTS_DIR / "target_scale.json"
 
     drawn = []
     if 1 in args.figure:
@@ -680,6 +922,36 @@ def main(argv: list[str] | None = None) -> int:
             )
         if 6 in args.figure:
             drawn.append(figure_6_outcomes(outcomes, out / "fig2_outcomes.png", outcomes_path))
+    if 7 in args.figure:
+        if rotation_path.exists():
+            drawn.append(
+                figure_7_rotation(
+                    json.loads(rotation_path.read_text()),
+                    out / "fig7_rotation.png",
+                    rotation_path,
+                )
+            )
+        else:
+            print(
+                "figure 7 needs every corpus scored by every source's model and the "
+                f"coverage table built from those scores; {rotation_path} does not exist "
+                "yet, so it is not drawn",
+                file=sys.stderr,
+            )
+    if 8 in args.figure:
+        if ladder_path.exists():
+            drawn.append(
+                figure_8_target_scale(
+                    json.loads(ladder_path.read_text()),
+                    out / "fig8_target_scale.png",
+                    ladder_path,
+                )
+            )
+        else:
+            print(
+                f"figure 8 needs {ladder_path}, which does not exist yet, so it is not drawn",
+                file=sys.stderr,
+            )
     for path in drawn:
         print(path, flush=True)
     return 0

@@ -78,6 +78,20 @@ class TestTheSplit:
         second = corpus_index("georgia").frame["part"]
         assert first.equals(second)
 
+    def test_the_corpora_that_ship_short_records_say_how_many_they_dropped(
+        self, indices: dict[str, Any]
+    ) -> None:
+        """Georgia and CPSC are the two; the count leaves with the deviations."""
+        dropped = {
+            corpus: [d for d in index.deviations if "shorter than ten seconds" in d]
+            for corpus, index in indices.items()
+        }
+        assert dropped["georgia"] == [
+            "52 records shorter than ten seconds, dropped before the split"
+        ]
+        assert dropped["cpsc"] == ["22 records shorter than ten seconds, dropped before the split"]
+        assert dropped["ptbxl"] == [] and dropped["chapman_ningbo"] == []
+
     def test_a_refused_class_is_dropped_rather_than_reported_as_absent(self) -> None:
         assert "NSR" not in usable_classes("sph")
         assert "NSR" in usable_classes("ptbxl")

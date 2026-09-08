@@ -51,6 +51,15 @@ Each maps to a named test. Unchecked means unverified, not done.
 | C-22 | WHERE a single tuned threshold is compared against a conformal scheme, THE results file SHALL record that its target is a sensitivity and the conformal target a coverage, and SHALL record the decision boundaries on the probability axis rather than the raw score quantiles. | `test_outcomes.py::TestTheCommittedOutcomeTable::test_the_table_says_the_two_targets_are_different_quantities`, `test_the_denominator_is_named_in_the_file` |
 
 
+| C-23 | THE label table SHALL map each corpus's own code system onto the five rotation diagnoses, and ITS per-corpus per-class counts SHALL equal the counts the Challenge publishes for its four partitions once the records carrying both halves of a fused pair are subtracted. | `test_label_map.py::TestTheCountsCloseAgainstThePublishedTable`, on `results/label_map.json`; the mapping itself against the three code tables in `mappings/` by `test_small_set.py` |
+| C-24 | THE label table SHALL name every join it could not make cleanly, and WHERE a class cannot be read on a corpus THE table SHALL refuse that cell with the ambiguity that refused it rather than fill it. | `test_label_map.py::TestEveryCorpusAndClassHasACell::test_a_refused_cell_is_empty_and_says_which_ambiguity_refused_it`; `test_small_set.py::TestEveryAmbiguityIsWritten` |
+| C-25 | WHERE a Challenge-2021 partition is ingested, THE loader SHALL return the canonical (N, 12, 5000) form and SHALL report that the bundle ships no patient identifier; WHEN a record carries fewer samples than the ten-second window, THE loader SHALL exclude it and count it. | `test_rotation.py::TestTheIngestionContract`, `TestTheSplit::test_the_corpora_that_ship_short_records_say_how_many_they_dropped`; `test_ingest.py::TestAssembly::test_a_record_too_short_for_the_window_is_excluded_and_counted` |
+| C-26 | WHEN a source model's thresholds are fitted, THEY SHALL be a function of that source's calibration records alone; permuting every label of a target corpus SHALL leave every threshold unchanged, on each of the twenty ordered pairs. | `test_rotation.py::TestNoThresholdReadsATargetLabel` on synthetic scores, `TestNoTargetLabelReachesAThresholdOnTheRealPairs` parametrised over the twenty pairs, and `TestTheCommittedRotation::test_an_unweighted_threshold_does_not_depend_on_which_corpus_it_is_spent_on` on the committed table |
+| C-27 | THE rotation file SHALL report, for every (source, target, diagnosis, correction, level), the coverage mean and spread over at least 200 calibration draws, with the effective size of the calibration sample behind the threshold. | `test_rotation.py::TestTheCommittedRotation::test_every_figure_is_a_mean_over_two_hundred_draws_with_its_spread`, `test_every_cell_reports_the_effective_size_of_what_calibrated_it` |
+| C-28 | THE rotation file SHALL report the coverage bias per diagnosis with its spread across the five sources, not only across the twenty pairs. | `test_rotation.py::TestTheCommittedRotation::test_the_bias_carries_its_spread_across_sources` |
+| C-29 | THE target-scale file SHALL report coverage on Chongqing after recalibration on 0, 100, 500 and 2,000 labelled target records, measured on one held-out half that no rung calibrates on. | `test_target_scale.py` |
+| C-30 | THE encoder arms SHALL include ECG-JEPA, and THE README SHALL name which arms saw PTB-XL at pre-training and HuBERT-ECG's non-commercial licence. | `test_encoder_arms.py`; the README's "Encoder arms" table |
+
 ## The ingestion contract
 
 Every corpus is reduced to one canonical form before anything else touches it:
@@ -135,13 +144,54 @@ being re-cut. Each is drawn by `scripts/figures.py` from a results file.
 6. Per-label outcomes. What a case of each label receives under each scheme:
    the correct label alone, a deferral, or the wrong label alone.
 
+7. The source rotation. Coverage of each of the five diagnoses when the
+   calibration source is each of five corpora in turn and its thresholds are
+   spent on the other four: one panel per correction, one point per ordered
+   pair coloured by its source, the source's own held-out reading beside it,
+   and the mean over the away pairs with its spread across sources.
+8. The target scale. Coverage on Chongqing against how many labelled Chongqing
+   tracings the threshold saw — 0, 100, 500, 2,000 — recalibrated on those
+   records against pooled with the source calibration half.
+
 Figures 5 and 6 are the report's figures 1 and 2; the coverage grid is its
 figure 3. Figures 2 and 4 above are kept in `results/figures/` and cited from
-`README.md` and `QUESTIONS.md` rather than carried in the report.
+`README.md` and `QUESTIONS.md` rather than carried in the report. Figures 7 and
+8 belong to the rotation and are not in the report yet.
 
 The numbers behind every figure live in `results/` as JSON or CSV and are
 committed before the figure. Each external corpus is scored once with the
 PTB-XL calibration; nothing is tuned on Shandong or Chongqing.
+
+## The source rotation
+
+The break table measures one calibration source against two targets. That is a
+pair, and a pair cannot say whether the break is a property of conformal
+prediction under a change of hospital or a property of PTB-XL and Chongqing.
+The rotation makes it an estimate: five corpora take turns as the source, each
+one's thresholds are spent once on each of the other four, and the coverage bias
+is reported per diagnosis with its spread across sources. This is Leinonen et
+al.'s rotation protocol (Comput Biol Med 2024, PMID 39427424) asked of coverage
+rather than of discrimination.
+
+Five corpora — PTB-XL, Shandong, Chapman-Shaoxing with Ningbo, Georgia, CPSC
+2018 with its extension — and five diagnoses a cardiologist reads at a glance:
+sinus rhythm, atrial fibrillation, left and right bundle-branch block,
+first-degree atrioventricular block. Infarction is not among them because it is
+not a scored Challenge class and exists with usable counts on PTB-XL, Shandong
+and Chongqing alone; the infarction axis stays as it is, and the target-scale
+ladder is measured on it.
+
+Every corpus is cut once by patient into train, validation, calibration and
+test. The test part is the same records whether the corpus is the source or a
+target, so a difference between home and away is the threshold rather than the
+sample. Train and calibration are capped at the size the smallest corpus
+reaches, so "which source" is not read together with "how much data the source
+had".
+
+`results/label_map.json` is the piece this rests on: the mapping from three
+annotation schemes onto five classes, its counts checked against the
+Challenge's own published table, and the five joins that could not be made
+cleanly written down rather than decided in passing.
 
 ## Days
 

@@ -101,22 +101,28 @@ of an old infarct, so the label definition changes as well as the prevalence.
 
 ## Reproduce
 
-Everything the report prints is redrawn from files committed here, so the
-figures and the outcome table need no corpus at all:
+Every number and every figure the report prints is redrawn from the scores
+committed here, so none of the raw tracings are needed. Two of the three
+scripts do need one file that is not committed: PTB-XL's `ptbxl_database.csv`,
+6.6 MB from PhysioNet, which holds the patient each record belongs to and the
+sex and age the subgroup table reports. Point `ECS_PTBXL_DIR` at the directory
+holding it. The figures redraw without it.
 
 ```bash
 uv sync                                  # 1 min
 uv run pytest -m "not data"              # unit tests, no corpora needed, 2 min
-uv run python scripts/outcomes.py        # rebuilds results/outcomes.json, 2 s
-uv run python scripts/figures.py         # redraws all six figures, 4 s
+uv run python scripts/figures.py         # redraws all six figures, 5 s
+export ECS_PTBXL_DIR=/path/to/ptbxl      # the directory with ptbxl_database.csv
+uv run python scripts/outcomes.py        # rebuilds results/outcomes.json, 3 s
+uv run python scripts/subgroups.py       # rebuilds results/subgroups.json, 23 s
 ```
 
 Timings are wall clock on a six-core i7-8700, CPU only. The full suite on a
 cold clone, where every test module is imported for the first time, took 28
 minutes.
 
-The corpora are only needed to re-score from the raw tracings, which the
-committed `.npz` files make unnecessary for reproducing the report. The three
+The corpora themselves are only needed to re-score from the raw tracings,
+which the committed `.npz` files make unnecessary for reproducing the report. The three
 of them take 7.3 GB on disk, and the four auxiliary PhysioNet corpora the
 script also fetches take roughly 21 GB more:
 

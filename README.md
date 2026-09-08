@@ -113,13 +113,43 @@ PTB-XL is read in place from `ECS_PTBXL_DIR`; SPH and ACS-ECG are stored under
 `ruff` (lint + format), `mypy --disallow-untyped-defs`, `pytest` — on every
 commit via `pre-commit`, tests at pre-push.
 
+## What this is not
+
+A retrospective measurement study on public, de-identified data. No device
+claim, no outcome claim, no prospective patient contact, no regulatory status,
+and nothing here is intended to guide the care of any patient. The ethics
+approvals under which each dataset was released, and the author's competing
+interests, are stated at the top of [REPORT.md](REPORT.md).
+
 ## Licence
 
-MIT ([LICENSE](LICENSE)). The vendored ECGFounder architecture in
-`third_party/ecgfounder/` is MIT, PKUDigitalHealth. The corpora keep their own
-licences (CC BY 4.0 and CC0) and are fetched by script, not redistributed
-here. The HuBERT-ECG weights are CC BY-NC 4.0, so that encoder arm is limited
-to research use and is excluded from any commercial product.
+The code is MIT ([LICENSE](LICENSE)), with three exceptions.
+
+`third_party/ecgfounder/net1d.py` is vendored from PKUDigitalHealth's
+ECGFounder release under MIT, and is itself derived from `hsd1503/resnet1d` by
+Shenda Hong under the Apache License 2.0. Both notices and the chain between
+them are in
+[`third_party/ecgfounder/PROVENANCE.md`](third_party/ecgfounder/PROVENANCE.md).
+The root MIT licence does not cover that directory.
+
+The HuBERT-ECG weights are CC BY-NC 4.0. That restriction reaches further than
+the arm itself: any number in this repository computed from those weights is a
+derivative of them, so `results/embeddings/hubert_ecg/` and the HuBERT-ECG rows
+of `results/arms.json` are limited to research use, whatever the root licence
+says about the code that produced them.
+
+No raw tracing is redistributed here, but the repository is not free of corpus
+data either. `results/baseline/scores.npz` and `results/external/*.npz` carry
+one row per record — the record identifier, its label and its model score, for
+45,923 records across the three corpora — which is derived data under each
+corpus's licence and joinable against the public patient tables. PTB-XL is
+CC BY 4.0, which requires attribution: cite Wagner et al. 2020
+(doi:10.1038/s41597-020-0495-6), the PhysioNet resource
+(doi:10.13026/kfzx-aw45) and PhysioNet itself (Goldberger et al., Circulation
+2000;101(23):e215–e220). The Shandong and Chongqing datasets are CC0. The
+PhysioNet/CinC Challenge 2021 collection (CC BY 4.0), read only to count how
+much infarction its non-PTB-XL partitions carry for
+`results/seen_target.json`, is Reyna et al., Computing in Cardiology 2021.
 
 ## Sources
 

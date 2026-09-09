@@ -481,3 +481,16 @@ def test_no_rotation_figure_is_named_without_a_file_behind_it(report: str) -> No
     for relative in rotation:
         assert (ROOT / relative).exists(), relative
         assert Path(relative).name in script, relative
+
+
+def test_no_committed_figure_is_one_no_script_draws() -> None:
+    """A renumbering left fig5_rotation.png behind, byte-identical to fig7.
+
+    Nothing referenced it and nothing failed, so it would have shipped. Every
+    file in the figure directory has to be a name ``scripts/figures.py`` writes.
+    """
+    script = (ROOT / "scripts/figures.py").read_text()
+    orphans = [
+        p.name for p in sorted((RESULTS_DIR / "figures").glob("*.png")) if p.name not in script
+    ]
+    assert orphans == [], orphans

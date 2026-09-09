@@ -67,6 +67,13 @@ NOT_REGENERABLE = {
         "needs the five corpora and the five trained models; the table alone is 416 s"
     ),
     "rotation_uncertainty.json": "written by the same chain as rotation.json",
+    # The two grids the summaries above are read from. A CSV carries no
+    # provenance block, so without a row here they sat outside the registry
+    # while the files they summarise sat inside it.
+    "rotation.csv": ("the 2,520-cell grid rotation.json summarises, written by the same 416 s run"),
+    "rotation_uncertainty.csv": (
+        "the 1,624-row grid rotation_uncertainty.json summarises, written by the same run"
+    ),
     "target_scale.json": "needs PTB-XL and Chongqing on disk to draw the ladder's splits",
     "rotation/chapman_ningbo/config.json": "written by a training run of that source",
     "rotation/chapman_ningbo/metrics.json": "written by that same training run",
@@ -84,14 +91,19 @@ NOT_REGENERABLE = {
 
 
 def tracked_tables() -> list[str]:
-    """Every committed results table, excluding the per-encoder and figure sidecars."""
+    """Every committed results table, excluding the per-encoder and figure sidecars.
+
+    CSV counts as a table.  Restricting this to JSON let the two rotation grids
+    sit outside the registry while the summaries computed from them sat inside
+    it, which is the drift the registry exists to catch.
+    """
     listed = subprocess.run(
         ["git", "ls-files", "results"], capture_output=True, text=True, check=True, cwd=REPO_ROOT
     ).stdout.split()
     return sorted(
         path[len("results/") :]
         for path in listed
-        if path.endswith(".json")
+        if path.endswith((".json", ".csv"))
         and not path.startswith("results/embeddings/")
         and not path.startswith("results/figures/")
     )
@@ -155,7 +167,13 @@ class TestNothingIsUnaccountedFor:
 
     @pytest.mark.parametrize("name", sorted(NOT_REGENERABLE))
     def test_an_excused_file_carries_no_provenance_block_it_cannot_honour(self, name: str) -> None:
-        """The excuse and the block are alternatives; carrying both would hide drift."""
+        """The excuse and the block are alternatives; carrying both would hide drift.
+
+        A CSV has nowhere to put a block, which is the reason its row here is
+        the only thing standing between it and going unaccounted for.
+        """
+        if name.endswith(".csv"):
+            pytest.skip("a CSV carries no provenance block")
         assert "provenance" not in json.loads((RESULTS / name).read_text())
 
     @pytest.mark.parametrize("name", sorted(NOT_REGENERABLE))

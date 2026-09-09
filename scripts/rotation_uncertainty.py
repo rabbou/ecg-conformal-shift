@@ -350,10 +350,36 @@ def summarise(rows: list[dict[str, Any]], draws: int, boot: int) -> dict[str, An
                     if r["sd_over_calibration_draws"] * 2.0 * NORMAL_95 > r["bootstrap_width"]
                 ),
                 "n_rows_compared": len(whole),
+                "by_correction": {
+                    correction: {
+                        "median_bootstrap_width": round(
+                            float(np.median([r["bootstrap_width"] for r in block])), 4
+                        ),
+                        "median_draw_spread_as_a_95_percent_width": round(
+                            float(np.median([r["sd_over_calibration_draws"] for r in block]))
+                            * 2.0
+                            * NORMAL_95,
+                            4,
+                        ),
+                        "n_pairs_where_the_draw_spread_is_the_wider": sum(
+                            1
+                            for r in block
+                            if r["sd_over_calibration_draws"] * 2.0 * NORMAL_95
+                            > r["bootstrap_width"]
+                        ),
+                        "n_pairs": len(block),
+                    }
+                    for correction in CORRECTIONS
+                    if (block := [r for r in whole if r["correction"] == correction])
+                },
                 "reading": (
                     "the bootstrap figure is the width of a 95% percentile interval and the "
                     "draw figure is one standard deviation, so the two say nothing about each "
-                    "other until the second is put on the first's scale"
+                    "other until the second is put on the first's scale; and the two "
+                    "corrections answer differently, so the figure over both stacked hides "
+                    "which of the two quantities is the larger. Each correction covers the "
+                    "same source-target-diagnosis pairs, so the stacked row count is twice "
+                    "the number of pairs"
                 ),
             },
             "conformal_minus_chow": {

@@ -329,7 +329,10 @@ def _cases(name: str) -> Iterator[tuple[str, str]]:
             lo, hi = block["auroc_ci95"]
             yield f"{arm} auroc", text.format(auroc=block["auroc"], lo=lo, hi=hi)
         seen = [a for a, b in arms["arms"].items() if b["saw"]]
-        yield "contaminated", f"{_word(len(seen))} of the five were pretrained on corpora used here"
+        yield (
+            "contaminated",
+            f"{_word(len(seen))} of the five arms had a corpus used here in their pre-training",
+        )
 
         # The headline rung of the arms file runs at a different target from the
         # rest of the report, which is why the paragraph says so.

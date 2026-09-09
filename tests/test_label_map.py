@@ -45,17 +45,30 @@ class TestTheCountsCloseAgainstThePublishedTable:
     def test_every_challenge_corpus_reproduces_the_published_count(
         self, table: dict[str, Any]
     ) -> None:
-        """C-23. Published minus measured minus double-counted is zero, everywhere."""
+        """C-23. Published minus measured minus double-counted is zero, everywhere.
+
+        The subtraction is redone here from the three counts rather than read
+        off ``unexplained_by_double_counting``. Asserting that field alone would
+        pass on a writer that computed it wrongly, which is the one failure this
+        check exists to catch.
+        """
         for corpus in CHALLENGE_CORPORA:
             block = table["corpora"][corpus]
             doubles = block["records_carrying_both_codes_of_a_fused_class"]
             for klass in SMALL_SET:
-                gap = block["unexplained_by_double_counting"][klass.key]
                 measured = block["counts"][klass.key]
                 published = block["published_counts"][klass.key]
-                assert gap == 0, (
+                double = doubles.get(klass.key, 0)
+                recomputed = published - measured - double
+                assert recomputed == 0, (
                     f"{corpus}/{klass.key}: measured {measured}, published {published}, "
-                    f"double-counted {doubles.get(klass.key, 0)}, unexplained {gap}"
+                    f"double-counted {double}, unexplained {recomputed}"
+                )
+                assert block["unexplained_by_double_counting"][klass.key] == recomputed, (
+                    f"{corpus}/{klass.key}: the file's own gap disagrees with the arithmetic"
+                )
+                assert block["published_minus_measured"][klass.key] == published - measured, (
+                    f"{corpus}/{klass.key}: the file's own difference disagrees"
                 )
 
     def test_the_only_difference_is_the_fused_classes(self, table: dict[str, Any]) -> None:

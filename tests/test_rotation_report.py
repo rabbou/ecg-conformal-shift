@@ -61,6 +61,16 @@ def _mean_pct(rows: list[dict[str, str]], column: str) -> str:
     return _pct(statistics.mean(float(r[column]) for r in rows))
 
 
+def _finite(rows: list[dict[str, str]]) -> list[dict[str, str]]:
+    """The cells whose class-conditional threshold was finite in every draw.
+
+    A pair that covers by admitting both labels satisfies the definition of
+    coverage without answering, so every class-conditional mean is quoted with
+    and without them.
+    """
+    return [r for r in rows if (r["source"], r["label"]) not in STARVED]
+
+
 @pytest.fixture(scope="module")
 def report() -> str:
     return (ROOT / "REPORT.md").read_text()
@@ -147,6 +157,22 @@ def _cases(name: str) -> Iterator[tuple[str, str]]:
         ):
             rows = [r for r in _grid(correction) if r["role"] == role]
             yield f"{correction} {role} {column}", phrase.format(_mean_pct(rows, column))
+        # The pooled figures are quoted once because a pooled threshold is a
+        # quantile of the whole calibration sample: the prose says it is finite
+        # everywhere, which is a claim about the grid and is checked here.
+        pooled_cells = _grid("none")
+        assert all(int(r["threshold_diagnosis_n_infinite"]) == 0 for r in pooled_cells), (
+            "the prose says no pooled coverage is bought by abstaining"
+        )
+        yield "pooled cells", f"finite in all {len(pooled_cells)} cells of the grid"
+        # The class-conditional figures are quoted twice, and the second reading
+        # is the one the paragraph rests on, so both are rebuilt from the grid.
+        kept: dict[str, str] = {}
+        for role in ("home", "away"):
+            rows = [r for r in _grid("mondrian") if r["role"] == role]
+            assert len(_finite(rows)) < len(rows), role
+            kept[role] = _mean_pct(_finite(rows), "coverage_diagnosis_mean")
+        yield "mondrian finite pair", f"read {kept['home']} and {kept['away']}"
 
     elif name == "bias":
         bias = _read("rotation.json")["bias"]
@@ -433,10 +459,20 @@ def test_the_abstract_carries_the_rotation_figures_it_claims(report: str) -> Non
             "diagnosis at home",
             f"and {_mean_pct(home_none, 'coverage_diagnosis_mean')} of the cases",
         ),
-        ("repaired at home", f"at {_mean_pct(home_mondrian, 'coverage_diagnosis_mean')}, and not"),
+        # The abstract leads with the reading that excludes the pairs covering
+        # by abstention, and carries the inclusive pair after it.
+        (
+            "repaired at home",
+            f"at home, at {_mean_pct(_finite(home_mondrian), 'coverage_diagnosis_mean')}",
+        ),
         (
             "not on transfer",
-            f"at {_mean_pct(away_mondrian, 'coverage_diagnosis_mean')}, with a spread",
+            f"on transfer, at {_mean_pct(_finite(away_mondrian), 'coverage_diagnosis_mean')}",
+        ),
+        (
+            "inclusive pair",
+            f"to {_mean_pct(home_mondrian, 'coverage_diagnosis_mean')} and "
+            f"{_mean_pct(away_mondrian, 'coverage_diagnosis_mean')}",
         ),
         ("ladder foot", f"from {_pct(scale[('recalibrated', 0)])}"),
         ("ladder at 100", f"to {_pct(scale[('recalibrated', 100)])}"),

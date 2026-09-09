@@ -55,6 +55,9 @@ WEIGHT_SHA256 = {
     "ecgfm/mimic_iv_ecg_physionet_pretrained.pt": (
         "4d0142bcb485eb9f0c7845e0c19ff3463f6ae9d0e458eab69136efe90ceb9b7e"
     ),
+    "ecg_jepa/ecg_jepa_random.pth": (
+        "66a7cbc2f965d624f1effb2fcad59f74abc91ac9413b97541bb44ecd0de7c2d9"
+    ),
     "hubert-ecg-base/model.safetensors": (
         "05bc1b1317f8e3063811a03fb840f5bf8a85968191e209c0cfbaa0c52c8aa1ae"
     ),
@@ -311,8 +314,11 @@ def ecg_jepa() -> Arm:
     sys.path.insert(0, str(REPO_ROOT / "third_party/ecg_jepa"))
     from ecg_jepa import MaskTransformer  # vendored, MIT
 
-    path = WEIGHTS / "ecg_jepa/ecg_jepa_random.pth"
-    checkpoint = torch.load(path, map_location="cpu")
+    # weights_only=True refuses this checkpoint on torch 2.2.2: it carries the
+    # training state beside the encoder's tensors. The digest is what stands in
+    # for that restriction, checked before the file is opened at all.
+    path = verified("ecg_jepa/ecg_jepa_random.pth")
+    checkpoint = torch.load(path, map_location="cpu", weights_only=False)
     state = checkpoint["encoder"]
     depth = 1 + max(
         int(key.split(".")[2]) for key in state if key.startswith("encoder_blocks.blocks.")

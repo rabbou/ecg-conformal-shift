@@ -53,6 +53,31 @@ NOT_REGENERABLE = {
     "external/sph.json": "a re-score of 25,770 tracings from the raw waveforms",
     "ingest_report.json": "a full re-read of all three corpora, 40 minutes",
     "seen_target.json": "needs the PhysioNet Challenge-2021 bundle, 21 GB, not in this repository",
+    # The rotation's tables. Each needs the five corpora on disk, so none of
+    # them regenerates from what this repository carries. What guards them
+    # against the drift this registry exists to catch is a different check:
+    # test_rotation.py compares the split sizes the table recorded against the
+    # ones the code draws now, which is the way they went stale in practice.
+    "label_map.json": "needs the Challenge-2021 bundle, PTB-XL and Shandong on disk",
+    "duplicate_groups.json": (
+        "a full re-read of the five rotation corpora, 1,221 s by its own seconds field"
+    ),
+    "split_leak.json": "needs the five corpora on disk to draw the splits it counts across",
+    "rotation.json": (
+        "needs the five corpora and the five trained models; the table alone is 416 s"
+    ),
+    "rotation_uncertainty.json": "written by the same chain as rotation.json",
+    "target_scale.json": "needs PTB-XL and Chongqing on disk to draw the ladder's splits",
+    "rotation/chapman_ningbo/config.json": "written by a training run of that source",
+    "rotation/chapman_ningbo/metrics.json": "written by that same training run",
+    "rotation/cpsc/config.json": "written by a training run of that source",
+    "rotation/cpsc/metrics.json": "written by that same training run",
+    "rotation/georgia/config.json": "written by a training run of that source",
+    "rotation/georgia/metrics.json": "written by that same training run",
+    "rotation/ptbxl/config.json": "written by a training run of that source",
+    "rotation/ptbxl/metrics.json": "written by that same training run",
+    "rotation/sph/config.json": "written by a training run of that source",
+    "rotation/sph/metrics.json": "written by that same training run",
     "timing.json": "a measurement of one machine at one moment",
     "timing_esprimo.json": "a measurement of a second machine at one moment",
 }

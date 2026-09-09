@@ -28,7 +28,6 @@ from ecs.config import RESULTS_DIR
 
 ROOT = RESULTS_DIR.parent
 HEADLINE_ALPHA, HEADLINE_SCORE = "0.1", "lac"
-STARVED = {("chapman_ningbo", "LBBB"), ("sph", "IAVB"), ("sph", "LBBB")}
 
 
 def _read(name: str) -> dict[str, Any]:
@@ -61,6 +60,20 @@ def _mean_pct(rows: list[dict[str, str]], column: str) -> str:
     return _pct(statistics.mean(float(r[column]) for r in rows))
 
 
+def starved(correction: str = "mondrian") -> set[tuple[str, str]]:
+    """The source-diagnosis pairs whose threshold ran to infinity in some draw.
+
+    Read off the grid over both roles rather than written down here: a
+    hard-coded set goes stale the moment a table is rebuilt, and one derived
+    from the away rows alone would miss a pair that starves only at home.
+    """
+    return {
+        (r["source"], r["label"])
+        for r in _grid(correction)
+        if int(r["threshold_diagnosis_n_infinite"]) > 0
+    }
+
+
 def _finite(rows: list[dict[str, str]]) -> list[dict[str, str]]:
     """The cells whose class-conditional threshold was finite in every draw.
 
@@ -68,7 +81,8 @@ def _finite(rows: list[dict[str, str]]) -> list[dict[str, str]]:
     coverage without answering, so every class-conditional mean is quoted with
     and without them.
     """
-    return [r for r in rows if (r["source"], r["label"]) not in STARVED]
+    excluded = starved()
+    return [r for r in rows if (r["source"], r["label"]) not in excluded]
 
 
 @pytest.fixture(scope="module")
@@ -164,7 +178,10 @@ def _cases(name: str) -> Iterator[tuple[str, str]]:
         assert all(int(r["threshold_diagnosis_n_infinite"]) == 0 for r in pooled_cells), (
             "the prose says no pooled coverage is bought by abstaining"
         )
-        yield "pooled cells", f"finite in all {len(pooled_cells)} cells of the grid"
+        yield (
+            "pooled cells",
+            f"every one of the {len(pooled_cells)} cells the grid holds at this setting",
+        )
         # The class-conditional figures are quoted twice, and the second reading
         # is the one the paragraph rests on, so both are rebuilt from the grid.
         kept: dict[str, str] = {}
@@ -212,6 +229,31 @@ def _cases(name: str) -> Iterator[tuple[str, str]]:
         others = [v for k, v in homes.items() if k != "NSR"]
         yield "home others", f"by {min(others) * 100:.1f} to {max(others) * 100:.1f} points"
 
+    elif name == "abstention_by_correction":
+        # The caption counts the ringed points in two panels, and the figure can
+        # only mark what the drawing code distinguishes: an earlier draft said
+        # the figure marked them while every away point was a plain dot.
+        counts = {
+            correction: len(
+                {
+                    (r["source"], r["label"])
+                    for r in _grid(correction)
+                    if int(r["threshold_diagnosis_n_infinite"]) > 0
+                }
+            )
+            for correction in ("none", "mondrian", "weighted")
+        }
+        assert counts["none"] == 0, counts
+        yield (
+            "caption mondrian",
+            f"{_word(counts['mondrian'])} source-diagnosis pairs under class-conditional",
+        )
+        yield "caption weighted", f"and {_word(counts['weighted'])} under label-shift weighting"
+        script = (ROOT / "scripts/figures.py").read_text()
+        assert "n_draws_threshold_infinite" in script, (
+            "the caption says the figure rings these points; the drawing code must read the field"
+        )
+
     elif name == "starved":
         rows = [r for r in _grid("mondrian") if r["role"] == "away"]
         infinite = {
@@ -219,12 +261,12 @@ def _cases(name: str) -> Iterator[tuple[str, str]]:
             for r in rows
             if int(r["threshold_diagnosis_n_infinite"]) > 0
         }
-        assert set(infinite) == STARVED, sorted(infinite)
+        assert set(infinite) == starved(), sorted(infinite)
         yield "sph lbbb", f"infinite in {infinite[('sph', 'LBBB')]} of 200 draws"
         yield "sph iavb", f"atrioventricular block in {infinite[('sph', 'IAVB')]}"
         yield "chapman lbbb", f"left bundle-branch block in {infinite[('chapman_ningbo', 'LBBB')]}"
-        sick = [r for r in rows if (r["source"], r["label"]) in STARVED]
-        well = [r for r in rows if (r["source"], r["label"]) not in STARVED]
+        sick = [r for r in rows if (r["source"], r["label"]) in starved()]
+        well = _finite(rows)
         sizes = [float(r["mean_set_size_mean"]) for r in sick]
         yield "starved sizes", f"average {min(sizes):.2f} to {max(sizes):.2f} labels"
         clean = statistics.mean(float(r["mean_set_size_mean"]) for r in well)
@@ -252,24 +294,44 @@ def _cases(name: str) -> Iterator[tuple[str, str]]:
         reading = _read("rotation_uncertainty.json")["reading"]
         widths = reading["bootstrap_width_against_draw_spread"]
         yield "rows", f"{reading['n_rows']:,} rows"
-        yield "pairs compared", f"{widths['n_rows_compared']} source-target-diagnosis pairs"
-        yield "bootstrap width", f"cohort is {widths['median_bootstrap_width']:.3f}"
-        yield "draw spread", f"a standard deviation of {widths['median_draw_spread']:.3f}"
-        # The two are a sigma and a 95% width. Quoting them side by side without
-        # the conversion is what made an earlier draft read the comparison
-        # backwards, so the converted figure is asserted with the raw pair.
-        yield (
-            "draw spread converted",
-            f"which is {widths['median_draw_spread_as_a_95_percent_width']:.3f} as a 95% width",
+        # A pair carries one row per correction, so the stacked row count is
+        # twice the number of pairs and naming it "pairs" overstated the design.
+        by_correction = widths["by_correction"]
+        pair_counts = {c["n_pairs"] for c in by_correction.values()}
+        assert (
+            len(pair_counts) == 1
+            and pair_counts.pop() * len(by_correction) == widths["n_rows_compared"]
         )
-        wider = widths["n_rows_where_the_draw_spread_is_the_wider"]
-        assert wider > widths["n_rows_compared"] / 2, (
-            "the prose says the calibration draw is the wider of the two on most pairs"
-        )
-        yield (
-            "which is wider",
-            f"wider of the two on {wider} of the {widths['n_rows_compared']} pairs",
-        )
+        pairs = by_correction["mondrian"]["n_pairs"]
+        yield "pairs compared", f"Over the {pairs} source-target-diagnosis pairs"
+        # The two corrections invert, so each is quoted with its own figures and
+        # neither is read off the stacked median.
+        for correction, phrase in (
+            (
+                "mondrian",
+                "median bootstrap width of {boot:.3f} against a draw spread of {draw:.3f} "
+                "on the same scale, the draw being the wider on {wider} of the {n}",
+            ),
+            (
+                "none",
+                "inverts it, at {boot:.3f} against {draw:.3f}, the draw being the wider on {wider}",
+            ),
+        ):
+            block = by_correction[correction]
+            yield (
+                f"{correction} widths",
+                phrase.format(
+                    boot=block["median_bootstrap_width"],
+                    draw=block["median_draw_spread_as_a_95_percent_width"],
+                    wider=block["n_pairs_where_the_draw_spread_is_the_wider"],
+                    n=block["n_pairs"],
+                ),
+            )
+        assert (
+            by_correction["mondrian"]["n_pairs_where_the_draw_spread_is_the_wider"]
+            > by_correction["mondrian"]["n_pairs"] / 2
+            > by_correction["none"]["n_pairs_where_the_draw_spread_is_the_wider"]
+        ), "the prose rests on the two corrections falling on opposite sides"
         yield "thin rows", f"{reading['n_rows_too_thin_to_read']} of the file's"
         # Only the class-conditional column compares like with like: Chow's rule
         # is a per-class quantile, so the pooled column has no counterpart in it.
@@ -292,7 +354,7 @@ def _cases(name: str) -> Iterator[tuple[str, str]]:
             if r["conformal_minus_chow"] and abs(float(r["conformal_minus_chow"])) > 0.35
         ]
         assert rows, "the prose claims departures above 0.35 exist"
-        assert {(r["source"], r["label"]) for r in rows} <= STARVED
+        assert {(r["source"], r["label"]) for r in rows} <= starved()
         yield "chow outliers", "Every departure above 0.35 sits on the three pairs"
 
     elif name == "ages":
@@ -348,12 +410,18 @@ def _cases(name: str) -> Iterator[tuple[str, str]]:
         worst, best = by_auroc[0], by_auroc[-1]
         assert worst == "random_init", by_auroc
         for arm, text in (
-            (worst, "an AUROC of {auroc:.3f} (95% CI {lo:.3f} to {hi:.3f}) for a randomly"),
-            (best, "to {auroc:.3f} ({lo:.3f} to {hi:.3f}) for the strongest"),
+            (worst, "an AUROC of {auroc:.3f} (95% CI {lo:.3f} to {hi:.3f})"),
+            (best, "to {auroc:.3f} ({lo:.3f} to {hi:.3f})"),
         ):
             block = arms["discrimination"][arm]["ptbxl"]
             lo, hi = block["auroc_ci95"]
             yield f"{arm} auroc", text.format(auroc=block["auroc"], lo=lo, hi=hi)
+        # The prose says both ends of the AUROC range are held-out readings,
+        # which is a claim about which arms sit at those ends, not about the
+        # numbers: naming the range without it would credit a contaminated arm.
+        assert not arms["arms"][worst]["saw"] and not arms["arms"][best]["saw"], (
+            "the prose says both ends of the range are arms with no corpus of this study"
+        )
         seen = [a for a, b in arms["arms"].items() if b["saw"]]
         yield (
             "contaminated",
@@ -381,13 +449,10 @@ def _cases(name: str) -> Iterator[tuple[str, str]]:
         yield "arms at chongqing", f"they read between {_pct(min(at_acs))} and {_pct(max(at_acs))}"
         over = [c for c in cover.values() if float(c["sph"]["mean"]) > target]
         yield "arms at shandong", f"{_word(len(over))} of the five over-cover at Shandong"
-        yield "best arm transfers", f"reads {_pct(cover[best]['acs']['mean'])} at Chongqing"
-        weaker = max((a for a in cover if a != best), key=lambda a: cover[a]["acs"]["mean"])
-        assert (
-            arms["discrimination"][weaker]["ptbxl"]["auroc"]
-            < arms["discrimination"][best]["ptbxl"]["auroc"]
-        ), "the prose calls the better transferrer the weaker arm"
-        yield "weaker arm transfers", f"a weaker arm reads {_pct(cover[weaker]['acs']['mean'])}"
+        # Chongqing is held out for every arm, which is what lets the paragraph
+        # read those figures across arms while refusing to order the AUROCs.
+        assert all("acs" not in block["saw"] for block in arms["arms"].values())
+        yield "chongqing held out", "no arm having been pretrained there"
 
     else:  # pragma: no cover - the parametrisation below is closed
         raise AssertionError(name)
@@ -409,6 +474,7 @@ def _word(n: int) -> str:
         5: "five",
         8: "eight",
         12: "twelve",
+        15: "fifteen",
         20: "twenty",
         80: "eighty",
     }
@@ -422,6 +488,7 @@ GROUPS = [
     "cells",
     "coverage",
     "bias",
+    "abstention_by_correction",
     "starved",
     "uncertainty",
     "chow_outliers",
@@ -480,13 +547,43 @@ def test_the_abstract_carries_the_rotation_figures_it_claims(report: str) -> Non
         assert expected in abstract, f"{what}: {expected!r} not in the abstract"
 
 
+def test_the_discussion_and_limitations_quote_the_same_files(report: str) -> None:
+    """The rotation reaches past section 3.6, and those sentences went unpinned.
+
+    The discussion qualifies its Chow reading with a rotation figure and the
+    limitations count the pairs that cover by abstaining under two schemes.
+    Neither sits inside the section slice the other tests read.
+    """
+    tail = report[report.index("## 4. Discussion") :]
+    chow = _read("rotation_uncertainty.json")["reading"]["conformal_minus_chow"]
+    counts = {
+        correction: len(
+            {
+                (r["source"], r["label"])
+                for r in _grid(correction)
+                if int(r["threshold_diagnosis_n_infinite"]) > 0
+            }
+        )
+        for correction in ("mondrian", "weighted")
+    }
+    for what, expected in (
+        (
+            "chow over the rotation",
+            f"differ by a median of {chow['by_correction']['mondrian']['median']:.3f} in coverage",
+        ),
+        ("mondrian pairs", f"{_word(counts['mondrian'])} source-diagnosis pairs of section 3.6"),
+        ("weighted pairs", f"reweights, {_word(counts['weighted'])} do"),
+    ):
+        assert expected in tail, f"{what}: {expected!r} not in the discussion or limitations"
+
+
 def test_the_questions_quote_the_same_files(questions: str) -> None:
     """Questions 11 to 13 restate figures from the section; they must not drift from it."""
     tail = questions[questions.index("## 11.") :]
     leak = _read("split_leak.json")
     before = {c: b["before"]["n_groups_across_two_used_parts"] for c, b in leak["corpora"].items()}
     rows = [r for r in _grid("mondrian") if r["role"] == "away"]
-    sick = [r for r in rows if (r["source"], r["label"]) in STARVED]
+    sick = [r for r in rows if (r["source"], r["label"]) in starved()]
     bias = _read("rotation.json")["bias"]["LBBB"]["mondrian"]
     ambiguities = _read("label_map.json")["ambiguities"]
     covers = [float(r["coverage_diagnosis_mean"]) for r in sick]
@@ -508,18 +605,30 @@ def test_the_questions_quote_the_same_files(questions: str) -> None:
     assert leak["n_groups_still_across_two_used_parts"] == 0
 
 
+def drawn_names() -> set[str]:
+    """The figure file names ``scripts/figures.py`` actually writes.
+
+    Parsed rather than searched for as a substring: ``"fig7_rotation.png" in
+    script`` also passes on a file the script only mentions in a comment, and it
+    would pass a name that is a prefix of a real one.
+    """
+    script = (ROOT / "scripts/figures.py").read_text()
+    return set(re.findall(r'out / "([A-Za-z0-9_.-]+\.png)"', script))
+
+
 def test_no_rotation_figure_is_named_without_a_file_behind_it(report: str) -> None:
     """C-20 over the section this branch adds: both its figures are redrawn by a script."""
     shown = re.findall(r"!\[[^\]]*\]\(([^)]+)\)", report)
-    rotation = [s for s in shown if "fig7" in s or "fig8" in s]
+    rotation = [s for s in shown if s.endswith(("fig7_rotation.png", "fig8_target_scale.png"))]
     assert rotation == [
         "results/figures/fig7_rotation.png",
         "results/figures/fig8_target_scale.png",
     ]
-    script = (ROOT / "scripts/figures.py").read_text()
+    names = drawn_names()
+    assert names, "no figure names parsed out of scripts/figures.py"
     for relative in rotation:
         assert (ROOT / relative).exists(), relative
-        assert Path(relative).name in script, relative
+        assert Path(relative).name in names, relative
 
 
 def test_no_committed_figure_is_one_no_script_draws() -> None:
@@ -527,9 +636,12 @@ def test_no_committed_figure_is_one_no_script_draws() -> None:
 
     Nothing referenced it and nothing failed, so it would have shipped. Every
     file in the figure directory has to be a name ``scripts/figures.py`` writes.
+    The glob is case-blind, since a ``.PNG`` would slip a case-sensitive one.
     """
-    script = (ROOT / "scripts/figures.py").read_text()
+    names = drawn_names()
     orphans = [
-        p.name for p in sorted((RESULTS_DIR / "figures").glob("*.png")) if p.name not in script
+        p.name
+        for p in sorted((RESULTS_DIR / "figures").iterdir())
+        if p.is_file() and p.name not in names
     ]
     assert orphans == [], orphans

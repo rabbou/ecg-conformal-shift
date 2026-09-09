@@ -131,9 +131,10 @@ class TestTheCommittedUncertainty:
             width = float(row["bootstrap_width"])
             assert width >= 0.0
             if width == 0.0:
-                # Every positive covered on every resample: the threshold was
-                # infinite, so the set held both labels and nothing could vary.
-                assert coverage in (0.0, 1.0), row
+                # Nothing could vary between resamples, for one of two reasons:
+                # every positive is covered or none is, or the cell rests on a
+                # single patient, whom every resample draws again.
+                assert coverage in (0.0, 1.0) or int(row["n_positive_patients"]) == 1, row
 
     def test_the_interval_widens_as_the_class_thins(self, rows: list[dict[str, str]]) -> None:
         """The point of resampling the cohort: 23 positives cannot support the

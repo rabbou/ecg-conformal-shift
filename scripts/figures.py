@@ -700,13 +700,20 @@ def figure_7_rotation(table: dict[str, Any], out: Path, source: Path) -> Path:
             away = block["away"]
             for entry in away:
                 jitter = offsets[(label, entry["source"], entry["target"])]
+                # A pair whose per-class threshold ran to infinity in some draws
+                # covers by admitting both labels, so its point sits near 1.0 for
+                # a reason that is not the scheme working. Ringing it in black is
+                # what lets the text say the figure marks them.
+                abstains = entry.get("n_draws_threshold_infinite", 0) > 0
                 axis.plot(
                     column + jitter,
                     target + entry["bias"],
                     "o",
                     color=SOURCE_COLOUR[entry["source"]],
-                    markersize=4,
+                    markersize=5 if abstains else 4,
                     alpha=0.75,
+                    markeredgecolor="#111111" if abstains else "none",
+                    markeredgewidth=1.1 if abstains else 0.0,
                     zorder=3,
                 )
             for entry in block["home"]:
@@ -761,6 +768,19 @@ def figure_7_rotation(table: dict[str, Any], out: Path, source: Path) -> Path:
         plt.Line2D(
             [],
             [],
+            marker="o",
+            linestyle="",
+            color="#999999",
+            markeredgecolor="#111111",
+            markeredgewidth=1.1,
+            markersize=6,
+            label="threshold infinite in some draws: covers by admitting both labels",
+        )
+    )
+    handles.append(
+        plt.Line2D(
+            [],
+            [],
             marker="_",
             linestyle="",
             color="#111111",
@@ -768,7 +788,7 @@ def figure_7_rotation(table: dict[str, Any], out: Path, source: Path) -> Path:
             label="mean over the away pairs, spread across sources",
         )
     )
-    figure.legend(handles=handles, loc="lower center", ncol=4, frameon=False, fontsize=8)
+    figure.legend(handles=handles, loc="lower center", ncol=3, frameon=False, fontsize=8)
     # Sinus rhythm is refused on Shandong, so it carries twelve ordered pairs
     # where the other four carry twenty. Stating one number would be wrong for
     # four columns of the figure.

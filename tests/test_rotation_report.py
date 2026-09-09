@@ -163,9 +163,24 @@ def _cases(name: str) -> Iterator[tuple[str, str]]:
         sds = {label: bias[label]["mondrian"]["away_bias"]["sd_across_sources"] for label in bias}
         yield "sd range", f"runs from {min(sds.values()):.3f} on first-degree"
         yield "sd worst", f"to {max(sds.values()):.3f} on sinus rhythm"
-        worst = min((entry for entry in bias["LBBB"]["mondrian"]["away"]), key=lambda e: e["bias"])
-        yield "worst pair", f"loses {abs(worst['bias']) * 100:.1f} points"
-        assert (worst["source"], worst["target"]) == ("ptbxl", "cpsc"), worst
+        # Over every diagnosis, not one of them: an earlier draft searched LBBB
+        # alone and named a pair seven points short of the actual worst.
+        ranked = sorted(
+            (
+                (entry["bias"], label, entry["source"], entry["target"], entry)
+                for label, block in bias.items()
+                for entry in block["mondrian"]["away"]
+            ),
+            key=lambda row: row[0],
+        )
+        worst, second = ranked[0], ranked[1]
+        assert (worst[1], worst[2], worst[3]) == ("NSR", "cpsc", "ptbxl"), worst[:4]
+        assert (second[1], second[2], second[3]) == ("LBBB", "ptbxl", "cpsc"), second[:4]
+        yield "worst pair", f"loses {abs(worst[0]) * 100:.1f} points"
+        yield "second worst", f"next at {abs(second[0]) * 100:.1f}"
+        # The prose leans on both being real transfers rather than abstention.
+        for row in (worst, second):
+            assert row[4]["n_draws_threshold_infinite"] == 0, row[:4]
         homes = {label: bias[label]["mondrian"]["home_bias"]["mean"] for label in bias}
         yield "home nsr", f"within {abs(homes['NSR']) * 100:.1f} points of the target"
         others = [v for k, v in homes.items() if k != "NSR"]

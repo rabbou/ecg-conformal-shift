@@ -717,6 +717,20 @@ def figure_7_rotation(table: dict[str, Any], out: Path, source: Path) -> Path:
                     zorder=3,
                 )
             for entry in block["home"]:
+                # A home reading can starve on the same label its away readings
+                # do, and leaving it unringed made the figure disagree with its
+                # own caption's count.
+                if entry.get("n_draws_threshold_infinite", 0) > 0:
+                    axis.plot(
+                        column - 0.34,
+                        target + entry["bias"],
+                        "o",
+                        markerfacecolor="none",
+                        markeredgecolor="#111111",
+                        markersize=9,
+                        markeredgewidth=1.1,
+                        zorder=4,
+                    )
                 axis.plot(
                     column - 0.34,
                     target + entry["bias"],

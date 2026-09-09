@@ -91,7 +91,10 @@ NOT_REGENERABLE = {
     "baseline/scores.npz": "the supervised baseline's scores over PTB-XL fold 10",
     "external/acs.npz": "the same model's scores over 17,955 Chongqing tracings",
     "external/sph.npz": "the same model's scores over 25,770 Shandong tracings",
-    "perturbations.npz": "six score arrays, one per acquisition fault of section 3.5",
+    "perturbations.npz": (
+        "six score arrays over PTB-XL fold 10: the five perturbed conditions of "
+        "section 3.5 and the unperturbed pass they are read against"
+    ),
     "timing.json": "a measurement of one machine at one moment",
     "timing_esprimo.json": "a measurement of a second machine at one moment",
 }

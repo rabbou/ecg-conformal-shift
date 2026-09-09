@@ -14,6 +14,7 @@ string built from the file will not be found.
 
 from __future__ import annotations
 
+import ast
 import csv
 import json
 import re
@@ -28,6 +29,9 @@ from ecs.config import RESULTS_DIR
 
 ROOT = RESULTS_DIR.parent
 HEADLINE_ALPHA, HEADLINE_SCORE = "0.1", "lac"
+# The grid holds three roles; figure_7_rotation panels two of them, so anything
+# the figure's caption counts has to be counted over these and not over the grid.
+DRAWN_ROLES = ("home", "away")
 
 
 def _read(name: str) -> dict[str, Any]:
@@ -230,29 +234,38 @@ def _cases(name: str) -> Iterator[tuple[str, str]]:
         yield "home others", f"by {min(others) * 100:.1f} to {max(others) * 100:.1f} points"
 
     elif name == "abstention_by_correction":
-        # The caption counts the ringed points in two panels, and the figure can
-        # only mark what the drawing code distinguishes: an earlier draft said
-        # the figure marked them while every away point was a plain dot.
-        counts = {
+        # The caption counts rings, so it has to count over the roles the figure
+        # draws. Counting the whole grid put one pair too many in it: a pair can
+        # starve in the calibration-holdout role, which no panel shows.
+        drawn = {
             correction: len(
                 {
                     (r["source"], r["label"])
                     for r in _grid(correction)
-                    if int(r["threshold_diagnosis_n_infinite"]) > 0
+                    if r["role"] in DRAWN_ROLES and int(r["threshold_diagnosis_n_infinite"]) > 0
                 }
             )
             for correction in ("none", "mondrian", "weighted")
         }
-        assert counts["none"] == 0, counts
+        assert drawn["none"] == 0, drawn
         yield (
             "caption mondrian",
-            f"{_word(counts['mondrian'])} source-diagnosis pairs under class-conditional",
+            f"{_word(drawn['mondrian'])} source-diagnosis pairs under class-conditional",
         )
-        yield "caption weighted", f"and {_word(counts['weighted'])} under label-shift weighting"
-        script = (ROOT / "scripts/figures.py").read_text()
-        assert "n_draws_threshold_infinite" in script, (
-            "the caption says the figure rings these points; the drawing code must read the field"
-        )
+        yield "caption weighted", f"and {_word(drawn['weighted'])} under label-shift weighting"
+        # The unringed pair the caption names is the difference between the two
+        # counts, so the caption owes the reader that pair by name.
+        hidden = {
+            (r["source"], r["label"])
+            for r in _grid("weighted")
+            if int(r["threshold_diagnosis_n_infinite"]) > 0
+        } - {
+            (r["source"], r["label"])
+            for r in _grid("weighted")
+            if r["role"] in DRAWN_ROLES and int(r["threshold_diagnosis_n_infinite"]) > 0
+        }
+        assert hidden == {("sph", "AF")}, sorted(hidden)
+        yield "unringed pair", "Shandong's atrial fibrillation, starves in a role no panel shows"
 
     elif name == "starved":
         rows = [r for r in _grid("mondrian") if r["role"] == "away"]
@@ -474,6 +487,7 @@ def _word(n: int) -> str:
         5: "five",
         8: "eight",
         12: "twelve",
+        14: "fourteen",
         15: "fifteen",
         20: "twenty",
         80: "eighty",
@@ -603,6 +617,28 @@ def test_the_questions_quote_the_same_files(questions: str) -> None:
     ):
         assert expected.lower() in tail.lower(), f"{what}: {expected!r} not in questions 11 to 13"
     assert leak["n_groups_still_across_two_used_parts"] == 0
+
+
+def test_the_figure_reads_the_abstention_field_in_both_role_loops() -> None:
+    """The caption counts rings in both roles, so both loops must consult the field.
+
+    Searched inside the function's own syntax tree rather than anywhere in the
+    file: a bare ``"n_draws_threshold_infinite" in script`` was satisfied while
+    only the away loop read it, which is how the caption came to count a ring
+    the figure never drew.
+    """
+    tree = ast.parse((ROOT / "scripts/figures.py").read_text())
+    function = next(
+        node
+        for node in ast.walk(tree)
+        if isinstance(node, ast.FunctionDef) and node.name == "figure_7_rotation"
+    )
+    reads = [
+        node
+        for node in ast.walk(function)
+        if isinstance(node, ast.Constant) and node.value == "n_draws_threshold_infinite"
+    ]
+    assert len(reads) >= 2, f"only {len(reads)} role loop(s) consult the field"
 
 
 def drawn_names() -> set[str]:

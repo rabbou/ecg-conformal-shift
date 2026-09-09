@@ -85,17 +85,42 @@ NOT_REGENERABLE = {
     "rotation/ptbxl/metrics.json": "written by that same training run",
     "rotation/sph/config.json": "written by a training run of that source",
     "rotation/sph/metrics.json": "written by that same training run",
+    # The frozen score arrays. Each is the output of a model pass over a corpus,
+    # so none of them regenerates from what this repository carries; every table
+    # above that reads scores reads one of these.
+    "baseline/scores.npz": "the supervised baseline's scores over PTB-XL fold 10",
+    "external/acs.npz": "the same model's scores over 17,955 Chongqing tracings",
+    "external/sph.npz": "the same model's scores over 25,770 Shandong tracings",
+    "perturbations.npz": "six score arrays, one per acquisition fault of section 3.5",
     "timing.json": "a measurement of one machine at one moment",
     "timing_esprimo.json": "a measurement of a second machine at one moment",
 }
 
 
-def tracked_tables() -> list[str]:
-    """Every committed results table, excluding the per-encoder and figure sidecars.
+# Directory families held as a family rather than file by file: they are large,
+# numerous and produced together, so one row would repeat itself many times over.
+# Each is named here so a NEW family cannot appear without a decision.
+FAMILIES = {
+    "results/embeddings/": "one cached representation per encoder arm and corpus",
+    "results/figures/": "redrawn from the committed tables by scripts/figures.py",
+    "scores/": "the frozen score arrays a rotation source wrote for one corpus",
+}
 
-    CSV counts as a table.  Restricting this to JSON let the two rotation grids
-    sit outside the registry while the summaries computed from them sat inside
-    it, which is the drift the registry exists to catch.
+
+def in_a_family(path: str) -> bool:
+    return any(
+        path.startswith(prefix) if prefix.startswith("results/") else f"/{prefix}" in path
+        for prefix in FAMILIES
+    )
+
+
+def tracked_tables() -> list[str]:
+    """Every committed results file that is not part of a named family.
+
+    CSV and npz count.  Restricting this to JSON let the two rotation grids sit
+    outside the registry while the summaries computed from them sat inside it,
+    and left every score array unaccounted for, which is the drift the registry
+    exists to catch.
     """
     listed = subprocess.run(
         ["git", "ls-files", "results"], capture_output=True, text=True, check=True, cwd=REPO_ROOT
@@ -103,10 +128,17 @@ def tracked_tables() -> list[str]:
     return sorted(
         path[len("results/") :]
         for path in listed
-        if path.endswith((".json", ".csv"))
-        and not path.startswith("results/embeddings/")
-        and not path.startswith("results/figures/")
+        if path.endswith((".json", ".csv", ".npz")) and not in_a_family(path)
     )
+
+
+def test_every_committed_results_file_is_a_kind_the_registry_knows() -> None:
+    """No extension slips the net: a new kind is a decision, not a default."""
+    listed = subprocess.run(
+        ["git", "ls-files", "results"], capture_output=True, text=True, check=True, cwd=REPO_ROOT
+    ).stdout.split()
+    unknown = sorted(p for p in listed if not p.endswith((".json", ".csv", ".npz", ".png")))
+    assert unknown == [], unknown
 
 
 def commit_is_known(commit: str) -> bool:
@@ -169,11 +201,11 @@ class TestNothingIsUnaccountedFor:
     def test_an_excused_file_carries_no_provenance_block_it_cannot_honour(self, name: str) -> None:
         """The excuse and the block are alternatives; carrying both would hide drift.
 
-        A CSV has nowhere to put a block, which is the reason its row here is
-        the only thing standing between it and going unaccounted for.
+        A CSV or an npz has nowhere to put a block, which is the reason its row
+        here is the only thing standing between it and going unaccounted for.
         """
-        if name.endswith(".csv"):
-            pytest.skip("a CSV carries no provenance block")
+        if name.endswith((".csv", ".npz")):
+            pytest.skip("neither a CSV nor an array file carries a provenance block")
         assert "provenance" not in json.loads((RESULTS / name).read_text())
 
     @pytest.mark.parametrize("name", sorted(NOT_REGENERABLE))

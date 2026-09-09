@@ -51,6 +51,23 @@ Each maps to a named test. Unchecked means unverified, not done.
 | C-22 | WHERE a single tuned threshold is compared against a conformal scheme, THE results file SHALL record that its target is a sensitivity and the conformal target a coverage, and SHALL record the decision boundaries on the probability axis rather than the raw score quantiles. | `test_outcomes.py::TestTheCommittedOutcomeTable::test_the_table_says_the_two_targets_are_different_quantities`, `test_the_denominator_is_named_in_the_file` |
 
 
+| C-23 | THE label table SHALL map each corpus's own code system onto the five rotation diagnoses, and ITS per-corpus per-class counts SHALL equal the counts the Challenge publishes for its four partitions once the records carrying both halves of a fused pair are subtracted. | `test_label_map.py::TestTheCountsCloseAgainstThePublishedTable`, on `results/label_map.json`; the mapping itself against the three code tables in `mappings/` by `test_small_set.py` |
+| C-24 | THE label table SHALL name every join it could not make cleanly, and WHERE a class cannot be read on a corpus THE table SHALL refuse that cell with the ambiguity that refused it rather than fill it. | `test_label_map.py::TestEveryCorpusAndClassHasACell::test_a_refused_cell_is_empty_and_says_which_ambiguity_refused_it`; `test_small_set.py::TestEveryAmbiguityIsWritten` |
+| C-25 | WHERE a Challenge-2021 partition is ingested, THE loader SHALL return the canonical (N, 12, 5000) form and SHALL report that the bundle ships no patient identifier; WHEN a record carries fewer samples than the ten-second window, THE loader SHALL exclude it and count it. | `test_rotation.py::TestTheIngestionContract`, `TestTheSplit::test_the_corpora_that_ship_short_records_say_how_many_they_dropped`; `test_ingest.py::TestAssembly::test_a_record_too_short_for_the_window_is_excluded_and_counted` |
+| C-26 | WHEN a source model's thresholds are fitted, THEY SHALL be a function of that source's calibration records alone; permuting every label of a target corpus SHALL leave every threshold unchanged, on each of the twenty ordered pairs. | `test_rotation.py::TestNoThresholdReadsATargetLabel` on synthetic scores, `TestNoTargetLabelReachesAThresholdOnTheRealPairs` parametrised over the twenty pairs, and `TestTheCommittedRotation::test_an_unweighted_threshold_does_not_depend_on_which_corpus_it_is_spent_on` on the committed table |
+| C-27 | THE rotation file SHALL report, for every (source, target, diagnosis, correction, level), the coverage mean and spread over at least 200 calibration draws, with the effective size of the calibration sample behind the threshold. | `test_rotation.py::TestTheCommittedRotation::test_every_figure_is_a_mean_over_two_hundred_draws_with_its_spread`, `test_every_cell_reports_the_effective_size_of_what_calibrated_it` |
+| C-28 | THE rotation file SHALL report the coverage bias per diagnosis with its spread across the five sources, not only across the twenty pairs. | `test_rotation.py::TestTheCommittedRotation::test_the_bias_carries_its_spread_across_sources` |
+| C-29 | THE target-scale file SHALL report coverage on Chongqing after recalibration on 0, 100, 500 and 2,000 labelled target records, measured on one held-out half that no rung calibrates on. | `test_target_scale.py` |
+| C-30 | THE encoder arms SHALL include ECG-JEPA, and THE README SHALL name which arms saw PTB-XL at pre-training and HuBERT-ECG's non-commercial licence. | `test_encoder_arms.py`; the README's "Encoder arms" table |
+
+| C-31 | THE rotation SHALL report, beside the spread over calibration draws, a 95% interval obtained by resampling each target cohort by patient, so that a coverage read on a thin class carries the uncertainty of the class being thin. | `test_rotation_uncertainty.py::TestTheCommittedUncertainty`, on `results/rotation_uncertainty.csv`; the resampling unit itself by `TestTheBootstrapItself` |
+| C-32 | THE rotation SHALL report, for every pair, the coverage a per-class rejection rule with one plain empirical quantile per class reaches on the same scores, and the difference from the conformal figure. | `test_rotation_uncertainty.py::TestChowIsMondrianWithoutTheCorrection` on the rule, `TestTheCommittedUncertainty::test_the_two_rules_agree_except_where_the_class_is_starved` on the committed file |
+
+| C-33 | THE rotation SHALL repeat every coverage cell by sex and by age band wherever the corpus records them, with the number of positives behind each cell and its patient bootstrap interval, and SHALL flag a cell resting on fewer than 25 positives rather than let it read as a result. | `test_rotation_uncertainty.py::TestTheSubgroups`, on `results/rotation_uncertainty.csv` |
+
+| C-34 | WHERE a corpus files one tracing under more than one record identifier, THE splitter SHALL place every record of that group on one side of every boundary, and no group SHALL sit in two parts a figure is read across. | `test_duplicates.py::TestTheSplitNoLongerLeaks`, on `results/split_leak.json`; the key itself by `TestTheWidenedKey` |
+| C-35 | THE results SHALL record, per corpus, how many groups of identical tracings straddled a boundary before the splitter was widened and how many straddle it after. | `test_duplicates.py::TestTheSplitNoLongerLeaks::test_the_leak_it_closed_is_on_the_record` |
+
 ## The ingestion contract
 
 Every corpus is reduced to one canonical form before anything else touches it:
@@ -135,13 +152,112 @@ being re-cut. Each is drawn by `scripts/figures.py` from a results file.
 6. Per-label outcomes. What a case of each label receives under each scheme:
    the correct label alone, a deferral, or the wrong label alone.
 
+7. The source rotation. Coverage of each of the five diagnoses when the
+   calibration source is each of five corpora in turn and its thresholds are
+   spent on the other four: one panel per correction, one point per ordered
+   pair coloured by its source, the source's own held-out reading beside it,
+   and the mean over the away pairs with its spread across sources.
+8. The target scale. Coverage on Chongqing against how many labelled Chongqing
+   tracings the threshold saw — 0, 100, 500, 2,000 — recalibrated on those
+   records against pooled with the source calibration half.
+
 Figures 5 and 6 are the report's figures 1 and 2; the coverage grid is its
 figure 3. Figures 2 and 4 above are kept in `results/figures/` and cited from
-`README.md` and `QUESTIONS.md` rather than carried in the report.
+`README.md` and `QUESTIONS.md` rather than carried in the report. Figures 7 and
+8 belong to the rotation and are not in the report yet.
 
 The numbers behind every figure live in `results/` as JSON or CSV and are
 committed before the figure. Each external corpus is scored once with the
 PTB-XL calibration; nothing is tuned on Shandong or Chongqing.
+
+## The source rotation
+
+The break table measures one calibration source against two targets. That is a
+pair, and a pair cannot say whether the break is a property of conformal
+prediction under a change of hospital or a property of PTB-XL and Chongqing.
+The rotation makes it an estimate: five corpora take turns as the source, each
+one's thresholds are spent once on each of the other four, and the coverage bias
+is reported per diagnosis with its spread across sources. This is Leinonen et
+al.'s rotation protocol (Comput Biol Med 2024, PMID 39427424) asked of coverage
+rather than of discrimination.
+
+Five corpora — PTB-XL, Shandong, Chapman-Shaoxing with Ningbo, Georgia, CPSC
+2018 with its extension — and five diagnoses a cardiologist reads at a glance:
+sinus rhythm, atrial fibrillation, left and right bundle-branch block,
+first-degree atrioventricular block. Infarction is not among them because it is
+not a scored Challenge class and exists with usable counts on PTB-XL, Shandong
+and Chongqing alone; the infarction axis stays as it is, and the target-scale
+ladder is measured on it.
+
+Every corpus is cut once by patient into train, validation, calibration and
+test. The test part is the same records whether the corpus is the source or a
+target, so a difference between home and away is the threshold rather than the
+sample. Train and calibration are capped at the size the smallest corpus
+reaches, so "which source" is not read together with "how much data the source
+had".
+
+`results/label_map.json` is the piece this rests on: the mapping from three
+annotation schemes onto five classes, its counts checked against the
+Challenge's own published table, and the five joins that could not be made
+cleanly written down rather than decided in passing.
+
+### What the coverage table cannot say on its own
+
+Two objections apply to the rotation as much as to the infarction axis, and
+both are answered by `results/rotation_uncertainty.csv` rather than left to the
+reader.
+
+*The spread in the table is the wrong uncertainty.* Every figure in
+`results/rotation.csv` is a mean over 200 calibration draws on a target cohort
+that never moves, so it carries the variability of the threshold and none of
+the variability of the population. A coverage read on Shandong's 23 left
+bundle-branch blocks is uncertain because there are 23 of them. The uncertainty
+file resamples each target cohort by patient and reports a percentile interval
+beside the draw spread.
+
+*A split by patient does not hold a repeated tracing.* Three of the five corpora
+file one tracing under several record identifiers, and the Challenge bundle
+names no patient, so each record was its own patient and the copies went
+wherever the shuffle sent them: 485 groups straddled a boundary a figure is read
+across, 421 of them in CPSC, and some of those boundaries were train against
+test. The screen is the delivery corpus's own (`ecg-data-chain` 4bff859): the
+first ten seconds of the twelve leads quantised to ten microvolts, SHA-256. On
+the 49,199 records both repositories digest, the two agree on every one. A group
+is now one splitting unit and the count after is zero.
+
+*A figure that holds over a cohort can fail over half of it.* Every row is
+repeated by sex and by age band. Coverage of sinus rhythm away from home falls
+from 0.841 under 50 to 0.619 at 75 and over, against the 0.90 promised; right
+bundle-branch block runs the other way, 0.714 to 0.906. The widest gap between
+the sexes on a single pair is left bundle-branch block from PTB-XL to
+Chapman-Shaoxing with Ningbo, 0.505 for men against 0.821 for women. A cell
+resting on fewer than 25 positives is flagged, because a 95% interval on twenty
+cases is wider than any difference the rotation looks for.
+
+*A rejection rule may do the same work.* One plain empirical quantile per class
+— Chow, *IEEE Trans Inf Theory* 1970 — is Mondrian minus the finite-sample
+`(n+1)` correction. If the two land in the same place, the conformal formalism
+is a rename of a per-class rejection rule, and the object has to say so. The
+uncertainty file reports both coverages and their difference, per pair, so what
+conformal prediction adds here is a number rather than a claim.
+
+### The nearest prior work, and what is not known about it
+
+El Allam and Hamlich, "Quantization-aware Mondrian conformal prediction for
+embedded ECG classification", *Biomed Signal Process Control* 2026;127:111217,
+10.1016/j.bspc.2026.111217. Read in full on 2026-09-08, and reference 15 of
+`REPORT.md` records what it says and where.
+
+It transfers no threshold between sites. Its §4.3 rotates PTB-XL ten ways by
+patient and compares pooled against Mondrian calibration inside that one
+corpus, closing a Normal-MI coverage gap of 3.06 points to 0.12. Its
+Chapman-Shaoxing figures are an in-distribution evaluation, which it says twice,
+in §3.8 and again in §4.4, each time warning against reading them as evidence of
+cross-database transfer. So the nearest prior work establishes that per-label
+calibration repairs a per-label gap at home, and leaves what a transferred
+threshold does at another hospital open. That is the question this rotation
+measures, on five corpora rather than one, so the two are complementary and
+neither displaces the other.
 
 ## Days
 

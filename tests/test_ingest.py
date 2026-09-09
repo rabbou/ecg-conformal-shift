@@ -140,6 +140,23 @@ class TestAssembly:
         assert corpus.ids == ["good"]
         assert corpus.excluded == {"broken": "unreadable: Samples were not loaded correctly"}
 
+    def test_a_record_too_short_for_the_window_is_excluded_and_counted(self) -> None:
+        """Georgia ships 52 records of five seconds, CPSC 22 that fall a sample or
+        three short of ten. Neither can reach the canonical window, and neither
+        may stop the pass over the rest of the corpus."""
+        records = [
+            ("ten-seconds", _record(np.ones((12, 5000)))),
+            ("five-seconds", _record(np.ones((12, 2500)))),
+            ("one-sample-short", _record(np.ones((12, 4999)))),
+        ]
+        corpus = assemble_corpus("synthetic", records, n=3)
+        assert corpus.ids == ["ten-seconds"]
+        assert set(corpus.excluded) == {"five-seconds", "one-sample-short"}
+        assert corpus.excluded["five-seconds"] == (
+            "record is shorter than ten seconds: 2500 samples"
+        )
+        assert corpus.x.shape == (1, 12, 5000)
+
     def test_read_or_error_returns_the_error_instead_of_raising(self, tmp_path: Path) -> None:
         result = read_or_error(read_wfdb, tmp_path / "missing")
         assert isinstance(result, FileNotFoundError)

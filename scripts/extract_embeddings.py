@@ -43,7 +43,7 @@ import numpy as np
 import pandas as pd
 import torch
 
-from ecs.config import ACS_DIR, PTBXL_DIR, RESULTS_DIR, SPH_DIR
+from ecs.config import ACS_DIR, EMBEDDINGS_DIR, PTBXL_DIR, SPH_DIR
 from ecs.encoders import ARMS, PRETRAINING, machine_info
 from ecs.ingest import Corpus, load_acs, load_ptbxl, load_sph
 
@@ -191,7 +191,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--arm", required=True, choices=list(ARMS))
     parser.add_argument("--corpus", nargs="+", default=["ptbxl", "sph", "acs"])
-    parser.add_argument("--out", default=str(RESULTS_DIR / "embeddings"))
+    parser.add_argument("--out", default=str(EMBEDDINGS_DIR))
     parser.add_argument("--overwrite", action="store_true")
     args = parser.parse_args(argv)
 

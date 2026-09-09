@@ -1,0 +1,52 @@
+{
+  "epochs": 8,
+  "learning_rate": 0.001,
+  "batch_size": 64,
+  "weight_decay": 0.01,
+  "patience": 3,
+  "seed": 0,
+  "source": "ptbxl",
+  "classes": [
+    "NSR",
+    "AF",
+    "LBBB",
+    "RBBB",
+    "IAVB"
+  ],
+  "usable_classes": [
+    "NSR",
+    "AF",
+    "LBBB",
+    "RBBB",
+    "IAVB"
+  ],
+  "caps": {
+    "train": 3500,
+    "val": 600,
+    "cal": 2000,
+    "test": 8000
+  },
+  "split_sizes": {
+    "train": 3500,
+    "val": 600,
+    "cal": 2000,
+    "test": 8000,
+    "unused": 7699
+  },
+  "n_train": 3500,
+  "n_validation": 600,
+  "standardisation": {
+    "centre_mv": -0.0004722433805000037,
+    "scale_mv": 0.2345341444015503
+  },
+  "deviations": [
+    "waveforms and patient identifiers from the PTB-XL distribution, SNOMED codes from the Challenge-2021 bundle's PTB-XL partition"
+  ],
+  "machine": {
+    "cpu": "Intel(R) Core(TM) i7-8700 CPU @ 3.20GHz",
+    "platform": "Linux-6.8.0-139-generic-x86_64-with-glibc2.39",
+    "python": "3.11.15",
+    "torch": "2.2.2+cu121",
+    "torch_threads": 4
+  }
+}

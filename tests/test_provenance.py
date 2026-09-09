@@ -45,7 +45,7 @@ REGENERABLE = (
 # Not regenerable in a session, and why. The reason is the point: it is what a
 # reader needs in order to judge how much the recorded commit is worth.
 NOT_REGENERABLE = {
-    "arms.json": "needs the four encoders' embeddings re-extracted over all three corpora",
+    "arms.json": "needs the five encoders' embeddings re-extracted over all three corpora",
     "baseline.json": "a 2 h 38 training run of the supervised baseline",
     "baseline/config.json": "written by that same training run",
     "baseline/metrics.json": "written by that same training run",

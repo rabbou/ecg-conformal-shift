@@ -1,6 +1,6 @@
 {
   "written_by": "scripts/duplicate_scan.py",
-  "commit": "b8d9c9ad79d26abefd1eee17134171769abf2468",
+  "commit": "e60b0ca414691548d2ee71bf5a4f100d548ecaa0",
   "screen": "the first ten seconds of the twelve canonical leads, quantised to 10 microvolts, SHA-256; the screen of ecg-data-chain 4bff859",
   "corpora": {
     "ptbxl": {
@@ -4016,5 +4016,10 @@
       }
     }
   },
-  "seconds": 1221.4
+  "across_corpora": {
+    "n_groups": 0,
+    "groups": [],
+    "reading": "a group here would be a tracing two corpora both hold, which no split inside one corpus can separate; the rotation would score a source on a recording its target had trained on"
+  },
+  "seconds": 984.8
 }

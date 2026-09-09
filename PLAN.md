@@ -244,18 +244,20 @@ conformal prediction adds here is a number rather than a claim.
 ### The nearest prior work, and what is not known about it
 
 El Allam and Hamlich, "Quantization-aware Mondrian conformal prediction for
-embedded ECG classification", *Biomed Signal Process Control*, November 2026,
-10.1016/j.bspc.2026.111217. Title, authors, journal and date were read from
-Crossref on 2026-09-08; the DOI resolves.
+embedded ECG classification", *Biomed Signal Process Control* 2026;127:111217,
+10.1016/j.bspc.2026.111217. Read in full on 2026-09-08, and reference 15 of
+`REPORT.md` records what it says and where.
 
-**The paper itself has not been read here.** It is closed access, and neither
-Crossref nor Semantic Scholar carries its abstract. So what corpora it uses,
-what diagnosis, and whether it reports coverage on a target site are unknown to
-this repository. That matters directly: it applies Mondrian conformal prediction
-to ECG, which is the correction this rotation reports, so if it already carries
-external per-label coverage then the novelty claim falls and this section is
-rewritten. Obtaining the full text, by library or by writing to the authors, is
-a dependency on the reading and not on the code.
+It transfers no threshold between sites. Its §4.3 rotates PTB-XL ten ways by
+patient and compares pooled against Mondrian calibration inside that one
+corpus, closing a Normal-MI coverage gap of 3.06 points to 0.12. Its
+Chapman-Shaoxing figures are an in-distribution evaluation, which it says twice,
+in §3.8 and again in §4.4, each time warning against reading them as evidence of
+cross-database transfer. So the nearest prior work establishes that per-label
+calibration repairs a per-label gap at home, and leaves what a transferred
+threshold does at another hospital open. That is the question this rotation
+measures, on five corpora rather than one, so the two are complementary and
+neither displaces the other.
 
 ## Days
 

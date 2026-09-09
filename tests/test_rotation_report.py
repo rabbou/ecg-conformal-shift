@@ -211,10 +211,31 @@ def _cases(name: str) -> Iterator[tuple[str, str]]:
         reading = _read("rotation_uncertainty.json")["reading"]
         widths = reading["bootstrap_width_against_draw_spread"]
         yield "rows", f"{reading['n_rows']:,} rows"
+        yield "pairs compared", f"{widths['n_rows_compared']} source-target-diagnosis pairs"
         yield "bootstrap width", f"cohort is {widths['median_bootstrap_width']:.3f}"
-        yield "draw spread", f"calibration draws is {widths['median_draw_spread']:.3f}"
-        yield "thin rows", f"{reading['n_rows_too_thin_to_read']} rows rest on"
-        yield "chow", f"median of {reading['conformal_minus_chow']['median']:.3f} in coverage"
+        yield "draw spread", f"a standard deviation of {widths['median_draw_spread']:.3f}"
+        # The two are a sigma and a 95% width. Quoting them side by side without
+        # the conversion is what made an earlier draft read the comparison
+        # backwards, so the converted figure is asserted with the raw pair.
+        yield (
+            "draw spread converted",
+            f"which is {widths['median_draw_spread_as_a_95_percent_width']:.3f} as a 95% width",
+        )
+        wider = widths["n_rows_where_the_draw_spread_is_the_wider"]
+        assert wider > widths["n_rows_compared"] / 2, (
+            "the prose says the calibration draw is the wider of the two on most pairs"
+        )
+        yield (
+            "which is wider",
+            f"wider of the two on {wider} of the {widths['n_rows_compared']} pairs",
+        )
+        yield "thin rows", f"{reading['n_rows_too_thin_to_read']} of the file's"
+        # Only the class-conditional column compares like with like: Chow's rule
+        # is a per-class quantile, so the pooled column has no counterpart in it.
+        chow = reading["conformal_minus_chow"]["by_correction"]["mondrian"]
+        yield "chow pairs", f"over its {chow['n_rows']} away pairs"
+        yield "chow median", f"median of {chow['median']:.3f} in coverage"
+        yield "chow max", f"by as much as {chow['max']:.3f}"
         sexes = reading["between_the_sexes"]
         yield (
             "sex median",

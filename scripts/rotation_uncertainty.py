@@ -66,6 +66,12 @@ CORRECTIONS = ("none", "mondrian")
 # is wider than any difference the rotation is looking for.
 THIN_BELOW = 25
 
+# A spread over calibration draws is a standard deviation and a bootstrap
+# interval is a 95% width.  Comparing them as they stand compares a sigma with
+# nearly four of them, so the summary carries the spread on the interval's scale
+# as well as its own.
+NORMAL_95 = 1.959964
+
 COLUMNS = (
     "source",
     "label",
@@ -332,12 +338,49 @@ def summarise(rows: list[dict[str, Any]], draws: int, boot: int) -> dict[str, An
                 "median_draw_spread": round(
                     float(np.median([r["sd_over_calibration_draws"] for r in whole])), 4
                 ),
+                "median_draw_spread_as_a_95_percent_width": round(
+                    float(np.median([r["sd_over_calibration_draws"] for r in whole]))
+                    * 2.0
+                    * NORMAL_95,
+                    4,
+                ),
+                "n_rows_where_the_draw_spread_is_the_wider": sum(
+                    1
+                    for r in whole
+                    if r["sd_over_calibration_draws"] * 2.0 * NORMAL_95 > r["bootstrap_width"]
+                ),
+                "n_rows_compared": len(whole),
+                "reading": (
+                    "the bootstrap figure is the width of a 95% percentile interval and the "
+                    "draw figure is one standard deviation, so the two say nothing about each "
+                    "other until the second is put on the first's scale"
+                ),
             },
             "conformal_minus_chow": {
                 "median": round(
                     float(np.median([abs(r["conformal_minus_chow"]) for r in whole])), 4
                 ),
                 "max": round(float(np.max([abs(r["conformal_minus_chow"]) for r in whole])), 4),
+                "by_correction": {
+                    correction: {
+                        "median": round(float(np.median(values)), 4),
+                        "max": round(float(np.max(values)), 4),
+                        "n_rows": len(values),
+                    }
+                    for correction in CORRECTIONS
+                    if (
+                        values := [
+                            abs(r["conformal_minus_chow"])
+                            for r in whole
+                            if r["correction"] == correction
+                        ]
+                    )
+                },
+                "reading": (
+                    "Chow's rule places one empirical quantile per class, so only the "
+                    "class-conditional column compares like with like; the median over both "
+                    "corrections is carried for continuity and should not be quoted alone"
+                ),
             },
             "between_the_sexes": {
                 "median_absolute_gap": round(float(np.median(spread)), 4) if spread else None,

@@ -202,7 +202,15 @@ def assemble_corpus(
             resampled += 1
         if record.signal.shape[-1] > WINDOW_SAMPLES * record.sampling_rate_hz / SAMPLING_RATE_HZ:
             cropped += 1
-        x[len(ids)] = canonicalise(record)
+        try:
+            canonical = canonicalise(record)
+        except ValueError as error:
+            # A record that cannot reach the canonical form -- too short for the
+            # ten-second window, a lead its header does not name -- is excluded
+            # and counted, not padded and not allowed to stop the pass.
+            excluded[record_id] = str(error)
+            continue
+        x[len(ids)] = canonical
         ids.append(record_id)
     if len(ids) + len(excluded) != n:
         raise ValueError(f"{name}: expected {n} records, read {len(ids) + len(excluded)}")

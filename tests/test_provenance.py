@@ -45,7 +45,7 @@ REGENERABLE = (
 # Not regenerable in a session, and why. The reason is the point: it is what a
 # reader needs in order to judge how much the recorded commit is worth.
 NOT_REGENERABLE = {
-    "arms.json": "needs the four encoders' embeddings re-extracted over all three corpora",
+    "arms.json": "needs the five encoders' embeddings re-extracted over all three corpora",
     "baseline.json": "a 2 h 38 training run of the supervised baseline",
     "baseline/config.json": "written by that same training run",
     "baseline/metrics.json": "written by that same training run",
@@ -53,23 +53,95 @@ NOT_REGENERABLE = {
     "external/sph.json": "a re-score of 25,770 tracings from the raw waveforms",
     "ingest_report.json": "a full re-read of all three corpora, 40 minutes",
     "seen_target.json": "needs the PhysioNet Challenge-2021 bundle, 21 GB, not in this repository",
+    # The rotation's tables. Each needs the five corpora on disk, so none of
+    # them regenerates from what this repository carries. What guards them
+    # against the drift this registry exists to catch is a different check:
+    # test_rotation.py compares the split sizes the table recorded against the
+    # ones the code draws now, which is the way they went stale in practice.
+    "label_map.json": "needs the Challenge-2021 bundle, PTB-XL and Shandong on disk",
+    "duplicate_groups.json": (
+        "a full re-read of the five rotation corpora, 1,221 s by its own seconds field"
+    ),
+    "split_leak.json": "needs the five corpora on disk to draw the splits it counts across",
+    "rotation.json": (
+        "needs the five corpora and the five trained models; the table alone is 416 s"
+    ),
+    "rotation_uncertainty.json": "written by the same chain as rotation.json",
+    # The two grids the summaries above are read from. A CSV carries no
+    # provenance block, so without a row here they sat outside the registry
+    # while the files they summarise sat inside it.
+    "rotation.csv": ("the 2,520-cell grid rotation.json summarises, written by the same 416 s run"),
+    "rotation_uncertainty.csv": (
+        "the 1,624-row grid rotation_uncertainty.json summarises, written by the same run"
+    ),
+    "target_scale.json": "needs PTB-XL and Chongqing on disk to draw the ladder's splits",
+    "rotation/chapman_ningbo/config.json": "written by a training run of that source",
+    "rotation/chapman_ningbo/metrics.json": "written by that same training run",
+    "rotation/cpsc/config.json": "written by a training run of that source",
+    "rotation/cpsc/metrics.json": "written by that same training run",
+    "rotation/georgia/config.json": "written by a training run of that source",
+    "rotation/georgia/metrics.json": "written by that same training run",
+    "rotation/ptbxl/config.json": "written by a training run of that source",
+    "rotation/ptbxl/metrics.json": "written by that same training run",
+    "rotation/sph/config.json": "written by a training run of that source",
+    "rotation/sph/metrics.json": "written by that same training run",
+    # The frozen score arrays. Each is the output of a model pass over a corpus,
+    # so none of them regenerates from what this repository carries; every table
+    # above that reads scores reads one of these.
+    "baseline/scores.npz": "the supervised baseline's scores over PTB-XL fold 10",
+    "external/acs.npz": "the same model's scores over 17,955 Chongqing tracings",
+    "external/sph.npz": "the same model's scores over 25,770 Shandong tracings",
+    "perturbations.npz": (
+        "six score arrays over PTB-XL fold 10: the five perturbed conditions of "
+        "section 3.5 and the unperturbed pass they are read against"
+    ),
     "timing.json": "a measurement of one machine at one moment",
     "timing_esprimo.json": "a measurement of a second machine at one moment",
 }
 
 
+# Directory families held as a family rather than file by file: they are large,
+# numerous and produced together, so one row would repeat itself many times over.
+# Each is named here so a NEW family cannot appear without a decision.
+FAMILIES = {
+    "results/embeddings/": "one cached representation per encoder arm and corpus",
+    "results/figures/": "redrawn from the committed tables by scripts/figures.py",
+    "scores/": "the frozen score arrays a rotation source wrote for one corpus",
+}
+
+
+def in_a_family(path: str) -> bool:
+    return any(
+        path.startswith(prefix) if prefix.startswith("results/") else f"/{prefix}" in path
+        for prefix in FAMILIES
+    )
+
+
 def tracked_tables() -> list[str]:
-    """Every committed results table, excluding the per-encoder and figure sidecars."""
+    """Every committed results file that is not part of a named family.
+
+    CSV and npz count.  Restricting this to JSON let the two rotation grids sit
+    outside the registry while the summaries computed from them sat inside it,
+    and left every score array unaccounted for, which is the drift the registry
+    exists to catch.
+    """
     listed = subprocess.run(
         ["git", "ls-files", "results"], capture_output=True, text=True, check=True, cwd=REPO_ROOT
     ).stdout.split()
     return sorted(
         path[len("results/") :]
         for path in listed
-        if path.endswith(".json")
-        and not path.startswith("results/embeddings/")
-        and not path.startswith("results/figures/")
+        if path.endswith((".json", ".csv", ".npz")) and not in_a_family(path)
     )
+
+
+def test_every_committed_results_file_is_a_kind_the_registry_knows() -> None:
+    """No extension slips the net: a new kind is a decision, not a default."""
+    listed = subprocess.run(
+        ["git", "ls-files", "results"], capture_output=True, text=True, check=True, cwd=REPO_ROOT
+    ).stdout.split()
+    unknown = sorted(p for p in listed if not p.endswith((".json", ".csv", ".npz", ".png")))
+    assert unknown == [], unknown
 
 
 def commit_is_known(commit: str) -> bool:
@@ -130,7 +202,13 @@ class TestNothingIsUnaccountedFor:
 
     @pytest.mark.parametrize("name", sorted(NOT_REGENERABLE))
     def test_an_excused_file_carries_no_provenance_block_it_cannot_honour(self, name: str) -> None:
-        """The excuse and the block are alternatives; carrying both would hide drift."""
+        """The excuse and the block are alternatives; carrying both would hide drift.
+
+        A CSV or an npz has nowhere to put a block, which is the reason its row
+        here is the only thing standing between it and going unaccounted for.
+        """
+        if name.endswith((".csv", ".npz")):
+            pytest.skip("neither a CSV nor an array file carries a provenance block")
         assert "provenance" not in json.loads((RESULTS / name).read_text())
 
     @pytest.mark.parametrize("name", sorted(NOT_REGENERABLE))

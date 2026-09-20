@@ -1,0 +1,3798 @@
+{
+  "written_by": "scripts/rotation_table.py",
+  "commit": "1463cd615535a858dfa0d8ad587ca7b61cd24f0f",
+  "machine": {
+    "cpu": "Intel(R) Core(TM) i7-8700 CPU @ 3.20GHz",
+    "platform": "Linux-6.8.0-139-generic-x86_64-with-glibc2.39",
+    "python": "3.11.15",
+    "torch": "2.2.2+cu121",
+    "torch_threads": 4
+  },
+  "settings": {
+    "alphas": [
+      0.2,
+      0.1,
+      0.05
+    ],
+    "scores": [
+      "lac",
+      "aps"
+    ],
+    "corrections": [
+      "none",
+      "mondrian",
+      "weighted"
+    ],
+    "n_draws": 200,
+    "headline": {
+      "alpha": 0.1,
+      "score": "lac"
+    },
+    "corpus_names": {
+      "ptbxl": "PTB-XL",
+      "sph": "Shandong",
+      "chapman_ningbo": "Chapman-Shaoxing and Ningbo",
+      "georgia": "Georgia",
+      "cpsc": "CPSC 2018 and extension"
+    },
+    "classes": [
+      "NSR",
+      "AF",
+      "LBBB",
+      "RBBB",
+      "IAVB"
+    ]
+  },
+  "sources": {
+    "ptbxl": {
+      "n_train": 3500,
+      "n_validation": 600,
+      "split_sizes": {
+        "train": 3500,
+        "val": 600,
+        "cal": 2000,
+        "test": 8000,
+        "unused": 7699
+      },
+      "usable_classes": [
+        "NSR",
+        "AF",
+        "LBBB",
+        "RBBB",
+        "IAVB"
+      ],
+      "standardisation": {
+        "centre_mv": -0.0004722433805000037,
+        "scale_mv": 0.2345341444015503
+      },
+      "deviations": [
+        "waveforms and patient identifiers from the PTB-XL distribution, SNOMED codes from the Challenge-2021 bundle's PTB-XL partition",
+        "293 patients older than 89 are recorded as age 300 by PTB-XL's de-identification and are read into the oldest band"
+      ],
+      "epochs": 8,
+      "val_macro_auroc": 0.9818
+    },
+    "sph": {
+      "n_train": 3500,
+      "n_validation": 600,
+      "split_sizes": {
+        "train": 3500,
+        "val": 600,
+        "cal": 2000,
+        "test": 8000,
+        "unused": 11670
+      },
+      "usable_classes": [
+        "AF",
+        "LBBB",
+        "RBBB",
+        "IAVB"
+      ],
+      "standardisation": {
+        "centre_mv": -0.0005905981524847448,
+        "scale_mv": 1.3738830089569092
+      },
+      "deviations": [
+        "diagnoses are AHA codes bridged to SNOMED by Leinonen et al.'s table",
+        "records run from ten to sixty seconds; the first ten are kept",
+        "168 groups of identical tracings, 336 records, split as one unit: the corpus repeats a tracing under more than one record identifier"
+      ],
+      "epochs": 8,
+      "val_macro_auroc": 0.9802
+    },
+    "chapman_ningbo": {
+      "n_train": 3493,
+      "n_validation": 599,
+      "split_sizes": {
+        "train": 3500,
+        "val": 600,
+        "cal": 2000,
+        "test": 8000,
+        "unused": 31052
+      },
+      "usable_classes": [
+        "NSR",
+        "AF",
+        "LBBB",
+        "RBBB",
+        "IAVB"
+      ],
+      "standardisation": {
+        "centre_mv": 0.0014309398829936981,
+        "scale_mv": 0.2703396677970886
+      },
+      "deviations": [
+        "the Challenge bundle ships no patient identifier, so each record is its own patient for splitting",
+        "87 groups of identical tracings, 174 records, split as one unit: the corpus repeats a tracing under more than one record identifier"
+      ],
+      "epochs": 8,
+      "val_macro_auroc": 0.9663
+    },
+    "georgia": {
+      "n_train": 3489,
+      "n_validation": 600,
+      "split_sizes": {
+        "train": 3492,
+        "val": 600,
+        "cal": 2000,
+        "test": 4123,
+        "unused": 77
+      },
+      "usable_classes": [
+        "NSR",
+        "AF",
+        "LBBB",
+        "RBBB",
+        "IAVB"
+      ],
+      "standardisation": {
+        "centre_mv": -0.00231633591465652,
+        "scale_mv": 0.19954797625541687
+      },
+      "deviations": [
+        "the Challenge bundle ships no patient identifier, so each record is its own patient for splitting",
+        "52 records shorter than ten seconds, dropped before the split",
+        "89 groups of identical tracings, 180 records, split as one unit: the corpus repeats a tracing under more than one record identifier"
+      ],
+      "epochs": 8,
+      "val_macro_auroc": 0.96
+    },
+    "cpsc": {
+      "n_train": 3500,
+      "n_validation": 600,
+      "split_sizes": {
+        "train": 3500,
+        "val": 600,
+        "cal": 2000,
+        "test": 4115,
+        "unused": 93
+      },
+      "usable_classes": [
+        "NSR",
+        "AF",
+        "LBBB",
+        "RBBB",
+        "IAVB"
+      ],
+      "standardisation": {
+        "centre_mv": -0.00013810404925607145,
+        "scale_mv": 0.27626466751098633
+      },
+      "deviations": [
+        "the Challenge bundle ships no patient identifier, so each record is its own patient for splitting",
+        "record lengths run from 5000 to 72000 samples; the first ten seconds are kept",
+        "22 records shorter than ten seconds, dropped before the split",
+        "637 groups of identical tracings, 1296 records, split as one unit: the corpus repeats a tracing under more than one record identifier"
+      ],
+      "epochs": 8,
+      "val_macro_auroc": 0.9616
+    }
+  },
+  "grid": {
+    "file": "results/rotation.csv",
+    "columns": [
+      "source",
+      "label",
+      "corpus",
+      "role",
+      "alpha",
+      "score",
+      "correction",
+      "n_points",
+      "n_patients",
+      "prevalence",
+      "n_positive",
+      "coverage_mean",
+      "coverage_sd",
+      "coverage_diagnosis_mean",
+      "coverage_diagnosis_sd",
+      "coverage_no_diagnosis_mean",
+      "coverage_no_diagnosis_sd",
+      "mean_set_size_mean",
+      "mean_set_size_sd",
+      "threshold_no_diagnosis_mean",
+      "threshold_diagnosis_mean",
+      "threshold_diagnosis_n_infinite",
+      "n_draws_target_prior_unidentified",
+      "calibration_n_mean",
+      "calibration_effective_size_mean",
+      "n_draws"
+    ],
+    "roles": {
+      "home": "the source's own test part, scored with its own model and threshold",
+      "away": "another corpus's test part, scored with this source's model and threshold, never re-calibrated on itself",
+      "calibration holdout": "the half of the source's calibration part that did not fit the threshold on that draw"
+    },
+    "weighting": {
+      "none": "uniform: one threshold shared by both classes reweights nothing",
+      "mondrian": "uniform: each class is calibrated on its own points, not on reweighted ones",
+      "weighted": "w(y) = q(y)/p(y), the estimated target prior over the source prior, carried by every calibration point of label y; q is estimated by BBSE from this corpus's unlabelled predictions alone"
+    },
+    "n_rows": 2520
+  },
+  "bias": {
+    "NSR": {
+      "none": {
+        "away": [
+          {
+            "source": "ptbxl",
+            "bias": 0.0675,
+            "n_positive": 1459,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.963,
+            "covers_by_abstaining": false,
+            "target": "chapman_ningbo"
+          },
+          {
+            "source": "ptbxl",
+            "bias": 0.0891,
+            "n_positive": 686,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.954,
+            "covers_by_abstaining": false,
+            "target": "georgia"
+          },
+          {
+            "source": "ptbxl",
+            "bias": 0.089,
+            "n_positive": 374,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.962,
+            "covers_by_abstaining": false,
+            "target": "cpsc"
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": -0.3629,
+            "n_positive": 6614,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.854,
+            "covers_by_abstaining": false,
+            "target": "ptbxl"
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": -0.1894,
+            "n_positive": 686,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.845,
+            "covers_by_abstaining": false,
+            "target": "georgia"
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": -0.0953,
+            "n_positive": 374,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.828,
+            "covers_by_abstaining": false,
+            "target": "cpsc"
+          },
+          {
+            "source": "georgia",
+            "bias": -0.5699,
+            "n_positive": 6614,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.07,
+            "covers_by_abstaining": false,
+            "target": "ptbxl"
+          },
+          {
+            "source": "georgia",
+            "bias": -0.368,
+            "n_positive": 1459,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.031,
+            "covers_by_abstaining": false,
+            "target": "chapman_ningbo"
+          },
+          {
+            "source": "georgia",
+            "bias": -0.1809,
+            "n_positive": 374,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.054,
+            "covers_by_abstaining": false,
+            "target": "cpsc"
+          },
+          {
+            "source": "cpsc",
+            "bias": -0.691,
+            "n_positive": 6614,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.971,
+            "covers_by_abstaining": false,
+            "target": "ptbxl"
+          },
+          {
+            "source": "cpsc",
+            "bias": -0.4703,
+            "n_positive": 1459,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.974,
+            "covers_by_abstaining": false,
+            "target": "chapman_ningbo"
+          },
+          {
+            "source": "cpsc",
+            "bias": -0.4151,
+            "n_positive": 686,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.98,
+            "covers_by_abstaining": false,
+            "target": "georgia"
+          }
+        ],
+        "home": [
+          {
+            "source": "ptbxl",
+            "bias": 0.0321,
+            "n_positive": 6614,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.965,
+            "covers_by_abstaining": false
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": -0.0968,
+            "n_positive": 1459,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.925,
+            "covers_by_abstaining": false
+          },
+          {
+            "source": "georgia",
+            "bias": -0.2737,
+            "n_positive": 686,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.04,
+            "covers_by_abstaining": false
+          },
+          {
+            "source": "cpsc",
+            "bias": -0.2213,
+            "n_positive": 374,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.986,
+            "covers_by_abstaining": false
+          }
+        ],
+        "by_source": {
+          "ptbxl": 0.0819,
+          "chapman_ningbo": -0.2159,
+          "georgia": -0.3729,
+          "cpsc": -0.5255
+        },
+        "away_bias": {
+          "mean": -0.2581,
+          "sd_across_pairs": 0.2631,
+          "sd_across_sources": 0.2595,
+          "n_pairs": 12,
+          "n_sources": 4,
+          "worst": -0.691
+        },
+        "fewest_positives_behind_a_pair": 374,
+        "away_bias_where_the_threshold_was_finite": {
+          "mean": -0.2581,
+          "sd_across_pairs": 0.2631,
+          "n_pairs": 12,
+          "n_pairs_covering_by_abstaining": 0
+        },
+        "home_bias": {
+          "mean": -0.1399,
+          "sd_across_sources": 0.1366,
+          "n_sources": 4
+        }
+      },
+      "mondrian": {
+        "away": [
+          {
+            "source": "ptbxl",
+            "bias": 0.0575,
+            "n_positive": 1459,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.168,
+            "covers_by_abstaining": false,
+            "target": "chapman_ningbo"
+          },
+          {
+            "source": "ptbxl",
+            "bias": 0.0841,
+            "n_positive": 686,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.209,
+            "covers_by_abstaining": false,
+            "target": "georgia"
+          },
+          {
+            "source": "ptbxl",
+            "bias": 0.0861,
+            "n_positive": 374,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.172,
+            "covers_by_abstaining": false,
+            "target": "cpsc"
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": -0.2684,
+            "n_positive": 6614,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.919,
+            "covers_by_abstaining": false,
+            "target": "ptbxl"
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": -0.0639,
+            "n_positive": 686,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.906,
+            "covers_by_abstaining": false,
+            "target": "georgia"
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": -0.0212,
+            "n_positive": 374,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.908,
+            "covers_by_abstaining": false,
+            "target": "cpsc"
+          },
+          {
+            "source": "georgia",
+            "bias": -0.3261,
+            "n_positive": 6614,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.124,
+            "covers_by_abstaining": false,
+            "target": "ptbxl"
+          },
+          {
+            "source": "georgia",
+            "bias": -0.1002,
+            "n_positive": 1459,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.084,
+            "covers_by_abstaining": false,
+            "target": "chapman_ningbo"
+          },
+          {
+            "source": "georgia",
+            "bias": 0.0274,
+            "n_positive": 374,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.112,
+            "covers_by_abstaining": false,
+            "target": "cpsc"
+          },
+          {
+            "source": "cpsc",
+            "bias": -0.4155,
+            "n_positive": 6614,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.161,
+            "covers_by_abstaining": false,
+            "target": "ptbxl"
+          },
+          {
+            "source": "cpsc",
+            "bias": -0.177,
+            "n_positive": 1459,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.152,
+            "covers_by_abstaining": false,
+            "target": "chapman_ningbo"
+          },
+          {
+            "source": "cpsc",
+            "bias": -0.1108,
+            "n_positive": 686,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.122,
+            "covers_by_abstaining": false,
+            "target": "georgia"
+          }
+        ],
+        "home": [
+          {
+            "source": "ptbxl",
+            "bias": -0.0013,
+            "n_positive": 6614,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.177,
+            "covers_by_abstaining": false
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": -0.0172,
+            "n_positive": 1459,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.943,
+            "covers_by_abstaining": false
+          },
+          {
+            "source": "georgia",
+            "bias": 0.0111,
+            "n_positive": 686,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.101,
+            "covers_by_abstaining": false
+          },
+          {
+            "source": "cpsc",
+            "bias": 0.0054,
+            "n_positive": 374,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.105,
+            "covers_by_abstaining": false
+          }
+        ],
+        "by_source": {
+          "ptbxl": 0.0759,
+          "chapman_ningbo": -0.1178,
+          "georgia": -0.133,
+          "cpsc": -0.2344
+        },
+        "away_bias": {
+          "mean": -0.1023,
+          "sd_across_pairs": 0.1657,
+          "sd_across_sources": 0.1296,
+          "n_pairs": 12,
+          "n_sources": 4,
+          "worst": -0.4155
+        },
+        "fewest_positives_behind_a_pair": 374,
+        "away_bias_where_the_threshold_was_finite": {
+          "mean": -0.1023,
+          "sd_across_pairs": 0.1657,
+          "n_pairs": 12,
+          "n_pairs_covering_by_abstaining": 0
+        },
+        "home_bias": {
+          "mean": -0.0005,
+          "sd_across_sources": 0.0122,
+          "n_sources": 4
+        }
+      },
+      "weighted": {
+        "away": [
+          {
+            "source": "ptbxl",
+            "bias": 0.0831,
+            "n_positive": 1459,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.124,
+            "covers_by_abstaining": false,
+            "target": "chapman_ningbo"
+          },
+          {
+            "source": "ptbxl",
+            "bias": 0.0922,
+            "n_positive": 686,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.008,
+            "covers_by_abstaining": false,
+            "target": "georgia"
+          },
+          {
+            "source": "ptbxl",
+            "bias": 0.0894,
+            "n_positive": 374,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.002,
+            "covers_by_abstaining": false,
+            "target": "cpsc"
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": -0.3109,
+            "n_positive": 6614,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.932,
+            "covers_by_abstaining": false,
+            "target": "ptbxl"
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": -0.1384,
+            "n_positive": 686,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.907,
+            "covers_by_abstaining": false,
+            "target": "georgia"
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": -0.0501,
+            "n_positive": 374,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.921,
+            "covers_by_abstaining": false,
+            "target": "cpsc"
+          },
+          {
+            "source": "georgia",
+            "bias": -0.4417,
+            "n_positive": 6614,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.302,
+            "covers_by_abstaining": false,
+            "target": "ptbxl"
+          },
+          {
+            "source": "georgia",
+            "bias": -0.4706,
+            "n_positive": 1459,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.983,
+            "covers_by_abstaining": false,
+            "target": "chapman_ningbo"
+          },
+          {
+            "source": "georgia",
+            "bias": -0.152,
+            "n_positive": 374,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.087,
+            "covers_by_abstaining": false,
+            "target": "cpsc"
+          },
+          {
+            "source": "cpsc",
+            "bias": -0.6494,
+            "n_positive": 6614,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.038,
+            "covers_by_abstaining": false,
+            "target": "ptbxl"
+          },
+          {
+            "source": "cpsc",
+            "bias": -0.4399,
+            "n_positive": 1459,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.007,
+            "covers_by_abstaining": false,
+            "target": "chapman_ningbo"
+          },
+          {
+            "source": "cpsc",
+            "bias": -0.3899,
+            "n_positive": 686,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.002,
+            "covers_by_abstaining": false,
+            "target": "georgia"
+          }
+        ],
+        "home": [
+          {
+            "source": "ptbxl",
+            "bias": 0.0331,
+            "n_positive": 6614,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.967,
+            "covers_by_abstaining": false
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": -0.0984,
+            "n_positive": 1459,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.924,
+            "covers_by_abstaining": false
+          },
+          {
+            "source": "georgia",
+            "bias": -0.2562,
+            "n_positive": 686,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.052,
+            "covers_by_abstaining": false
+          },
+          {
+            "source": "cpsc",
+            "bias": -0.2194,
+            "n_positive": 374,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.988,
+            "covers_by_abstaining": false
+          }
+        ],
+        "by_source": {
+          "ptbxl": 0.0882,
+          "chapman_ningbo": -0.1665,
+          "georgia": -0.3548,
+          "cpsc": -0.4931
+        },
+        "away_bias": {
+          "mean": -0.2315,
+          "sd_across_pairs": 0.2532,
+          "sd_across_sources": 0.2517,
+          "n_pairs": 12,
+          "n_sources": 4,
+          "worst": -0.6494
+        },
+        "fewest_positives_behind_a_pair": 374,
+        "away_bias_where_the_threshold_was_finite": {
+          "mean": -0.2315,
+          "sd_across_pairs": 0.2532,
+          "n_pairs": 12,
+          "n_pairs_covering_by_abstaining": 0
+        },
+        "home_bias": {
+          "mean": -0.1352,
+          "sd_across_sources": 0.1309,
+          "n_sources": 4
+        }
+      }
+    },
+    "AF": {
+      "none": {
+        "away": [
+          {
+            "source": "ptbxl",
+            "bias": -0.5507,
+            "n_positive": 216,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.962,
+            "covers_by_abstaining": false,
+            "target": "sph"
+          },
+          {
+            "source": "ptbxl",
+            "bias": -0.7409,
+            "n_positive": 307,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.758,
+            "covers_by_abstaining": false,
+            "target": "chapman_ningbo"
+          },
+          {
+            "source": "ptbxl",
+            "bias": -0.7192,
+            "n_positive": 245,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.847,
+            "covers_by_abstaining": false,
+            "target": "georgia"
+          },
+          {
+            "source": "ptbxl",
+            "bias": -0.6553,
+            "n_positive": 541,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.843,
+            "covers_by_abstaining": false,
+            "target": "cpsc"
+          },
+          {
+            "source": "sph",
+            "bias": -0.3582,
+            "n_positive": 550,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.94,
+            "covers_by_abstaining": false,
+            "target": "ptbxl"
+          },
+          {
+            "source": "sph",
+            "bias": -0.1753,
+            "n_positive": 307,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.95,
+            "covers_by_abstaining": false,
+            "target": "chapman_ningbo"
+          },
+          {
+            "source": "sph",
+            "bias": -0.3901,
+            "n_positive": 245,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.919,
+            "covers_by_abstaining": false,
+            "target": "georgia"
+          },
+          {
+            "source": "sph",
+            "bias": -0.1315,
+            "n_positive": 541,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.924,
+            "covers_by_abstaining": false,
+            "target": "cpsc"
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": -0.9,
+            "n_positive": 550,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.974,
+            "covers_by_abstaining": false,
+            "target": "ptbxl"
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": -0.9,
+            "n_positive": 216,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.989,
+            "covers_by_abstaining": false,
+            "target": "sph"
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": -0.9,
+            "n_positive": 245,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.974,
+            "covers_by_abstaining": false,
+            "target": "georgia"
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": -0.9,
+            "n_positive": 541,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.956,
+            "covers_by_abstaining": false,
+            "target": "cpsc"
+          },
+          {
+            "source": "georgia",
+            "bias": -0.787,
+            "n_positive": 550,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.919,
+            "covers_by_abstaining": false,
+            "target": "ptbxl"
+          },
+          {
+            "source": "georgia",
+            "bias": -0.7623,
+            "n_positive": 216,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.969,
+            "covers_by_abstaining": false,
+            "target": "sph"
+          },
+          {
+            "source": "georgia",
+            "bias": -0.794,
+            "n_positive": 307,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.813,
+            "covers_by_abstaining": false,
+            "target": "chapman_ningbo"
+          },
+          {
+            "source": "georgia",
+            "bias": -0.8059,
+            "n_positive": 541,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.889,
+            "covers_by_abstaining": false,
+            "target": "cpsc"
+          },
+          {
+            "source": "cpsc",
+            "bias": -0.1931,
+            "n_positive": 550,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.902,
+            "covers_by_abstaining": false,
+            "target": "ptbxl"
+          },
+          {
+            "source": "cpsc",
+            "bias": -0.0395,
+            "n_positive": 216,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.976,
+            "covers_by_abstaining": false,
+            "target": "sph"
+          },
+          {
+            "source": "cpsc",
+            "bias": -0.1162,
+            "n_positive": 307,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.874,
+            "covers_by_abstaining": false,
+            "target": "chapman_ningbo"
+          },
+          {
+            "source": "cpsc",
+            "bias": -0.357,
+            "n_positive": 245,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.861,
+            "covers_by_abstaining": false,
+            "target": "georgia"
+          }
+        ],
+        "home": [
+          {
+            "source": "ptbxl",
+            "bias": -0.6423,
+            "n_positive": 550,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.897,
+            "covers_by_abstaining": false
+          },
+          {
+            "source": "sph",
+            "bias": -0.0657,
+            "n_positive": 216,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.958,
+            "covers_by_abstaining": false
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": -0.9,
+            "n_positive": 307,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.934,
+            "covers_by_abstaining": false
+          },
+          {
+            "source": "georgia",
+            "bias": -0.7322,
+            "n_positive": 245,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.923,
+            "covers_by_abstaining": false
+          },
+          {
+            "source": "cpsc",
+            "bias": -0.1692,
+            "n_positive": 541,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.916,
+            "covers_by_abstaining": false
+          }
+        ],
+        "by_source": {
+          "ptbxl": -0.6665,
+          "sph": -0.2638,
+          "chapman_ningbo": -0.9,
+          "georgia": -0.7873,
+          "cpsc": -0.1764
+        },
+        "away_bias": {
+          "mean": -0.5588,
+          "sd_across_pairs": 0.3063,
+          "sd_across_sources": 0.3215,
+          "n_pairs": 20,
+          "n_sources": 5,
+          "worst": -0.9
+        },
+        "fewest_positives_behind_a_pair": 216,
+        "away_bias_where_the_threshold_was_finite": {
+          "mean": -0.5588,
+          "sd_across_pairs": 0.3063,
+          "n_pairs": 20,
+          "n_pairs_covering_by_abstaining": 0
+        },
+        "home_bias": {
+          "mean": -0.5019,
+          "sd_across_sources": 0.3648,
+          "n_sources": 5
+        }
+      },
+      "mondrian": {
+        "away": [
+          {
+            "source": "ptbxl",
+            "bias": 0.028,
+            "n_positive": 216,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.963,
+            "covers_by_abstaining": false,
+            "target": "sph"
+          },
+          {
+            "source": "ptbxl",
+            "bias": 0.0194,
+            "n_positive": 307,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.887,
+            "covers_by_abstaining": false,
+            "target": "chapman_ningbo"
+          },
+          {
+            "source": "ptbxl",
+            "bias": -0.1189,
+            "n_positive": 245,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.861,
+            "covers_by_abstaining": false,
+            "target": "georgia"
+          },
+          {
+            "source": "ptbxl",
+            "bias": -0.066,
+            "n_positive": 541,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.882,
+            "covers_by_abstaining": false,
+            "target": "cpsc"
+          },
+          {
+            "source": "sph",
+            "bias": -0.1348,
+            "n_positive": 550,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.131,
+            "covers_by_abstaining": false,
+            "target": "ptbxl"
+          },
+          {
+            "source": "sph",
+            "bias": -0.0018,
+            "n_positive": 307,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.081,
+            "covers_by_abstaining": false,
+            "target": "chapman_ningbo"
+          },
+          {
+            "source": "sph",
+            "bias": -0.1574,
+            "n_positive": 245,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.126,
+            "covers_by_abstaining": false,
+            "target": "georgia"
+          },
+          {
+            "source": "sph",
+            "bias": 0.0153,
+            "n_positive": 541,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.118,
+            "covers_by_abstaining": false,
+            "target": "cpsc"
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": -0.0219,
+            "n_positive": 550,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.059,
+            "covers_by_abstaining": false,
+            "target": "ptbxl"
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": 0.0389,
+            "n_positive": 216,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.016,
+            "covers_by_abstaining": false,
+            "target": "sph"
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": -0.1205,
+            "n_positive": 245,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.078,
+            "covers_by_abstaining": false,
+            "target": "georgia"
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": -0.0639,
+            "n_positive": 541,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.077,
+            "covers_by_abstaining": false,
+            "target": "cpsc"
+          },
+          {
+            "source": "georgia",
+            "bias": 0.09,
+            "n_positive": 550,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.317,
+            "covers_by_abstaining": false,
+            "target": "ptbxl"
+          },
+          {
+            "source": "georgia",
+            "bias": 0.0948,
+            "n_positive": 216,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.247,
+            "covers_by_abstaining": false,
+            "target": "sph"
+          },
+          {
+            "source": "georgia",
+            "bias": 0.099,
+            "n_positive": 307,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.235,
+            "covers_by_abstaining": false,
+            "target": "chapman_ningbo"
+          },
+          {
+            "source": "georgia",
+            "bias": 0.078,
+            "n_positive": 541,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.353,
+            "covers_by_abstaining": false,
+            "target": "cpsc"
+          },
+          {
+            "source": "cpsc",
+            "bias": 0.024,
+            "n_positive": 550,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.91,
+            "covers_by_abstaining": false,
+            "target": "ptbxl"
+          },
+          {
+            "source": "cpsc",
+            "bias": 0.0721,
+            "n_positive": 216,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.976,
+            "covers_by_abstaining": false,
+            "target": "sph"
+          },
+          {
+            "source": "cpsc",
+            "bias": 0.0643,
+            "n_positive": 307,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.922,
+            "covers_by_abstaining": false,
+            "target": "chapman_ningbo"
+          },
+          {
+            "source": "cpsc",
+            "bias": -0.0978,
+            "n_positive": 245,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.886,
+            "covers_by_abstaining": false,
+            "target": "georgia"
+          }
+        ],
+        "home": [
+          {
+            "source": "ptbxl",
+            "bias": -0.0068,
+            "n_positive": 550,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.902,
+            "covers_by_abstaining": false
+          },
+          {
+            "source": "sph",
+            "bias": 0.0573,
+            "n_positive": 216,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.105,
+            "covers_by_abstaining": false
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": 0.0325,
+            "n_positive": 307,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.114,
+            "covers_by_abstaining": false
+          },
+          {
+            "source": "georgia",
+            "bias": 0.0484,
+            "n_positive": 245,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.295,
+            "covers_by_abstaining": false
+          },
+          {
+            "source": "cpsc",
+            "bias": -0.0057,
+            "n_positive": 541,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.937,
+            "covers_by_abstaining": false
+          }
+        ],
+        "by_source": {
+          "ptbxl": -0.0344,
+          "sph": -0.0697,
+          "chapman_ningbo": -0.0418,
+          "georgia": 0.0905,
+          "cpsc": 0.0156
+        },
+        "away_bias": {
+          "mean": -0.008,
+          "sd_across_pairs": 0.0842,
+          "sd_across_sources": 0.0631,
+          "n_pairs": 20,
+          "n_sources": 5,
+          "worst": -0.1574
+        },
+        "fewest_positives_behind_a_pair": 216,
+        "away_bias_where_the_threshold_was_finite": {
+          "mean": -0.008,
+          "sd_across_pairs": 0.0842,
+          "n_pairs": 20,
+          "n_pairs_covering_by_abstaining": 0
+        },
+        "home_bias": {
+          "mean": 0.0251,
+          "sd_across_sources": 0.03,
+          "n_sources": 5
+        }
+      },
+      "weighted": {
+        "away": [
+          {
+            "source": "ptbxl",
+            "bias": -0.7535,
+            "n_positive": 216,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.942,
+            "covers_by_abstaining": false,
+            "target": "sph"
+          },
+          {
+            "source": "ptbxl",
+            "bias": -0.4337,
+            "n_positive": 307,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.855,
+            "covers_by_abstaining": false,
+            "target": "chapman_ningbo"
+          },
+          {
+            "source": "ptbxl",
+            "bias": -0.7174,
+            "n_positive": 245,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.848,
+            "covers_by_abstaining": false,
+            "target": "georgia"
+          },
+          {
+            "source": "ptbxl",
+            "bias": -0.4928,
+            "n_positive": 541,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.891,
+            "covers_by_abstaining": false,
+            "target": "cpsc"
+          },
+          {
+            "source": "sph",
+            "bias": -0.3435,
+            "n_positive": 550,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.953,
+            "covers_by_abstaining": false,
+            "target": "ptbxl"
+          },
+          {
+            "source": "sph",
+            "bias": -0.1185,
+            "n_positive": 307,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.997,
+            "covers_by_abstaining": false,
+            "target": "chapman_ningbo"
+          },
+          {
+            "source": "sph",
+            "bias": -0.3488,
+            "n_positive": 245,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.977,
+            "covers_by_abstaining": false,
+            "target": "georgia"
+          },
+          {
+            "source": "sph",
+            "bias": -0.0855,
+            "n_positive": 541,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.979,
+            "covers_by_abstaining": false,
+            "target": "cpsc"
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": 0.1,
+            "n_positive": 550,
+            "n_draws_threshold_infinite": 200,
+            "mean_set_size": 2.0,
+            "covers_by_abstaining": true,
+            "target": "ptbxl"
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": 0.1,
+            "n_positive": 216,
+            "n_draws_threshold_infinite": 200,
+            "mean_set_size": 2.0,
+            "covers_by_abstaining": true,
+            "target": "sph"
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": 0.1,
+            "n_positive": 245,
+            "n_draws_threshold_infinite": 200,
+            "mean_set_size": 2.0,
+            "covers_by_abstaining": true,
+            "target": "georgia"
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": 0.1,
+            "n_positive": 541,
+            "n_draws_threshold_infinite": 200,
+            "mean_set_size": 2.0,
+            "covers_by_abstaining": true,
+            "target": "cpsc"
+          },
+          {
+            "source": "georgia",
+            "bias": -0.7672,
+            "n_positive": 550,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.923,
+            "covers_by_abstaining": false,
+            "target": "ptbxl"
+          },
+          {
+            "source": "georgia",
+            "bias": -0.7561,
+            "n_positive": 216,
+            "n_draws_threshold_infinite": 24,
+            "mean_set_size": 1.08,
+            "covers_by_abstaining": false,
+            "target": "sph"
+          },
+          {
+            "source": "georgia",
+            "bias": -0.4792,
+            "n_positive": 307,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.977,
+            "covers_by_abstaining": false,
+            "target": "chapman_ningbo"
+          },
+          {
+            "source": "georgia",
+            "bias": -0.7536,
+            "n_positive": 541,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.913,
+            "covers_by_abstaining": false,
+            "target": "cpsc"
+          },
+          {
+            "source": "cpsc",
+            "bias": -0.2512,
+            "n_positive": 550,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.882,
+            "covers_by_abstaining": false,
+            "target": "ptbxl"
+          },
+          {
+            "source": "cpsc",
+            "bias": -0.0228,
+            "n_positive": 216,
+            "n_draws_threshold_infinite": 85,
+            "mean_set_size": 1.403,
+            "covers_by_abstaining": false,
+            "target": "sph"
+          },
+          {
+            "source": "cpsc",
+            "bias": -0.0753,
+            "n_positive": 307,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.901,
+            "covers_by_abstaining": false,
+            "target": "chapman_ningbo"
+          },
+          {
+            "source": "cpsc",
+            "bias": -0.4095,
+            "n_positive": 245,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.842,
+            "covers_by_abstaining": false,
+            "target": "georgia"
+          }
+        ],
+        "home": [
+          {
+            "source": "ptbxl",
+            "bias": -0.672,
+            "n_positive": 550,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.891,
+            "covers_by_abstaining": false
+          },
+          {
+            "source": "sph",
+            "bias": -0.0669,
+            "n_positive": 216,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.958,
+            "covers_by_abstaining": false
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": 0.1,
+            "n_positive": 307,
+            "n_draws_threshold_infinite": 200,
+            "mean_set_size": 2.0,
+            "covers_by_abstaining": true
+          },
+          {
+            "source": "georgia",
+            "bias": -0.7843,
+            "n_positive": 245,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.91,
+            "covers_by_abstaining": false
+          },
+          {
+            "source": "cpsc",
+            "bias": -0.175,
+            "n_positive": 541,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.913,
+            "covers_by_abstaining": false
+          }
+        ],
+        "by_source": {
+          "ptbxl": -0.5993,
+          "sph": -0.2241,
+          "chapman_ningbo": 0.1,
+          "georgia": -0.689,
+          "cpsc": -0.1897
+        },
+        "away_bias": {
+          "mean": -0.3204,
+          "sd_across_pairs": 0.3208,
+          "sd_across_sources": 0.3228,
+          "n_pairs": 20,
+          "n_sources": 5,
+          "worst": -0.7672
+        },
+        "fewest_positives_behind_a_pair": 216,
+        "away_bias_where_the_threshold_was_finite": {
+          "mean": -0.4255,
+          "sd_across_pairs": 0.2673,
+          "n_pairs": 16,
+          "n_pairs_covering_by_abstaining": 4
+        },
+        "home_bias": {
+          "mean": -0.3196,
+          "sd_across_sources": 0.3876,
+          "n_sources": 5
+        }
+      }
+    },
+    "LBBB": {
+      "none": {
+        "away": [
+          {
+            "source": "ptbxl",
+            "bias": -0.9,
+            "n_positive": 23,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.98,
+            "covers_by_abstaining": false,
+            "target": "sph"
+          },
+          {
+            "source": "ptbxl",
+            "bias": -0.8862,
+            "n_positive": 74,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.914,
+            "covers_by_abstaining": false,
+            "target": "chapman_ningbo"
+          },
+          {
+            "source": "ptbxl",
+            "bias": -0.9,
+            "n_positive": 92,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.889,
+            "covers_by_abstaining": false,
+            "target": "georgia"
+          },
+          {
+            "source": "ptbxl",
+            "bias": -0.8789,
+            "n_positive": 95,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.908,
+            "covers_by_abstaining": false,
+            "target": "cpsc"
+          },
+          {
+            "source": "sph",
+            "bias": -0.9,
+            "n_positive": 216,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.631,
+            "covers_by_abstaining": false,
+            "target": "ptbxl"
+          },
+          {
+            "source": "sph",
+            "bias": -0.9,
+            "n_positive": 74,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.69,
+            "covers_by_abstaining": false,
+            "target": "chapman_ningbo"
+          },
+          {
+            "source": "sph",
+            "bias": -0.9,
+            "n_positive": 92,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.597,
+            "covers_by_abstaining": false,
+            "target": "georgia"
+          },
+          {
+            "source": "sph",
+            "bias": -0.9,
+            "n_positive": 95,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.694,
+            "covers_by_abstaining": false,
+            "target": "cpsc"
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": -0.9,
+            "n_positive": 216,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.896,
+            "covers_by_abstaining": false,
+            "target": "ptbxl"
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": -0.9,
+            "n_positive": 23,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.984,
+            "covers_by_abstaining": false,
+            "target": "sph"
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": -0.9,
+            "n_positive": 92,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.907,
+            "covers_by_abstaining": false,
+            "target": "georgia"
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": -0.9,
+            "n_positive": 95,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.913,
+            "covers_by_abstaining": false,
+            "target": "cpsc"
+          },
+          {
+            "source": "georgia",
+            "bias": -0.8764,
+            "n_positive": 216,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.905,
+            "covers_by_abstaining": false,
+            "target": "ptbxl"
+          },
+          {
+            "source": "georgia",
+            "bias": -0.9,
+            "n_positive": 23,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.984,
+            "covers_by_abstaining": false,
+            "target": "sph"
+          },
+          {
+            "source": "georgia",
+            "bias": -0.873,
+            "n_positive": 74,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.945,
+            "covers_by_abstaining": false,
+            "target": "chapman_ningbo"
+          },
+          {
+            "source": "georgia",
+            "bias": -0.8895,
+            "n_positive": 95,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.935,
+            "covers_by_abstaining": false,
+            "target": "cpsc"
+          },
+          {
+            "source": "cpsc",
+            "bias": -0.8874,
+            "n_positive": 216,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.879,
+            "covers_by_abstaining": false,
+            "target": "ptbxl"
+          },
+          {
+            "source": "cpsc",
+            "bias": -0.9,
+            "n_positive": 23,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.986,
+            "covers_by_abstaining": false,
+            "target": "sph"
+          },
+          {
+            "source": "cpsc",
+            "bias": -0.9,
+            "n_positive": 74,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.935,
+            "covers_by_abstaining": false,
+            "target": "chapman_ningbo"
+          },
+          {
+            "source": "cpsc",
+            "bias": -0.9,
+            "n_positive": 92,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.91,
+            "covers_by_abstaining": false,
+            "target": "georgia"
+          }
+        ],
+        "home": [
+          {
+            "source": "ptbxl",
+            "bias": -0.8868,
+            "n_positive": 216,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.893,
+            "covers_by_abstaining": false
+          },
+          {
+            "source": "sph",
+            "bias": -0.9,
+            "n_positive": 23,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.904,
+            "covers_by_abstaining": false
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": -0.9,
+            "n_positive": 74,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.908,
+            "covers_by_abstaining": false
+          },
+          {
+            "source": "georgia",
+            "bias": -0.9,
+            "n_positive": 92,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.909,
+            "covers_by_abstaining": false
+          },
+          {
+            "source": "cpsc",
+            "bias": -0.9,
+            "n_positive": 95,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.92,
+            "covers_by_abstaining": false
+          }
+        ],
+        "by_source": {
+          "ptbxl": -0.8913,
+          "sph": -0.9,
+          "chapman_ningbo": -0.9,
+          "georgia": -0.8847,
+          "cpsc": -0.8968
+        },
+        "away_bias": {
+          "mean": -0.8946,
+          "sd_across_pairs": 0.0092,
+          "sd_across_sources": 0.0066,
+          "n_pairs": 20,
+          "n_sources": 5,
+          "worst": -0.9
+        },
+        "fewest_positives_behind_a_pair": 23,
+        "away_bias_where_the_threshold_was_finite": {
+          "mean": -0.8946,
+          "sd_across_pairs": 0.0092,
+          "n_pairs": 20,
+          "n_pairs_covering_by_abstaining": 0
+        },
+        "home_bias": {
+          "mean": -0.8974,
+          "sd_across_sources": 0.0059,
+          "n_sources": 5
+        }
+      },
+      "mondrian": {
+        "away": [
+          {
+            "source": "ptbxl",
+            "bias": 0.0546,
+            "n_positive": 23,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.976,
+            "covers_by_abstaining": false,
+            "target": "sph"
+          },
+          {
+            "source": "ptbxl",
+            "bias": -0.2486,
+            "n_positive": 74,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.912,
+            "covers_by_abstaining": false,
+            "target": "chapman_ningbo"
+          },
+          {
+            "source": "ptbxl",
+            "bias": -0.1092,
+            "n_positive": 92,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.904,
+            "covers_by_abstaining": false,
+            "target": "georgia"
+          },
+          {
+            "source": "ptbxl",
+            "bias": -0.3469,
+            "n_positive": 95,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.91,
+            "covers_by_abstaining": false,
+            "target": "cpsc"
+          },
+          {
+            "source": "sph",
+            "bias": 0.0978,
+            "n_positive": 216,
+            "n_draws_threshold_infinite": 189,
+            "mean_set_size": 1.573,
+            "covers_by_abstaining": true,
+            "target": "ptbxl"
+          },
+          {
+            "source": "sph",
+            "bias": 0.0889,
+            "n_positive": 74,
+            "n_draws_threshold_infinite": 189,
+            "mean_set_size": 1.63,
+            "covers_by_abstaining": true,
+            "target": "chapman_ningbo"
+          },
+          {
+            "source": "sph",
+            "bias": 0.0895,
+            "n_positive": 92,
+            "n_draws_threshold_infinite": 189,
+            "mean_set_size": 1.539,
+            "covers_by_abstaining": true,
+            "target": "georgia"
+          },
+          {
+            "source": "sph",
+            "bias": 0.0852,
+            "n_positive": 95,
+            "n_draws_threshold_infinite": 189,
+            "mean_set_size": 1.638,
+            "covers_by_abstaining": true,
+            "target": "cpsc"
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": 0.0971,
+            "n_positive": 216,
+            "n_draws_threshold_infinite": 132,
+            "mean_set_size": 1.703,
+            "covers_by_abstaining": true,
+            "target": "ptbxl"
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": 0.1,
+            "n_positive": 23,
+            "n_draws_threshold_infinite": 132,
+            "mean_set_size": 1.758,
+            "covers_by_abstaining": true,
+            "target": "sph"
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": 0.0797,
+            "n_positive": 92,
+            "n_draws_threshold_infinite": 132,
+            "mean_set_size": 1.719,
+            "covers_by_abstaining": true,
+            "target": "georgia"
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": 0.0781,
+            "n_positive": 95,
+            "n_draws_threshold_infinite": 132,
+            "mean_set_size": 1.72,
+            "covers_by_abstaining": true,
+            "target": "cpsc"
+          },
+          {
+            "source": "georgia",
+            "bias": 0.0871,
+            "n_positive": 216,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.982,
+            "covers_by_abstaining": false,
+            "target": "ptbxl"
+          },
+          {
+            "source": "georgia",
+            "bias": 0.0998,
+            "n_positive": 23,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.995,
+            "covers_by_abstaining": false,
+            "target": "sph"
+          },
+          {
+            "source": "georgia",
+            "bias": -0.1796,
+            "n_positive": 74,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.985,
+            "covers_by_abstaining": false,
+            "target": "chapman_ningbo"
+          },
+          {
+            "source": "georgia",
+            "bias": -0.1338,
+            "n_positive": 95,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.982,
+            "covers_by_abstaining": false,
+            "target": "cpsc"
+          },
+          {
+            "source": "cpsc",
+            "bias": 0.0881,
+            "n_positive": 216,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.062,
+            "covers_by_abstaining": false,
+            "target": "ptbxl"
+          },
+          {
+            "source": "cpsc",
+            "bias": 0.097,
+            "n_positive": 23,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.027,
+            "covers_by_abstaining": false,
+            "target": "sph"
+          },
+          {
+            "source": "cpsc",
+            "bias": -0.0811,
+            "n_positive": 74,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.07,
+            "covers_by_abstaining": false,
+            "target": "chapman_ningbo"
+          },
+          {
+            "source": "cpsc",
+            "bias": 0.0343,
+            "n_positive": 92,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.078,
+            "covers_by_abstaining": false,
+            "target": "georgia"
+          }
+        ],
+        "home": [
+          {
+            "source": "ptbxl",
+            "bias": -0.0027,
+            "n_positive": 216,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.912,
+            "covers_by_abstaining": false
+          },
+          {
+            "source": "sph",
+            "bias": 0.0996,
+            "n_positive": 23,
+            "n_draws_threshold_infinite": 189,
+            "mean_set_size": 1.846,
+            "covers_by_abstaining": true
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": 0.0899,
+            "n_positive": 74,
+            "n_draws_threshold_infinite": 132,
+            "mean_set_size": 1.739,
+            "covers_by_abstaining": true
+          },
+          {
+            "source": "georgia",
+            "bias": -0.0021,
+            "n_positive": 92,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.978,
+            "covers_by_abstaining": false
+          },
+          {
+            "source": "cpsc",
+            "bias": -0.0359,
+            "n_positive": 95,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.065,
+            "covers_by_abstaining": false
+          }
+        ],
+        "by_source": {
+          "ptbxl": -0.1625,
+          "sph": 0.0903,
+          "chapman_ningbo": 0.0887,
+          "georgia": -0.0316,
+          "cpsc": 0.0346
+        },
+        "away_bias": {
+          "mean": 0.0039,
+          "sd_across_pairs": 0.1365,
+          "sd_across_sources": 0.1055,
+          "n_pairs": 20,
+          "n_sources": 5,
+          "worst": -0.3469
+        },
+        "fewest_positives_behind_a_pair": 23,
+        "away_bias_where_the_threshold_was_finite": {
+          "mean": -0.0532,
+          "sd_across_pairs": 0.1525,
+          "n_pairs": 12,
+          "n_pairs_covering_by_abstaining": 8
+        },
+        "home_bias": {
+          "mean": 0.0298,
+          "sd_across_sources": 0.061,
+          "n_sources": 5
+        }
+      },
+      "weighted": {
+        "away": [
+          {
+            "source": "ptbxl",
+            "bias": -0.47,
+            "n_positive": 23,
+            "n_draws_threshold_infinite": 86,
+            "mean_set_size": 1.414,
+            "covers_by_abstaining": false,
+            "target": "sph"
+          },
+          {
+            "source": "ptbxl",
+            "bias": -0.8866,
+            "n_positive": 74,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.898,
+            "covers_by_abstaining": false,
+            "target": "chapman_ningbo"
+          },
+          {
+            "source": "ptbxl",
+            "bias": -0.9,
+            "n_positive": 92,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.889,
+            "covers_by_abstaining": false,
+            "target": "georgia"
+          },
+          {
+            "source": "ptbxl",
+            "bias": -0.8789,
+            "n_positive": 95,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.901,
+            "covers_by_abstaining": false,
+            "target": "cpsc"
+          },
+          {
+            "source": "sph",
+            "bias": 0.1,
+            "n_positive": 216,
+            "n_draws_threshold_infinite": 200,
+            "mean_set_size": 2.0,
+            "covers_by_abstaining": true,
+            "target": "ptbxl"
+          },
+          {
+            "source": "sph",
+            "bias": 0.1,
+            "n_positive": 74,
+            "n_draws_threshold_infinite": 200,
+            "mean_set_size": 2.0,
+            "covers_by_abstaining": true,
+            "target": "chapman_ningbo"
+          },
+          {
+            "source": "sph",
+            "bias": 0.1,
+            "n_positive": 92,
+            "n_draws_threshold_infinite": 200,
+            "mean_set_size": 2.0,
+            "covers_by_abstaining": true,
+            "target": "georgia"
+          },
+          {
+            "source": "sph",
+            "bias": 0.1,
+            "n_positive": 95,
+            "n_draws_threshold_infinite": 200,
+            "mean_set_size": 2.0,
+            "covers_by_abstaining": true,
+            "target": "cpsc"
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": -0.595,
+            "n_positive": 216,
+            "n_draws_threshold_infinite": 61,
+            "mean_set_size": 1.244,
+            "covers_by_abstaining": false,
+            "target": "ptbxl"
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": 0.0441,
+            "n_positive": 23,
+            "n_draws_threshold_infinite": 158,
+            "mean_set_size": 1.832,
+            "covers_by_abstaining": true,
+            "target": "sph"
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": -0.3358,
+            "n_positive": 92,
+            "n_draws_threshold_infinite": 109,
+            "mean_set_size": 1.508,
+            "covers_by_abstaining": true,
+            "target": "georgia"
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": -0.595,
+            "n_positive": 95,
+            "n_draws_threshold_infinite": 61,
+            "mean_set_size": 1.246,
+            "covers_by_abstaining": false,
+            "target": "cpsc"
+          },
+          {
+            "source": "georgia",
+            "bias": -0.8671,
+            "n_positive": 216,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.915,
+            "covers_by_abstaining": false,
+            "target": "ptbxl"
+          },
+          {
+            "source": "georgia",
+            "bias": -0.735,
+            "n_positive": 23,
+            "n_draws_threshold_infinite": 33,
+            "mean_set_size": 1.148,
+            "covers_by_abstaining": false,
+            "target": "sph"
+          },
+          {
+            "source": "georgia",
+            "bias": -0.873,
+            "n_positive": 74,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.94,
+            "covers_by_abstaining": false,
+            "target": "chapman_ningbo"
+          },
+          {
+            "source": "georgia",
+            "bias": -0.8895,
+            "n_positive": 95,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.933,
+            "covers_by_abstaining": false,
+            "target": "cpsc"
+          },
+          {
+            "source": "cpsc",
+            "bias": -0.885,
+            "n_positive": 216,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.885,
+            "covers_by_abstaining": false,
+            "target": "ptbxl"
+          },
+          {
+            "source": "cpsc",
+            "bias": -0.12,
+            "n_positive": 23,
+            "n_draws_threshold_infinite": 156,
+            "mean_set_size": 1.775,
+            "covers_by_abstaining": true,
+            "target": "sph"
+          },
+          {
+            "source": "cpsc",
+            "bias": -0.4,
+            "n_positive": 74,
+            "n_draws_threshold_infinite": 100,
+            "mean_set_size": 1.452,
+            "covers_by_abstaining": false,
+            "target": "chapman_ningbo"
+          },
+          {
+            "source": "cpsc",
+            "bias": -0.9,
+            "n_positive": 92,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.884,
+            "covers_by_abstaining": false,
+            "target": "georgia"
+          }
+        ],
+        "home": [
+          {
+            "source": "ptbxl",
+            "bias": -0.8865,
+            "n_positive": 216,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.896,
+            "covers_by_abstaining": false
+          },
+          {
+            "source": "sph",
+            "bias": 0.1,
+            "n_positive": 23,
+            "n_draws_threshold_infinite": 200,
+            "mean_set_size": 2.0,
+            "covers_by_abstaining": true
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": -0.595,
+            "n_positive": 74,
+            "n_draws_threshold_infinite": 61,
+            "mean_set_size": 1.249,
+            "covers_by_abstaining": false
+          },
+          {
+            "source": "georgia",
+            "bias": -0.9,
+            "n_positive": 92,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.91,
+            "covers_by_abstaining": false
+          },
+          {
+            "source": "cpsc",
+            "bias": -0.9,
+            "n_positive": 95,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.908,
+            "covers_by_abstaining": false
+          }
+        ],
+        "by_source": {
+          "ptbxl": -0.7839,
+          "sph": 0.1,
+          "chapman_ningbo": -0.3704,
+          "georgia": -0.8412,
+          "cpsc": -0.5762
+        },
+        "away_bias": {
+          "mean": -0.4943,
+          "sd_across_pairs": 0.409,
+          "sd_across_sources": 0.3806,
+          "n_pairs": 20,
+          "n_sources": 5,
+          "worst": -0.9
+        },
+        "fewest_positives_behind_a_pair": 23,
+        "away_bias_where_the_threshold_was_finite": {
+          "mean": -0.7596,
+          "sd_across_pairs": 0.1814,
+          "n_pairs": 13,
+          "n_pairs_covering_by_abstaining": 7
+        },
+        "home_bias": {
+          "mean": -0.6363,
+          "sd_across_sources": 0.4317,
+          "n_sources": 5
+        }
+      }
+    },
+    "RBBB": {
+      "none": {
+        "away": [
+          {
+            "source": "ptbxl",
+            "bias": -0.8788,
+            "n_positive": 219,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.96,
+            "covers_by_abstaining": false,
+            "target": "sph"
+          },
+          {
+            "source": "ptbxl",
+            "bias": -0.8494,
+            "n_positive": 308,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.884,
+            "covers_by_abstaining": false,
+            "target": "chapman_ningbo"
+          },
+          {
+            "source": "ptbxl",
+            "bias": -0.8538,
+            "n_positive": 239,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.9,
+            "covers_by_abstaining": false,
+            "target": "georgia"
+          },
+          {
+            "source": "ptbxl",
+            "bias": -0.8797,
+            "n_positive": 788,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.805,
+            "covers_by_abstaining": false,
+            "target": "cpsc"
+          },
+          {
+            "source": "sph",
+            "bias": -0.8849,
+            "n_positive": 208,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.669,
+            "covers_by_abstaining": false,
+            "target": "ptbxl"
+          },
+          {
+            "source": "sph",
+            "bias": -0.8768,
+            "n_positive": 308,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.732,
+            "covers_by_abstaining": false,
+            "target": "chapman_ningbo"
+          },
+          {
+            "source": "sph",
+            "bias": -0.8861,
+            "n_positive": 239,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.598,
+            "covers_by_abstaining": false,
+            "target": "georgia"
+          },
+          {
+            "source": "sph",
+            "bias": -0.8651,
+            "n_positive": 788,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.723,
+            "covers_by_abstaining": false,
+            "target": "cpsc"
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": -0.8445,
+            "n_positive": 208,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.9,
+            "covers_by_abstaining": false,
+            "target": "ptbxl"
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": -0.8708,
+            "n_positive": 219,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.964,
+            "covers_by_abstaining": false,
+            "target": "sph"
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": -0.8584,
+            "n_positive": 239,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.874,
+            "covers_by_abstaining": false,
+            "target": "georgia"
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": -0.876,
+            "n_positive": 788,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.82,
+            "covers_by_abstaining": false,
+            "target": "cpsc"
+          },
+          {
+            "source": "georgia",
+            "bias": -0.4019,
+            "n_positive": 208,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.94,
+            "covers_by_abstaining": false,
+            "target": "ptbxl"
+          },
+          {
+            "source": "georgia",
+            "bias": -0.4806,
+            "n_positive": 219,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.978,
+            "covers_by_abstaining": false,
+            "target": "sph"
+          },
+          {
+            "source": "georgia",
+            "bias": -0.3954,
+            "n_positive": 308,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.94,
+            "covers_by_abstaining": false,
+            "target": "chapman_ningbo"
+          },
+          {
+            "source": "georgia",
+            "bias": -0.5432,
+            "n_positive": 788,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.888,
+            "covers_by_abstaining": false,
+            "target": "cpsc"
+          },
+          {
+            "source": "cpsc",
+            "bias": -0.332,
+            "n_positive": 208,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.93,
+            "covers_by_abstaining": false,
+            "target": "ptbxl"
+          },
+          {
+            "source": "cpsc",
+            "bias": -0.1003,
+            "n_positive": 219,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.963,
+            "covers_by_abstaining": false,
+            "target": "sph"
+          },
+          {
+            "source": "cpsc",
+            "bias": -0.3624,
+            "n_positive": 308,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.923,
+            "covers_by_abstaining": false,
+            "target": "chapman_ningbo"
+          },
+          {
+            "source": "cpsc",
+            "bias": -0.4256,
+            "n_positive": 239,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.862,
+            "covers_by_abstaining": false,
+            "target": "georgia"
+          }
+        ],
+        "home": [
+          {
+            "source": "ptbxl",
+            "bias": -0.8847,
+            "n_positive": 208,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.896,
+            "covers_by_abstaining": false
+          },
+          {
+            "source": "sph",
+            "bias": -0.8865,
+            "n_positive": 219,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.906,
+            "covers_by_abstaining": false
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": -0.7542,
+            "n_positive": 308,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.887,
+            "covers_by_abstaining": false
+          },
+          {
+            "source": "georgia",
+            "bias": -0.5095,
+            "n_positive": 239,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.914,
+            "covers_by_abstaining": false
+          },
+          {
+            "source": "cpsc",
+            "bias": -0.2794,
+            "n_positive": 788,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.91,
+            "covers_by_abstaining": false
+          }
+        ],
+        "by_source": {
+          "ptbxl": -0.8654,
+          "sph": -0.8782,
+          "chapman_ningbo": -0.8624,
+          "georgia": -0.4553,
+          "cpsc": -0.3051
+        },
+        "away_bias": {
+          "mean": -0.6733,
+          "sd_across_pairs": 0.2583,
+          "sd_across_sources": 0.2728,
+          "n_pairs": 20,
+          "n_sources": 5,
+          "worst": -0.8861
+        },
+        "fewest_positives_behind_a_pair": 208,
+        "away_bias_where_the_threshold_was_finite": {
+          "mean": -0.6733,
+          "sd_across_pairs": 0.2583,
+          "n_pairs": 20,
+          "n_pairs_covering_by_abstaining": 0
+        },
+        "home_bias": {
+          "mean": -0.6629,
+          "sd_across_sources": 0.2637,
+          "n_sources": 5
+        }
+      },
+      "mondrian": {
+        "away": [
+          {
+            "source": "ptbxl",
+            "bias": -0.1419,
+            "n_positive": 219,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.976,
+            "covers_by_abstaining": false,
+            "target": "sph"
+          },
+          {
+            "source": "ptbxl",
+            "bias": -0.1091,
+            "n_positive": 308,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.902,
+            "covers_by_abstaining": false,
+            "target": "chapman_ningbo"
+          },
+          {
+            "source": "ptbxl",
+            "bias": -0.2492,
+            "n_positive": 239,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.935,
+            "covers_by_abstaining": false,
+            "target": "georgia"
+          },
+          {
+            "source": "ptbxl",
+            "bias": -0.3008,
+            "n_positive": 788,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.914,
+            "covers_by_abstaining": false,
+            "target": "cpsc"
+          },
+          {
+            "source": "sph",
+            "bias": 0.0696,
+            "n_positive": 208,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.037,
+            "covers_by_abstaining": false,
+            "target": "ptbxl"
+          },
+          {
+            "source": "sph",
+            "bias": -0.0159,
+            "n_positive": 308,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.028,
+            "covers_by_abstaining": false,
+            "target": "chapman_ningbo"
+          },
+          {
+            "source": "sph",
+            "bias": -0.017,
+            "n_positive": 239,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.016,
+            "covers_by_abstaining": false,
+            "target": "georgia"
+          },
+          {
+            "source": "sph",
+            "bias": -0.1158,
+            "n_positive": 788,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.044,
+            "covers_by_abstaining": false,
+            "target": "cpsc"
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": 0.0629,
+            "n_positive": 208,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.947,
+            "covers_by_abstaining": false,
+            "target": "ptbxl"
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": 0.0048,
+            "n_positive": 219,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.988,
+            "covers_by_abstaining": false,
+            "target": "sph"
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": -0.0801,
+            "n_positive": 239,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.948,
+            "covers_by_abstaining": false,
+            "target": "georgia"
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": -0.1931,
+            "n_positive": 788,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.962,
+            "covers_by_abstaining": false,
+            "target": "cpsc"
+          },
+          {
+            "source": "georgia",
+            "bias": 0.0823,
+            "n_positive": 208,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.02,
+            "covers_by_abstaining": false,
+            "target": "ptbxl"
+          },
+          {
+            "source": "georgia",
+            "bias": 0.0443,
+            "n_positive": 219,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.014,
+            "covers_by_abstaining": false,
+            "target": "sph"
+          },
+          {
+            "source": "georgia",
+            "bias": 0.0533,
+            "n_positive": 308,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.029,
+            "covers_by_abstaining": false,
+            "target": "chapman_ningbo"
+          },
+          {
+            "source": "georgia",
+            "bias": -0.1153,
+            "n_positive": 788,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.017,
+            "covers_by_abstaining": false,
+            "target": "cpsc"
+          },
+          {
+            "source": "cpsc",
+            "bias": 0.0785,
+            "n_positive": 208,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.923,
+            "covers_by_abstaining": false,
+            "target": "ptbxl"
+          },
+          {
+            "source": "cpsc",
+            "bias": 0.0771,
+            "n_positive": 219,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.931,
+            "covers_by_abstaining": false,
+            "target": "sph"
+          },
+          {
+            "source": "cpsc",
+            "bias": 0.0754,
+            "n_positive": 308,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.896,
+            "covers_by_abstaining": false,
+            "target": "chapman_ningbo"
+          },
+          {
+            "source": "cpsc",
+            "bias": 0.0145,
+            "n_positive": 239,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.896,
+            "covers_by_abstaining": false,
+            "target": "georgia"
+          }
+        ],
+        "home": [
+          {
+            "source": "ptbxl",
+            "bias": -0.0098,
+            "n_positive": 208,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.91,
+            "covers_by_abstaining": false
+          },
+          {
+            "source": "sph",
+            "bias": 0.0306,
+            "n_positive": 219,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.075,
+            "covers_by_abstaining": false
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": 0.0357,
+            "n_positive": 308,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.935,
+            "covers_by_abstaining": false
+          },
+          {
+            "source": "georgia",
+            "bias": 0.0242,
+            "n_positive": 239,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.025,
+            "covers_by_abstaining": false
+          },
+          {
+            "source": "cpsc",
+            "bias": 0.0106,
+            "n_positive": 788,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.933,
+            "covers_by_abstaining": false
+          }
+        ],
+        "by_source": {
+          "ptbxl": -0.2002,
+          "sph": -0.0198,
+          "chapman_ningbo": -0.0514,
+          "georgia": 0.0162,
+          "cpsc": 0.0614
+        },
+        "away_bias": {
+          "mean": -0.0388,
+          "sd_across_pairs": 0.1179,
+          "sd_across_sources": 0.0995,
+          "n_pairs": 20,
+          "n_sources": 5,
+          "worst": -0.3008
+        },
+        "fewest_positives_behind_a_pair": 208,
+        "away_bias_where_the_threshold_was_finite": {
+          "mean": -0.0388,
+          "sd_across_pairs": 0.1179,
+          "n_pairs": 20,
+          "n_pairs_covering_by_abstaining": 0
+        },
+        "home_bias": {
+          "mean": 0.0183,
+          "sd_across_sources": 0.0183,
+          "n_sources": 5
+        }
+      },
+      "weighted": {
+        "away": [
+          {
+            "source": "ptbxl",
+            "bias": -0.8818,
+            "n_positive": 219,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.958,
+            "covers_by_abstaining": false,
+            "target": "sph"
+          },
+          {
+            "source": "ptbxl",
+            "bias": -0.8209,
+            "n_positive": 308,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.897,
+            "covers_by_abstaining": false,
+            "target": "chapman_ningbo"
+          },
+          {
+            "source": "ptbxl",
+            "bias": -0.7908,
+            "n_positive": 239,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.918,
+            "covers_by_abstaining": false,
+            "target": "georgia"
+          },
+          {
+            "source": "ptbxl",
+            "bias": -0.5971,
+            "n_positive": 788,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.898,
+            "covers_by_abstaining": false,
+            "target": "cpsc"
+          },
+          {
+            "source": "sph",
+            "bias": -0.7961,
+            "n_positive": 208,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.764,
+            "covers_by_abstaining": false,
+            "target": "ptbxl"
+          },
+          {
+            "source": "sph",
+            "bias": -0.8518,
+            "n_positive": 308,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.782,
+            "covers_by_abstaining": false,
+            "target": "chapman_ningbo"
+          },
+          {
+            "source": "sph",
+            "bias": -0.641,
+            "n_positive": 239,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.759,
+            "covers_by_abstaining": false,
+            "target": "georgia"
+          },
+          {
+            "source": "sph",
+            "bias": -0.4371,
+            "n_positive": 788,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.923,
+            "covers_by_abstaining": false,
+            "target": "cpsc"
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": -0.8441,
+            "n_positive": 208,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.9,
+            "covers_by_abstaining": false,
+            "target": "ptbxl"
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": -0.874,
+            "n_positive": 219,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.962,
+            "covers_by_abstaining": false,
+            "target": "sph"
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": -0.8259,
+            "n_positive": 239,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.895,
+            "covers_by_abstaining": false,
+            "target": "georgia"
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": -0.4521,
+            "n_positive": 788,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.944,
+            "covers_by_abstaining": false,
+            "target": "cpsc"
+          },
+          {
+            "source": "georgia",
+            "bias": -0.5125,
+            "n_positive": 208,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.922,
+            "covers_by_abstaining": false,
+            "target": "ptbxl"
+          },
+          {
+            "source": "georgia",
+            "bias": -0.6117,
+            "n_positive": 219,
+            "n_draws_threshold_infinite": 1,
+            "mean_set_size": 0.973,
+            "covers_by_abstaining": false,
+            "target": "sph"
+          },
+          {
+            "source": "georgia",
+            "bias": -0.4379,
+            "n_positive": 308,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.927,
+            "covers_by_abstaining": false,
+            "target": "chapman_ningbo"
+          },
+          {
+            "source": "georgia",
+            "bias": -0.3789,
+            "n_positive": 788,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.945,
+            "covers_by_abstaining": false,
+            "target": "cpsc"
+          },
+          {
+            "source": "cpsc",
+            "bias": -0.5259,
+            "n_positive": 208,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.869,
+            "covers_by_abstaining": false,
+            "target": "ptbxl"
+          },
+          {
+            "source": "cpsc",
+            "bias": -0.2803,
+            "n_positive": 219,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.903,
+            "covers_by_abstaining": false,
+            "target": "sph"
+          },
+          {
+            "source": "cpsc",
+            "bias": -0.5682,
+            "n_positive": 308,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.842,
+            "covers_by_abstaining": false,
+            "target": "chapman_ningbo"
+          },
+          {
+            "source": "cpsc",
+            "bias": -0.5284,
+            "n_positive": 239,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.82,
+            "covers_by_abstaining": false,
+            "target": "georgia"
+          }
+        ],
+        "home": [
+          {
+            "source": "ptbxl",
+            "bias": -0.8838,
+            "n_positive": 208,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.897,
+            "covers_by_abstaining": false
+          },
+          {
+            "source": "sph",
+            "bias": -0.887,
+            "n_positive": 219,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.906,
+            "covers_by_abstaining": false
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": -0.7377,
+            "n_positive": 308,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.897,
+            "covers_by_abstaining": false
+          },
+          {
+            "source": "georgia",
+            "bias": -0.516,
+            "n_positive": 239,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.913,
+            "covers_by_abstaining": false
+          },
+          {
+            "source": "cpsc",
+            "bias": -0.2771,
+            "n_positive": 788,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.911,
+            "covers_by_abstaining": false
+          }
+        ],
+        "by_source": {
+          "ptbxl": -0.7727,
+          "sph": -0.6815,
+          "chapman_ningbo": -0.749,
+          "georgia": -0.4853,
+          "cpsc": -0.4757
+        },
+        "away_bias": {
+          "mean": -0.6328,
+          "sd_across_pairs": 0.1888,
+          "sd_across_sources": 0.1431,
+          "n_pairs": 20,
+          "n_sources": 5,
+          "worst": -0.8818
+        },
+        "fewest_positives_behind_a_pair": 208,
+        "away_bias_where_the_threshold_was_finite": {
+          "mean": -0.6328,
+          "sd_across_pairs": 0.1888,
+          "n_pairs": 20,
+          "n_pairs_covering_by_abstaining": 0
+        },
+        "home_bias": {
+          "mean": -0.6603,
+          "sd_across_sources": 0.2622,
+          "n_sources": 5
+        }
+      }
+    },
+    "IAVB": {
+      "none": {
+        "away": [
+          {
+            "source": "ptbxl",
+            "bias": -0.8845,
+            "n_positive": 67,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.975,
+            "covers_by_abstaining": false,
+            "target": "sph"
+          },
+          {
+            "source": "ptbxl",
+            "bias": -0.8987,
+            "n_positive": 217,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.927,
+            "covers_by_abstaining": false,
+            "target": "chapman_ningbo"
+          },
+          {
+            "source": "ptbxl",
+            "bias": -0.8868,
+            "n_positive": 296,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.882,
+            "covers_by_abstaining": false,
+            "target": "georgia"
+          },
+          {
+            "source": "ptbxl",
+            "bias": -0.8948,
+            "n_positive": 310,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.9,
+            "covers_by_abstaining": false,
+            "target": "cpsc"
+          },
+          {
+            "source": "sph",
+            "bias": -0.898,
+            "n_positive": 385,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.706,
+            "covers_by_abstaining": false,
+            "target": "ptbxl"
+          },
+          {
+            "source": "sph",
+            "bias": -0.9,
+            "n_positive": 217,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.741,
+            "covers_by_abstaining": false,
+            "target": "chapman_ningbo"
+          },
+          {
+            "source": "sph",
+            "bias": -0.898,
+            "n_positive": 296,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.635,
+            "covers_by_abstaining": false,
+            "target": "georgia"
+          },
+          {
+            "source": "sph",
+            "bias": -0.9,
+            "n_positive": 310,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.754,
+            "covers_by_abstaining": false,
+            "target": "cpsc"
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": -0.8869,
+            "n_positive": 385,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.857,
+            "covers_by_abstaining": false,
+            "target": "ptbxl"
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": -0.8989,
+            "n_positive": 67,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.954,
+            "covers_by_abstaining": false,
+            "target": "sph"
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": -0.8838,
+            "n_positive": 296,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.836,
+            "covers_by_abstaining": false,
+            "target": "georgia"
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": -0.8834,
+            "n_positive": 310,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.877,
+            "covers_by_abstaining": false,
+            "target": "cpsc"
+          },
+          {
+            "source": "georgia",
+            "bias": -0.7438,
+            "n_positive": 385,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.941,
+            "covers_by_abstaining": false,
+            "target": "ptbxl"
+          },
+          {
+            "source": "georgia",
+            "bias": -0.6579,
+            "n_positive": 67,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.987,
+            "covers_by_abstaining": false,
+            "target": "sph"
+          },
+          {
+            "source": "georgia",
+            "bias": -0.7395,
+            "n_positive": 217,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.955,
+            "covers_by_abstaining": false,
+            "target": "chapman_ningbo"
+          },
+          {
+            "source": "georgia",
+            "bias": -0.7,
+            "n_positive": 310,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.942,
+            "covers_by_abstaining": false,
+            "target": "cpsc"
+          },
+          {
+            "source": "cpsc",
+            "bias": -0.613,
+            "n_positive": 385,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.833,
+            "covers_by_abstaining": false,
+            "target": "ptbxl"
+          },
+          {
+            "source": "cpsc",
+            "bias": -0.3621,
+            "n_positive": 67,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.944,
+            "covers_by_abstaining": false,
+            "target": "sph"
+          },
+          {
+            "source": "cpsc",
+            "bias": -0.5367,
+            "n_positive": 217,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.88,
+            "covers_by_abstaining": false,
+            "target": "chapman_ningbo"
+          },
+          {
+            "source": "cpsc",
+            "bias": -0.6489,
+            "n_positive": 296,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.83,
+            "covers_by_abstaining": false,
+            "target": "georgia"
+          }
+        ],
+        "home": [
+          {
+            "source": "ptbxl",
+            "bias": -0.8899,
+            "n_positive": 385,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.903,
+            "covers_by_abstaining": false
+          },
+          {
+            "source": "sph",
+            "bias": -0.8873,
+            "n_positive": 67,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.914,
+            "covers_by_abstaining": false
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": -0.843,
+            "n_positive": 217,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.889,
+            "covers_by_abstaining": false
+          },
+          {
+            "source": "georgia",
+            "bias": -0.7199,
+            "n_positive": 296,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.929,
+            "covers_by_abstaining": false
+          },
+          {
+            "source": "cpsc",
+            "bias": -0.4191,
+            "n_positive": 310,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.912,
+            "covers_by_abstaining": false
+          }
+        ],
+        "by_source": {
+          "ptbxl": -0.8912,
+          "sph": -0.899,
+          "chapman_ningbo": -0.8882,
+          "georgia": -0.7103,
+          "cpsc": -0.5402
+        },
+        "away_bias": {
+          "mean": -0.7858,
+          "sd_across_pairs": 0.1549,
+          "sd_across_sources": 0.1585,
+          "n_pairs": 20,
+          "n_sources": 5,
+          "worst": -0.9
+        },
+        "fewest_positives_behind_a_pair": 67,
+        "away_bias_where_the_threshold_was_finite": {
+          "mean": -0.7858,
+          "sd_across_pairs": 0.1549,
+          "n_pairs": 20,
+          "n_pairs_covering_by_abstaining": 0
+        },
+        "home_bias": {
+          "mean": -0.7518,
+          "sd_across_sources": 0.1984,
+          "n_sources": 5
+        }
+      },
+      "mondrian": {
+        "away": [
+          {
+            "source": "ptbxl",
+            "bias": 0.0784,
+            "n_positive": 67,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.008,
+            "covers_by_abstaining": false,
+            "target": "sph"
+          },
+          {
+            "source": "ptbxl",
+            "bias": -0.001,
+            "n_positive": 217,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.025,
+            "covers_by_abstaining": false,
+            "target": "chapman_ningbo"
+          },
+          {
+            "source": "ptbxl",
+            "bias": 0.0218,
+            "n_positive": 296,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.019,
+            "covers_by_abstaining": false,
+            "target": "georgia"
+          },
+          {
+            "source": "ptbxl",
+            "bias": -0.0452,
+            "n_positive": 310,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.022,
+            "covers_by_abstaining": false,
+            "target": "cpsc"
+          },
+          {
+            "source": "sph",
+            "bias": 0.0842,
+            "n_positive": 385,
+            "n_draws_threshold_infinite": 152,
+            "mean_set_size": 1.544,
+            "covers_by_abstaining": true,
+            "target": "ptbxl"
+          },
+          {
+            "source": "sph",
+            "bias": 0.0695,
+            "n_positive": 217,
+            "n_draws_threshold_infinite": 152,
+            "mean_set_size": 1.57,
+            "covers_by_abstaining": true,
+            "target": "chapman_ningbo"
+          },
+          {
+            "source": "sph",
+            "bias": 0.0891,
+            "n_positive": 296,
+            "n_draws_threshold_infinite": 152,
+            "mean_set_size": 1.491,
+            "covers_by_abstaining": true,
+            "target": "georgia"
+          },
+          {
+            "source": "sph",
+            "bias": 0.0762,
+            "n_positive": 310,
+            "n_draws_threshold_infinite": 152,
+            "mean_set_size": 1.581,
+            "covers_by_abstaining": true,
+            "target": "cpsc"
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": -0.0126,
+            "n_positive": 385,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.013,
+            "covers_by_abstaining": false,
+            "target": "ptbxl"
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": 0.0722,
+            "n_positive": 67,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.008,
+            "covers_by_abstaining": false,
+            "target": "sph"
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": 0.0188,
+            "n_positive": 296,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.01,
+            "covers_by_abstaining": false,
+            "target": "georgia"
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": -0.0265,
+            "n_positive": 310,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.016,
+            "covers_by_abstaining": false,
+            "target": "cpsc"
+          },
+          {
+            "source": "georgia",
+            "bias": -0.0694,
+            "n_positive": 385,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.977,
+            "covers_by_abstaining": false,
+            "target": "ptbxl"
+          },
+          {
+            "source": "georgia",
+            "bias": 0.0577,
+            "n_positive": 67,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.993,
+            "covers_by_abstaining": false,
+            "target": "sph"
+          },
+          {
+            "source": "georgia",
+            "bias": -0.0807,
+            "n_positive": 217,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.969,
+            "covers_by_abstaining": false,
+            "target": "chapman_ningbo"
+          },
+          {
+            "source": "georgia",
+            "bias": -0.1184,
+            "n_positive": 310,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.98,
+            "covers_by_abstaining": false,
+            "target": "cpsc"
+          },
+          {
+            "source": "cpsc",
+            "bias": -0.1068,
+            "n_positive": 385,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.904,
+            "covers_by_abstaining": false,
+            "target": "ptbxl"
+          },
+          {
+            "source": "cpsc",
+            "bias": 0.0231,
+            "n_positive": 67,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.965,
+            "covers_by_abstaining": false,
+            "target": "sph"
+          },
+          {
+            "source": "cpsc",
+            "bias": -0.0771,
+            "n_positive": 217,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.905,
+            "covers_by_abstaining": false,
+            "target": "chapman_ningbo"
+          },
+          {
+            "source": "cpsc",
+            "bias": -0.0857,
+            "n_positive": 296,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.907,
+            "covers_by_abstaining": false,
+            "target": "georgia"
+          }
+        ],
+        "home": [
+          {
+            "source": "ptbxl",
+            "bias": 0.032,
+            "n_positive": 385,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.019,
+            "covers_by_abstaining": false
+          },
+          {
+            "source": "sph",
+            "bias": 0.0969,
+            "n_positive": 67,
+            "n_draws_threshold_infinite": 152,
+            "mean_set_size": 1.702,
+            "covers_by_abstaining": true
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": 0.0248,
+            "n_positive": 217,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 1.02,
+            "covers_by_abstaining": false
+          },
+          {
+            "source": "georgia",
+            "bias": -0.009,
+            "n_positive": 296,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.979,
+            "covers_by_abstaining": false
+          },
+          {
+            "source": "cpsc",
+            "bias": -0.0212,
+            "n_positive": 310,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.954,
+            "covers_by_abstaining": false
+          }
+        ],
+        "by_source": {
+          "ptbxl": 0.0135,
+          "sph": 0.0798,
+          "chapman_ningbo": 0.013,
+          "georgia": -0.0527,
+          "cpsc": -0.0616
+        },
+        "away_bias": {
+          "mean": -0.0016,
+          "sd_across_pairs": 0.0706,
+          "sd_across_sources": 0.0576,
+          "n_pairs": 20,
+          "n_sources": 5,
+          "worst": -0.1184
+        },
+        "fewest_positives_behind_a_pair": 67,
+        "away_bias_where_the_threshold_was_finite": {
+          "mean": -0.022,
+          "sd_across_pairs": 0.0639,
+          "n_pairs": 16,
+          "n_pairs_covering_by_abstaining": 4
+        },
+        "home_bias": {
+          "mean": 0.0247,
+          "sd_across_sources": 0.0461,
+          "n_sources": 5
+        }
+      },
+      "weighted": {
+        "away": [
+          {
+            "source": "ptbxl",
+            "bias": 0.005,
+            "n_positive": 67,
+            "n_draws_threshold_infinite": 181,
+            "mean_set_size": 1.901,
+            "covers_by_abstaining": true,
+            "target": "sph"
+          },
+          {
+            "source": "ptbxl",
+            "bias": -0.825,
+            "n_positive": 217,
+            "n_draws_threshold_infinite": 15,
+            "mean_set_size": 0.974,
+            "covers_by_abstaining": false,
+            "target": "chapman_ningbo"
+          },
+          {
+            "source": "ptbxl",
+            "bias": -0.6946,
+            "n_positive": 296,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.95,
+            "covers_by_abstaining": false,
+            "target": "georgia"
+          },
+          {
+            "source": "ptbxl",
+            "bias": -0.8345,
+            "n_positive": 310,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.933,
+            "covers_by_abstaining": false,
+            "target": "cpsc"
+          },
+          {
+            "source": "sph",
+            "bias": -0.0787,
+            "n_positive": 385,
+            "n_draws_threshold_infinite": 53,
+            "mean_set_size": 1.413,
+            "covers_by_abstaining": false,
+            "target": "ptbxl"
+          },
+          {
+            "source": "sph",
+            "bias": -0.3987,
+            "n_positive": 217,
+            "n_draws_threshold_infinite": 53,
+            "mean_set_size": 1.256,
+            "covers_by_abstaining": false,
+            "target": "chapman_ningbo"
+          },
+          {
+            "source": "sph",
+            "bias": -0.0406,
+            "n_positive": 296,
+            "n_draws_threshold_infinite": 53,
+            "mean_set_size": 1.461,
+            "covers_by_abstaining": false,
+            "target": "georgia"
+          },
+          {
+            "source": "sph",
+            "bias": -0.3764,
+            "n_positive": 310,
+            "n_draws_threshold_infinite": 53,
+            "mean_set_size": 1.28,
+            "covers_by_abstaining": false,
+            "target": "cpsc"
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": -0.8349,
+            "n_positive": 385,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.887,
+            "covers_by_abstaining": false,
+            "target": "ptbxl"
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": -0.76,
+            "n_positive": 67,
+            "n_draws_threshold_infinite": 28,
+            "mean_set_size": 1.094,
+            "covers_by_abstaining": false,
+            "target": "sph"
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": -0.7865,
+            "n_positive": 296,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.887,
+            "covers_by_abstaining": false,
+            "target": "georgia"
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": -0.7497,
+            "n_positive": 310,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.913,
+            "covers_by_abstaining": false,
+            "target": "cpsc"
+          },
+          {
+            "source": "georgia",
+            "bias": -0.8426,
+            "n_positive": 385,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.912,
+            "covers_by_abstaining": false,
+            "target": "ptbxl"
+          },
+          {
+            "source": "georgia",
+            "bias": 0.055,
+            "n_positive": 67,
+            "n_draws_threshold_infinite": 191,
+            "mean_set_size": 1.953,
+            "covers_by_abstaining": true,
+            "target": "sph"
+          },
+          {
+            "source": "georgia",
+            "bias": -0.8946,
+            "n_positive": 217,
+            "n_draws_threshold_infinite": 1,
+            "mean_set_size": 0.874,
+            "covers_by_abstaining": false,
+            "target": "chapman_ningbo"
+          },
+          {
+            "source": "georgia",
+            "bias": -0.8128,
+            "n_positive": 310,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.916,
+            "covers_by_abstaining": false,
+            "target": "cpsc"
+          },
+          {
+            "source": "cpsc",
+            "bias": -0.6244,
+            "n_positive": 385,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.829,
+            "covers_by_abstaining": false,
+            "target": "ptbxl"
+          },
+          {
+            "source": "cpsc",
+            "bias": -0.4821,
+            "n_positive": 67,
+            "n_draws_threshold_infinite": 3,
+            "mean_set_size": 0.937,
+            "covers_by_abstaining": false,
+            "target": "sph"
+          },
+          {
+            "source": "cpsc",
+            "bias": -0.6447,
+            "n_positive": 217,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.839,
+            "covers_by_abstaining": false,
+            "target": "chapman_ningbo"
+          },
+          {
+            "source": "cpsc",
+            "bias": -0.6519,
+            "n_positive": 296,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.829,
+            "covers_by_abstaining": false,
+            "target": "georgia"
+          }
+        ],
+        "home": [
+          {
+            "source": "ptbxl",
+            "bias": -0.8397,
+            "n_positive": 385,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.926,
+            "covers_by_abstaining": false
+          },
+          {
+            "source": "sph",
+            "bias": -0.5535,
+            "n_positive": 67,
+            "n_draws_threshold_infinite": 62,
+            "mean_set_size": 1.257,
+            "covers_by_abstaining": false
+          },
+          {
+            "source": "chapman_ningbo",
+            "bias": -0.8236,
+            "n_positive": 217,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.897,
+            "covers_by_abstaining": false
+          },
+          {
+            "source": "georgia",
+            "bias": -0.7972,
+            "n_positive": 296,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.913,
+            "covers_by_abstaining": false
+          },
+          {
+            "source": "cpsc",
+            "bias": -0.4376,
+            "n_positive": 310,
+            "n_draws_threshold_infinite": 0,
+            "mean_set_size": 0.906,
+            "covers_by_abstaining": false
+          }
+        ],
+        "by_source": {
+          "ptbxl": -0.5873,
+          "sph": -0.2236,
+          "chapman_ningbo": -0.7828,
+          "georgia": -0.6238,
+          "cpsc": -0.6008
+        },
+        "away_bias": {
+          "mean": -0.5636,
+          "sd_across_pairs": 0.3168,
+          "sd_across_sources": 0.2057,
+          "n_pairs": 20,
+          "n_sources": 5,
+          "worst": -0.8946
+        },
+        "fewest_positives_behind_a_pair": 67,
+        "away_bias_where_the_threshold_was_finite": {
+          "mean": -0.6296,
+          "sd_across_pairs": 0.2569,
+          "n_pairs": 18,
+          "n_pairs_covering_by_abstaining": 2
+        },
+        "home_bias": {
+          "mean": -0.6903,
+          "sd_across_sources": 0.1831,
+          "n_sources": 5
+        }
+      }
+    }
+  },
+  "seconds": 416.0
+}

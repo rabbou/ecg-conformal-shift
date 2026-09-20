@@ -1,0 +1,516 @@
+{
+  "written_by": "scripts/label_table.py",
+  "commit": "5a80601f854db05c34b9bcce19e3377bc180c55c",
+  "mappings": {
+    "directory": "mappings",
+    "scored_diagnoses_rows": 30,
+    "aha_rows": 23
+  },
+  "classes": [
+    {
+      "key": "NSR",
+      "description": "sinus rhythm: the rhythm the sinus node drives, whatever else the tracing shows",
+      "challenge_abbreviations": [
+        "NSR"
+      ],
+      "snomed": [
+        "426783006"
+      ],
+      "aha_base_codes": [],
+      "scp_acronyms": [
+        "SR"
+      ],
+      "fusion": null
+    },
+    {
+      "key": "AF",
+      "description": "atrial fibrillation",
+      "challenge_abbreviations": [
+        "AF"
+      ],
+      "snomed": [
+        "164889003"
+      ],
+      "aha_base_codes": [
+        "50"
+      ],
+      "scp_acronyms": [
+        "AFIB"
+      ],
+      "fusion": null
+    },
+    {
+      "key": "LBBB",
+      "description": "left bundle-branch block",
+      "challenge_abbreviations": [
+        "LBBB",
+        "CLBBB"
+      ],
+      "snomed": [
+        "164909002",
+        "733534002"
+      ],
+      "aha_base_codes": [
+        "104"
+      ],
+      "scp_acronyms": [
+        "CLBBB"
+      ],
+      "fusion": "the Challenge scores 164909002 and 733534002 as one diagnosis, in the Notes column of dx_mapping_scored.csv; unfused, the complete form exists in Ningbo alone and the class is unusable"
+    },
+    {
+      "key": "RBBB",
+      "description": "right bundle-branch block, complete or unqualified; the incomplete form is a separate Challenge class and stays out",
+      "challenge_abbreviations": [
+        "RBBB",
+        "CRBBB"
+      ],
+      "snomed": [
+        "59118001",
+        "713427006"
+      ],
+      "aha_base_codes": [
+        "106"
+      ],
+      "scp_acronyms": [
+        "CRBBB"
+      ],
+      "fusion": "the Challenge scores 59118001 and 713427006 as one diagnosis, in the Notes column of dx_mapping_scored.csv; unfused, PTB-XL carries no record of the unqualified form and CPSC none of the complete one"
+    },
+    {
+      "key": "IAVB",
+      "description": "first-degree atrioventricular block, that is a PR interval longer than normal with every beat conducted",
+      "challenge_abbreviations": [
+        "IAVB",
+        "LPR"
+      ],
+      "snomed": [
+        "164947007",
+        "270492004"
+      ],
+      "aha_base_codes": [
+        "82"
+      ],
+      "scp_acronyms": [
+        "1AVB",
+        "LPR"
+      ],
+      "fusion": "not a fusion the Challenge declares: see the ambiguity 'iavb-lpr'. The two are one finding under two names, and Shandong has one code for both"
+    }
+  ],
+  "ambiguities": [
+    {
+      "key": "sph-normal-versus-sinus",
+      "what": "Shandong's AHA code 1 is 'Normal ECG', a statement about the whole tracing. The Challenge's NSR class is SNOMED 426783006 'sinus rhythm', a statement about the rhythm alone, which sits on abnormal tracings too: 18,092 of PTB-XL's 21,799 records carry it. Leinonen's AHA-to-SNOMED table has no row for code 1, so it offers no bridge either.",
+      "corpora": [
+        "sph"
+      ],
+      "decision": "NSR is refused on Shandong. Reading code 1 as sinus rhythm would put a narrower class on one corpus than on the other four, and a difference in what the label means is indistinguishable, downstream, from the difference between hospitals this study measures.",
+      "why": "13,907 of Shandong's 25,770 records carry code 1 (54%) against 83% NSR in PTB-XL; the gap is the definition, not the population.",
+      "evidence": "data/sph/code.csv row 'A,1,Normal ECG'; dx_mapping_scored.csv row 'sinus rhythm,426783006,NSR'; AHA_SNOMED_mapping.csv has no row with AHA_Code 1",
+      "refuses": [
+        [
+          "sph",
+          "NSR"
+        ]
+      ]
+    },
+    {
+      "key": "iavb-lpr",
+      "what": "The Challenge scores 'prolonged pr interval' (164947007) and '1st degree av block' (270492004) as two classes and does not declare them equivalent. Shandong has one code for both, AHA 82 'Prolonged PR interval', which Leinonen's table maps to 270492004.",
+      "corpora": [
+        "ptbxl",
+        "chapman_ningbo",
+        "georgia",
+        "cpsc",
+        "sph"
+      ],
+      "decision": "The two Challenge classes are unioned into one IAVB class on all five corpora, so that the class denotes the same finding everywhere.",
+      "why": "A PR interval longer than 200 ms with every beat conducted is what first-degree atrioventricular block is; the two names are one finding. Keeping them apart would make the class mean 'prolonged PR' on Shandong and 'prolonged PR minus whatever the annotator called by the other name' on the four Challenge corpora. The count each side contributes is reported, so the union can be undone by a reader who disagrees.",
+      "evidence": "dx_mapping_scored.csv rows 'prolonged pr interval,164947007,LPR' and '1st degree av block,270492004,IAVB', neither carrying an equivalence note; AHA_SNOMED_mapping.csv row '1st degree av block,270492004,82'; data/sph/code.csv row 'H,82,Prolonged PR interval'",
+      "refuses": []
+    },
+    {
+      "key": "ptbxl-plus-is-omop",
+      "what": "PTB-XL+'s SCP-to-SNOMED file maps each SCP-ECG acronym to OMOP concept identifiers, not to SNOMED CT codes. Its own apply_snomed_mapping.py joins them against Athena's CONCEPT.csv, which is not redistributable, so the file alone does not put PTB-XL's statements in the Challenge's vocabulary.",
+      "corpora": [
+        "ptbxl"
+      ],
+      "decision": "PTB-XL's SNOMED labels are read from the Challenge's own PTB-XL partition headers, the same route as the other three Challenge corpora. PTB-XL+ is used to name the clinical concept behind each SCP acronym, and the agreement between the two routes is reported per class rather than assumed.",
+      "why": "The alternative -- deriving SNOMED from SCP by hand -- would put PTB-XL on a mapping of my own while the other four corpora keep the publishers'.",
+      "evidence": "mappings/ptbxlToSNOMED.csv header 'Acronym,Dx Statement,id1,name1,...' with id values such as 4065279 for NORM; physionet.org/files/ptb-xl-plus/1.0.1/labels/mapping/apply_snomed_mapping.py reads CONCEPT.csv and CONCEPT_RELATIONSHIP.csv",
+      "refuses": []
+    },
+    {
+      "key": "ptbxl-snomed-versus-scp",
+      "what": "PTB-XL can be read two ways: the SNOMED codes the Challenge put on its records, and PTB-XL's own SCP-ECG statements. On the sinus-rhythm class the two disagree on a block of records that carry the SCP statement NORM without the statement SR, and whose rhythm statements are sinus arrhythmia, sinus bradycardia or sinus tachycardia -- sinus rhythms all. The Challenge's route counts them; a route keyed on the SR statement alone does not.",
+      "corpora": [
+        "ptbxl"
+      ],
+      "decision": "The SNOMED route is used, the same route as the other three Challenge corpora. The agreement between the two is measured per class and written to results/label_map.json under 'snomed_against_scp', so the size of the disagreement is on the record rather than asserted.",
+      "why": "Switching route for one corpus would put PTB-XL on a narrower rhythm class than its four neighbours, which is the same failure as reading Shandong's 'Normal ECG' as sinus rhythm, in the other direction.",
+      "evidence": "results/label_map.json, corpora.ptbxl.as_read_by_this_study.snomed_against_scp; the disagreeing records all carry the SCP statement NORM",
+      "refuses": []
+    },
+    {
+      "key": "aha-modifier-tokens",
+      "what": "Shandong writes a diagnosis as a code with an optional modifier, '50+346' for atrial fibrillation with a rapid ventricular response. Leinonen's table lists the modifier variants its authors met ('50', '50+346', '50+347') and cannot list the ones they did not.",
+      "corpora": [
+        "sph"
+      ],
+      "decision": "A Shandong code is matched on its base code, before the '+', so a modifier the table does not list still counts as the diagnosis it modifies.",
+      "why": "The modifiers in Shandong's own table are rate, frequency and timing qualifiers, not different diagnoses. The count under exact matching is reported beside the count under base matching, so the choice is visible.",
+      "evidence": "data/sph/code.csv rows 330-367 are all listed under Category 'Modifier'; AHA_SNOMED_mapping.csv rows 'atrial fibrillation,164889003,50', '...,50+346', '...,50+347'",
+      "refuses": []
+    }
+  ],
+  "refused_cells": [
+    {
+      "corpus": "sph",
+      "class": "NSR",
+      "ambiguity": "sph-normal-versus-sinus"
+    }
+  ],
+  "corpora": {
+    "ptbxl": {
+      "route": "SNOMED CT codes on the Challenge-2021 '# Dx:' header line",
+      "partitions": [
+        "ptb-xl"
+      ],
+      "n_records": 21837,
+      "n_patients": 21837,
+      "counts": {
+        "NSR": 18092,
+        "AF": 1514,
+        "LBBB": 536,
+        "RBBB": 542,
+        "IAVB": 1012
+      },
+      "published_counts": {
+        "NSR": 18092,
+        "AF": 1514,
+        "LBBB": 536,
+        "RBBB": 542,
+        "IAVB": 1137
+      },
+      "published_minus_measured": {
+        "NSR": 0,
+        "AF": 0,
+        "LBBB": 0,
+        "RBBB": 0,
+        "IAVB": 125
+      },
+      "records_carrying_both_codes_of_a_fused_class": {
+        "LBBB": 0,
+        "RBBB": 0,
+        "IAVB": 125
+      },
+      "unexplained_by_double_counting": {
+        "NSR": 0,
+        "AF": 0,
+        "LBBB": 0,
+        "RBBB": 0,
+        "IAVB": 0
+      },
+      "completeness": {
+        "n_distributed": 21837,
+        "n_on_disk": 21837,
+        "missing_from_this_copy": [],
+        "not_in_the_manifest": []
+      },
+      "the_published_count_closes": true,
+      "deviations": [
+        "the Challenge bundle ships no patient identifier, so each record is its own patient for splitting"
+      ],
+      "seconds": 2.1,
+      "as_read_by_this_study": {
+        "n_records": 21799,
+        "n_patients": 18869,
+        "counts": {
+          "NSR": 18058,
+          "AF": 1514,
+          "LBBB": 536,
+          "RBBB": 542,
+          "IAVB": 1010
+        },
+        "join": {
+          "n_in_the_distribution": 21799,
+          "n_in_the_bundle": 21837,
+          "n_kept": 21799,
+          "in_the_distribution_not_in_the_bundle": [],
+          "in_the_bundle_not_in_the_distribution": [
+            "HR00137",
+            "HR00139",
+            "HR00140",
+            "HR00141",
+            "HR00142",
+            "HR00143",
+            "HR00145",
+            "HR00456",
+            "HR00458",
+            "HR00459",
+            "HR00461",
+            "HR00462",
+            "HR02506",
+            "HR02511",
+            "HR03795",
+            "HR03798",
+            "HR03800",
+            "HR03801",
+            "HR03832",
+            "HR05817",
+            "HR07777",
+            "HR07779",
+            "HR07782",
+            "HR09821",
+            "HR09825",
+            "HR09888",
+            "HR11810",
+            "HR11814",
+            "HR11815",
+            "HR11817",
+            "HR11838",
+            "HR13791",
+            "HR13793",
+            "HR13796",
+            "HR13797",
+            "HR13799",
+            "HR15742",
+            "HR18150"
+          ]
+        },
+        "snomed_against_scp": {
+          "NSR": {
+            "scp_acronyms": [
+              "SR"
+            ],
+            "both": 16748,
+            "snomed_only": 1310,
+            "scp_only": 0,
+            "neither": 3741
+          },
+          "AF": {
+            "scp_acronyms": [
+              "AFIB"
+            ],
+            "both": 1514,
+            "snomed_only": 0,
+            "scp_only": 0,
+            "neither": 20285
+          },
+          "LBBB": {
+            "scp_acronyms": [
+              "CLBBB"
+            ],
+            "both": 536,
+            "snomed_only": 0,
+            "scp_only": 0,
+            "neither": 21263
+          },
+          "RBBB": {
+            "scp_acronyms": [
+              "CRBBB"
+            ],
+            "both": 541,
+            "snomed_only": 1,
+            "scp_only": 0,
+            "neither": 21257
+          },
+          "IAVB": {
+            "scp_acronyms": [
+              "1AVB",
+              "LPR"
+            ],
+            "both": 1008,
+            "snomed_only": 2,
+            "scp_only": 0,
+            "neither": 20789
+          }
+        }
+      }
+    },
+    "chapman_ningbo": {
+      "route": "SNOMED CT codes on the Challenge-2021 '# Dx:' header line",
+      "partitions": [
+        "chapman_shaoxing",
+        "ningbo"
+      ],
+      "n_records": 45152,
+      "n_patients": 45152,
+      "counts": {
+        "NSR": 8125,
+        "AF": 1780,
+        "LBBB": 453,
+        "RBBB": 1745,
+        "IAVB": 1192
+      },
+      "published_counts": {
+        "NSR": 8125,
+        "AF": 1780,
+        "LBBB": 453,
+        "RBBB": 1745,
+        "IAVB": 1192
+      },
+      "published_minus_measured": {
+        "NSR": 0,
+        "AF": 0,
+        "LBBB": 0,
+        "RBBB": 0,
+        "IAVB": 0
+      },
+      "records_carrying_both_codes_of_a_fused_class": {
+        "LBBB": 0,
+        "RBBB": 0,
+        "IAVB": 0
+      },
+      "unexplained_by_double_counting": {
+        "NSR": 0,
+        "AF": 0,
+        "LBBB": 0,
+        "RBBB": 0,
+        "IAVB": 0
+      },
+      "completeness": {
+        "n_distributed": 45152,
+        "n_on_disk": 45152,
+        "missing_from_this_copy": [],
+        "not_in_the_manifest": []
+      },
+      "the_published_count_closes": true,
+      "deviations": [
+        "the Challenge bundle ships no patient identifier, so each record is its own patient for splitting"
+      ],
+      "seconds": 4.8
+    },
+    "georgia": {
+      "route": "SNOMED CT codes on the Challenge-2021 '# Dx:' header line",
+      "partitions": [
+        "georgia"
+      ],
+      "n_records": 10344,
+      "n_patients": 10344,
+      "counts": {
+        "NSR": 1752,
+        "AF": 570,
+        "LBBB": 231,
+        "RBBB": 556,
+        "IAVB": 769
+      },
+      "published_counts": {
+        "NSR": 1752,
+        "AF": 570,
+        "LBBB": 231,
+        "RBBB": 570,
+        "IAVB": 769
+      },
+      "published_minus_measured": {
+        "NSR": 0,
+        "AF": 0,
+        "LBBB": 0,
+        "RBBB": 14,
+        "IAVB": 0
+      },
+      "records_carrying_both_codes_of_a_fused_class": {
+        "LBBB": 0,
+        "RBBB": 14,
+        "IAVB": 0
+      },
+      "unexplained_by_double_counting": {
+        "NSR": 0,
+        "AF": 0,
+        "LBBB": 0,
+        "RBBB": 0,
+        "IAVB": 0
+      },
+      "completeness": {
+        "n_distributed": 10344,
+        "n_on_disk": 10344,
+        "missing_from_this_copy": [],
+        "not_in_the_manifest": []
+      },
+      "the_published_count_closes": true,
+      "deviations": [
+        "the Challenge bundle ships no patient identifier, so each record is its own patient for splitting",
+        "record lengths run from 2500 to 5000 samples; the first ten seconds are kept"
+      ],
+      "seconds": 1.1
+    },
+    "cpsc": {
+      "route": "SNOMED CT codes on the Challenge-2021 '# Dx:' header line",
+      "partitions": [
+        "cpsc_2018",
+        "cpsc_2018_extra"
+      ],
+      "n_records": 10330,
+      "n_patients": 10330,
+      "counts": {
+        "NSR": 922,
+        "AF": 1374,
+        "LBBB": 274,
+        "RBBB": 1971,
+        "IAVB": 828
+      },
+      "published_counts": {
+        "NSR": 922,
+        "AF": 1374,
+        "LBBB": 274,
+        "RBBB": 1971,
+        "IAVB": 828
+      },
+      "published_minus_measured": {
+        "NSR": 0,
+        "AF": 0,
+        "LBBB": 0,
+        "RBBB": 0,
+        "IAVB": 0
+      },
+      "records_carrying_both_codes_of_a_fused_class": {
+        "LBBB": 0,
+        "RBBB": 0,
+        "IAVB": 0
+      },
+      "unexplained_by_double_counting": {
+        "NSR": 0,
+        "AF": 0,
+        "LBBB": 0,
+        "RBBB": 0,
+        "IAVB": 0
+      },
+      "completeness": {
+        "n_distributed": 10330,
+        "n_on_disk": 10330,
+        "missing_from_this_copy": [],
+        "not_in_the_manifest": []
+      },
+      "the_published_count_closes": true,
+      "deviations": [
+        "the Challenge bundle ships no patient identifier, so each record is its own patient for splitting",
+        "record lengths run from 3000 to 72000 samples; the first ten seconds are kept"
+      ],
+      "seconds": 1.2
+    },
+    "sph": {
+      "route": "AHA codes bridged to SNOMED by Leinonen et al.'s published table",
+      "n_records": 25770,
+      "n_patients": 24666,
+      "counts": {
+        "NSR": 0,
+        "AF": 675,
+        "LBBB": 84,
+        "RBBB": 710,
+        "IAVB": 238
+      },
+      "counts_matching_the_full_modifier_token": {
+        "NSR": 0,
+        "AF": 675,
+        "LBBB": 84,
+        "RBBB": 710,
+        "IAVB": 238
+      },
+      "deviations": [
+        "diagnoses are AHA codes bridged to SNOMED by Leinonen et al.'s table, not the Challenge's own SNOMED annotation",
+        "records run from ten to sixty seconds; the first ten are kept"
+      ]
+    }
+  }
+}

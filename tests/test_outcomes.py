@@ -182,6 +182,8 @@ class TestTheFiguresDrawnFromIt:
             "results/figures/fig1_thresholds.png",
             "results/figures/fig2_outcomes.png",
             "results/figures/fig3_coverage.png",
+            "results/figures/fig7_rotation.png",
+            "results/figures/fig8_target_scale.png",
         ]
         for relative in shown:
             assert (RESULTS_DIR.parent / relative).exists(), relative

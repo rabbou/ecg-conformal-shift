@@ -1,0 +1,103 @@
+{
+  "epoch_kept": 5,
+  "val_macro_auroc": 0.9802,
+  "history": [
+    {
+      "epoch": 0,
+      "train_loss": 0.08323,
+      "val_auroc": {
+        "AF": 0.7154,
+        "LBBB": 0.6511,
+        "RBBB": 0.7945,
+        "IAVB": 0.7013
+      },
+      "val_macro_auroc": 0.7156,
+      "seconds": 1181.0
+    },
+    {
+      "epoch": 1,
+      "train_loss": 0.04783,
+      "val_auroc": {
+        "AF": 0.9358,
+        "LBBB": 0.995,
+        "RBBB": 0.9424,
+        "IAVB": 0.6598
+      },
+      "val_macro_auroc": 0.8832,
+      "seconds": 471.2
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.03504,
+      "val_auroc": {
+        "AF": 0.9963,
+        "LBBB": 0.9983,
+        "RBBB": 0.9689,
+        "IAVB": 0.9417
+      },
+      "val_macro_auroc": 0.9763,
+      "seconds": 1008.5
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.03157,
+      "val_auroc": {
+        "AF": 0.9708,
+        "LBBB": 0.9716,
+        "RBBB": 0.9467,
+        "IAVB": 0.8679
+      },
+      "val_macro_auroc": 0.9393,
+      "seconds": 574.6
+    },
+    {
+      "epoch": 4,
+      "train_loss": 0.02418,
+      "val_auroc": {
+        "AF": 0.9921,
+        "LBBB": 1.0,
+        "RBBB": 0.9911,
+        "IAVB": 0.9362
+      },
+      "val_macro_auroc": 0.9799,
+      "seconds": 575.3
+    },
+    {
+      "epoch": 5,
+      "train_loss": 0.02142,
+      "val_auroc": {
+        "AF": 0.9856,
+        "LBBB": 1.0,
+        "RBBB": 0.9804,
+        "IAVB": 0.9547
+      },
+      "val_macro_auroc": 0.9802,
+      "seconds": 486.4
+    },
+    {
+      "epoch": 6,
+      "train_loss": 0.01982,
+      "val_auroc": {
+        "AF": 0.9906,
+        "LBBB": 0.9616,
+        "RBBB": 0.9562,
+        "IAVB": 0.9757
+      },
+      "val_macro_auroc": 0.971,
+      "seconds": 419.2
+    },
+    {
+      "epoch": 7,
+      "train_loss": 0.01616,
+      "val_auroc": {
+        "AF": 0.9863,
+        "LBBB": 0.9366,
+        "RBBB": 0.9614,
+        "IAVB": 0.9748
+      },
+      "val_macro_auroc": 0.9648,
+      "seconds": 731.8
+    }
+  ],
+  "seconds": 5490.6
+}

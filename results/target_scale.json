@@ -1,0 +1,7512 @@
+{
+  "written_by": "scripts/target_scale.py",
+  "commit": "f9d4943ec8786f16c1ccfc1ccea78596846049fa",
+  "machine": {
+    "cpu": "Intel(R) Core(TM) i7-8700 CPU @ 3.20GHz",
+    "platform": "Linux-6.8.0-139-generic-x86_64-with-glibc2.39",
+    "python": "3.11.15",
+    "torch": "2.2.2+cu121",
+    "torch_threads": 6
+  },
+  "pair": {
+    "source": "ptbxl",
+    "target": "acs",
+    "label": "infarction",
+    "model": "the PTB-XL supervised baseline, frozen (results/baseline/model.pt)"
+  },
+  "settings": {
+    "rungs": [
+      0,
+      100,
+      500,
+      2000
+    ],
+    "families": [
+      "recalibrated",
+      "pooled"
+    ],
+    "alphas": [
+      0.2,
+      0.1,
+      0.05
+    ],
+    "scores": [
+      "lac",
+      "aps"
+    ],
+    "n_draws": 200,
+    "seed": 0,
+    "headline": {
+      "alpha": 0.1,
+      "score": "lac"
+    }
+  },
+  "split": {
+    "how": "Chongqing cut once by patient; the evaluation half never calibrates",
+    "n_pool": 8971,
+    "n_eval": 8984,
+    "n_pool_patients": 8506,
+    "n_eval_patients": 8507,
+    "eval_prevalence": 0.14748441674087268,
+    "pool_prevalence": 0.15093077694794338,
+    "source_prior": [
+      0.7497725204731575,
+      0.2502274795268426
+    ]
+  },
+  "rows": [
+    {
+      "alpha": 0.05,
+      "target_coverage": 0.95,
+      "score": "aps",
+      "correction": "mondrian",
+      "family": "pooled",
+      "n_target_records": 0,
+      "calibrated_on": "PTB-XL alone",
+      "coverage": {
+        "mean": 0.861019033837934,
+        "sd": 0.01028709843884279,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.85120511816164,
+          "sd": 0.011467081820557907,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.9177471698113208,
+          "sd": 0.017852566369788884,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.4896616206589492,
+        "sd": 0.0468428504943569,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 824.015,
+            "sd": 14.027065546264335,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 274.775,
+            "sd": 12.929043888834045,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.9206431440493645,
+          "sd": 0.009049102119895173,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.9728605470526054,
+          "sd": 0.007438235924424393,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.05,
+      "target_coverage": 0.95,
+      "score": "aps",
+      "correction": "mondrian",
+      "family": "pooled",
+      "n_target_records": 100,
+      "calibrated_on": "the PTB-XL calibration half plus 100 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.8728522929652717,
+        "sd": 0.010315552323153189,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.864541715628672,
+          "sd": 0.011435313406711695,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.9208905660377359,
+          "sd": 0.017282516223842404,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.513034839715049,
+        "sd": 0.047147901449137754,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 1198.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 909.13,
+            "sd": 14.527502941267736,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 289.66,
+            "sd": 13.293909891412873,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 1198.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.9310997815769045,
+          "sd": 0.00853525047681897,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.9743745755478708,
+          "sd": 0.007064219733275273,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.05,
+      "target_coverage": 0.95,
+      "score": "aps",
+      "correction": "mondrian",
+      "family": "pooled",
+      "n_target_records": 500,
+      "calibrated_on": "the PTB-XL calibration half plus 500 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.9029352181656278,
+        "sd": 0.008491613433175825,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.8983535709622665,
+          "sd": 0.009264930875164131,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.9294188679245283,
+          "sd": 0.015526746599399604,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.5755598842386465,
+        "sd": 0.04466993127425039,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 1598.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 1248.96,
+            "sd": 15.378912665525784,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 349.83,
+            "sd": 14.556460859831937,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 1598.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.955434793242224,
+          "sd": 0.006050761783330328,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.9781547885527857,
+          "sd": 0.0058492861981473245,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.05,
+      "target_coverage": 0.95,
+      "score": "aps",
+      "correction": "mondrian",
+      "family": "pooled",
+      "n_target_records": 2000,
+      "calibrated_on": "the PTB-XL calibration half plus 2000 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.932473285841496,
+        "sd": 0.005267505536993507,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.9307768638203422,
+          "sd": 0.005845464066738138,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.9422792452830189,
+          "sd": 0.011040547243698642,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.6543950356188781,
+        "sd": 0.03190042487435363,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 3098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 2523.41,
+            "sd": 20.07578355699064,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 575.38,
+            "sd": 19.132849491077934,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 3098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.9744339690912301,
+          "sd": 0.002783915650560082,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.9832902546919765,
+          "sd": 0.0036857806072463956,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.05,
+      "target_coverage": 0.95,
+      "score": "aps",
+      "correction": "mondrian",
+      "family": "recalibrated",
+      "n_target_records": 0,
+      "calibrated_on": "PTB-XL alone",
+      "coverage": {
+        "mean": 0.861019033837934,
+        "sd": 0.01028709843884279,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.85120511816164,
+          "sd": 0.011467081820557907,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.9177471698113208,
+          "sd": 0.017852566369788884,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.4896616206589492,
+        "sd": 0.0468428504943569,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 824.015,
+            "sd": 14.027065546264335,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 274.775,
+            "sd": 12.929043888834045,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.9206431440493645,
+          "sd": 0.009049102119895173,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.9728605470526054,
+          "sd": 0.007438235924424393,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.05,
+      "target_coverage": 0.95,
+      "score": "aps",
+      "correction": "mondrian",
+      "family": "recalibrated",
+      "n_target_records": 100,
+      "calibrated_on": "100 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.9588857969723954,
+        "sd": 0.019939458878548165,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.9527346912129521,
+          "sd": 0.02321121195934569,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.9944415094339623,
+          "sd": 0.023013682430443896,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.9039369991095279,
+        "sd": 0.07804031238911745,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 100.0,
+          "sd": 0.0,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 85.115,
+            "sd": 3.2472292015558724,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 14.885,
+            "sd": 3.2472292015558715,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 100.0,
+          "sd": 0.0,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.9831472307892178,
+          "sd": 0.010242681865982279,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.9833677342834348,
+          "sd": 0.025657913843459536,
+          "n_draws": 200,
+          "n_infinite": 178
+        }
+      }
+    },
+    {
+      "alpha": 0.05,
+      "target_coverage": 0.95,
+      "score": "aps",
+      "correction": "mondrian",
+      "family": "recalibrated",
+      "n_target_records": 500,
+      "calibrated_on": "500 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.9538451691896705,
+        "sd": 0.00966641200769211,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.9526831179005092,
+          "sd": 0.010072392097528275,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.9605622641509435,
+          "sd": 0.023675150828515394,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.7568199020480855,
+        "sd": 0.0834013028501888,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 500.0,
+          "sd": 0.0,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 424.945,
+            "sd": 7.663918923522851,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 75.055,
+            "sd": 7.663918923522851,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 500.0,
+          "sd": 0.0,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.983926213411104,
+          "sd": 0.003865607547304037,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.9889824979773653,
+          "sd": 0.00840207024396263,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.05,
+      "target_coverage": 0.95,
+      "score": "aps",
+      "correction": "mondrian",
+      "family": "recalibrated",
+      "n_target_records": 2000,
+      "calibrated_on": "2000 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.9513318121104186,
+        "sd": 0.004941296083874745,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.9502265308787048,
+          "sd": 0.005566814062289411,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.9577207547169811,
+          "sd": 0.01192207489526381,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.7349254229741762,
+        "sd": 0.0391200500692754,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 2000.0,
+          "sd": 0.0,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 1699.395,
+            "sd": 14.86992090559642,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 300.605,
+            "sd": 14.86992090559642,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 2000.0,
+          "sd": 0.0,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.9831108163572789,
+          "sd": 0.002052733407482703,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.9886109724124458,
+          "sd": 0.003587164060782739,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.05,
+      "target_coverage": 0.95,
+      "score": "aps",
+      "correction": "none",
+      "family": "pooled",
+      "n_target_records": 0,
+      "calibrated_on": "PTB-XL alone",
+      "coverage": {
+        "mean": 0.8743343722172752,
+        "sd": 0.009455567077146704,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.8773097010053532,
+          "sd": 0.009282838026840616,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.8571358490566038,
+          "sd": 0.01225798300165727,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.3861865538735532,
+        "sd": 0.028558562902748854,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 824.015,
+            "sd": 14.027065546264335,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 274.775,
+            "sd": 12.929043888834045,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.9407180100089738,
+          "sd": 0.006613186644047947,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.9407180100089738,
+          "sd": 0.006613186644047947,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.05,
+      "target_coverage": 0.95,
+      "score": "aps",
+      "correction": "none",
+      "family": "pooled",
+      "n_target_records": 100,
+      "calibrated_on": "the PTB-XL calibration half plus 100 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.8838596393588601,
+        "sd": 0.009353957225794666,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.8866196631414023,
+          "sd": 0.009029847788022429,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.8679056603773586,
+          "sd": 0.012803375794354357,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.416678539626002,
+        "sd": 0.030004237754048656,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 1198.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 909.13,
+            "sd": 14.527502941267736,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 289.66,
+            "sd": 13.293909891412873,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 1198.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.9474470217084634,
+          "sd": 0.006165387804914128,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.9474470217084634,
+          "sd": 0.006165387804914128,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.05,
+      "target_coverage": 0.95,
+      "score": "aps",
+      "correction": "none",
+      "family": "pooled",
+      "n_target_records": 500,
+      "calibrated_on": "the PTB-XL calibration half plus 500 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.9080665627782725,
+        "sd": 0.008442808350674935,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.9101488444966707,
+          "sd": 0.008149254101091108,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.8960301886792453,
+          "sd": 0.011506019230232839,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.5023825690115762,
+        "sd": 0.03163103794987914,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 1598.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 1248.96,
+            "sd": 15.378912665525784,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 349.83,
+            "sd": 14.556460859831937,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 1598.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.962971029350151,
+          "sd": 0.004811822809743743,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.962971029350151,
+          "sd": 0.004811822809743743,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.05,
+      "target_coverage": 0.95,
+      "score": "aps",
+      "correction": "none",
+      "family": "pooled",
+      "n_target_records": 2000,
+      "calibrated_on": "the PTB-XL calibration half plus 2000 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.933672640249332,
+        "sd": 0.0052772327956182915,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.9351586368977672,
+          "sd": 0.005187287066617341,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.9250830188679245,
+          "sd": 0.007395257897551359,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.608635908281389,
+        "sd": 0.0216664236218174,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 3098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 2523.41,
+            "sd": 20.07578355699064,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 575.38,
+            "sd": 19.132849491077934,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 3098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.9766276396125477,
+          "sd": 0.002250544761733908,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.9766276396125477,
+          "sd": 0.002250544761733908,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.05,
+      "target_coverage": 0.95,
+      "score": "aps",
+      "correction": "none",
+      "family": "recalibrated",
+      "n_target_records": 0,
+      "calibrated_on": "PTB-XL alone",
+      "coverage": {
+        "mean": 0.8743343722172752,
+        "sd": 0.009455567077146704,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.8773097010053532,
+          "sd": 0.009282838026840616,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.8571358490566038,
+          "sd": 0.01225798300165727,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.3861865538735532,
+        "sd": 0.028558562902748854,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 824.015,
+            "sd": 14.027065546264335,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 274.775,
+            "sd": 12.929043888834045,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.9407180100089738,
+          "sd": 0.006613186644047947,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.9407180100089738,
+          "sd": 0.006613186644047947,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.05,
+      "target_coverage": 0.95,
+      "score": "aps",
+      "correction": "none",
+      "family": "recalibrated",
+      "n_target_records": 100,
+      "calibrated_on": "100 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.9508170080142476,
+        "sd": 0.022646666332254418,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.952069460765113,
+          "sd": 0.02228213564301535,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.9435773584905661,
+          "sd": 0.02510526106645826,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.6959978851291186,
+        "sd": 0.10883731201873507,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 100.0,
+          "sd": 0.0,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 85.115,
+            "sd": 3.2472292015558724,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 14.885,
+            "sd": 3.2472292015558715,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 100.0,
+          "sd": 0.0,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.9829409977769332,
+          "sd": 0.009792985370170057,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.9829409977769332,
+          "sd": 0.009792985370170057,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.05,
+      "target_coverage": 0.95,
+      "score": "aps",
+      "correction": "none",
+      "family": "recalibrated",
+      "n_target_records": 500,
+      "calibrated_on": "500 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.952112644701692,
+        "sd": 0.009932871676996096,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.9533796840318578,
+          "sd": 0.00982263663412068,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.9447886792452829,
+          "sd": 0.011342628594349617,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.6948207925200356,
+        "sd": 0.04847214198237194,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 500.0,
+          "sd": 0.0,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 424.945,
+            "sd": 7.663918923522851,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 75.055,
+            "sd": 7.663918923522851,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 500.0,
+          "sd": 0.0,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.9842043275670682,
+          "sd": 0.0037823419429667614,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.9842043275670682,
+          "sd": 0.0037823419429667614,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.05,
+      "target_coverage": 0.95,
+      "score": "aps",
+      "correction": "none",
+      "family": "recalibrated",
+      "n_target_records": 2000,
+      "calibrated_on": "2000 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.9512461041852183,
+        "sd": 0.004924061136537483,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.9525094659877269,
+          "sd": 0.004963981153646281,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.943943396226415,
+          "sd": 0.006364504171514936,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.6893738869100625,
+        "sd": 0.022132436684070705,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 2000.0,
+          "sd": 0.0,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 1699.395,
+            "sd": 14.86992090559642,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 300.605,
+            "sd": 14.86992090559642,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 2000.0,
+          "sd": 0.0,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.984023363786876,
+          "sd": 0.0017632589080422048,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.984023363786876,
+          "sd": 0.0017632589080422048,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.05,
+      "target_coverage": 0.95,
+      "score": "aps",
+      "correction": "weighted",
+      "family": "pooled",
+      "n_target_records": 0,
+      "calibrated_on": "PTB-XL alone",
+      "coverage": {
+        "mean": 0.8894245325022261,
+        "sd": 0.01056417355089644,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.8918044131087609,
+          "sd": 0.010185872765404232,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.8756679245283019,
+          "sd": 0.014164240647321618,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.437630231522707,
+        "sd": 0.03589911591057672,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 824.015,
+            "sd": 14.027065546264335,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 274.775,
+            "sd": 12.929043888834045,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 960.311218503025,
+          "sd": 34.31246805919026,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.9510160436683358,
+          "sd": 0.006918495485497259,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.951766114527082,
+          "sd": 0.007030531101356886,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.05,
+      "target_coverage": 0.95,
+      "score": "aps",
+      "correction": "weighted",
+      "family": "recalibrated",
+      "n_target_records": 0,
+      "calibrated_on": "PTB-XL alone",
+      "coverage": {
+        "mean": 0.8894245325022261,
+        "sd": 0.01056417355089644,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.8918044131087609,
+          "sd": 0.010185872765404232,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.8756679245283019,
+          "sd": 0.014164240647321618,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.437630231522707,
+        "sd": 0.03589911591057672,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 824.015,
+            "sd": 14.027065546264335,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 274.775,
+            "sd": 12.929043888834045,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 960.311218503025,
+          "sd": 34.31246805919026,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.9510160436683358,
+          "sd": 0.006918495485497259,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.951766114527082,
+          "sd": 0.007030531101356886,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.05,
+      "target_coverage": 0.95,
+      "score": "lac",
+      "correction": "mondrian",
+      "family": "pooled",
+      "n_target_records": 0,
+      "calibrated_on": "PTB-XL alone",
+      "coverage": {
+        "mean": 0.786226625111309,
+        "sd": 0.009592564274365412,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.7666705836271052,
+          "sd": 0.01123036312702514,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.8992679245283018,
+          "sd": 0.009655288671122593,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.2976591718610866,
+        "sd": 0.023826300435163764,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 824.015,
+            "sd": 14.027065546264335,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 274.775,
+            "sd": 12.929043888834045,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.5457604113221168,
+          "sd": 0.025538345942768135,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.877819610722363,
+          "sd": 0.014910884092630569,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.05,
+      "target_coverage": 0.95,
+      "score": "lac",
+      "correction": "mondrian",
+      "family": "pooled",
+      "n_target_records": 100,
+      "calibrated_on": "the PTB-XL calibration half plus 100 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.8110874888691006,
+        "sd": 0.009865438161253806,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.7952532967750359,
+          "sd": 0.01144572271525263,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.9026150943396226,
+          "sd": 0.009350001655245434,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.3357858414959929,
+        "sd": 0.02540986956697831,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 1198.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 909.075,
+            "sd": 14.500714763183781,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 289.715,
+            "sd": 13.633898597054838,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 1198.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.6079902984201908,
+          "sd": 0.024582640421863748,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.8829837184026837,
+          "sd": 0.014436322926036495,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.05,
+      "target_coverage": 0.95,
+      "score": "lac",
+      "correction": "mondrian",
+      "family": "pooled",
+      "n_target_records": 500,
+      "calibrated_on": "the PTB-XL calibration half plus 500 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.8801964603739983,
+        "sd": 0.011009444550996887,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.874021412717065,
+          "sd": 0.012937077475247393,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.915890566037736,
+          "sd": 0.012454398250941827,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.4538429430097952,
+        "sd": 0.03728751349262103,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 1598.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 1247.655,
+            "sd": 16.6107059682549,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 351.135,
+            "sd": 15.184519192769255,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 1598.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.7846282806247473,
+          "sd": 0.03224559420255841,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.9028085218183697,
+          "sd": 0.018178748566518278,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.05,
+      "target_coverage": 0.95,
+      "score": "lac",
+      "correction": "mondrian",
+      "family": "pooled",
+      "n_target_records": 2000,
+      "calibrated_on": "the PTB-XL calibration half plus 2000 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.9282552315227071,
+        "sd": 0.005803554677866906,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.9269728424076251,
+          "sd": 0.006787348426970825,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.9356679245283018,
+          "sd": 0.008580527798286402,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.5780565449688333,
+        "sd": 0.03093521766377358,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 3098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 2522.105,
+            "sd": 19.382527877825257,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 576.685,
+            "sd": 18.65895382353857,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 3098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.9036490480974316,
+          "sd": 0.011579490791632735,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.9315128442831337,
+          "sd": 0.012669623542909984,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.05,
+      "target_coverage": 0.95,
+      "score": "lac",
+      "correction": "mondrian",
+      "family": "recalibrated",
+      "n_target_records": 0,
+      "calibrated_on": "PTB-XL alone",
+      "coverage": {
+        "mean": 0.786226625111309,
+        "sd": 0.009592564274365412,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.7666705836271052,
+          "sd": 0.01123036312702514,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.8992679245283018,
+          "sd": 0.009655288671122593,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.2976591718610866,
+        "sd": 0.023826300435163764,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 824.015,
+            "sd": 14.027065546264335,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 274.775,
+            "sd": 12.929043888834045,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.5457604113221168,
+          "sd": 0.025538345942768135,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.877819610722363,
+          "sd": 0.014910884092630569,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.05,
+      "target_coverage": 0.95,
+      "score": "lac",
+      "correction": "mondrian",
+      "family": "recalibrated",
+      "n_target_records": 100,
+      "calibrated_on": "100 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.960625556544969,
+        "sd": 0.01992908009148652,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.9550130565347956,
+          "sd": 0.02271733619984151,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.9930679245283018,
+          "sd": 0.024604873806298125,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.8896632902938557,
+        "sd": 0.10280418539162704,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 100.0,
+          "sd": 0.0,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 85.06,
+            "sd": 3.6500705575888377,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 14.94,
+            "sd": 3.650070557588837,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 100.0,
+          "sd": 0.0,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.9439732475485653,
+          "sd": 0.03355736855945262,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.9438600045706456,
+          "sd": 0.06371630922255611,
+          "n_draws": 200,
+          "n_infinite": 170
+        }
+      }
+    },
+    {
+      "alpha": 0.05,
+      "target_coverage": 0.95,
+      "score": "lac",
+      "correction": "mondrian",
+      "family": "recalibrated",
+      "n_target_records": 500,
+      "calibrated_on": "500 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.953225734639359,
+        "sd": 0.009530498893210471,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.950816033424729,
+          "sd": 0.010589299559853757,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.9671547169811321,
+          "sd": 0.018427468808778324,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.736373552983081,
+        "sd": 0.07912131809511995,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 500.0,
+          "sd": 0.0,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 423.64,
+            "sd": 7.789981970163819,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 76.36,
+            "sd": 7.789981970163819,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 500.0,
+          "sd": 0.0,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.9425072486605495,
+          "sd": 0.01628453002039783,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.9657744915504008,
+          "sd": 0.01888582822279823,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.05,
+      "target_coverage": 0.95,
+      "score": "lac",
+      "correction": "mondrian",
+      "family": "recalibrated",
+      "n_target_records": 2000,
+      "calibrated_on": "2000 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.9516301202137132,
+        "sd": 0.003956237704252464,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.9504608956782868,
+          "sd": 0.004322251447696224,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.958388679245283,
+          "sd": 0.012655473862823504,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.6953656500445238,
+        "sd": 0.04895611666585438,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 2000.0,
+          "sd": 0.0,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 1698.09,
+            "sd": 12.80514579354604,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 301.91,
+            "sd": 12.805145793546039,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 2000.0,
+          "sd": 0.0,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.9430907935835421,
+          "sd": 0.0073294041001301805,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.9580215006321668,
+          "sd": 0.012835582030918172,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.05,
+      "target_coverage": 0.95,
+      "score": "lac",
+      "correction": "none",
+      "family": "pooled",
+      "n_target_records": 0,
+      "calibrated_on": "PTB-XL alone",
+      "coverage": {
+        "mean": 0.8428817898486198,
+        "sd": 0.007850559096217699,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.8472502937720329,
+          "sd": 0.007504783483485312,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.8176301886792453,
+          "sd": 0.00997523082234089,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.2275016696349064,
+        "sd": 0.018870500947203998,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 824.015,
+            "sd": 14.027065546264335,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 274.775,
+            "sd": 12.929043888834045,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.7209968883544207,
+          "sd": 0.01604588331809705,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.7209968883544207,
+          "sd": 0.01604588331809705,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.05,
+      "target_coverage": 0.95,
+      "score": "lac",
+      "correction": "none",
+      "family": "pooled",
+      "n_target_records": 100,
+      "calibrated_on": "the PTB-XL calibration half plus 100 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.856069679430098,
+        "sd": 0.007373518280983738,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.8602611306959134,
+          "sd": 0.007460822840809605,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.8318415094339622,
+          "sd": 0.007030128467458746,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.2622695903829029,
+        "sd": 0.021081356066848737,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 1198.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 909.075,
+            "sd": 14.500714763183781,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 289.715,
+            "sd": 13.633898597054838,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 1198.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.7496236862242222,
+          "sd": 0.017179868270709827,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.7496236862242222,
+          "sd": 0.017179868270709827,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.05,
+      "target_coverage": 0.95,
+      "score": "lac",
+      "correction": "none",
+      "family": "pooled",
+      "n_target_records": 500,
+      "calibrated_on": "the PTB-XL calibration half plus 500 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.8921632902938558,
+        "sd": 0.008926205144898872,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.895397571484528,
+          "sd": 0.008411244575256363,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.8734679245283019,
+          "sd": 0.011980425580658304,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.3837299643811218,
+        "sd": 0.03277667067290695,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 1598.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 1247.655,
+            "sd": 16.6107059682549,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 351.135,
+            "sd": 15.184519192769255,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 1598.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.8377236411347986,
+          "sd": 0.019840267569375205,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.8377236411347986,
+          "sd": 0.019840267569375205,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.05,
+      "target_coverage": 0.95,
+      "score": "lac",
+      "correction": "none",
+      "family": "pooled",
+      "n_target_records": 2000,
+      "calibrated_on": "the PTB-XL calibration half plus 2000 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.9296004007123776,
+        "sd": 0.0057781083114663975,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.9310066588327459,
+          "sd": 0.00562298310439468,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.9214716981132075,
+          "sd": 0.006758339587709476,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.5352131567230631,
+        "sd": 0.02620137314136208,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 3098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 2522.105,
+            "sd": 19.382527877825257,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 576.685,
+            "sd": 18.65895382353857,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 3098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.9105575588345528,
+          "sd": 0.009060065476436,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.9105575588345528,
+          "sd": 0.009060065476436,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.05,
+      "target_coverage": 0.95,
+      "score": "lac",
+      "correction": "none",
+      "family": "recalibrated",
+      "n_target_records": 0,
+      "calibrated_on": "PTB-XL alone",
+      "coverage": {
+        "mean": 0.8428817898486198,
+        "sd": 0.007850559096217699,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.8472502937720329,
+          "sd": 0.007504783483485312,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.8176301886792453,
+          "sd": 0.00997523082234089,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.2275016696349064,
+        "sd": 0.018870500947203998,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 824.015,
+            "sd": 14.027065546264335,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 274.775,
+            "sd": 12.929043888834045,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.7209968883544207,
+          "sd": 0.01604588331809705,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.7209968883544207,
+          "sd": 0.01604588331809705,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.05,
+      "target_coverage": 0.95,
+      "score": "lac",
+      "correction": "none",
+      "family": "recalibrated",
+      "n_target_records": 100,
+      "calibrated_on": "100 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.951864425645592,
+        "sd": 0.021572317855650506,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.9528796187491841,
+          "sd": 0.021130646982093784,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.9459962264150944,
+          "sd": 0.024210211893847037,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.6594657168299198,
+        "sd": 0.11571794532658052,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 100.0,
+          "sd": 0.0,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 85.06,
+            "sd": 3.6500705575888377,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 14.94,
+            "sd": 3.650070557588837,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 100.0,
+          "sd": 0.0,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.9418288540653884,
+          "sd": 0.030739760707461712,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.9418288540653884,
+          "sd": 0.030739760707461712,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.05,
+      "target_coverage": 0.95,
+      "score": "lac",
+      "correction": "none",
+      "family": "recalibrated",
+      "n_target_records": 500,
+      "calibrated_on": "500 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.9518310329474622,
+        "sd": 0.009017210976352176,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.9527124951037994,
+          "sd": 0.008752067950230816,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.9467358490566038,
+          "sd": 0.010613726376075685,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.6544178539626,
+        "sd": 0.052208391533038884,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 500.0,
+          "sd": 0.0,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 423.64,
+            "sd": 7.789981970163819,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 76.36,
+            "sd": 7.789981970163819,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 500.0,
+          "sd": 0.0,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.9455723423883319,
+          "sd": 0.012905006081710982,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.9455723423883319,
+          "sd": 0.012905006081710982,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.05,
+      "target_coverage": 0.95,
+      "score": "lac",
+      "correction": "none",
+      "family": "recalibrated",
+      "n_target_records": 2000,
+      "calibrated_on": "2000 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.9507140471950133,
+        "sd": 0.0035436077085551068,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.9516105235670453,
+          "sd": 0.0033451464367033946,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.9455320754716982,
+          "sd": 0.004792465521768325,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.6472545636687443,
+        "sd": 0.021349099117559993,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 2000.0,
+          "sd": 0.0,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 1698.09,
+            "sd": 12.80514579354604,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 301.91,
+            "sd": 12.805145793546039,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 2000.0,
+          "sd": 0.0,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.9450232093781232,
+          "sd": 0.005508800483755874,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.9450232093781232,
+          "sd": 0.005508800483755874,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.05,
+      "target_coverage": 0.95,
+      "score": "lac",
+      "correction": "weighted",
+      "family": "pooled",
+      "n_target_records": 0,
+      "calibrated_on": "PTB-XL alone",
+      "coverage": {
+        "mean": 0.8666618432769368,
+        "sd": 0.007624684976294279,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.870710928319624,
+          "sd": 0.007501829319103156,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.8432566037735849,
+          "sd": 0.00851534452076895,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.2958715494211932,
+        "sd": 0.024521607033725763,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 824.015,
+            "sd": 14.027065546264335,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 274.775,
+            "sd": 12.929043888834045,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 960.311218503025,
+          "sd": 34.31246805919026,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.7753614061325789,
+          "sd": 0.019253344796249943,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.7773615646362305,
+          "sd": 0.019240500221089862,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.05,
+      "target_coverage": 0.95,
+      "score": "lac",
+      "correction": "weighted",
+      "family": "recalibrated",
+      "n_target_records": 0,
+      "calibrated_on": "PTB-XL alone",
+      "coverage": {
+        "mean": 0.8666618432769368,
+        "sd": 0.007624684976294279,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.870710928319624,
+          "sd": 0.007501829319103156,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.8432566037735849,
+          "sd": 0.00851534452076895,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.2958715494211932,
+        "sd": 0.024521607033725763,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 824.015,
+            "sd": 14.027065546264335,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 274.775,
+            "sd": 12.929043888834045,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 960.311218503025,
+          "sd": 34.31246805919026,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.7753614061325789,
+          "sd": 0.019253344796249943,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.7773615646362305,
+          "sd": 0.019240500221089862,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.1,
+      "target_coverage": 0.9,
+      "score": "aps",
+      "correction": "mondrian",
+      "family": "pooled",
+      "n_target_records": 0,
+      "calibrated_on": "PTB-XL alone",
+      "coverage": {
+        "mean": 0.7953088824577026,
+        "sd": 0.01152832152162501,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.7845554249902075,
+          "sd": 0.013059088049924117,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.8574679245283019,
+          "sd": 0.018976820107450595,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.2904530276046304,
+        "sd": 0.03410106292597945,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 824.015,
+            "sd": 14.027065546264335,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 274.775,
+            "sd": 12.929043888834045,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.8619104361855843,
+          "sd": 0.011799964047950926,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.9405331480528127,
+          "sd": 0.010972733232203078,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.1,
+      "target_coverage": 0.9,
+      "score": "aps",
+      "correction": "mondrian",
+      "family": "pooled",
+      "n_target_records": 100,
+      "calibrated_on": "the PTB-XL calibration half plus 100 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.8064587043633125,
+        "sd": 0.011159347149325946,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.7969969969969969,
+          "sd": 0.012521568555392134,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.8611509433962264,
+          "sd": 0.018577445405801793,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.3096215494211934,
+        "sd": 0.03417734755093475,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 1198.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 909.13,
+            "sd": 14.527502941267736,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 289.66,
+            "sd": 13.293909891412873,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 1198.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.8735864797736801,
+          "sd": 0.011082381935070999,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.9428840295295238,
+          "sd": 0.010770927523764538,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.1,
+      "target_coverage": 0.9,
+      "score": "aps",
+      "correction": "mondrian",
+      "family": "pooled",
+      "n_target_records": 500,
+      "calibrated_on": "the PTB-XL calibration half plus 500 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.8352526714158504,
+        "sd": 0.009277051320348027,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.8291180310745528,
+          "sd": 0.01029632815631617,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.87071320754717,
+          "sd": 0.018155066436478393,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.3600183659839717,
+        "sd": 0.03432741868049236,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 1598.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 1248.96,
+            "sd": 15.378912665525784,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 349.83,
+            "sd": 14.556460859831937,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 1598.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.9023309562908,
+          "sd": 0.008755157240022274,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.9486529451511935,
+          "sd": 0.00979309188321038,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.1,
+      "target_coverage": 0.9,
+      "score": "aps",
+      "correction": "mondrian",
+      "family": "pooled",
+      "n_target_records": 2000,
+      "calibrated_on": "the PTB-XL calibration half plus 2000 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.8715115761353516,
+        "sd": 0.006612409775822117,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.8687433085259173,
+          "sd": 0.00734244107701478,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.8875132075471699,
+          "sd": 0.013513141781098768,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.4356784283170083,
+        "sd": 0.02715281150773741,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 3098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 2523.41,
+            "sd": 20.07578355699064,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 575.38,
+            "sd": 19.132849491077934,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 3098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.9344487269558417,
+          "sd": 0.005164299780787778,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.9583711879904848,
+          "sd": 0.006518789214888719,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.1,
+      "target_coverage": 0.9,
+      "score": "aps",
+      "correction": "mondrian",
+      "family": "recalibrated",
+      "n_target_records": 0,
+      "calibrated_on": "PTB-XL alone",
+      "coverage": {
+        "mean": 0.7953088824577026,
+        "sd": 0.01152832152162501,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.7845554249902075,
+          "sd": 0.013059088049924117,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.8574679245283019,
+          "sd": 0.018976820107450595,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.2904530276046304,
+        "sd": 0.03410106292597945,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 824.015,
+            "sd": 14.027065546264335,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 274.775,
+            "sd": 12.929043888834045,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.8619104361855843,
+          "sd": 0.011799964047950926,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.9405331480528127,
+          "sd": 0.010972733232203078,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.1,
+      "target_coverage": 0.9,
+      "score": "aps",
+      "correction": "mondrian",
+      "family": "recalibrated",
+      "n_target_records": 100,
+      "calibrated_on": "100 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.9071549421193232,
+        "sd": 0.03000291576341567,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.9022078600339469,
+          "sd": 0.032653333648221344,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.9357509433962263,
+          "sd": 0.06375986899495727,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.6369723953695459,
+        "sd": 0.16553993776405562,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 100.0,
+          "sd": 0.0,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 85.115,
+            "sd": 3.2472292015558724,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 14.885,
+            "sd": 3.2472292015558715,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 100.0,
+          "sd": 0.0,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.9561491565412377,
+          "sd": 0.021543223327790937,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.974749498510934,
+          "sd": 0.03528035544113402,
+          "n_draws": 200,
+          "n_infinite": 4
+        }
+      }
+    },
+    {
+      "alpha": 0.1,
+      "target_coverage": 0.9,
+      "score": "aps",
+      "correction": "mondrian",
+      "family": "recalibrated",
+      "n_target_records": 500,
+      "calibrated_on": "500 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.903355966162066,
+        "sd": 0.013644954762766323,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.9013134874004439,
+          "sd": 0.014502308006237792,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.9151622641509434,
+          "sd": 0.03366971032369931,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.5470208147818343,
+        "sd": 0.0867651178904589,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 500.0,
+          "sd": 0.0,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 424.945,
+            "sd": 7.663918923522851,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 75.055,
+            "sd": 7.663918923522851,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 500.0,
+          "sd": 0.0,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.9570444918737138,
+          "sd": 0.009251211957057328,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.9704791183749052,
+          "sd": 0.016298116529724814,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.1,
+      "target_coverage": 0.9,
+      "score": "aps",
+      "correction": "mondrian",
+      "family": "recalibrated",
+      "n_target_records": 2000,
+      "calibrated_on": "2000 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.9011292297417631,
+        "sd": 0.006633228375160651,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.8991793967880924,
+          "sd": 0.007233860982545078,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.9124000000000001,
+          "sd": 0.01632167854886388,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.5293449465716833,
+        "sd": 0.04007197604526449,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 2000.0,
+          "sd": 0.0,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 1699.395,
+            "sd": 14.86992090559642,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 300.605,
+            "sd": 14.86992090559642,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 2000.0,
+          "sd": 0.0,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.9560737061519109,
+          "sd": 0.004571356781501332,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.9705338518158766,
+          "sd": 0.0073199222131934165,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.1,
+      "target_coverage": 0.9,
+      "score": "aps",
+      "correction": "none",
+      "family": "pooled",
+      "n_target_records": 0,
+      "calibrated_on": "PTB-XL alone",
+      "coverage": {
+        "mean": 0.8095814781834372,
+        "sd": 0.010356075881875444,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.813928058493276,
+          "sd": 0.010226101795334492,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.784456603773585,
+          "sd": 0.013242224586567307,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.2146504897595727,
+        "sd": 0.022660609509194476,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 824.015,
+            "sd": 14.027065546264335,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 274.775,
+            "sd": 12.929043888834045,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.8890185868443115,
+          "sd": 0.008550176158051872,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.8890185868443115,
+          "sd": 0.008550176158051872,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.1,
+      "target_coverage": 0.9,
+      "score": "aps",
+      "correction": "none",
+      "family": "pooled",
+      "n_target_records": 100,
+      "calibrated_on": "the PTB-XL calibration half plus 100 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.8179975512021371,
+        "sd": 0.010053090187048485,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.8221699960830395,
+          "sd": 0.009921567801679052,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.7938792452830189,
+          "sd": 0.012866343183448798,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.2342586821015138,
+        "sd": 0.02280782256258956,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 1198.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 909.13,
+            "sd": 14.527502941267736,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 289.66,
+            "sd": 13.293909891412873,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 1198.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.8963347514155089,
+          "sd": 0.008120386575873694,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.8963347514155089,
+          "sd": 0.008120386575873694,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.1,
+      "target_coverage": 0.9,
+      "score": "aps",
+      "correction": "none",
+      "family": "pooled",
+      "n_target_records": 500,
+      "calibrated_on": "the PTB-XL calibration half plus 500 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.8419941006233305,
+        "sd": 0.00931044464883636,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.8456175740958349,
+          "sd": 0.009045181822886808,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.8210490566037736,
+          "sd": 0.01294485594323707,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.2938724398931434,
+        "sd": 0.023812603077416398,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 1598.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 1248.96,
+            "sd": 15.378912665525784,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 349.83,
+            "sd": 14.556460859831937,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 1598.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.9162043111610666,
+          "sd": 0.007148804172128517,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.9162043111610666,
+          "sd": 0.007148804172128517,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.1,
+      "target_coverage": 0.9,
+      "score": "aps",
+      "correction": "none",
+      "family": "pooled",
+      "n_target_records": 2000,
+      "calibrated_on": "the PTB-XL calibration half plus 2000 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.8736548308103295,
+        "sd": 0.00617122499967395,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.8766105235670455,
+          "sd": 0.006195883547607338,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.8565698113207548,
+          "sd": 0.008750000364176572,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.3838819011576136,
+        "sd": 0.01843133710525822,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 3098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 2523.41,
+            "sd": 20.07578355699064,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 575.38,
+            "sd": 19.132849491077934,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 3098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.9403809228388483,
+          "sd": 0.004222597010927475,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.9403809228388483,
+          "sd": 0.004222597010927475,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.1,
+      "target_coverage": 0.9,
+      "score": "aps",
+      "correction": "none",
+      "family": "recalibrated",
+      "n_target_records": 0,
+      "calibrated_on": "PTB-XL alone",
+      "coverage": {
+        "mean": 0.8095814781834372,
+        "sd": 0.010356075881875444,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.813928058493276,
+          "sd": 0.010226101795334492,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.784456603773585,
+          "sd": 0.013242224586567307,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.2146504897595727,
+        "sd": 0.022660609509194476,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 824.015,
+            "sd": 14.027065546264335,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 274.775,
+            "sd": 12.929043888834045,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.8890185868443115,
+          "sd": 0.008550176158051872,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.8890185868443115,
+          "sd": 0.008550176158051872,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.1,
+      "target_coverage": 0.9,
+      "score": "aps",
+      "correction": "none",
+      "family": "recalibrated",
+      "n_target_records": 100,
+      "calibrated_on": "100 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.8998580810329474,
+        "sd": 0.031089267199026775,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.9021615093354224,
+          "sd": 0.030458665570138647,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.8865433962264152,
+          "sd": 0.0352168115756806,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.4809583704363314,
+        "sd": 0.10874258111450949,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 100.0,
+          "sd": 0.0,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 85.115,
+            "sd": 3.2472292015558724,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 14.885,
+            "sd": 3.2472292015558715,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 100.0,
+          "sd": 0.0,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.9563264356785219,
+          "sd": 0.02035218377513977,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.9563264356785219,
+          "sd": 0.02035218377513977,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.1,
+      "target_coverage": 0.9,
+      "score": "aps",
+      "correction": "none",
+      "family": "recalibrated",
+      "n_target_records": 500,
+      "calibrated_on": "500 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.9018994879786287,
+        "sd": 0.014587240303034469,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.9041669930800365,
+          "sd": 0.014169318742803512,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.8887924528301887,
+          "sd": 0.017882086354260703,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.4807429875333926,
+        "sd": 0.05375103861427727,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 500.0,
+          "sd": 0.0,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 424.945,
+            "sd": 7.663918923522851,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 75.055,
+            "sd": 7.663918923522851,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 500.0,
+          "sd": 0.0,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.9589006986142118,
+          "sd": 0.008977126415745343,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.9589006986142118,
+          "sd": 0.008977126415745343,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.1,
+      "target_coverage": 0.9,
+      "score": "aps",
+      "correction": "none",
+      "family": "recalibrated",
+      "n_target_records": 2000,
+      "calibrated_on": "2000 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.901015694568121,
+        "sd": 0.0063412305473548635,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.9032504243373808,
+          "sd": 0.006218691368060607,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.8880981132075472,
+          "sd": 0.00903119282045706,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.4755966162065897,
+        "sd": 0.022548307565247224,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 2000.0,
+          "sd": 0.0,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 1699.395,
+            "sd": 14.86992090559642,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 300.605,
+            "sd": 14.86992090559642,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 2000.0,
+          "sd": 0.0,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.9587452172083321,
+          "sd": 0.0037995470169482227,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.9587452172083321,
+          "sd": 0.0037995470169482227,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.1,
+      "target_coverage": 0.9,
+      "score": "aps",
+      "correction": "weighted",
+      "family": "pooled",
+      "n_target_records": 0,
+      "calibrated_on": "PTB-XL alone",
+      "coverage": {
+        "mean": 0.8264976625111309,
+        "sd": 0.011742924530609399,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.8303362057709884,
+          "sd": 0.0115167668619015,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.8043094339622641,
+          "sd": 0.014782323646977564,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.255685106856634,
+        "sd": 0.028065370419608812,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 824.015,
+            "sd": 14.027065546264335,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 274.775,
+            "sd": 12.929043888834045,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 960.311218503025,
+          "sd": 34.31246805919026,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.9033635029997679,
+          "sd": 0.009544688350429492,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.9040369629633205,
+          "sd": 0.009604312549970772,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.1,
+      "target_coverage": 0.9,
+      "score": "aps",
+      "correction": "weighted",
+      "family": "recalibrated",
+      "n_target_records": 0,
+      "calibrated_on": "PTB-XL alone",
+      "coverage": {
+        "mean": 0.8264976625111309,
+        "sd": 0.011742924530609399,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.8303362057709884,
+          "sd": 0.0115167668619015,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.8043094339622641,
+          "sd": 0.014782323646977564,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.255685106856634,
+        "sd": 0.028065370419608812,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 824.015,
+            "sd": 14.027065546264335,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 274.775,
+            "sd": 12.929043888834045,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 960.311218503025,
+          "sd": 34.31246805919026,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.9033635029997679,
+          "sd": 0.009544688350429492,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.9040369629633205,
+          "sd": 0.009604312549970772,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.1,
+      "target_coverage": 0.9,
+      "score": "lac",
+      "correction": "mondrian",
+      "family": "pooled",
+      "n_target_records": 0,
+      "calibrated_on": "PTB-XL alone",
+      "coverage": {
+        "mean": 0.7142865093499554,
+        "sd": 0.009632229009036757,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.691216869042956,
+          "sd": 0.011191258143667226,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.8476377358490567,
+          "sd": 0.009203187816689162,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.1184043855743544,
+        "sd": 0.020722923373761103,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 824.015,
+            "sd": 14.027065546264335,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 274.775,
+            "sd": 12.929043888834045,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.38824841886758804,
+          "sd": 0.019896059150677735,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.7871697746962308,
+          "sd": 0.0198208202684778,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.1,
+      "target_coverage": 0.9,
+      "score": "lac",
+      "correction": "mondrian",
+      "family": "pooled",
+      "n_target_records": 100,
+      "calibrated_on": "the PTB-XL calibration half plus 100 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.735946126447017,
+        "sd": 0.00915815321676432,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.7161679070374722,
+          "sd": 0.010535636161490943,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.8502716981132076,
+          "sd": 0.01012355251490675,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.1480175868210152,
+        "sd": 0.022603106434115023,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 1198.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 909.075,
+            "sd": 14.500714763183781,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 289.715,
+            "sd": 13.633898597054838,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 1198.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.43585777923464775,
+          "sd": 0.021391620543359097,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.7927306242287159,
+          "sd": 0.021864533275639246,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.1,
+      "target_coverage": 0.9,
+      "score": "lac",
+      "correction": "mondrian",
+      "family": "pooled",
+      "n_target_records": 500,
+      "calibrated_on": "the PTB-XL calibration half plus 500 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.7931778717720392,
+        "sd": 0.010089090606844393,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.7814975845410628,
+          "sd": 0.011698069864789556,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.8606943396226415,
+          "sd": 0.01216011860409925,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.2362427649154053,
+        "sd": 0.026584641499366037,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 1598.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 1247.655,
+            "sd": 16.6107059682549,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 351.135,
+            "sd": 15.184519192769255,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 1598.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.5784711572527885,
+          "sd": 0.025194139992880824,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.8136852773278952,
+          "sd": 0.023572675512751447,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.1,
+      "target_coverage": 0.9,
+      "score": "lac",
+      "correction": "mondrian",
+      "family": "pooled",
+      "n_target_records": 2000,
+      "calibrated_on": "the PTB-XL calibration half plus 2000 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.8611731967943009,
+        "sd": 0.006636636158226789,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.857313617965792,
+          "sd": 0.007773762998996778,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.8834830188679246,
+          "sd": 0.01244013649794862,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.359077804986643,
+        "sd": 0.023957666188978367,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 3098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 2522.105,
+            "sd": 19.382527877825257,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 576.685,
+            "sd": 18.65895382353857,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 3098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.7432525957375765,
+          "sd": 0.017323687266819158,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.8532097756490111,
+          "sd": 0.019655592439704384,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.1,
+      "target_coverage": 0.9,
+      "score": "lac",
+      "correction": "mondrian",
+      "family": "recalibrated",
+      "n_target_records": 0,
+      "calibrated_on": "PTB-XL alone",
+      "coverage": {
+        "mean": 0.7142865093499554,
+        "sd": 0.009632229009036757,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.691216869042956,
+          "sd": 0.011191258143667226,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.8476377358490567,
+          "sd": 0.009203187816689162,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.1184043855743544,
+        "sd": 0.020722923373761103,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 824.015,
+            "sd": 14.027065546264335,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 274.775,
+            "sd": 12.929043888834045,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.38824841886758804,
+          "sd": 0.019896059150677735,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.7871697746962308,
+          "sd": 0.0198208202684778,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.1,
+      "target_coverage": 0.9,
+      "score": "lac",
+      "correction": "mondrian",
+      "family": "recalibrated",
+      "n_target_records": 100,
+      "calibrated_on": "100 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.9118649821905609,
+        "sd": 0.028700554957104156,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.9072855464159812,
+          "sd": 0.03195966467636057,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.9383358490566037,
+          "sd": 0.05539553287572908,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.6027020258236866,
+        "sd": 0.17057561429592918,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 100.0,
+          "sd": 0.0,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 85.06,
+            "sd": 3.6500705575888377,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 14.94,
+            "sd": 3.650070557588837,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 100.0,
+          "sd": 0.0,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.8580936389323324,
+          "sd": 0.0678905471630613,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.9202028356210228,
+          "sd": 0.08388361847630825,
+          "n_draws": 200,
+          "n_infinite": 7
+        }
+      }
+    },
+    {
+      "alpha": 0.1,
+      "target_coverage": 0.9,
+      "score": "lac",
+      "correction": "mondrian",
+      "family": "recalibrated",
+      "n_target_records": 500,
+      "calibrated_on": "500 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.9036971282279608,
+        "sd": 0.013294941376259188,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.9006352004178092,
+          "sd": 0.01522635112439127,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.9213962264150943,
+          "sd": 0.030115370362272933,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.5113117764915405,
+        "sd": 0.08430837093222751,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 500.0,
+          "sd": 0.0,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 423.64,
+            "sd": 7.789981970163819,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 76.36,
+            "sd": 7.789981970163819,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 500.0,
+          "sd": 0.0,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.8484620962291956,
+          "sd": 0.034682598450718374,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.9088259749300778,
+          "sd": 0.04470483717417214,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.1,
+      "target_coverage": 0.9,
+      "score": "lac",
+      "correction": "mondrian",
+      "family": "recalibrated",
+      "n_target_records": 2000,
+      "calibrated_on": "2000 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.9007702582368654,
+        "sd": 0.005908724622338172,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.898240631936284,
+          "sd": 0.0066628317088470316,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.9153924528301889,
+          "sd": 0.015512441640748316,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.4813807880676757,
+        "sd": 0.0412292952851262,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 2000.0,
+          "sd": 0.0,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 1698.09,
+            "sd": 12.80514579354604,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 301.91,
+            "sd": 12.805145793546039,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 2000.0,
+          "sd": 0.0,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.8444335009902716,
+          "sd": 0.015266282641971562,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.9017690586671233,
+          "sd": 0.022744354732762394,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.1,
+      "target_coverage": 0.9,
+      "score": "lac",
+      "correction": "none",
+      "family": "pooled",
+      "n_target_records": 0,
+      "calibrated_on": "PTB-XL alone",
+      "coverage": {
+        "mean": 0.7698853517364204,
+        "sd": 0.008117961656259904,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.7756136571353963,
+          "sd": 0.00811074523578367,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.7367735849056604,
+          "sd": 0.008257269106621948,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.0624927649154052,
+        "sd": 0.017382352704272002,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 824.015,
+            "sd": 14.027065546264335,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 274.775,
+            "sd": 12.929043888834045,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.5659704375267028,
+          "sd": 0.018056889282456728,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.5659704375267028,
+          "sd": 0.018056889282456728,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.1,
+      "target_coverage": 0.9,
+      "score": "lac",
+      "correction": "none",
+      "family": "pooled",
+      "n_target_records": 100,
+      "calibrated_on": "the PTB-XL calibration half plus 100 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.782483303650935,
+        "sd": 0.00834844756135487,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.7883999216607913,
+          "sd": 0.008522851579369396,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.7482830188679245,
+          "sd": 0.007503023440467539,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.0894256455921638,
+        "sd": 0.018105003659353212,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 1198.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 909.075,
+            "sd": 14.500714763183781,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 289.715,
+            "sd": 13.633898597054838,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 1198.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.592960459291935,
+          "sd": 0.017709813629577322,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.592960459291935,
+          "sd": 0.017709813629577322,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.1,
+      "target_coverage": 0.9,
+      "score": "lac",
+      "correction": "none",
+      "family": "pooled",
+      "n_target_records": 500,
+      "calibrated_on": "the PTB-XL calibration half plus 500 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.8211097506678539,
+        "sd": 0.010018907863688064,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.8260229795012404,
+          "sd": 0.009971168134078884,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.792709433962264,
+          "sd": 0.010350215586553212,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.1760847061442563,
+        "sd": 0.02313850949094846,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 1598.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 1247.655,
+            "sd": 16.6107059682549,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 351.135,
+            "sd": 15.184519192769255,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 1598.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.6747549685835839,
+          "sd": 0.021575141849409275,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.6747549685835839,
+          "sd": 0.021575141849409275,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.1,
+      "target_coverage": 0.9,
+      "score": "lac",
+      "correction": "none",
+      "family": "pooled",
+      "n_target_records": 2000,
+      "calibrated_on": "the PTB-XL calibration half plus 2000 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.8661615093499555,
+        "sd": 0.004758245277010571,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.8703923488706099,
+          "sd": 0.004669730622444997,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.8417056603773585,
+          "sd": 0.005411878473795384,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.292653606411398,
+        "sd": 0.01520105230583363,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 3098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 2522.105,
+            "sd": 19.382527877825257,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 576.685,
+            "sd": 18.65895382353857,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 3098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.7744687453657388,
+          "sd": 0.012280306356454768,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.7744687453657388,
+          "sd": 0.012280306356454768,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.1,
+      "target_coverage": 0.9,
+      "score": "lac",
+      "correction": "none",
+      "family": "recalibrated",
+      "n_target_records": 0,
+      "calibrated_on": "PTB-XL alone",
+      "coverage": {
+        "mean": 0.7698853517364204,
+        "sd": 0.008117961656259904,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.7756136571353963,
+          "sd": 0.00811074523578367,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.7367735849056604,
+          "sd": 0.008257269106621948,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.0624927649154052,
+        "sd": 0.017382352704272002,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 824.015,
+            "sd": 14.027065546264335,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 274.775,
+            "sd": 12.929043888834045,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.5659704375267028,
+          "sd": 0.018056889282456728,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.5659704375267028,
+          "sd": 0.018056889282456728,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.1,
+      "target_coverage": 0.9,
+      "score": "lac",
+      "correction": "none",
+      "family": "recalibrated",
+      "n_target_records": 100,
+      "calibrated_on": "100 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.9041184327693678,
+        "sd": 0.030593979054138028,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.9067097532314924,
+          "sd": 0.029435386100193143,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.8891396226415094,
+          "sd": 0.037346376583912363,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.4391540516473733,
+        "sd": 0.11999263892906976,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 100.0,
+          "sd": 0.0,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 85.06,
+            "sd": 3.6500705575888377,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 14.94,
+            "sd": 3.650070557588837,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 100.0,
+          "sd": 0.0,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.8579239949956536,
+          "sd": 0.0629335816395799,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.8579239949956536,
+          "sd": 0.0629335816395799,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.1,
+      "target_coverage": 0.9,
+      "score": "lac",
+      "correction": "none",
+      "family": "recalibrated",
+      "n_target_records": 500,
+      "calibrated_on": "500 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.9026892252894032,
+        "sd": 0.013640498375165889,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.9052872437655046,
+          "sd": 0.012947692848973895,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.8876716981132076,
+          "sd": 0.017687513339787922,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.4243727738201246,
+        "sd": 0.05314618194153988,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 500.0,
+          "sd": 0.0,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 423.64,
+            "sd": 7.789981970163819,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 76.36,
+            "sd": 7.789981970163819,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 500.0,
+          "sd": 0.0,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.8595708353072404,
+          "sd": 0.02883126893091755,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.8595708353072404,
+          "sd": 0.02883126893091755,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.1,
+      "target_coverage": 0.9,
+      "score": "lac",
+      "correction": "none",
+      "family": "recalibrated",
+      "n_target_records": 2000,
+      "calibrated_on": "2000 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.9009422306322351,
+        "sd": 0.00631662876632821,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.9035983809896854,
+          "sd": 0.00586370561401075,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.885588679245283,
+          "sd": 0.008976638056951215,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.4155637800534282,
+        "sd": 0.024051903850659723,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 2000.0,
+          "sd": 0.0,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 1698.09,
+            "sd": 12.80514579354604,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 301.91,
+            "sd": 12.805145793546039,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 2000.0,
+          "sd": 0.0,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.8567507846280933,
+          "sd": 0.013462339058672411,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.8567507846280933,
+          "sd": 0.013462339058672411,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.1,
+      "target_coverage": 0.9,
+      "score": "lac",
+      "correction": "weighted",
+      "family": "pooled",
+      "n_target_records": 0,
+      "calibrated_on": "PTB-XL alone",
+      "coverage": {
+        "mean": 0.806039626001781,
+        "sd": 0.012536642121594955,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.8111757409583498,
+          "sd": 0.012153950186449007,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.7763509433962263,
+          "sd": 0.014977891102798598,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.1429457925200355,
+        "sd": 0.028435797311883636,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 824.015,
+            "sd": 14.027065546264335,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 274.775,
+            "sd": 12.929043888834045,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 960.311218503025,
+          "sd": 34.31246805919026,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.642536913305521,
+          "sd": 0.026405809439150208,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.6445458433032036,
+          "sd": 0.026838359515123776,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.1,
+      "target_coverage": 0.9,
+      "score": "lac",
+      "correction": "weighted",
+      "family": "recalibrated",
+      "n_target_records": 0,
+      "calibrated_on": "PTB-XL alone",
+      "coverage": {
+        "mean": 0.806039626001781,
+        "sd": 0.012536642121594955,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.8111757409583498,
+          "sd": 0.012153950186449007,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.7763509433962263,
+          "sd": 0.014977891102798598,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.1429457925200355,
+        "sd": 0.028435797311883636,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 824.015,
+            "sd": 14.027065546264335,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 274.775,
+            "sd": 12.929043888834045,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 960.311218503025,
+          "sd": 34.31246805919026,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.642536913305521,
+          "sd": 0.026405809439150208,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.6445458433032036,
+          "sd": 0.026838359515123776,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.2,
+      "target_coverage": 0.8,
+      "score": "aps",
+      "correction": "mondrian",
+      "family": "pooled",
+      "n_target_records": 0,
+      "calibrated_on": "PTB-XL alone",
+      "coverage": {
+        "mean": 0.6915104630454141,
+        "sd": 0.01246891891662462,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.6801847499673588,
+          "sd": 0.014110585396946203,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.7569773584905661,
+          "sd": 0.01993414777370063,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.054696126447017,
+        "sd": 0.02348610036972312,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 824.015,
+            "sd": 14.027065546264335,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 274.775,
+            "sd": 12.929043888834045,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.7587589249342579,
+          "sd": 0.013983494100430344,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.8661745809031136,
+          "sd": 0.016042855817976435,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.2,
+      "target_coverage": 0.8,
+      "score": "aps",
+      "correction": "mondrian",
+      "family": "pooled",
+      "n_target_records": 100,
+      "calibrated_on": "the PTB-XL calibration half plus 100 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.7004992208370436,
+        "sd": 0.012072181533162737,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.6901220786003396,
+          "sd": 0.013727597921052912,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.7604830188679246,
+          "sd": 0.019946283349977622,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.0677932991985752,
+        "sd": 0.023592559673318417,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 1198.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 909.13,
+            "sd": 14.527502941267736,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 289.66,
+            "sd": 13.293909891412873,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 1198.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.7688955872392665,
+          "sd": 0.01343306482691297,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.8692134332445071,
+          "sd": 0.015941717392812926,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.2,
+      "target_coverage": 0.8,
+      "score": "aps",
+      "correction": "mondrian",
+      "family": "pooled",
+      "n_target_records": 500,
+      "calibrated_on": "the PTB-XL calibration half plus 500 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.7264848619768478,
+        "sd": 0.010841333013039288,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.719204857030944,
+          "sd": 0.01218591098678526,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.7685660377358491,
+          "sd": 0.020488479157207334,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.10415071237756,
+        "sd": 0.0241969459723204,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 1598.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 1248.96,
+            "sd": 15.378912665525784,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 349.83,
+            "sd": 14.556460859831937,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 1598.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.798235452871705,
+          "sd": 0.011449167839158343,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.8758046608946916,
+          "sd": 0.01620567571265121,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.2,
+      "target_coverage": 0.8,
+      "score": "aps",
+      "correction": "mondrian",
+      "family": "pooled",
+      "n_target_records": 2000,
+      "calibrated_on": "the PTB-XL calibration half plus 2000 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.7641084149599289,
+        "sd": 0.007627440841881467,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.7596833790312051,
+          "sd": 0.008317673097625204,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.7896867924528302,
+          "sd": 0.01652225391806044,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.1670692341941227,
+        "sd": 0.01981190024516777,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 3098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 2523.41,
+            "sd": 20.07578355699064,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 575.38,
+            "sd": 19.132849491077934,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 3098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.838296428988308,
+          "sd": 0.0073605502691710305,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.8930210212822268,
+          "sd": 0.011606850747611284,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.2,
+      "target_coverage": 0.8,
+      "score": "aps",
+      "correction": "mondrian",
+      "family": "recalibrated",
+      "n_target_records": 0,
+      "calibrated_on": "PTB-XL alone",
+      "coverage": {
+        "mean": 0.6915104630454141,
+        "sd": 0.01246891891662462,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.6801847499673588,
+          "sd": 0.014110585396946203,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.7569773584905661,
+          "sd": 0.01993414777370063,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.054696126447017,
+        "sd": 0.02348610036972312,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 824.015,
+            "sd": 14.027065546264335,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 274.775,
+            "sd": 12.929043888834045,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.7587589249342579,
+          "sd": 0.013983494100430344,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.8661745809031136,
+          "sd": 0.016042855817976435,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.2,
+      "target_coverage": 0.8,
+      "score": "aps",
+      "correction": "mondrian",
+      "family": "recalibrated",
+      "n_target_records": 100,
+      "calibrated_on": "100 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.8080097951914514,
+        "sd": 0.03745261486572546,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.8011430996213604,
+          "sd": 0.04079575308178916,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.8477018867924528,
+          "sd": 0.09260741901071202,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.3304925422974176,
+        "sd": 0.16021641250812615,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 100.0,
+          "sd": 0.0,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 85.115,
+            "sd": 3.2472292015558724,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 14.885,
+            "sd": 3.2472292015558715,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 100.0,
+          "sd": 0.0,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.8761168001271442,
+          "sd": 0.03706698130776699,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.9250946835712334,
+          "sd": 0.06644817626415327,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.2,
+      "target_coverage": 0.8,
+      "score": "aps",
+      "correction": "mondrian",
+      "family": "recalibrated",
+      "n_target_records": 500,
+      "calibrated_on": "500 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.8011937889581477,
+        "sd": 0.018417372994270695,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.7980819950385168,
+          "sd": 0.018915309735596016,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.8191811320754718,
+          "sd": 0.047239930588838124,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.2505326135351738,
+        "sd": 0.07118905030836727,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 500.0,
+          "sd": 0.0,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 424.945,
+            "sd": 7.663918923522851,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 75.055,
+            "sd": 7.663918923522851,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 500.0,
+          "sd": 0.0,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.8745062665536181,
+          "sd": 0.017487575256976858,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.9127138368632594,
+          "sd": 0.034091061720148384,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.2,
+      "target_coverage": 0.8,
+      "score": "aps",
+      "correction": "mondrian",
+      "family": "recalibrated",
+      "n_target_records": 2000,
+      "calibrated_on": "2000 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.8011075244879785,
+        "sd": 0.008372609969136432,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.7979821125473299,
+          "sd": 0.008975165400178505,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.8191735849056602,
+          "sd": 0.022767588976742806,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.2436392475512021,
+        "sd": 0.03144518974517311,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 2000.0,
+          "sd": 0.0,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 1699.395,
+            "sd": 14.86992090559642,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 300.605,
+            "sd": 14.86992090559642,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 2000.0,
+          "sd": 0.0,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.874494977646465,
+          "sd": 0.00782690894011553,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.9143911099081288,
+          "sd": 0.015652572993439497,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.2,
+      "target_coverage": 0.8,
+      "score": "aps",
+      "correction": "none",
+      "family": "pooled",
+      "n_target_records": 0,
+      "calibrated_on": "PTB-XL alone",
+      "coverage": {
+        "mean": 0.7040766918967052,
+        "sd": 0.012204713609094003,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.709415720067894,
+          "sd": 0.012208725942041107,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.6732150943396227,
+          "sd": 0.015159051575607155,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.0083209038290295,
+        "sd": 0.020065187779548705,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 824.015,
+            "sd": 14.027065546264335,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 274.775,
+            "sd": 12.929043888834045,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.7883370697611302,
+          "sd": 0.011358883508046019,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.7883370697611302,
+          "sd": 0.011358883508046019,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.2,
+      "target_coverage": 0.8,
+      "score": "aps",
+      "correction": "none",
+      "family": "pooled",
+      "n_target_records": 100,
+      "calibrated_on": "the PTB-XL calibration half plus 100 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.7117853962600178,
+        "sd": 0.011862545092846667,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.7171497584541062,
+          "sd": 0.011880857234381736,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.6807773584905661,
+          "sd": 0.01473001297410915,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.0215850400712376,
+        "sd": 0.0196039783240685,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 1198.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 909.13,
+            "sd": 14.527502941267736,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 289.66,
+            "sd": 13.293909891412873,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 1198.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.7961625283171315,
+          "sd": 0.010879806390132592,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.7961625283171315,
+          "sd": 0.010879806390132592,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.2,
+      "target_coverage": 0.8,
+      "score": "aps",
+      "correction": "none",
+      "family": "pooled",
+      "n_target_records": 500,
+      "calibrated_on": "the PTB-XL calibration half plus 500 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.733415516473731,
+        "sd": 0.010376324252520802,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.7386408147277712,
+          "sd": 0.01030028662799364,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.7032113207547169,
+          "sd": 0.013828499327229586,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.060017252894034,
+        "sd": 0.01784467656934832,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 1598.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 1248.96,
+            "sd": 15.378912665525784,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 349.83,
+            "sd": 14.556460859831937,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 1598.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.8177002358551709,
+          "sd": 0.009272879181068373,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.8177002358551709,
+          "sd": 0.009272879181068373,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.2,
+      "target_coverage": 0.8,
+      "score": "aps",
+      "correction": "none",
+      "family": "pooled",
+      "n_target_records": 2000,
+      "calibrated_on": "the PTB-XL calibration half plus 2000 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.7672295191451468,
+        "sd": 0.007421592638469479,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.7722222222222223,
+          "sd": 0.007498337800480799,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.7383698113207546,
+          "sd": 0.010892422059628858,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.1240967275155833,
+        "sd": 0.013494820914161905,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 3098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 2523.41,
+            "sd": 20.07578355699064,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 575.38,
+            "sd": 19.132849491077934,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 3098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.8502220714744412,
+          "sd": 0.006383631223088445,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.8502220714744412,
+          "sd": 0.006383631223088445,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.2,
+      "target_coverage": 0.8,
+      "score": "aps",
+      "correction": "none",
+      "family": "recalibrated",
+      "n_target_records": 0,
+      "calibrated_on": "PTB-XL alone",
+      "coverage": {
+        "mean": 0.7040766918967052,
+        "sd": 0.012204713609094003,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.709415720067894,
+          "sd": 0.012208725942041107,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.6732150943396227,
+          "sd": 0.015159051575607155,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.0083209038290295,
+        "sd": 0.020065187779548705,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 824.015,
+            "sd": 14.027065546264335,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 274.775,
+            "sd": 12.929043888834045,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.7883370697611302,
+          "sd": 0.011358883508046019,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.7883370697611302,
+          "sd": 0.011358883508046019,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.2,
+      "target_coverage": 0.8,
+      "score": "aps",
+      "correction": "none",
+      "family": "recalibrated",
+      "n_target_records": 100,
+      "calibrated_on": "100 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.8023753339269812,
+        "sd": 0.038151678799327876,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.8067567567567567,
+          "sd": 0.03756455686575183,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.7770490566037735,
+          "sd": 0.04218519151772586,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.2040566562778272,
+        "sd": 0.08543678912391799,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 100.0,
+          "sd": 0.0,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 85.115,
+            "sd": 3.2472292015558724,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 14.885,
+            "sd": 3.2472292015558715,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 100.0,
+          "sd": 0.0,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.8814419273342737,
+          "sd": 0.0339366276246458,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.8814419273342737,
+          "sd": 0.0339366276246458,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.2,
+      "target_coverage": 0.8,
+      "score": "aps",
+      "correction": "none",
+      "family": "recalibrated",
+      "n_target_records": 500,
+      "calibrated_on": "500 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.8003784505788067,
+        "sd": 0.01866927855352276,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.8048563781172475,
+          "sd": 0.018149378217813514,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.7744943396226415,
+          "sd": 0.022885609048882823,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.1949393365983971,
+        "sd": 0.04120550811077344,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 500.0,
+          "sd": 0.0,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 424.945,
+            "sd": 7.663918923522851,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 75.055,
+            "sd": 7.663918923522851,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 500.0,
+          "sd": 0.0,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.880734109913774,
+          "sd": 0.016477052709688866,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.880734109913774,
+          "sd": 0.016477052709688866,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.2,
+      "target_coverage": 0.8,
+      "score": "aps",
+      "correction": "none",
+      "family": "recalibrated",
+      "n_target_records": 2000,
+      "calibrated_on": "2000 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.8016379118432769,
+        "sd": 0.008637229455980297,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.8061195978587282,
+          "sd": 0.008532571702090297,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.775732075471698,
+          "sd": 0.011694741636184072,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.1964603739982191,
+        "sd": 0.0182099376256661,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 2000.0,
+          "sd": 0.0,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 1699.395,
+            "sd": 14.86992090559642,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 300.605,
+            "sd": 14.86992090559642,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 2000.0,
+          "sd": 0.0,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.881921623315261,
+          "sd": 0.007225281854063118,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.881921623315261,
+          "sd": 0.007225281854063118,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.2,
+      "target_coverage": 0.8,
+      "score": "aps",
+      "correction": "weighted",
+      "family": "pooled",
+      "n_target_records": 0,
+      "calibrated_on": "PTB-XL alone",
+      "coverage": {
+        "mean": 0.7235207034728407,
+        "sd": 0.013173182635180879,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.7287054445750099,
+          "sd": 0.013205397373871889,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.6935509433962264,
+          "sd": 0.015776978326398197,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.042640249332146,
+        "sd": 0.022689017216857742,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 824.015,
+            "sd": 14.027065546264335,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 274.775,
+            "sd": 12.929043888834045,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 960.311218503025,
+          "sd": 34.31246805919026,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.8077908833114088,
+          "sd": 0.012182896264857643,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.8083955274331268,
+          "sd": 0.012163904905629025,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.2,
+      "target_coverage": 0.8,
+      "score": "aps",
+      "correction": "weighted",
+      "family": "recalibrated",
+      "n_target_records": 0,
+      "calibrated_on": "PTB-XL alone",
+      "coverage": {
+        "mean": 0.7235207034728407,
+        "sd": 0.013173182635180879,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.7287054445750099,
+          "sd": 0.013205397373871889,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.6935509433962264,
+          "sd": 0.015776978326398197,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.042640249332146,
+        "sd": 0.022689017216857742,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 824.015,
+            "sd": 14.027065546264335,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 274.775,
+            "sd": 12.929043888834045,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 960.311218503025,
+          "sd": 34.31246805919026,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.8077908833114088,
+          "sd": 0.012182896264857643,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.8083955274331268,
+          "sd": 0.012163904905629025,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.2,
+      "target_coverage": 0.8,
+      "score": "lac",
+      "correction": "mondrian",
+      "family": "pooled",
+      "n_target_records": 0,
+      "calibrated_on": "PTB-XL alone",
+      "coverage": {
+        "mean": 0.5974482413178985,
+        "sd": 0.010005564413951026,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.5658029768899334,
+          "sd": 0.01134411857963349,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.7803698113207547,
+          "sd": 0.016002094708773073,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 0.9029530276046305,
+        "sd": 0.020630794176637473,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 824.015,
+            "sd": 14.027065546264335,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 274.775,
+            "sd": 12.929043888834045,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.20981380254030227,
+          "sd": 0.011576476945968561,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.6518929508328438,
+          "sd": 0.029701916888074806,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.2,
+      "target_coverage": 0.8,
+      "score": "lac",
+      "correction": "mondrian",
+      "family": "pooled",
+      "n_target_records": 100,
+      "calibrated_on": "the PTB-XL calibration half plus 100 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.614405053428317,
+        "sd": 0.007627141493007607,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.5853362057709884,
+          "sd": 0.00842624772605262,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.7824339622641509,
+          "sd": 0.016631494223498466,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 0.9235318343722173,
+        "sd": 0.02005577608208478,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 1198.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 909.075,
+            "sd": 14.500714763183781,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 289.715,
+            "sd": 13.633898597054838,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 1198.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.23133368641138077,
+          "sd": 0.009955683564442692,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.655963683873415,
+          "sd": 0.03124086422897156,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.2,
+      "target_coverage": 0.8,
+      "score": "lac",
+      "correction": "mondrian",
+      "family": "pooled",
+      "n_target_records": 500,
+      "calibrated_on": "the PTB-XL calibration half plus 500 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.6716662956366874,
+        "sd": 0.011324128970752143,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.6512207860033947,
+          "sd": 0.01308939067470309,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.7898490566037737,
+          "sd": 0.015586321832500662,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 0.9943989314336598,
+        "sd": 0.021670171231187103,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 1598.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 1247.655,
+            "sd": 16.6107059682549,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 351.135,
+            "sd": 15.184519192769255,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 1598.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.32039748966693876,
+          "sd": 0.021034434837598766,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.6698590105772019,
+          "sd": 0.030140796956571413,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.2,
+      "target_coverage": 0.8,
+      "score": "lac",
+      "correction": "mondrian",
+      "family": "pooled",
+      "n_target_records": 2000,
+      "calibrated_on": "the PTB-XL calibration half plus 2000 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.7417174977738202,
+        "sd": 0.00618890952558814,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.7314342603473036,
+          "sd": 0.007196474685066944,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.8011584905660378,
+          "sd": 0.00993464297701847,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.087597395369546,
+        "sd": 0.013795621520584512,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 3098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 2522.105,
+            "sd": 19.382527877825257,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 576.685,
+            "sd": 18.65895382353857,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 3098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.46829210430383683,
+          "sd": 0.01603376977487154,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.6932889944314957,
+          "sd": 0.02015831473614223,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.2,
+      "target_coverage": 0.8,
+      "score": "lac",
+      "correction": "mondrian",
+      "family": "recalibrated",
+      "n_target_records": 0,
+      "calibrated_on": "PTB-XL alone",
+      "coverage": {
+        "mean": 0.5974482413178985,
+        "sd": 0.010005564413951026,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.5658029768899334,
+          "sd": 0.01134411857963349,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.7803698113207547,
+          "sd": 0.016002094708773073,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 0.9029530276046305,
+        "sd": 0.020630794176637473,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 824.015,
+            "sd": 14.027065546264335,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 274.775,
+            "sd": 12.929043888834045,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.20981380254030227,
+          "sd": 0.011576476945968561,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.6518929508328438,
+          "sd": 0.029701916888074806,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.2,
+      "target_coverage": 0.8,
+      "score": "lac",
+      "correction": "mondrian",
+      "family": "recalibrated",
+      "n_target_records": 100,
+      "calibrated_on": "100 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.8064692787177205,
+        "sd": 0.041129587335617064,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.8002911607259433,
+          "sd": 0.044977409531691485,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.8421811320754716,
+          "sd": 0.0900723814019715,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.257964715048976,
+        "sd": 0.15972251559052797,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 100.0,
+          "sd": 0.0,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 85.06,
+            "sd": 3.6500705575888377,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 14.94,
+            "sd": 3.650070557588837,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 100.0,
+          "sd": 0.0,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.6193920890986919,
+          "sd": 0.09883036675464671,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.7667434487305581,
+          "sd": 0.1621218577689364,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.2,
+      "target_coverage": 0.8,
+      "score": "lac",
+      "correction": "mondrian",
+      "family": "recalibrated",
+      "n_target_records": 500,
+      "calibrated_on": "500 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.8010156945681212,
+        "sd": 0.0187933669445284,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.7969473821647735,
+          "sd": 0.021869569986048068,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.8245320754716982,
+          "sd": 0.042763242417578826,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.1963451691896705,
+        "sd": 0.06433036634920584,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 500.0,
+          "sd": 0.0,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 423.64,
+            "sd": 7.789981970163819,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 76.36,
+            "sd": 7.789981970163819,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 500.0,
+          "sd": 0.0,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.6116885477304459,
+          "sd": 0.047527706225582125,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.7390525180101395,
+          "sd": 0.08340718277944831,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.2,
+      "target_coverage": 0.8,
+      "score": "lac",
+      "correction": "mondrian",
+      "family": "recalibrated",
+      "n_target_records": 2000,
+      "calibrated_on": "2000 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.79764303205699,
+        "sd": 0.008351738176721324,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.7938053270661967,
+          "sd": 0.009338703462786566,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.8198264150943396,
+          "sd": 0.019304657831833254,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.1789692787177204,
+        "sd": 0.030012363309873398,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 2000.0,
+          "sd": 0.0,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 1698.09,
+            "sd": 12.80514579354604,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 301.91,
+            "sd": 12.805145793546039,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 2000.0,
+          "sd": 0.0,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.6045589560270309,
+          "sd": 0.019964353798959878,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.72919882632792,
+          "sd": 0.03786492112183259,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.2,
+      "target_coverage": 0.8,
+      "score": "lac",
+      "correction": "none",
+      "family": "pooled",
+      "n_target_records": 0,
+      "calibrated_on": "PTB-XL alone",
+      "coverage": {
+        "mean": 0.6568321460373997,
+        "sd": 0.011116918016945403,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.6660503982243112,
+          "sd": 0.011164774339678963,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.6035471698113208,
+          "sd": 0.01088599784566309,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 0.8449521371326805,
+        "sd": 0.020018451386495988,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 824.015,
+            "sd": 14.027065546264335,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 274.775,
+            "sd": 12.929043888834045,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.34483979612588883,
+          "sd": 0.01880718898234257,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.34483979612588883,
+          "sd": 0.01880718898234257,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.2,
+      "target_coverage": 0.8,
+      "score": "lac",
+      "correction": "none",
+      "family": "pooled",
+      "n_target_records": 100,
+      "calibrated_on": "the PTB-XL calibration half plus 100 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.6700784728406055,
+        "sd": 0.01108389079654503,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.679264917091004,
+          "sd": 0.010950995958778069,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.616977358490566,
+          "sd": 0.011910794611216344,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 0.8689258682101513,
+        "sd": 0.020078038911962956,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 1198.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 909.075,
+            "sd": 14.500714763183781,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 289.715,
+            "sd": 13.633898597054838,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 1198.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.3674127411842346,
+          "sd": 0.018933317220025003,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.3674127411842346,
+          "sd": 0.018933317220025003,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.2,
+      "target_coverage": 0.8,
+      "score": "lac",
+      "correction": "none",
+      "family": "pooled",
+      "n_target_records": 500,
+      "calibrated_on": "the PTB-XL calibration half plus 500 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.70354964381122,
+        "sd": 0.009540633736064274,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.711714323018671,
+          "sd": 0.00924566935233578,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.6563547169811321,
+          "sd": 0.011305981954495137,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 0.9303611976847729,
+        "sd": 0.017963871998278633,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 1598.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 1247.655,
+            "sd": 16.6107059682549,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 351.135,
+            "sd": 15.184519192769255,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 1598.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.4267559090256691,
+          "sd": 0.01838311655507287,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.4267559090256691,
+          "sd": 0.01838311655507287,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.2,
+      "target_coverage": 0.8,
+      "score": "lac",
+      "correction": "none",
+      "family": "pooled",
+      "n_target_records": 2000,
+      "calibrated_on": "the PTB-XL calibration half plus 2000 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.7515215939447907,
+        "sd": 0.006664019272360805,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.7576165295730513,
+          "sd": 0.0063082719106462015,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.7162905660377358,
+          "sd": 0.008832529537801732,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.0241824354407836,
+        "sd": 0.013385612479170831,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 3098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 2522.105,
+            "sd": 19.382527877825257,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 576.685,
+            "sd": 18.65895382353857,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 3098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.5246763199567794,
+          "sd": 0.01424487847206856,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.5246763199567794,
+          "sd": 0.01424487847206856,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.2,
+      "target_coverage": 0.8,
+      "score": "lac",
+      "correction": "none",
+      "family": "recalibrated",
+      "n_target_records": 0,
+      "calibrated_on": "PTB-XL alone",
+      "coverage": {
+        "mean": 0.6568321460373997,
+        "sd": 0.011116918016945403,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.6660503982243112,
+          "sd": 0.011164774339678963,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.6035471698113208,
+          "sd": 0.01088599784566309,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 0.8449521371326805,
+        "sd": 0.020018451386495988,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 824.015,
+            "sd": 14.027065546264335,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 274.775,
+            "sd": 12.929043888834045,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.34483979612588883,
+          "sd": 0.01880718898234257,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.34483979612588883,
+          "sd": 0.01880718898234257,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.2,
+      "target_coverage": 0.8,
+      "score": "lac",
+      "correction": "none",
+      "family": "recalibrated",
+      "n_target_records": 100,
+      "calibrated_on": "100 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.8020336153161176,
+        "sd": 0.03939733313217549,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.8074095834965401,
+          "sd": 0.038584602236839204,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.7709584905660378,
+          "sd": 0.04415911671439061,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.1363412733748888,
+        "sd": 0.08940078197411859,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 100.0,
+          "sd": 0.0,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 85.06,
+            "sd": 3.6500705575888377,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 14.94,
+            "sd": 3.650070557588837,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 100.0,
+          "sd": 0.0,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.6345167105644941,
+          "sd": 0.084819635207113,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.6345167105644941,
+          "sd": 0.084819635207113,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.2,
+      "target_coverage": 0.8,
+      "score": "lac",
+      "correction": "none",
+      "family": "recalibrated",
+      "n_target_records": 500,
+      "calibrated_on": "500 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.8028111086375779,
+        "sd": 0.019161652741600123,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.8081727379553466,
+          "sd": 0.018755806818917736,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.7718188679245283,
+          "sd": 0.02162126492967024,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.135153049866429,
+        "sd": 0.043143851952609294,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 500.0,
+          "sd": 0.0,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 423.64,
+            "sd": 7.789981970163819,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 76.36,
+            "sd": 7.789981970163819,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 500.0,
+          "sd": 0.0,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.6360552290081978,
+          "sd": 0.040619341286894206,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.6360552290081978,
+          "sd": 0.040619341286894206,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.2,
+      "target_coverage": 0.8,
+      "score": "lac",
+      "correction": "none",
+      "family": "recalibrated",
+      "n_target_records": 2000,
+      "calibrated_on": "2000 labelled Chongqing records",
+      "coverage": {
+        "mean": 0.799334372217275,
+        "sd": 0.008569671293521663,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.804828306567437,
+          "sd": 0.008129822121113238,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.767577358490566,
+          "sd": 0.011259488464116285,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 1.1269250890471951,
+        "sd": 0.019177434034046106,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 2000.0,
+          "sd": 0.0,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 1698.09,
+            "sd": 12.80514579354604,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 301.91,
+            "sd": 12.805145793546039,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 2000.0,
+          "sd": 0.0,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.6286794340610504,
+          "sd": 0.018078369899424192,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.6286794340610504,
+          "sd": 0.018078369899424192,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.2,
+      "target_coverage": 0.8,
+      "score": "lac",
+      "correction": "weighted",
+      "family": "pooled",
+      "n_target_records": 0,
+      "calibrated_on": "PTB-XL alone",
+      "coverage": {
+        "mean": 0.7078289180765804,
+        "sd": 0.0125747042619194,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.7157520564042303,
+          "sd": 0.012149409518283378,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.6620301886792452,
+          "sd": 0.015122452250540337,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 0.9388396037399823,
+        "sd": 0.02399287814322272,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 824.015,
+            "sd": 14.027065546264335,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 274.775,
+            "sd": 12.929043888834045,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 960.311218503025,
+          "sd": 34.31246805919026,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.43509036526083944,
+          "sd": 0.02497280833207701,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.43623867750167844,
+          "sd": 0.025255004688367128,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    },
+    {
+      "alpha": 0.2,
+      "target_coverage": 0.8,
+      "score": "lac",
+      "correction": "weighted",
+      "family": "recalibrated",
+      "n_target_records": 0,
+      "calibrated_on": "PTB-XL alone",
+      "coverage": {
+        "mean": 0.7078289180765804,
+        "sd": 0.0125747042619194,
+        "n_draws": 200
+      },
+      "coverage_by_class": {
+        "0": {
+          "mean": 0.7157520564042303,
+          "sd": 0.012149409518283378,
+          "n_draws": 200
+        },
+        "1": {
+          "mean": 0.6620301886792452,
+          "sd": 0.015122452250540337,
+          "n_draws": 200
+        }
+      },
+      "mean_set_size": {
+        "mean": 0.9388396037399823,
+        "sd": 0.02399287814322272,
+        "n_draws": 200
+      },
+      "calibration": {
+        "n": {
+          "mean": 1098.79,
+          "sd": 10.372746470763358,
+          "n_draws": 200
+        },
+        "n_by_class": {
+          "0": {
+            "mean": 824.015,
+            "sd": 14.027065546264335,
+            "n_draws": 200
+          },
+          "1": {
+            "mean": 274.775,
+            "sd": 12.929043888834045,
+            "n_draws": 200
+          }
+        },
+        "effective_sample_size": {
+          "mean": 960.311218503025,
+          "sd": 34.31246805919026,
+          "n_draws": 200
+        }
+      },
+      "threshold_by_class": {
+        "0": {
+          "mean": 0.43509036526083944,
+          "sd": 0.02497280833207701,
+          "n_draws": 200,
+          "n_infinite": 0
+        },
+        "1": {
+          "mean": 0.43623867750167844,
+          "sd": 0.025255004688367128,
+          "n_draws": 200,
+          "n_infinite": 0
+        }
+      }
+    }
+  ],
+  "seconds": 16.8
+}

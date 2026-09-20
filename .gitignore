@@ -16,6 +16,16 @@ results/baseline/model.pt
 !results/perturbations.npz
 !results/seen_target.json
 !results/arms.json
+!results/label_map.json
+!results/target_scale.json
+!results/rotation.json
+!results/rotation.csv
+!results/rotation_uncertainty.csv
+!results/rotation_uncertainty.json
+!results/duplicate_groups.json
+!results/split_leak.json
+!results/rotation/
+results/rotation/**/model.pt
 !results/embeddings/
 results/embeddings/**/*.npz
 !results/figures/
@@ -28,3 +38,5 @@ __pycache__/
 .DS_Store
 results/baseline/train.log
 .claude/
+results/rotation/**/train.log
+/relearn.log

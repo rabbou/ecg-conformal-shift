@@ -16,8 +16,16 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+# Only the pre-trained encoder arms need these, and only to run other people's
+# published code unmodified: transformers loads HuBERT-ECG's custom module, and
+# ECG-JEPA's encoder imports timm's DropPath and trunc_normal_ (timm in turn
+# imports torchvision, pinned to the release that matches torch 2.2.2).  The
+# supervised model, the ingestion chain and the conformal machinery need none
+# of them.
 encoders = [
     "transformers>=4.38,<5",
+    "timm==0.9.16",
+    "torchvision==0.17.2",
 ]
 
 [build-system]

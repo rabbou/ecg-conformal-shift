@@ -1,0 +1,27 @@
+{
+  "arm": "ecg_jepa",
+  "corpus": "sph",
+  "weights_source": "ECG_JEPA repository, random-masking checkpoint from the README download link (MIT), epoch 99",
+  "pretraining_corpora": "Chapman-Shaoxing with Ningbo (PhysioNet ecg-arrhythmia 1.0.0) and CODE-15; not PTB-XL, not Shandong, not Chongqing (ECG_JEPA README, Pretraining, read 2026-09-07; arXiv:2410.08559)",
+  "preprocessing": "eight of the twelve leads (I, II, V1-V6) kept and the ten seconds resampled from 500 to 250 Hz by scipy.signal.resample, as the authors' ecg_data.py does. Not applied: nothing else -- their chain adds no filter and no normalisation",
+  "notes": "published MaskTransformer, depth 12 read off the checkpoint, 768-d mean-pooled representation; input (B, 8, 2500); load_state_dict missing=0 unexpected=0",
+  "n_params": 85374720,
+  "git_commit": "7522385c18029b395391ad8b1c9a8bf4be0bd462",
+  "n_records": 25770,
+  "n_kept": 25770,
+  "n_excluded": 0,
+  "excluded": {},
+  "ingestion_deviations": [
+    "lead order and sampling rate are not in the record (no HDF5 attributes); taken from Liu et al. 2022, Data Records",
+    "51 of 170 records longer than ten seconds, cropped to the first"
+  ],
+  "embedding_dim": 768,
+  "seconds": 7729.9,
+  "machine": {
+    "cpu": "Intel(R) Core(TM) i7-8700 CPU @ 3.20GHz",
+    "platform": "Linux-6.8.0-139-generic-x86_64-with-glibc2.39",
+    "python": "3.11.15",
+    "torch": "2.2.2+cu121",
+    "torch_threads": 4
+  }
+}

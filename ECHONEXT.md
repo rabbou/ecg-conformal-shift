@@ -18,9 +18,9 @@ outpatient ECGs; an ejection fraction of 45% or less, in 24.5% and 7.7%.
 Calibration per label (Mondrian) is built for this case: each class gets its
 own threshold, so a change in prevalence alone cannot move the coverage of
 either class. A coverage of the ill that still falls on outpatients points to
-a change in the ECGs of the ill themselves [belief: milder disease among outpatients is the likely reason; the
-echocardiographic severity values that would show it are in the metadata and
-have not been compared].
+a change in the ECGs of the ill themselves. Milder disease among outpatients is a
+likely reason; the echocardiographic severity values that would show it are in
+the metadata and have not been compared.
 
 ## What was measured
 

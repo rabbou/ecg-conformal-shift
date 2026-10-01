@@ -87,24 +87,28 @@ def _logistic_fit(design: Array, y: Array, offset: Array) -> Array:
     """Unpenalised maximum likelihood by damped Newton steps.
 
     A step is halved until the likelihood rises, so a start far from the optimum
-    (an offset that already saturates every prediction) still converges.  Raises
-    when it does not, which is what separable outcomes produce.
+    (an offset that already saturates every prediction) still converges.  The
+    fit ends when the score equations hold, judged on the gradient: a step
+    shrunk by the line search is not evidence of an optimum, and near one the
+    likelihood moves by less than rounding, which a strict rise would refuse.
+    Raises when it does not converge, which is what separable outcomes produce.
     """
     beta = np.zeros(design.shape[1])
     current = _log_likelihood(design, y, offset, beta)
     for _ in range(NEWTON_STEPS):
         mu = 1.0 / (1.0 + np.exp(-(design @ beta + offset)))
         gradient = design.T @ (y - mu)
+        if np.max(np.abs(gradient)) < NEWTON_TOL * len(y):
+            return beta
         hessian = design.T @ (design * np.maximum(mu * (1 - mu), 1e-12)[:, None])
         step = np.linalg.solve(hessian, gradient)
+        slack = 1e-12 * (1.0 + abs(current))
         for _ in range(60):
             candidate = _log_likelihood(design, y, offset, beta + step)
-            if candidate >= current:
+            if candidate >= current - slack:
                 break
             step = step / 2
-        beta, current = beta + step, max(candidate, current)
-        if np.max(np.abs(step)) < NEWTON_TOL:
-            return beta
+        beta, current = beta + step, candidate
     raise ValueError("logistic recalibration did not converge (separable outcomes?)")
 
 

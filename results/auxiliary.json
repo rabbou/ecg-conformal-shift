@@ -4,7 +4,7 @@
   "n_draws": 200,
   "seed": 0,
   "provenance": {
-    "commit": "2bd1a3ca0ad15bf90319572f0db1a7069f95569d",
+    "commit": "0189b865c34b070570281db70ccb41bd9e3c18e5",
     "producers": {
       "scripts/auxiliary.py": "8acc434edf14cb88780b5af56b53c32abf18104a1febfa57ce0d744062a92bf0",
       "scripts/shift_table.py": "b1f87d9b4c70b0d8e20175a9fc2701f0bafb992b83addca67153304304940709",
@@ -12,7 +12,7 @@
       "src/ecs/metrics.py": "e04509abce93b400ac90cbd102a63a747f0559de4d2c9d20cdc2ee4ce1cf90e6"
     }
   },
-  "seconds": 5.3,
+  "seconds": 5.9,
   "differences": {
     "note": "MI coverage under class-conditional calibration minus MI coverage under pooled calibration, formed inside each replicate. The source cohort is resampled by patient and the target cohorts by record.",
     "n_bootstrap": 2000,

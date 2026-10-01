@@ -15,7 +15,7 @@
   "n_draws": 200,
   "seed": 0,
   "provenance": {
-    "commit": "2bd1a3ca0ad15bf90319572f0db1a7069f95569d",
+    "commit": "0189b865c34b070570281db70ccb41bd9e3c18e5",
     "producers": {
       "scripts/shift_table.py": "b1f87d9b4c70b0d8e20175a9fc2701f0bafb992b83addca67153304304940709",
       "src/ecs/conformal.py": "c434998b704a551d55bc2206a1a3ada6d42309947b0b92db11607746dcd068dc",
@@ -49,7 +49,7 @@
       "n_excluded": 0
     }
   },
-  "seconds": 6.6,
+  "seconds": 10.6,
   "reading": {
     "asked_at": "the 90% set on the lac score, over 200 draws",
     "restored_within": 0.02,

@@ -13,7 +13,7 @@
   "n_draws": 200,
   "seed": 0,
   "provenance": {
-    "commit": "2bd1a3ca0ad15bf90319572f0db1a7069f95569d",
+    "commit": "0189b865c34b070570281db70ccb41bd9e3c18e5",
     "producers": {
       "scripts/outcomes.py": "ff9b268d351d0678c1e223274686fbb1e9e6098d1c0dd91848993ba1cfeb6114",
       "scripts/shift_table.py": "b1f87d9b4c70b0d8e20175a9fc2701f0bafb992b83addca67153304304940709",
@@ -21,7 +21,7 @@
       "src/ecs/splits.py": "17f1d2fea5970c37b989ad0df925b3d19f355012bfca02aed6983ce142b5a946"
     }
   },
-  "seconds": 0.5,
+  "seconds": 0.7,
   "by_corpus": {
     "ptbxl": {
       "name": "PTB-XL",

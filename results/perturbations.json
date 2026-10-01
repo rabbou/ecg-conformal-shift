@@ -13,7 +13,7 @@
     "passed": true
   },
   "provenance": {
-    "commit": "2bd1a3ca0ad15bf90319572f0db1a7069f95569d",
+    "commit": "0189b865c34b070570281db70ccb41bd9e3c18e5",
     "producers": {
       "scripts/perturbations.py": "f099000142db6a185fc652ac8072676cb920286cc4dcde2d0f591aced4169ecb",
       "scripts/score_external.py": "4ee99a952debb3302eba58439f7b76883d56420edec911929ae530f48ff7d384",
@@ -24,7 +24,7 @@
       "src/ecs/splits.py": "17f1d2fea5970c37b989ad0df925b3d19f355012bfca02aed6983ce142b5a946"
     }
   },
-  "seconds": 1746.8,
+  "seconds": 2332.3,
   "conditions": {
     "clean": {
       "description": "the tracings as recorded; the row that must reproduce results/baseline/scores.npz",

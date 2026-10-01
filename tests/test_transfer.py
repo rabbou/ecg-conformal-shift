@@ -131,11 +131,23 @@ class TestLadder:
         assert rows[0]["n_eval"] == 600
 
     def test_rung_zero_is_the_source_threshold_once(self) -> None:
-        zero = self.rows()[0]
+        # Nine source positives with 0.9 down to 0.5: at 90% the per-label
+        # threshold admits a positive down to a probability of 0.5.  Every target
+        # positive scores 0.45, below it, so rung zero covers none of them; a
+        # rung zero refitted on the target would set its threshold at 0.45 and
+        # cover all of them.
+        p_src = np.array([0.9, 0.8, 0.7, 0.65, 0.6, 0.55, 0.5, 0.5, 0.5] + [0.1] * 9)
+        y_src = np.array([1] * 9 + [0] * 9)
+        p_tgt = np.array([0.45] * 20 + [0.1] * 20)
+        y_tgt = np.array([1] * 20 + [0] * 20)
+        patients = pd.Series([f"z{i}" for i in range(40)])
+        rows = ladder_rows(p_src, y_src, p_tgt, y_tgt, patients, rungs=(0, 10), draws=3)
+        zero, ten = rows
         assert zero["draws"] == 1
-        expected = conformal_sets(self.p_cal, self.y_cal, self.p_tgt)  # same thresholds
-        assert zero["coverage_pos_p10"] == zero["coverage_pos_p90"]
-        assert expected["perlabel"].shape == (1200, 2)
+        assert zero["coverage_pos_mean"] == 0.0
+        assert zero["coverage_pos_p10"] == zero["coverage_pos_p90"] == 0.0
+        assert ten["coverage_pos_mean"] == 1.0
+        assert zero["n_eval_pos"] > 0
 
     def test_target_labels_shrink_the_calibration_intercept(self) -> None:
         rows = self.rows()

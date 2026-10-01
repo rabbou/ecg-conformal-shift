@@ -160,7 +160,7 @@ class TestLadder:
             self.patients,
             rungs=(0, 100),
             draws=5,
-            rng=recording,
+            rng=recording,  # type: ignore[arg-type]
         )
         part = transfer.patient_split(
             self.patients, {"pool": transfer.POOL_SHARE, "eval": 1 - transfer.POOL_SHARE}, 0

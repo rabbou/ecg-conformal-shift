@@ -6,8 +6,8 @@ probability itself can be read as a risk, and what acting on it is worth.
 ``calibration_curve``    observed rate against mean prediction per bin, with a
                          Wilson interval on each observed rate.
 ``slope_intercept``      the logistic recalibration of Cox (1958): the slope is
-                         the coefficient of logit(p) when the outcome is
-                         regressed on it (1 when the spread is right); the
+                         the coefficient of logit(p) in a logistic model of
+                         the outcome (1 when the spread is right); the
                          intercept is calibration-in-the-large, fitted with
                          logit(p) as a fixed offset (0 when the level is right).
 ``brier``                mean squared error of the probability.

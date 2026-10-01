@@ -153,12 +153,13 @@ def arm_figures(result: dict[str, Any], arm: str) -> dict[str, str]:
 
 
 def shared_figures(result: dict[str, Any], provenance: dict[str, Any]) -> dict[str, str]:
-    replay = result["prevalence_by_context_val_and_test"]
+    source = result["source"]["prevalence"]
+    outpatient = result["targets"]["outpatient"]["prevalence"]
     return {
-        "lvef_inpatient": pct(replay["inpatient"][LVEF]),
-        "lvef_outpatient": pct(replay["outpatient"][LVEF]),
-        "composite_inpatient": pct(replay["inpatient"][COMPOSITE]),
-        "composite_outpatient": pct(replay["outpatient"][COMPOSITE]),
+        "lvef_inpatient": pct(source[LVEF]),
+        "lvef_outpatient": pct(outpatient[LVEF]),
+        "composite_inpatient": pct(source[COMPOSITE]),
+        "composite_outpatient": pct(outpatient[COMPOSITE]),
         "calibration_ecgs": f"{result['source']['n']:,}",
         "outpatient_ecgs": f"{result['targets']['outpatient']['n']:,}",
         "tracings": f"{provenance['records']:,}",

@@ -24,6 +24,9 @@ results/baseline/model.pt
 !results/rotation_uncertainty.json
 !results/duplicate_groups.json
 !results/split_leak.json
+!results/echonext_provenance.json
+!results/echonext_transfer.json
+!results/echonext_coverage.csv
 !results/rotation/
 results/rotation/**/model.pt
 !results/embeddings/

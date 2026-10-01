@@ -341,7 +341,7 @@ def refusals() -> dict[tuple[str, str], Ambiguity]:
 def challenge_published_counts(corpus: str, key: str, root: Path = MAPPINGS_DIR) -> int:
     """What the Challenge's own table says this corpus holds of this class.
 
-    The reference the label table is checked against (C-23).  A record carrying
+    The reference the label table is checked against.  A record carrying
     two of a fused pair would be counted twice by this sum; the check reports
     the double-counted records rather than hiding the difference.
     """

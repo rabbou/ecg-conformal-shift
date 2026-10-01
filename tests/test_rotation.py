@@ -2,15 +2,15 @@
 
 Three claims, in order of what they cost to check.
 
-*The split.*  Every corpus is cut by patient (C-4) and every part is capped at
+*The split.*  Every corpus is cut by patient and every part is capped at
 the size the smallest corpus can reach, so "which source" is not read together
-with "how much data the source had" (C-25).
+with "how much data the source had".
 
 *The ingestion.*  A Challenge-2021 partition comes out of the chain in the same
 canonical form as PTB-XL and Shandong: float32, (n, 12, 5000), millivolts, leads
-in the canonical order (C-13, C-25).
+in the canonical order.
 
-*The thresholds.*  No threshold is a function of a target label (C-26).  The
+*The thresholds.*  No threshold is a function of a target label.  The
 check permutes every label of the target corpus and re-runs the whole
 frozen-calibration machinery on all twenty ordered pairs: if a single threshold
 moves, a target label reached one.  The weighted correction is the interesting
@@ -29,7 +29,7 @@ from typing import Any
 import numpy as np
 import pytest
 
-from ecs.config import RESULTS_DIR
+from ecs.config import CHALLENGE2021_DIR, PTBXL_DIR, RESULTS_DIR
 from ecs.ingest import CANONICAL_LEADS
 from ecs.report import CORRECTIONS, Source, Target, frozen_calibration_table
 from ecs.rotation import (
@@ -50,8 +50,19 @@ ROTATION = Path(RESULTS_DIR) / "rotation.json"
 GRID = Path(RESULTS_DIR) / "rotation.csv"
 
 
+# The split and the ingestion read the Challenge-2021 bundle and PTB-XL's database
+# file; a clone without them skips those tests instead of failing on a missing path.
+CORPORA_ON_DISK = (CHALLENGE2021_DIR / "training").is_dir() and (
+    PTBXL_DIR / "ptbxl_database.csv"
+).is_file()
+NOT_ON_DISK = "the Challenge-2021 bundle or PTB-XL's database file is not on disk"
+needs_corpora = pytest.mark.skipif(not CORPORA_ON_DISK, reason=NOT_ON_DISK)
+
+
 @pytest.fixture(scope="module")
 def indices() -> dict[str, Any]:
+    if not CORPORA_ON_DISK:
+        pytest.skip(NOT_ON_DISK)
     return {corpus: corpus_index(corpus) for corpus in SOURCES}
 
 
@@ -75,6 +86,7 @@ class TestTheSplit:
             assert present <= {*PARTS, "unused"}, corpus
             assert set(PARTS) <= present, corpus
 
+    @needs_corpora
     def test_the_split_is_the_same_on_a_second_reading(self) -> None:
         first = corpus_index("georgia").frame["part"]
         second = corpus_index("georgia").frame["part"]
@@ -103,6 +115,7 @@ class TestTheSplit:
 
 @pytest.mark.data
 class TestTheIngestionContract:
+    @needs_corpora
     @pytest.mark.parametrize("corpus", SOURCES)
     def test_a_sample_comes_out_canonical(self, corpus: str) -> None:
         index = corpus_index(corpus)
@@ -153,7 +166,7 @@ def _thresholds(rows: list[dict[str, Any]]) -> dict[tuple[Any, ...], Any]:
 
 
 class TestNoThresholdReadsATargetLabel:
-    """C-26, on synthetic data first: cheap, and it covers every ordered pair."""
+    """On synthetic data first: cheap, and it covers every ordered pair."""
 
     def test_permuting_a_targets_labels_moves_no_threshold(self) -> None:
         probs, labels, patients = _fixture_pair(400, seed=0)
@@ -220,7 +233,7 @@ def summary() -> dict[str, Any]:
 
 
 class TestTheBiasSummary:
-    """C-28: what the rotation exists to produce, on numbers whose answer is known.
+    """What the rotation exists to produce, on numbers whose answer is known.
 
     Two sources, one diagnosis. The first source lands 10 points low on both its
     targets, the second 20 points low on both, and each reads the level exactly at
@@ -333,7 +346,7 @@ class TestTheCommittedRotation:
     def test_every_figure_is_a_mean_over_two_hundred_draws_with_its_spread(
         self, table: dict[str, Any], grid: list[dict[str, str]]
     ) -> None:
-        """C-27, and C-10 carried over to the rotation."""
+        """The spread over 200 draws carries over to the rotation."""
         assert table["settings"]["n_draws"] >= 200
         for row in grid:
             assert int(row["n_draws"]) >= 200
@@ -343,7 +356,7 @@ class TestTheCommittedRotation:
     def test_every_cell_reports_the_effective_size_of_what_calibrated_it(
         self, grid: list[dict[str, str]]
     ) -> None:
-        """C-9, carried over: a weighting that costs sample size says what it cost."""
+        """Carried over: a weighting that costs sample size says what it cost."""
         for row in grid:
             effective = float(row["calibration_effective_size_mean"])
             drawn = float(row["calibration_n_mean"])
@@ -362,7 +375,7 @@ class TestTheCommittedRotation:
     def test_an_unweighted_threshold_does_not_depend_on_which_corpus_it_is_spent_on(
         self, grid: list[dict[str, str]]
     ) -> None:
-        """C-26 on the committed grid: one threshold, spent everywhere unchanged."""
+        """On the committed grid: one threshold, spent everywhere unchanged."""
         seen: dict[tuple[str, str, str, str, str], set[str]] = {}
         for row in grid:
             if row["correction"] == "weighted":
@@ -401,7 +414,7 @@ class TestTheCommittedRotation:
         assert moved > 0, "no weighted threshold differed by target; BBSE read nothing"
 
     def test_the_bias_carries_its_spread_across_sources(self, table: dict[str, Any]) -> None:
-        """C-28. One pair is an anecdote; the spread across sources is the estimate."""
+        """One pair is an anecdote; the spread across sources is the estimate."""
         for label, corrections in table["bias"].items():
             assert set(corrections) == set(CORRECTIONS), label
             for correction, block in corrections.items():
@@ -527,9 +540,10 @@ class TestTheCommittedRotation:
             assert block["deviations"]
 
 
+@needs_corpora
 @pytest.mark.data
 class TestNoTargetLabelReachesAThresholdOnTheRealPairs:
-    """C-26 again, on the scores the rotation actually spent, pair by pair."""
+    """The same check on the scores the rotation actually spent, pair by pair."""
 
     @staticmethod
     def _scores(source: str, corpus: str, part: str) -> dict[str, Any]:

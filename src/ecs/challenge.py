@@ -9,7 +9,7 @@ record is a WFDB pair whose header carries the diagnoses as SNOMED CT codes on a
 Two things the bundle does not ship, and neither is guessed:
 
 *Patient identifiers.*  A Challenge header has an age and a sex and no patient
-key.  Splitting by patient (C-4) therefore treats each record as its own
+key.  Splitting by patient therefore treats each record as its own
 patient, which is right for Chapman-Shaoxing, Ningbo, Georgia and CPSC -- one
 tracing per patient by construction -- and wrong for PTB-XL, whose 21,799
 records come from 18,869 patients.  PTB-XL is the one corpus with a published
@@ -181,7 +181,7 @@ def completeness(
 
 
 def partition_deviations(source: str, table: pd.DataFrame) -> list[str]:
-    """What the chain could not make identical for this source (C-14)."""
+    """What the chain could not make identical for this source."""
     out = [NO_PATIENT_KEY]
     rates = sorted({int(r) for r in table["sampling_rate_hz"]})
     if rates != [500]:

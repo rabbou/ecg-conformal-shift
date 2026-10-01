@@ -15,7 +15,7 @@ and the machine has 15.
 Two files come out per corpus, under ``results/external/``:
 
 ``<corpus>.npz``    the record identifiers, their labels, and the probability row;
-``<corpus>.json``   what was run, what was kept, and what had to give (C-14).
+``<corpus>.json``   what was run, what was kept, and what had to give.
 
 Usage: .venv/bin/python scripts/score_external.py [--corpus sph acs]
 """
@@ -59,7 +59,7 @@ class Scored:
 
     @property
     def deviations(self) -> list[str]:
-        """Every step the chain could not make identical across corpora (C-14)."""
+        """Every step the chain could not make identical across corpora."""
         n = len(self.ids) + len(self.excluded)
         out = list(self.notes)
         if self.n_resampled:

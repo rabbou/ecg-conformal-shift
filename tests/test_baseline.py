@@ -1,12 +1,12 @@
 """The supervised baseline: the run holds together, and the reference it is
-measured against is on record (C-19).
+measured against is on record.
 
 The end-to-end test builds a miniature PTB-XL on disk -- its database table,
 its statement table, its WFDB records -- and runs the real script over it for
 one epoch.  Nothing here asserts the model is any good on eighty synthetic
 tracings; what it asserts is that the four files a result is made of appear,
-agree with each other, and hold the fields the plan says they hold.  The
-quality claim is C-19's and is checked against results/baseline.json once the
+agree with each other, and hold the fields they are documented to hold.  The
+quality claim is checked against results/baseline.json once the
 real run finishes.
 """
 
@@ -146,7 +146,7 @@ class TestOneEpochEndToEnd:
 
 
 class TestTheReferenceValue:
-    """C-19 compares against a number that is on disk with its provenance, never
+    """The AUROC check compares against a number that is on disk with its provenance, never
     one recalled from memory."""
 
     TOLERANCE = 0.03
@@ -164,7 +164,7 @@ class TestTheReferenceValue:
         gap = abs(metrics["auroc"] - reference["reference_auroc"])
         assert gap <= self.TOLERANCE, (
             f"fold-10 MI AUROC {metrics['auroc']:.4f} is {gap:.4f} from the reference "
-            f"{reference['reference_auroc']}, past the {self.TOLERANCE} C-19 allows"
+            f"{reference['reference_auroc']}, past the {self.TOLERANCE} allowed"
         )
 
     def test_the_run_scored_the_whole_of_fold_ten_once(self) -> None:

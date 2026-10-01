@@ -170,11 +170,10 @@ class TestTheFiguresDrawnFromIt:
             assert figure.stat().st_size > 10_000
 
     def test_the_report_shows_exactly_the_figures_it_names(self) -> None:
-        """C-20 on the report itself: no figure in it that a script cannot redraw.
+        """On the report itself: no figure in it that a script cannot redraw.
 
-        The criterion says the report carries exactly the planned figures. Until
-        something opened REPORT.md, that half of C-20 was a promise about a file
-        no test read.
+        The report carries exactly the figures it names. A claim about REPORT.md
+        needs a test that opens it.
         """
         report = (RESULTS_DIR.parent / "REPORT.md").read_text()
         shown = re.findall(r"!\[[^\]]*\]\(([^)]+)\)", report)

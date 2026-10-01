@@ -131,7 +131,7 @@ class TestBBSE:
 
 
 class TestWhatTheWeightingCosts:
-    """C-9's arithmetic, on a sample whose answer can be worked out by hand.
+    """The effective-size arithmetic, on a sample whose answer can be worked out by hand.
 
     A thousand calibration points at the source's mix, reweighted to the target's:
     750 healthy carry 0.99/0.75 = 1.32 each and 250 sick carry 0.01/0.25 = 0.04

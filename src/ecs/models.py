@@ -1,8 +1,8 @@
 """The supervised encoder: a small one-dimensional ResNet over 12-lead ECG.
 
 Frozen at its random initialisation it is the floor every pre-trained arm has
-to clear (C-17); trained from scratch on PTB-XL it is the supervised baseline
-whose MI AUROC is checked against the published benchmark (C-19).  The shape
+to clear; trained from scratch on PTB-XL it is the supervised baseline
+whose MI AUROC is checked against the published benchmark.  The shape
 follows the time-series ResNet of Wang et al. 2017 that the PTB-XL benchmark
 uses: a wide stem, four stages of two residual blocks, global average pooling.
 """

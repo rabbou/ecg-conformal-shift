@@ -1,11 +1,10 @@
-"""What a coverage number has to say before it can be believed (C-5, C-10, C-11,
-C-12, C-17, C-18).
+"""What a coverage number has to say before it can be believed.
 
 Two kinds of check live here.  The synthetic ones put a known, exchangeable
 problem through the re-draw harness and demand the guarantee come out where the
 theory says it will -- if split conformal is wired up wrongly, coverage misses
 the target and it fails here on data whose answer is known.  The rest read the
-committed result files and hold them to what the plan says a reported number
+committed result files and hold them to what a reported number
 must carry: a spread over enough draws, a figure per class, and a named source
 for every encoder arm.
 """
@@ -23,7 +22,7 @@ import pytest
 from ecs.config import RESULTS_DIR
 from ecs.report import Source, Target, frozen_calibration_table, repeated_split_report, spread
 
-# C-5's band around the target, and C-10's floor on the number of draws.
+# The band around the target, and the floor on the number of draws.
 COVERAGE_BAND = (-0.012, 0.025)
 MIN_DRAWS = 100
 
@@ -40,7 +39,7 @@ def _calibrated_problem(n: int = 1200, seed: int = 0) -> tuple[np.ndarray, np.nd
 
 
 class TestTheGuaranteeOnDataWhoseAnswerIsKnown:
-    """C-5: on an exchangeable sample, coverage lands on the level asked for."""
+    """On an exchangeable sample, coverage lands on the level asked for."""
 
     @pytest.mark.parametrize("alpha", [0.20, 0.10, 0.05])
     @pytest.mark.parametrize("score", ["lac", "aps"])
@@ -122,7 +121,7 @@ class TestTheHarnessItself:
 
 
 class TestTheCommittedAbstentionTable:
-    """The table itself, held to C-5, C-10 and C-11."""
+    """The table itself."""
 
     @pytest.fixture(scope="module")
     def table(self) -> dict:
@@ -161,7 +160,7 @@ class TestTheCommittedAbstentionTable:
 
 
 class TestTheEncoderArmsOnRecord:
-    """C-12 and C-17: every cached representation says where its weights came
+    """Every cached representation says where its weights came
     from and what they were pre-trained on, and the random arm is one of them."""
 
     @pytest.fixture(scope="module")
@@ -203,7 +202,7 @@ class TestTheEncoderArmsOnRecord:
 
 
 class TestTheFigures:
-    """C-20: the report holds exactly the figures the plan named, each one
+    """The report holds exactly the figures it names, each one
     redrawn by a script from a results file that is already committed."""
 
     NAMED = {
@@ -230,7 +229,7 @@ class TestTheFigures:
     def test_each_figure_redraws_pixel_for_pixel(self, tmp_path: Path) -> None:
         """The committed PNG is the one the script draws from the committed numbers.
 
-        The plan's claim is that no figure was hand-cut: every one of them comes
+        The claim is that no figure was hand-cut: every one of them comes
         out of ``scripts/figures.py`` and the file it names.  Checking that the
         source is tracked cannot fail on that -- ``git ls-files`` succeeds for any
         tracked file whatever the commit order -- so the property is checked the
@@ -264,13 +263,13 @@ class TestTheFigures:
         """A figure with two of the three hospitals on it, or with a correction
         left off, would read as a result. Both counts are checked against what
         the table holds rather than against a number written here."""
-        import figures
+        import bilingual_figures as figures
 
         table = json.loads((RESULTS_DIR / "shift.json").read_text())
         assert set(figures.corpora_on(table)) == {"ptbxl", "sph", "acs"}
         assert figures.corrections_on(table) == ["none", "mondrian", "weighted"]
         assert set(figures.corrections_on(table)) == {r["correction"] for r in table["rows"]}
-        drawn = figures.figure_1_coverage(table, tmp_path / "fig1.png", RESULTS_DIR / "shift.json")
+        drawn = figures.figure_1_coverage(table, tmp_path / "fig1.png")
         assert drawn.stat().st_size > 10_000
 
     def test_figure_three_carries_every_arm_and_every_target(self, tmp_path: Path) -> None:
@@ -279,7 +278,7 @@ class TestTheFigures:
 
         grid = json.loads((RESULTS_DIR / "arms.json").read_text())
         assert set(figures.ARM_ORDER) == set(grid["arms"])
-        drawn = figures.figure_3_arms(grid, tmp_path / "fig3.png", RESULTS_DIR / "arms.json")
+        drawn = figures.figure_3_arms(grid, tmp_path / "fig3.png")
         assert drawn.stat().st_size > 10_000
 
     def test_figure_three_names_the_contaminated_arms_from_the_fact_not_the_prose(
@@ -312,7 +311,7 @@ class TestTheFigures:
         table = json.loads(path.read_text())
         assert set(figures.ROTATION_LABEL_NAMES) >= set(table["bias"])
         assert set(table["settings"]["corrections"]) == {"none", "mondrian", "weighted"}
-        drawn = figures.figure_7_rotation(table, tmp_path / "fig7.png", path)
+        drawn = figures.figure_7_rotation(table, tmp_path / "fig7.png")
         assert drawn.stat().st_size > 10_000
 
     def test_figure_seven_draws_every_pair_the_table_measured(self, tmp_path: Path) -> None:
@@ -334,7 +333,7 @@ class TestTheFigures:
         ladder = json.loads(path.read_text())
         assert ladder["settings"]["rungs"] == [0, 100, 500, 2000]
         assert set(ladder["settings"]["families"]) == {"recalibrated", "pooled"}
-        drawn = figures.figure_8_target_scale(ladder, tmp_path / "fig8.png", path)
+        drawn = figures.figure_8_target_scale(ladder, tmp_path / "fig8.png")
         assert drawn.stat().st_size > 10_000
 
     def test_figure_eight_says_what_it_is_waiting_for_rather_than_drawing_empty(
@@ -359,10 +358,10 @@ class TestTheFigures:
         assert "does not exist yet" in capsys.readouterr().err
 
 
-# The shifted corpora are scored once and whole (C-20), so unlike the re-draw
+# The shifted corpora are scored once and whole, so unlike the re-draw
 # harness above the test sample never moves: whatever that one sample happens to
 # be, re-drawing the calibration cannot average its own sampling error away.  The
-# band a fixed target is held to is therefore C-5's band widened by three
+# band a fixed target is held to is therefore that band widened by three
 # standard errors of a proportion on that target's own size.
 FIXED_TARGET_SIGMAS = 3.0
 
@@ -452,7 +451,7 @@ def _row(table: list[dict], score: str, correction: str, alpha: float = 0.10) ->
 class TestTheFrozenCalibrationOnDataWhoseAnswerIsKnown:
     """The break harness, on data built so that theory says what must come out.
 
-    C-20 is in force throughout: the threshold is fitted on the source sample
+    Throughout, the threshold is fitted on the source sample
     alone and spent unchanged on a target that is never subsampled, never
     re-calibrated, and scored whole every draw.
     """
@@ -469,7 +468,7 @@ class TestTheFrozenCalibrationOnDataWhoseAnswerIsKnown:
             assert target + low <= got <= target + high, (row["score"], target, got)
 
     def test_no_target_label_ever_reaches_a_threshold(self) -> None:
-        """C-20's falsifier, and the one the weighted correction has to survive.
+        """The falsifier, and the one the weighted correction has to survive.
 
         The same source is given a target twice: once as it is, once with every
         label inverted.  A threshold that read a target label -- or a target
@@ -664,7 +663,7 @@ class TestTheWeightedCorrection:
     def test_the_estimated_prior_follows_the_target_and_costs_effective_sample_size(
         self, shifted_table: list[dict]
     ) -> None:
-        """C-9's reason for existing. Reweighting 25% sick calibration points to
+        """Why the effective size is reported. Reweighting 25% sick calibration points to
         look like a 2% sick target puts most of the mass on one class, and the
         effective sample size is what says how few points the restored guarantee
         actually rests on."""
@@ -715,7 +714,7 @@ class TestTheWeightedCorrection:
 
 
 class TestWhatTheBreakTableCarries:
-    """C-9, C-10, C-11 and C-14 on the harness's own output, before any corpus."""
+    """The harness's own output, before any corpus."""
 
     @pytest.fixture(scope="class")
     @staticmethod
@@ -748,13 +747,13 @@ class TestWhatTheBreakTableCarries:
     def test_every_cell_reports_the_effective_size_of_what_calibrated_it(
         self, table: list[dict]
     ) -> None:
-        """C-9, on every (level, score, correction, corpus) cell of the table.
+        """On every (level, score, correction, corpus) cell of the table.
 
         The two unweighted corrections spend every calibration point at weight
         one, so their effective size is the count itself and the file says so
         rather than leaving it to be assumed.  The weighted one reweights, so
-        its effective size can only be lower -- that is the price the criterion
-        exists to keep visible."""
+        its effective size can only be lower -- that is the price the reported
+        size exists to keep visible."""
         for row in table:
             n = row["calibration"]["n"]["mean"]
             for corpus, block in row["by_corpus"].items():
@@ -773,7 +772,7 @@ class TestWhatTheBreakTableCarries:
                         assert weight["mean"] == pytest.approx(1.0)
 
     def test_the_split_reports_what_each_class_is_calibrated_on(self, table: list[dict]) -> None:
-        """C-9's other half: the Mondrian threshold for a class is only as good
+        """The Mondrian threshold for a class is only as good
         as the points that class was left with, and the minority class is where
         that bites, so the count per class is on the row beside the total."""
         for row in table:
@@ -785,7 +784,7 @@ class TestWhatTheBreakTableCarries:
                 assert figures["mean"] > 0
 
     def test_every_corpus_names_what_could_not_be_made_identical(self, table: list[dict]) -> None:
-        """C-14: the deviations travel with the numbers, not beside them."""
+        """The deviations travel with the numbers, not beside them."""
         for row in table:
             assert row["by_corpus"]["source"]["deviations"] == ["nothing gave here"]
             assert row["by_corpus"]["elsewhere"]["deviations"] == ["a named deviation"]
@@ -818,7 +817,7 @@ class TestWhatTheBreakTableCarries:
 
 
 class TestTheCommittedBreakTable:
-    """The three-corpus table itself, held to C-9, C-10, C-11, C-14 and C-20."""
+    """The three-corpus table itself."""
 
     # Read off the corpora's own description files on 2026-08-22 and asserted in
     # test_labels.py; repeated here because a table whose prevalences drifted is
@@ -843,7 +842,7 @@ class TestTheCommittedBreakTable:
         assert set(table["corrections"]) == {"none", "mondrian", "weighted"}
 
     def test_every_threshold_was_fitted_on_ptbxl_and_nowhere_else(self, table: dict) -> None:
-        """C-20 on the committed file: the protocol is named, every row says which
+        """On the committed file: the protocol is named, every row says which
         corpus its threshold came from, and every row says what -- if anything --
         the target supplied.
 
@@ -884,10 +883,10 @@ class TestTheCommittedBreakTable:
                     assert figures["n_draws"] >= MIN_DRAWS
 
     def test_every_weighted_cell_reports_what_the_weighting_cost_it(self, table: dict) -> None:
-        """C-9 on the committed file. The two exact corrections spend every point
+        """On the committed file, the two exact corrections spend every point
         at weight one; the weighted one does not, and on the two corpora whose
         class mix actually moved it must show a smaller effective sample than the
-        count -- which is the whole reason the criterion exists."""
+        count -- which is the whole reason the size is reported."""
         for row in table["rows"]:
             n = row["calibration"]["n"]["mean"]
             assert n > 0
@@ -909,7 +908,7 @@ class TestTheCommittedBreakTable:
                     assert effective < 0.95 * n, (corpus, effective, n)
 
     def test_the_split_reports_what_the_minority_class_is_calibrated_on(self, table: dict) -> None:
-        """C-9's other half: a Mondrian threshold is only as good as the points
+        """A Mondrian threshold is only as good as the points
         its class was left with, so the row carries the count per class."""
         for row in table["rows"]:
             by_class = row["calibration"]["n_by_class"]
@@ -960,7 +959,7 @@ class TestTheCommittedBreakTable:
         assert "cannot know which of the two promises applies" in prose
 
     def test_each_corpus_names_what_could_not_be_made_identical(self, table: dict) -> None:
-        """C-14: every external corpus states its own ingestion and label deviations,
+        """Every external corpus states its own ingestion and label deviations,
         and the file would rather carry an awkward one than drop it."""
         for row in table["rows"]:
             for corpus in ("ptbxl", "sph", "acs"):
@@ -1001,7 +1000,7 @@ class TestTheCommittedBreakTable:
 
 
 class TestTheCommittedArmGrid:
-    """C-12, C-17 and C-18 on ``results/arms.json``: five arms on one break,
+    """``results/arms.json``: five arms on one break,
     each with intervals, and every arm-versus-arm claim made pairwise."""
 
     ARMS = ("random_init", "ecgfounder", "ecg_jepa", "ecgfm", "hubert_ecg")
@@ -1016,7 +1015,7 @@ class TestTheCommittedArmGrid:
         return json.loads(path.read_text())
 
     def test_the_frozen_random_arm_is_reported_beside_the_others(self, grid: dict) -> None:
-        """C-17: the control is in the grid, not mentioned in passing."""
+        """The control is in the grid, not mentioned in passing."""
         assert set(grid["arms"]) == set(self.ARMS)
         assert "random initialisation" in grid["arms"]["random_init"]["pretraining_corpora"]
         for arm in self.ARMS:
@@ -1024,7 +1023,7 @@ class TestTheCommittedArmGrid:
             assert arm in grid["coverage"], arm
 
     def test_every_arm_names_the_corpora_it_was_pre_trained_on(self, grid: dict) -> None:
-        """C-12: the grid's whole claim rests on which arm saw what."""
+        """The grid's whole claim rests on which arm saw what."""
         for arm in self.ARMS:
             assert grid["arms"][arm]["pretraining_corpora"].strip(), arm
 
@@ -1041,7 +1040,7 @@ class TestTheCommittedArmGrid:
     def test_every_arm_and_corpus_carries_auroc_and_auprc_with_an_interval(
         self, grid: dict
     ) -> None:
-        """C-18, first half: no bare point estimate anywhere on the grid."""
+        """First half: no bare point estimate anywhere on the grid."""
         for arm in self.ARMS:
             for corpus in self.CORPORA:
                 block = grid["discrimination"][arm][corpus]
@@ -1052,7 +1051,7 @@ class TestTheCommittedArmGrid:
                 assert block["n_positive"] > 0, (arm, corpus)
 
     def test_every_pair_of_arms_is_compared_paired_on_every_corpus(self, grid: dict) -> None:
-        """C-18, second half: an arm-beats-arm claim is never two separate intervals."""
+        """Second half: an arm-beats-arm claim is never two separate intervals."""
         expected = {
             f"{a} - {b}" for index, a in enumerate(self.ARMS) for b in self.ARMS[index + 1 :]
         }
@@ -1084,7 +1083,7 @@ class TestTheCommittedArmGrid:
     def test_every_coverage_figure_is_a_mean_over_at_least_a_hundred_draws_with_its_spread(
         self, grid: dict
     ) -> None:
-        """C-10, on this table as on the break table."""
+        """On this table as on the break table."""
         assert grid["n_draws"] >= MIN_DRAWS
         for arm in self.ARMS:
             for row in grid["coverage"][arm]:

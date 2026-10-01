@@ -1,20 +1,29 @@
 # ecg-conformal-shift
 
-Split conformal prediction on 12-lead ECG, calibrated on one hospital corpus
-and evaluated without re-calibration on others. The question measured is
-whether the 90% coverage guarantee survives the change of hospital; the two
-standard corrections, Mondrian per-class calibration and label-shift
-weighting, are compared on the same break.
+An ECG classifier calibrated on one hospital's tracings can be set so that,
+for 90% of tracings, the diagnoses it cannot rule out include the right one. On
+PTB-XL, a German research corpus, that holds for 89.9% of all tracings and for
+73.2% of infarctions. Carried unchanged to a hospital in Chongqing, the same
+threshold covers 72.5% of infarctions across the cohort's 17,955 tracings. On
+the 8,984 tracings held out there for evaluation it covers 73.7%, and 100
+tracings labelled on site bring that half to 88.9%. The two Chongqing figures
+differ because they are measured on different tracings: the first on the whole
+cohort, the second on the half that never calibrates.
 
-Two measurements sit on that question. The first is infarction, calibrated on
-PTB-XL and spent on Shandong and Chongqing. The second rotates the calibration
-source over five corpora and five diagnoses a cardiologist reads at a glance,
-so that the break has a spread across sources instead of a single pair.
+The calibration is split conformal prediction on the 12-lead ECG. Two standard
+corrections are compared on the same change of hospital: Mondrian calibration,
+with one threshold per class, and label-shift weighting.
 
-The findings, the three figures and the limitations are in
-[REPORT.md](REPORT.md). Common questions are answered in
-[QUESTIONS.md](QUESTIONS.md). This file documents the corpora, the layout and
-the reproduction commands.
+The study has two parts. The first is infarction, calibrated on PTB-XL and
+applied to Shandong and Chongqing. The second rotates the calibration source
+over five corpora and five diagnoses a cardiologist reads at a glance, so that
+the result has a spread across sources instead of resting on a single pair.
+The study uses seven corpora, counting Chapman-Shaoxing and Ningbo apart:
+PTB-XL, Shandong, Chongqing, Chapman-Shaoxing, Ningbo, Georgia and CPSC.
+
+The findings, their figures and the limitations are in [REPORT.md](REPORT.md),
+and [QUESTIONS.md](QUESTIONS.md) answers the questions a clinician or a
+technical reader is likely to ask.
 
 ## Cohorts
 
@@ -28,8 +37,10 @@ All three are public and permissively licensed (CC BY 4.0, CC0, CC0). The
 counts are computed from each corpus's description file, not quoted from a
 paper, and are pinned by tests in `tests/test_labels.py`.
 
-The source rotation adds three corpora from the PhysioNet/CinC Challenge-2021
-bundle, and reuses PTB-XL and Shandong as sources in their turn.
+The source rotation adds four corpora from the PhysioNet/CinC Challenge-2021
+bundle (Chapman-Shaoxing and Ningbo, which rotate as one source, then Georgia
+and CPSC) and reuses PTB-XL and Shandong as sources in their turn. Chongqing
+is the seventh corpus.
 
 | Corpus | Country | Records | Role in the rotation |
 |---|---|---|---|
@@ -41,19 +52,20 @@ bundle, and reuses PTB-XL and Shandong as sources in their turn.
 
 Three of these corpora file the same tracing more than once under different
 record identifiers, and the Challenge bundle ships no patient key, so a split by
-patient did not keep those copies together: 421 groups of identical tracings in
-CPSC straddled two parts a figure is read across, 56 in Georgia, 8 in
-Chapman-Shaoxing with Ningbo. A group of identical tracings is now one splitting
-unit, and `results/split_leak.json` carries the count before and after, which is
-zero. Shandong repeats tracings too but files them under one patient, so its
-split already held them; PTB-XL's distribution repeats none.
+patient alone would put copies of one tracing on both sides: 421 groups of
+identical tracings in CPSC, 56 in Georgia, 8 in Chapman-Shaoxing with Ningbo.
+Each group of identical tracings is therefore one splitting unit, and
+`results/split_leak.json` carries the count of groups split across two parts
+with and without that rule; with it, the count is zero. Shandong repeats
+tracings too but files them under one patient, so its split already held them;
+PTB-XL's distribution repeats none.
 
 Five diagnoses: sinus rhythm, atrial fibrillation, left bundle-branch block,
 right bundle-branch block, first-degree atrioventricular block. The mapping
 that puts three annotation schemes (SNOMED CT, AHA, SCP-ECG) on those five
 classes is in `results/label_map.json`; it reproduces the Challenge's own
 published per-partition counts, and it names the five joins that could not be
-made cleanly instead of choosing quietly. Sinus rhythm is refused on Shandong,
+made cleanly. Sinus rhythm is refused on Shandong,
 whose "Normal ECG" code is a narrower statement than the Challenge's "sinus
 rhythm".
 
@@ -114,9 +126,9 @@ corrections are implemented:
   to estimate. Vovk (ACML 2012) calls this label conditional validity and
   proves it in his Proposition 3.
 - Label-shift weighting: reweight by `w(y) = q(y)/p(y)` in the Tibshirani
-  form, with the target prior estimated by BBSE. The guarantee is asymptotic
-  and depends on that estimate, so effective sample size is reported next to
-  every result.
+  form, with the target prior estimated by BBSE. Its coverage holds only
+  asymptotically and depends on that estimate, so effective sample size is
+  reported next to every result.
 
 Chongqing is the harder target: its positive is the dataset's `AMI` column, set
 from the discharge diagnosis, in a cohort every patient of which underwent
@@ -161,19 +173,16 @@ PTB-XL figure is external; ECG-JEPA in turn saw Chapman-Shaoxing and Ningbo, so
 its figure there carries the same caveat.
 
 What each arm was pre-trained on is written into every result file that uses
-it (C-12), sourced to the authors' own description, so the caveat travels with
-the number.
+it, sourced to the authors' own description, both as a sentence and as a list
+of the corpora it saw. The list is what a script should read: ECG-JEPA's
+sentence reads "not PTB-XL, not Shandong, not Chongqing", and matching on the
+name of a corpus would count it as having seen all three.
 
-Which corpus an arm saw is a field on every result file that uses it, not only a
-sentence: ECG-JEPA's pre-training reads "not PTB-XL, not Shandong, not
-Chongqing", so a reader matching on the name of a corpus would count it as
-having seen all three.
-
-On this break the two contaminated arms do not come out ahead. ECGFounder, which
-saw no public corpus, reaches 0.919 [0.907, 0.932] on PTB-XL fold 10 against
-0.891 for ECG-FM and 0.838 for HuBERT-ECG; ECG-JEPA reaches 0.858 [0.841,
-0.876]. Extracting ECG-JEPA over the three corpora took 6 h 53 on this machine's
-four threads.
+On PTB-XL, a corpus both contaminated arms saw at pre-training, neither comes
+out ahead. ECGFounder, which saw no public corpus, reaches 0.919 [0.907, 0.932]
+on PTB-XL fold 10 against 0.891 for ECG-FM and 0.838 for HuBERT-ECG; ECG-JEPA
+reaches 0.858 [0.841, 0.876]. Extracting ECG-JEPA over the three corpora took 6
+h 53 on this machine's four threads.
 
 ## Reproduce
 
@@ -187,7 +196,8 @@ holding it. The figures redraw without it.
 ```bash
 uv sync                                  # 1 min
 uv run pytest -m "not data"              # unit tests, no corpora needed, 2 min
-uv run python scripts/figures.py         # redraws all six figures, 5 s
+uv run python scripts/figures.py         # redraws every figure, 5 s
+uv run python scripts/figures.py --lang fr  # the report's five figures in French, *_fr.png
 export ECS_PTBXL_DIR=/path/to/ptbxl      # the directory with ptbxl_database.csv
 uv run python scripts/outcomes.py        # rebuilds results/outcomes.json, 3 s
 uv run python scripts/subgroups.py       # rebuilds results/subgroups.json, 23 s
@@ -195,7 +205,8 @@ uv run python scripts/subgroups.py       # rebuilds results/subgroups.json, 23 s
 
 Timings are wall clock on a six-core i7-8700, CPU only. The full suite on a
 cold clone, where every test module is imported for the first time, took 28
-minutes.
+minutes. A clone without the corpora skips the
+corpus-backed tests and finishes much sooner, as measured below.
 
 The corpora themselves are only needed to re-score from the raw tracings,
 which the committed `.npz` files make unnecessary for reproducing the report. The three
@@ -210,7 +221,12 @@ uv run pytest                            # adds the corpus-backed tests
 `fetch_open_corpora.sh` does not fetch PTB-XL or SPH. PTB-XL is read in place
 from `ECS_PTBXL_DIR` (default `~/Developer/ptbxl5d/data`) and is downloaded
 from PhysioNet; SPH is downloaded from its figshare record and unpacked under
-`data/sph`. Without them the corpus-backed tests skip rather than fail.
+`data/sph`. On a clone that holds only the committed files, none of the corpora
+and no optional `timm` extra, `uv run pytest -o addopts=""` ends with
+`540 passed, 59 skipped, 5 warnings` and exit code 0: the 59 skipped
+tests are the ones that read a corpus, the Challenge-2021 bundle or `timm`. The
+project's `addopts` already carries `-q`, so a bare `uv run pytest -q` prints
+the dots and the warnings without that summary line.
 
 The rotation, in order; each step writes the file the next one reads.
 
@@ -233,16 +249,16 @@ hour.
 
 ## Gates
 
-`ruff` (lint + format), `mypy --disallow-untyped-defs`, `pytest` — on every
-commit via `pre-commit`, tests at pre-push.
+`ruff` for lint and format, `mypy --disallow-untyped-defs` and `pytest` run on
+every commit through `pre-commit`, and the unit tests again before a push.
 
-## What this is not
+## Scope
 
-A retrospective measurement study on public, de-identified data. No device
-claim, no outcome claim, no prospective patient contact, no regulatory status,
-and nothing here is intended to guide the care of any patient. The ethics
-approvals under which each dataset was released, and the author's competing
-interests, are stated at the top of [REPORT.md](REPORT.md).
+A retrospective measurement study on public, de-identified data. It is not a
+medical device and has no regulatory status, it involved no contact with
+patients, and nothing here is meant to guide the care of any patient. The
+ethics approvals under which each dataset was released, and the author's
+competing interests, are stated at the top of [REPORT.md](REPORT.md).
 
 ## Licence
 
@@ -272,9 +288,9 @@ for PTB-XL+.
 
 No raw tracing is redistributed here, but the repository is not free of corpus
 data either. `results/baseline/scores.npz` and `results/external/*.npz` carry
-one row per record — the record identifier, its label and its model score, for
-45,923 records across the three corpora — which is derived data under each
-corpus's licence and joinable against the public patient tables. PTB-XL is
+one row per record, holding the record identifier, its label and its model
+score, for 45,923 records across the three corpora. That is derived data under
+each corpus's licence and joinable against the public patient tables. PTB-XL is
 CC BY 4.0, which requires attribution: cite Wagner et al. 2020
 (doi:10.1038/s41597-020-0495-6), the PhysioNet resource
 (doi:10.13026/kfzx-aw45) and PhysioNet itself (Goldberger et al., Circulation

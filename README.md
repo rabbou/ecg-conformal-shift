@@ -236,9 +236,9 @@ everything after it reads the files the step before wrote. Training one source
 held 612 MB on a six-core i7-8700, and the whole chain after the scan took an
 hour.
 
-## EchoNext, inpatients to outpatients
+## Part 2. Fitted on inpatients, tested on outpatients
 
-A third measurement moves inside one hospital: calibrated on Columbia
+The second part moves inside one hospital: calibrated on Columbia
 inpatients, read on Columbia outpatients, for the eleven echocardiographic
 findings of EchoNext and their composite. The findings are in
 [ECHONEXT.md](ECHONEXT.md) and the one-page reports in `reports/transfer/`.

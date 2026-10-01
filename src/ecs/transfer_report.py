@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from typing import Any
 
-__all__ = ["LABEL_NAMES", "pct", "render"]
+__all__ = ["CONTEXT_NAMES", "LABEL_NAMES", "pct", "render"]
 
 LABEL_NAMES = {
     "lvef_lte_45_flag": "LVEF ≤45%",
@@ -58,7 +58,10 @@ def _coverage_section(result: dict[str, Any], arm: dict[str, Any], target: str) 
         "Ill covered is the share of patients with the finding whose decision includes it: "
         "the sensitivity for the plain threshold, the coverage of the positive class for the "
         "two conformal schemes. A per-label threshold that the calibration positives cannot "
-        "certify flags everyone, and the row then shows the whole target flagged.",
+        "certify flags everyone, and the row then shows the whole target flagged. The plain "
+        "threshold and the per-label threshold of the ill are the same calibration quantile, "
+        "so their columns agree; the per-label scheme adds a threshold for the healthy, and "
+        "with it the share sent to a human.",
         "",
         "| Label | Prevalence, source | Prevalence, target | Ill in target "
         "| Ill covered, plain | Ill covered, pooled | Ill covered, per-label "
@@ -203,16 +206,16 @@ def render(result: dict[str, Any], arm_name: str, target: str = "outpatient") ->
     arm = result["arms"][arm_name]
     source, tgt = result["source"], result["targets"][target]
     per = _cell(arm["coverage"], COMPOSITE, target, "perlabel")
-    plain = _cell(arm["coverage"], COMPOSITE, target, "plain")
     lines = [
         f"# Transfer report: {arm['title']}, "
         f"Columbia inpatients to Columbia {CONTEXT_NAMES[target]}",
         "",
         f"Calibrated on {source['n']} inpatient ECGs and applied unchanged to {tgt['n']} "
-        f"{CONTEXT_NAMES[target]}, the per-label thresholds cover {pct(per['coverage_pos'])} "
-        f"of {CONTEXT_NAMES[target]} with structural heart disease (composite), against "
-        f"{pct(plain['coverage_pos'])} for the plain threshold set at 90% sensitivity on the "
-        f"inpatients. The composite's prevalence falls from "
+        f"{CONTEXT_NAMES[target]}, the per-label thresholds cover "
+        f"{pct(per['coverage_pos'])} of {CONTEXT_NAMES[target]} with structural heart "
+        f"disease (composite) where {pct(1 - result['alpha'], 0)} was asked, cover "
+        f"{pct(per['coverage_neg'])} of those without it, and send "
+        f"{pct(per['abstention'])} to a human. The composite's prevalence falls from "
         f"{pct(source['prevalence'][COMPOSITE])} to {pct(tgt['prevalence'][COMPOSITE])}.",
         "",
         "| | Source | Target |",

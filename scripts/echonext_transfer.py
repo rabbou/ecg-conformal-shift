@@ -48,7 +48,7 @@ from ecs.transfer import (
     ppv_row,
     subgroup_rows,
 )
-from ecs.transfer_report import render
+from ecs.transfer_report import CONTEXT_NAMES, render
 
 LVEF = "lvef_lte_45_flag"
 TARGETS = ("inpatient", "emergency", "outpatient")
@@ -210,7 +210,7 @@ def main() -> None:
         },
         "targets": {
             context: {
-                "cohort": f"EchoNext test split, {context}",
+                "cohort": f"EchoNext test split, {CONTEXT_NAMES[context]}",
                 "n": int(len(rows)),
                 "patients": int(len(set(patients[rows]))),
                 "prevalence": prevalence(meta, rows),

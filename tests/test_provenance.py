@@ -100,6 +100,10 @@ NOT_REGENERABLE = {
     "echonext_provenance.json": (
         "a full read and hash of EchoNext's 23 GB, which cannot be redistributed"
     ),
+    "echonext_transfer.json": (
+        "needs EchoNext and the two arms' per-record scores, neither of which may be committed"
+    ),
+    "echonext_coverage.csv": "the coverage grid echonext_transfer.json carries, same run",
     "timing.json": "a measurement of one machine at one moment",
     "timing_esprimo.json": "a measurement of a second machine at one moment",
 }

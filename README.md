@@ -135,6 +135,11 @@ of an old infarct, so the label definition changes as well as the prevalence.
 | `src/ecs/challenge.py` | the Challenge-2021 partitions: headers, SNOMED labels, completeness against the bundle manifest |
 | `src/ecs/rotation.py` | the five corpora split the same way, capped to a common size |
 | `src/ecs/encoders.py` | the five encoder arms and the chain each one demands |
+| `src/ecs/echonext.py` | EchoNext's files against their published digests, one provenance row per tracing, the patient-disjoint cohorts |
+| `src/ecs/embedding_store.py` | encoder vectors filed once by encoder, encoder version and tracing digest |
+| `src/ecs/calibration.py` | calibration curve, slope, intercept, Brier, net benefit, PPV and false alerts at a stated prevalence |
+| `src/ecs/transfer.py` | one model, one source, one target: coverage per label under three schemes, subgroups, the local-label ladder |
+| `src/ecs/transfer_report.py` | the one-page transfer report, rendered from its result file |
 | `mappings/` | the three published code tables the label mapping joins on, with provenance and digests |
 
 ## Encoder arms
@@ -230,6 +235,30 @@ The scan reads every record of the five corpora and takes about twenty minutes;
 everything after it reads the files the step before wrote. Training one source
 held 612 MB on a six-core i7-8700, and the whole chain after the scan took an
 hour.
+
+## EchoNext, inpatients to outpatients
+
+A third measurement moves inside one hospital: calibrated on Columbia
+inpatients, read on Columbia outpatients, for the eleven echocardiographic
+findings of EchoNext and their composite. The findings are in
+[ECHONEXT.md](ECHONEXT.md) and the one-page reports in `reports/transfer/`.
+
+EchoNext is under PhysioNet's restricted licence: its tracings, and every
+per-record file computed from them, stay outside this repository. Point
+`ECS_ECHONEXT_DIR` at the distribution (default `~/data/echonext`);
+`ECS_ECHONEXT_DERIVED` (default `~/data/echonext-derived`) and
+`ECS_EMBEDDING_STORE` (default `~/data/ecg-embeddings`) receive what the scripts
+derive from it.
+
+```bash
+uv run python scripts/echonext_provenance.py   # results/echonext_provenance.json
+export PYTORCH_ENABLE_MPS_FALLBACK=1
+uv run python scripts/echonext_transfer.py     # the coverage table and the reports
+uv run pytest -m data tests/test_echonext_data.py
+```
+
+`echonext_transfer.py` scores an arm first when its scores are missing, which
+for the trained ResNet is a training run on the Apple GPU or the CPU.
 
 ## Gates
 

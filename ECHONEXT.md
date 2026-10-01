@@ -10,10 +10,11 @@ One hundred labelled outpatient ECGs bring the coverage of the ill back to
 
 A model that reads structural heart disease from the ECG learns from the
 patients who had an echocardiogram, and in a hospital those are mostly
-inpatients. A screening programme would run it on outpatients. In EchoNext's
-validation and test splits, one ECG per patient, the composite of eleven
-echocardiographic findings is present in 52.8% of inpatient ECGs and 26.7% of
-outpatient ECGs; an ejection fraction of 45% or less, in 24.5% and 7.7%.
+inpatients. A screening programme would run it on outpatients. In the cohorts
+used here, one ECG per patient, the composite of eleven echocardiographic
+findings is present in 53.2% of the 1,903 inpatient ECGs that calibrate the
+thresholds and in 25.6% of the 1,059 outpatient ECGs that test them; an
+ejection fraction of 45% or less, in 24.5% and 6.6%.
 
 Calibration per label (Mondrian) is built for this case: each class gets its
 own threshold, so a change in prevalence alone cannot move the coverage of

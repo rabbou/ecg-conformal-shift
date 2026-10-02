@@ -103,7 +103,7 @@ class TestEffectiveSampleSize:
 
 
 class TestBootstrapInterval:
-    """The interval C-18 asks for, pinned to hand-computable AUROC values."""
+    """The paired interval, pinned to hand-computable AUROC values."""
 
     @staticmethod
     def _auroc(labels: np.ndarray, scores: np.ndarray) -> float:

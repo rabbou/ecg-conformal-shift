@@ -88,7 +88,7 @@ def read_part(
     thousand tracings stops holding eight hundred megabytes resident on a machine
     several sessions share, and the kernel may drop the pages instead. The file
     belongs to this run and is deleted with it, so no transformed waveform
-    outlives the process (C-14b).
+    outlives the process.
     """
     wanted = index.ids(part)
     kept: list[str] = []

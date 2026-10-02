@@ -4,10 +4,10 @@ One calibration/test split gives one coverage figure, and that figure moves by
 several points depending on which half the split happened to pick.  Reporting it
 alone invites reading noise as an effect, so every coverage number in this
 project is a mean over at least a hundred re-draws with the spread beside it
-(C-10).  The re-draw is the standard way of evaluating a split conformal
+.  The re-draw is the standard way of evaluating a split conformal
 predictor -- Angelopoulos & Bates, arXiv:2107.07511, section 3.
 
-The split is drawn over patients, never over records (C-4): two tracings of one
+The split is drawn over patients, never over records: two tracings of one
 patient on opposite sides of the boundary are one draw counted twice, which
 inflates the measured coverage.
 
@@ -82,7 +82,7 @@ SCORES = ("lac", "aps")
 #             Tibshirani et al. (NeurIPS 2019).  q is not known and is estimated
 #             from the target's UNLABELLED predictions by BBSE (Lipton, Wang &
 #             Smola, ICML 2018), so the guarantee is only as good as that estimate
-#             and the reweighting costs effective sample size (C-9).
+#             and the reweighting costs effective sample size.
 CORRECTIONS = ("none", "mondrian", "weighted")
 
 # The re-draw harness has one population and therefore no target to estimate a
@@ -198,15 +198,15 @@ def repeated_split_report(
 # ---------------------------------------------------------------------------
 # The frozen calibration
 #
-# A coverage guarantee is a promise about the population the calibration sample
-# came from.  Measuring what it is worth somewhere else means fitting the
+# Conformal coverage holds for the population the calibration sample came
+# from.  Measuring what it is worth somewhere else means fitting the
 # threshold on the source and spending it, unchanged, on the target: a
 # threshold re-fitted on the target would measure only the target's own
-# difficulty (C-20).
+# difficulty.
 #
 # The spread still has to come from somewhere, since one calibration half gives
 # one number and that number moves by points depending on which half was drawn
-# (C-10).  So the re-draw is over the SOURCE alone: each draw halves PTB-XL by
+# .  So the re-draw is over the SOURCE alone: each draw halves PTB-XL by
 # patient, fits a threshold on one half, and spends it on the other half AND on
 # every external corpus at once.  The external corpora are never subsampled;
 # each is scored whole, every draw, which is what makes the three panels
@@ -229,7 +229,7 @@ def frozen_threshold(
 
     No target corpus is in scope here: the target reaches this function only as
     ``target_prior``, a vector of class shares, so the scores and labels a
-    threshold is computed from can only ever be the calibration sample's (C-20).
+    threshold is computed from can only ever be the calibration sample's.
     That is what makes the weighted correction reportable beside the other two --
     it reads the target's estimated class mix, never a target label and never a
     target score.
@@ -272,7 +272,7 @@ class Target:
     """A corpus the frozen threshold is spent on, whole and unchanged.
 
     ``deviations`` carries what the ingestion and label chains could not make
-    identical to the source's (C-14); it travels with the numbers rather than
+    identical to the source's; it travels with the numbers rather than
     being remembered separately.
     """
 
@@ -393,7 +393,7 @@ class _Calibration:
     Under the two unweighted corrections this is the same object for every corpus
     -- the same threshold, the same points at weight one -- and holding it per
     corpus anyway is what lets the file be read without knowing which correction
-    varies by target and which does not (C-20's falsifier, on the file itself).
+    varies by target and which does not (the falsifier, on the file itself).
 
     A draw whose target prior could not be identified leaves no weight and no
     effective size behind: it is counted in ``n_unidentified`` and its threshold
@@ -462,28 +462,28 @@ def frozen_calibration_table(
 ) -> list[dict[str, object]]:
     """Coverage on every corpus under one PTB-XL calibration, over ``n_draws`` draws.
 
-    One row per (level, score, correction).  Each row carries the calibration
-    sample the thresholds came from -- its size and the points each class was
-    left with (C-9) -- and a block per corpus holding coverage, coverage per
-    class (C-11), the set-size shares, the threshold actually spent there and
-    what that threshold cost in effective sample size (C-9).  Every figure is a
-    mean over the draws with its standard deviation (C-10).
+     One row per (level, score, correction).  Each row carries the calibration
+     sample the thresholds came from -- its size and the points each class was
+     left with -- and a block per corpus holding coverage, coverage per
+     class, the set-size shares, the threshold actually spent there and
+     what that threshold cost in effective sample size.  Every figure is a
+     mean over the draws with its standard deviation.
 
-    The threshold sits inside the corpus block rather than on the row because
-    one of the three corrections makes it depend on the corpus: ``weighted``
-    reads each target's estimated class mix.  It reads nothing else of the
-    target -- no label, no score -- so no corpus is ever calibrated on itself
-    (C-20), and under the other two corrections all three blocks carry the same
-    threshold, which is that claim made checkable on the file.
+     The threshold sits inside the corpus block rather than on the row because
+     one of the three corrections makes it depend on the corpus: ``weighted``
+     reads each target's estimated class mix.  It reads nothing else of the
+     target -- no label, no score -- so no corpus is ever calibrated on itself
+    , and under the other two corrections all three blocks carry the same
+     threshold, which is that claim made checkable on the file.
 
-    ``keep_draws`` additionally writes each corpus's coverage, per-class coverage
-    and mean set size draw by draw.  The summary alone cannot answer a paired
-    question -- the gap between two corpora within one draw, the gap between two
-    encoder arms on the same draw, or what one correction cost against another on
-    the draw they shared -- and subtracting two means throws away the fact that
-    the draws were shared.  It is off by default because the series is two
-    hundred numbers per corpus per row and only the caller asking a paired
-    question needs them.
+     ``keep_draws`` additionally writes each corpus's coverage, per-class coverage
+     and mean set size draw by draw.  The summary alone cannot answer a paired
+     question -- the gap between two corpora within one draw, the gap between two
+     encoder arms on the same draw, or what one correction cost against another on
+     the draw they shared -- and subtracting two means throws away the fact that
+     the draws were shared.  It is off by default because the series is two
+     hundred numbers per corpus per row and only the caller asking a paired
+     question needs them.
     """
     n_classes = source.probs.shape[1]
     keys = pd.Series(list(source.patients), index=range(len(source.labels)))

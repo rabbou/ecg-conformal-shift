@@ -3,18 +3,18 @@
 One threshold is fitted on PTB-XL and spent, unchanged, on three populations at
 once: the PTB-XL patients it was not fitted on, all of Shandong, and all of
 Chongqing.  Nothing is tuned on the two external corpora and neither is ever
-re-calibrated on itself (C-20); they are read once, scored once, and reported
+re-calibrated on itself; they are read once, scored once, and reported
 whatever the number says.
 
 The spread comes from re-drawing the calibration alone.  Each of the draws
-halves PTB-XL fold 10 by patient (C-4), fits the threshold on one half, and
+halves PTB-XL fold 10 by patient, fits the threshold on one half, and
 measures on the other half and on both external corpora with that same
 threshold -- so the three panels differ in nothing but the population they
 describe.
 
 The result file names, per corpus, what the ingestion and label chains could not
-make identical (C-14), and per row the calibration sample behind the threshold
-with its effective size (C-9).
+make identical, and per row the calibration sample behind the threshold
+with its effective size.
 
 Usage: .venv/bin/python scripts/shift_table.py [--draws 200]
 """
@@ -36,7 +36,7 @@ from ecs.config import ACS_DIR, ACS_LABELLED_SPLIT, PTBXL_DIR, RESULTS_DIR, SPH_
 from ecs.provenance import provenance_block
 from ecs.report import CORRECTIONS, Source, Target, frozen_calibration_table
 
-# Confidence levels from the plan, loosest first.
+# Confidence levels, loosest first.
 ALPHAS = (0.20, 0.10, 0.05)
 
 # The setting the reading is written at: the 90% set on the score that gives the
@@ -349,7 +349,7 @@ def main(argv: list[str] | None = None) -> int:
         "protocol": (
             "the threshold is fitted on half the PTB-XL fold-10 patients and spent unchanged on "
             "the other half, on all of Shandong and on all of Chongqing; the external corpora are "
-            "scored once, never re-calibrated on themselves, and nothing is tuned on them (C-20). "
+            "scored once, never re-calibrated on themselves, and nothing is tuned on them. "
             "The spread is over the calibration draw alone, since the targets are fixed"
         ),
         "calibrated_on": "ptbxl",
@@ -372,8 +372,8 @@ def main(argv: list[str] | None = None) -> int:
             "under the two unweighted corrections, nothing: one PTB-XL threshold is spent "
             "unchanged on all three corpora. Under the weighted correction, each corpus's "
             "unlabelled predicted-label marginal and nothing else -- no target label and no "
-            "target score enters a threshold, which is what keeps C-20 intact while the "
-            "threshold is allowed to differ by corpus"
+            "target score enters a threshold, which is what keeps the no-tuning rule intact "
+            "while the threshold is allowed to differ by corpus"
         ),
         "classes": {"0": "no infarction", "1": "infarction"},
         "n_draws": args.draws,

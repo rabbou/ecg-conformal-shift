@@ -16,7 +16,7 @@ syndrome; the angiographic label in that dataset is ``OMI``, which is not used
 here.  A label
 learned on one is not the same clinical question as a label read off the other,
 and no re-coding here can make it so; the deviation is named in the results
-file (C-14) instead of being smoothed over.
+file instead of being smoothed over.
 """
 
 from __future__ import annotations

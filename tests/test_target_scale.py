@@ -1,6 +1,6 @@
 """The target-scale ladder: what labelled target records buy, and what they cost.
 
-C-29.  Four rungs on one pair, PTB-XL to Chongqing, infarction.  The claims worth
+Four rungs on one pair, PTB-XL to Chongqing, infarction.  The claims worth
 holding are the ones that make the ladder readable rather than the numbers on it:
 rung zero is the frozen source threshold and nothing else; the rungs above it
 calibrate on target records and only on target records; every rung is measured on

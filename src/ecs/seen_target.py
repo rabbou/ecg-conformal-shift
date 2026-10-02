@@ -89,11 +89,11 @@ SNOMED_NAMES = {
 # The two conditions a seen target has to meet, as numbers rather than as a
 # judgement made after the counts were seen.
 #
-# ENOUGH_INFARCTION -- coverage is reported per class (C-11), so the infarction
+# ENOUGH_INFARCTION -- coverage is reported per class, so the infarction
 # class is the binding support, and a new target that carries less of it than
 # the thinnest target already in the study measures less than that target does.
-# Shandong is that floor: 260 infarction records of 25,770 (PLAN.md, C-2, the
-# count `test_labels.py::TestSPH` holds the loader to).
+# Shandong is that floor: 260 infarction records of 25,770 (the count
+# `test_labels.py::TestSPH` holds the loader to).
 #
 # MAX_SHARE_FROM_ONE_PARTITION -- a target glued from partitions of very
 # different prevalence has the prevalence of whichever partition was glued on,

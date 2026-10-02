@@ -1,4 +1,4 @@
-"""The ingestion contract (C-13, C-14, C-14b, C-15).
+"""The ingestion contract.
 
 The synthetic tests pin the chain itself: lead reordering by header name,
 resampling, cropping, the millivolt scale, NaN exclusion.  The ``data`` tests
@@ -305,7 +305,7 @@ class TestACS:
 @pytest.mark.data
 class TestScanReport:
     """results/ingest_report.json is what scripts/scan_corpora.py wrote after a
-    full pass over every corpus (2026-08-23); these are the C-15 counts."""
+    full pass over every corpus (2026-08-23); these are the drop counts."""
 
     def test_every_record_is_either_kept_or_excluded_with_a_reason(self) -> None:
         _skip_unless(RESULTS_DIR / "ingest_report.json")

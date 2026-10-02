@@ -27,13 +27,13 @@ Three things come out, into ``results/arms.json``:
 
 *Discrimination.*  AUROC and AUPRC per arm and corpus, each with a 95% bootstrap
 interval, and the paired difference between every pair of arms on every corpus
-(C-18).  Paired because the arms scored the same records: two intervals that
+.  Paired because the arms scored the same records: two intervals that
 overlap can still hide a difference that is there in every draw.
 
 *The break.*  Coverage on PTB-XL, Shandong and Chongqing under one threshold
 fitted on PTB-XL and spent unchanged, over the same 200 draws day 3 used, and
 the coverage gap -- home minus target -- as a mean over those draws with its
-spread (C-10).  The gap is taken inside each draw, not between two means,
+spread.  The gap is taken inside each draw, not between two means,
 because the draws are shared and subtracting the summaries would throw that
 away.
 
@@ -175,7 +175,7 @@ def ptbxl_parts() -> tuple[pd.Series, pd.Series]:
 def discrimination(
     labels: NDArray[np.int_], scores: NDArray[np.float64], draws: int, seed: int
 ) -> dict[str, object]:
-    """AUROC and AUPRC with the interval that makes them arguable (C-18)."""
+    """AUROC and AUPRC with the interval that makes them arguable."""
     out: dict[str, object] = {"n_points": int(len(labels)), "n_positive": int(labels.sum())}
     for name, statistic in METRICS.items():
         point, low, high = bootstrap_ci(statistic, labels, scores, n_draws=draws, seed=seed)

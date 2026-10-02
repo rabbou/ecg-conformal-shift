@@ -28,7 +28,7 @@ class TestWhatTheArmDeclares:
             assert len(corpora.split()) >= 3, arm
 
     def test_the_two_contaminated_arms_are_the_ones_that_name_ptb_xl(self) -> None:
-        """C-12's point: which arm saw the calibration corpus is on the record."""
+        """Which arm saw the calibration corpus is on the record."""
         assert {arm for arm, corpora in SAW.items() if "ptbxl" in corpora} == {
             "ecgfm",
             "hubert_ecg",
@@ -60,6 +60,10 @@ class TestWhatTheArmDeclares:
 
 @pytest.mark.data
 class TestTheCheckpointLoadsWhole:
+    @pytest.fixture(autouse=True)
+    def _needs_timm(self) -> None:
+        pytest.importorskip("timm", reason="the optional timm extra is not installed")
+
     def test_no_weight_is_missing_and_none_is_left_over(self) -> None:
         _embed, meta = ARMS["ecg_jepa"]()
         assert "missing=0 unexpected=0" in str(meta["notes"])

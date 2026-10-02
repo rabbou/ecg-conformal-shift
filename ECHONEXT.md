@@ -81,6 +81,23 @@ means replaying the same preprocessing on that hospital's ECGs, with that
 hospital's own standardisation, which absorbs part of any difference between
 electrocardiographs.
 
+## Reproduce
+
+EchoNext's tracings stay outside the repository. Point `ECS_ECHONEXT_DIR` at
+the distribution (default `~/data/echonext`); `ECS_ECHONEXT_DERIVED` (default
+`~/data/echonext-derived`) and `ECS_EMBEDDING_STORE` (default
+`~/data/ecg-embeddings`) receive what the scripts derive from it.
+
+```bash
+uv run python scripts/echonext_provenance.py   # results/echonext_provenance.json
+export PYTORCH_ENABLE_MPS_FALLBACK=1
+uv run python scripts/echonext_transfer.py     # the coverage table and the reports
+uv run pytest -m data tests/test_echonext_data.py
+```
+
+`echonext_transfer.py` scores an arm first when its scores are missing, which
+for the trained ResNet is a training run on the Apple GPU or the CPU.
+
 ## What did not run
 
 The protocol names two pre-trained arms that are absent: the published EchoNext

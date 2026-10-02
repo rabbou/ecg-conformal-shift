@@ -116,7 +116,7 @@ def draw_target_records(
 
     Drawing records rather than patients would put two tracings of one patient
     in a calibration sample that is supposed to hold exchangeable draws from the
-    population, the same error C-4 rules out at the split.  A patient whose
+    population, the same error the patient-level split rules out.  A patient whose
     records would overflow the rung is skipped rather than split, so a rung can
     land a record or two short; the calibration size is reported per draw
     instead of being assumed equal to the rung.

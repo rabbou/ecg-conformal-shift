@@ -372,8 +372,8 @@ def main(argv: list[str] | None = None) -> int:
             "under the two unweighted corrections, nothing: one PTB-XL threshold is spent "
             "unchanged on all three corpora. Under the weighted correction, each corpus's "
             "unlabelled predicted-label marginal and nothing else -- no target label and no "
-            "target score enters a threshold, which is what keeps the no-tuning rule intact while the "
-            "threshold is allowed to differ by corpus"
+            "target score enters a threshold, which is what keeps the no-tuning rule intact "
+            "while the threshold is allowed to differ by corpus"
         ),
         "classes": {"0": "no infarction", "1": "infarction"},
         "n_draws": args.draws,

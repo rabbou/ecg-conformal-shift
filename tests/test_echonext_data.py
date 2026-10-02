@@ -61,9 +61,23 @@ def test_every_tracing_in_the_provenance_table_is_in_z_score(meta: pd.DataFrame)
 
 def test_the_scores_cover_every_validation_and_test_ecg(meta: pd.DataFrame) -> None:
     keys = set(meta.loc[meta["split"].isin(["val", "test"]), "ecg_key"])
-    for arm in ("resnet", "random_init"):
+    for arm in ("resnet", "random_init", "ecgfounder", "echonext_mini"):
         path = DERIVED_DIR / f"scores/{arm}.npz"
         require(path)
         with np.load(path) as data:
             assert set(data["ecg_key"].tolist()) == keys
             assert np.isfinite(data["probs"]).all()
+
+
+def test_both_published_checkpoints_load_whole_without_full_unpickling() -> None:
+    """The mini-model under weights_only=True, ECGFounder through the allowlist,
+    each into its architecture with no tensor missing and none left over."""
+    import torch
+
+    from ecs.echonext_mini import EchoNextMini
+    from ecs.encoders import allowlisted_load, ecgfounder_net, verified
+
+    mini = torch.load(verified("echonext_mini/weights.pt"), map_location="cpu", weights_only=True)
+    EchoNextMini().load_state_dict(mini["model"], strict=True)
+    founder = allowlisted_load(verified("ecgfounder/12_lead_ECGFounder.pth"))
+    ecgfounder_net().load_state_dict(founder["state_dict"], strict=True)

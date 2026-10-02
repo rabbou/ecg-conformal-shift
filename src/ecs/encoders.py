@@ -25,11 +25,14 @@ the arm's factory is called.
 from __future__ import annotations
 
 import hashlib
+import pickle
 import platform
 import subprocess
 import sys
+import types
 from collections.abc import Callable
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 import torch
@@ -38,7 +41,16 @@ from scipy.signal import butter, decimate, filtfilt, resample
 from .config import REPO_ROOT
 from .models import ResNet1d
 
-__all__ = ["ARMS", "PRETRAINING", "SAW", "WEIGHTS", "Arm", "machine_info"]
+__all__ = [
+    "ARMS",
+    "PRETRAINING",
+    "SAW",
+    "WEIGHTS",
+    "Arm",
+    "allowlisted_load",
+    "ecgfounder_net",
+    "machine_info",
+]
 
 WEIGHTS = REPO_ROOT / "data/weights"
 
@@ -66,7 +78,49 @@ WEIGHT_SHA256 = {
     "hubert-ecg-base/hubert_ecg.py": (
         "8a76a50e0e107167023544eecd5444cb6a9bb4eee75fd8d0d5a03dbe9f8034d9"
     ),
+    # The published EchoNext mini-model's weights (github.com/PierreElias/IntroECG,
+    # commit 15233e93). Only tensors: it opens with weights_only=True.
+    "echonext_mini/weights.pt": (
+        "aac57aad0ec9763021c6264e89c74e3d78f8b711159b1880e5bd4515d5e21cd6"
+    ),
 }
+
+# What a checkpoint may name and still be read: tensors, an ordered dict, and
+# the numpy scalar ECGFounder keeps beside its weights, with the dtype and the
+# byte codec that rebuild it.  torch resolves the storage classes itself; every
+# other name the file asks for goes through find_class and is refused.
+ALLOWED_GLOBALS = frozenset(
+    {
+        ("collections", "OrderedDict"),
+        ("torch._utils", "_rebuild_tensor_v2"),
+        ("numpy.core.multiarray", "scalar"),
+        ("numpy", "dtype"),
+        ("_codecs", "encode"),
+    }
+)
+
+
+class _AllowlistedUnpickler(pickle.Unpickler):
+    def find_class(self, module: str, name: str) -> Any:
+        if (module, name) not in ALLOWED_GLOBALS:
+            raise pickle.UnpicklingError(f"{module}.{name} is not on the checkpoint allowlist")
+        return super().find_class(module, name)
+
+
+_allowlisted_pickle = types.ModuleType("allowlisted_pickle")
+_allowlisted_pickle.Unpickler = _AllowlistedUnpickler  # type: ignore[attr-defined]
+
+
+def allowlisted_load(path: Path) -> Any:
+    """``torch.load`` that resolves only ``ALLOWED_GLOBALS`` and refuses the file otherwise.
+
+    weights_only=True refuses the ECGFounder checkpoint on torch 2.2.2 for one
+    numpy scalar, and add_safe_globals arrives only in 2.4.  This is the same
+    restriction with that scalar admitted: no name outside the list is looked
+    up, so nothing outside it is called.
+    """
+    return torch.load(path, map_location="cpu", pickle_module=_allowlisted_pickle)
+
 
 HUBERT_FILES = ("hubert-ecg-base/model.safetensors", "hubert-ecg-base/hubert_ecg.py")
 
@@ -156,11 +210,12 @@ def random_init() -> Arm:
     )
 
 
-def ecgfounder() -> Arm:
+def ecgfounder_net() -> torch.nn.Module:
+    """The published Net1D as the authors' finetune_model.py builds it, without weights."""
     sys.path.insert(0, str(REPO_ROOT / "third_party/ecgfounder"))
-    from net1d import Net1D  # vendored, MIT; architecture as in finetune_model.py
+    from net1d import Net1D  # vendored, MIT
 
-    model = Net1D(
+    net: torch.nn.Module = Net1D(
         in_channels=12,
         base_filters=64,
         ratio=1,
@@ -175,6 +230,11 @@ def ecgfounder() -> Arm:
         n_classes=150,
         return_features=True,
     )
+    return net
+
+
+def ecgfounder() -> Arm:
+    model = ecgfounder_net()
     # weights_only=True refuses this checkpoint on torch 2.2.2 -- it holds a
     # numpy scalar, and add_safe_globals to allow one only arrives in 2.4. The
     # digest check above is what stands in for the flag here, deliberately.

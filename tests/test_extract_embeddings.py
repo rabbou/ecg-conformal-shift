@@ -250,12 +250,35 @@ class TestNoThirdPartyWeightOpensUnchecked:
             "src/ecs/encoders.py",
             "scripts/score_external.py",
             "scripts/timing_probe.py",
+            "scripts/echonext_scores.py",
         ):
             source = (Path(__file__).resolve().parents[1] / module).read_text()
             for match in re.finditer(r"torch\.load\(([^)]*)\)", source):
                 call = match.group(1)
                 preceding = source[max(0, match.start() - 400) : match.start()]
-                assert "weights_only=True" in call or "verified(" in preceding, (module, call)
+                restricted = "weights_only=True" in call or "pickle_module=_allowlisted" in call
+                assert restricted or "verified(" in preceding, (module, call)
+
+    def test_the_allowlist_refuses_a_checkpoint_that_names_anything_else(
+        self, tmp_path: Path
+    ) -> None:
+        """A file that asks for os.system is refused before the name is resolved."""
+        from ecs import encoders
+
+        class Planted:
+            def __reduce__(self) -> tuple[Callable[..., object], tuple[str]]:
+                import os
+
+                return os.system, ("true",)
+
+        path = tmp_path / "planted.pt"
+        torch.save({"state_dict": {"w": torch.zeros(2)}, "extra": Planted()}, path)
+        with pytest.raises(Exception, match="not on the checkpoint allowlist"):
+            encoders.allowlisted_load(path)
+        tensors = tmp_path / "tensors.pt"
+        torch.save({"state_dict": {"w": torch.ones(2)}, "step": np.float64(3.0)}, tensors)
+        loaded = encoders.allowlisted_load(tensors)
+        assert torch.equal(loaded["state_dict"]["w"], torch.ones(2))
 
     def test_the_file_transformers_executes_is_in_the_manifest(self) -> None:
         from ecs import encoders

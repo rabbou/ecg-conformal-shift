@@ -27,7 +27,7 @@ the difference is zero either -- the arms scored the same records, so their
 errors are correlated and the paired difference is far tighter than the two
 intervals suggest.  So an arm-versus-arm claim is made on a paired bootstrap:
 one set of resampled record indices per draw, applied to both arms, difference
-taken inside the draw (C-18).  DeLong's test is the closed-form standard for
+taken inside the draw.  DeLong's test is the closed-form standard for
 paired AUROC but tests AUROC only; the paired bootstrap covers AUPRC on the same
 footing, so both metrics are compared the same way here.
 """

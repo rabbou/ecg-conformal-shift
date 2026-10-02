@@ -1,4 +1,4 @@
-"""C-4: no patient on both sides of any boundary, on a synthetic frame and on
+"""No patient on both sides of any boundary, on a synthetic frame and on
 each corpus; determinism for a fixed seed; the proportions."""
 
 from __future__ import annotations

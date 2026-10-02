@@ -45,7 +45,7 @@ class TestTheCountsCloseAgainstThePublishedTable:
     def test_every_challenge_corpus_reproduces_the_published_count(
         self, table: dict[str, Any]
     ) -> None:
-        """C-23. Published minus measured minus double-counted is zero, everywhere.
+        """Published minus measured minus double-counted is zero, everywhere.
 
         The subtraction is redone here from the three counts rather than read
         off ``unexplained_by_double_counting``. Asserting that field alone would
@@ -108,7 +108,7 @@ class TestEveryCorpusAndClassHasACell:
     def test_a_refused_cell_is_empty_and_says_which_ambiguity_refused_it(
         self, table: dict[str, Any]
     ) -> None:
-        """C-24. Shandong has no sinus-rhythm class, and the file says why."""
+        """Shandong has no sinus-rhythm class, and the file says why."""
         refused = {
             (row["corpus"], row["class"]): row["ambiguity"] for row in table["refused_cells"]
         }
@@ -141,7 +141,7 @@ class TestPtbxlIsReadThroughItsOwnDistribution:
     def test_the_join_keeps_the_records_the_object_already_counts(
         self, table: dict[str, Any]
     ) -> None:
-        """C-1's reference values: 21,799 records from 18,869 patients."""
+        """The reference values: 21,799 records from 18,869 patients."""
         block = table["corpora"]["ptbxl"]["as_read_by_this_study"]
         assert block["n_records"] == 21799
         assert block["n_patients"] == 18869

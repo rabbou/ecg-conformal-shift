@@ -74,7 +74,7 @@ def bootstrap_ci(
 
     Returns ``(point, low, high)``.  The interval comes from resampling the
     test points with replacement ``n_draws`` times, which is what makes a
-    claim that one arm beats another checkable (C-18): two point estimates a
+    claim that one arm beats another checkable: two point estimates a
     hundredth apart with overlapping intervals are not a difference.
 
     A draw that happens to contain one class only leaves AUROC undefined and is

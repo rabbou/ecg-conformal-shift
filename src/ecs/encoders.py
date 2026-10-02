@@ -3,7 +3,7 @@
 An *arm* is a way of turning a canonical (12, 5000) tracing into one vector.
 Four are pre-trained encoders published by other groups; the fifth is our own
 ResNet1d left at its random initialisation, the floor the others have to clear
-(C-17).
+.
 
 Two of the four saw PTB-XL at pre-training and one saw Shandong as well, so
 their figures on those corpora are partly memory rather than transfer.  What

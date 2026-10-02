@@ -24,9 +24,9 @@ comparable miss rates on the source, so the remaining differences are the
 false-alarm rate and what each scheme defers.
 
 The spread comes from re-drawing the calibration alone, on the same protocol as
-`shift_table.py`: each draw halves PTB-XL fold 10 by patient (C-4), fits every
+`shift_table.py`: each draw halves PTB-XL fold 10 by patient, fits every
 threshold on one half, and spends them on the other half and on both external
-corpora unchanged (C-20).
+corpora unchanged.
 
 Usage: .venv/bin/python scripts/outcomes.py [--draws 200]
 """

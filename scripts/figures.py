@@ -1,33 +1,29 @@
-"""Draw the six figures the plan and the report name.
+"""Draw the figures the report names, each from a committed file.
 
-Each one is drawn from a committed file under ``results/`` and redraws from it
-pixel for pixel, so a figure always comes from the numbers rather than from
-memory, and a surprising result cannot be quietly re-cut.
+Each one is drawn from a file under ``results/`` and redraws from it pixel for
+pixel, so a figure always comes from the numbers rather than from memory, and a
+surprising result cannot be quietly re-cut.
 
-1. Coverage against target -- does the guarantee hold at each hospital, and does
-   it hold for the sick as well as the healthy.
-2. Set-size distribution -- how often the model answers with one label, both, or
-   neither, at each hospital.
-3. Encoder arms on the same break -- does the encoder underneath change how far
-   the guarantee falls, and does an encoder that saw the calibration corpus look
-   better at home for a reason other than being better.
-4. Baseline discrimination -- AUROC and AUPRC against the published reference
-   value.
+| --figure | File | What it shows |
+|---|---|---|
+| 1 | fig3_coverage.png | coverage against the level asked for, per hospital and correction |
+| 2 | fig2_set_sizes.png | how often the model answers with one label, both, or neither |
+| 3 | fig3_arms.png | how far coverage falls per encoder arm |
+| 4 | fig4_discrimination.png | baseline AUROC and AUPRC against the published reference |
+| 5 | fig1_thresholds.png | where each scheme places its thresholds on the MI score |
+| 6 | fig2_outcomes.png | what a case of each label gets under each scheme |
+| 7 | fig7_rotation.png | coverage of five diagnoses across the source rotation |
+| 8 | fig8_target_scale.png | coverage at Chongqing against labelled target records |
 
-Figures 1 and 2 read ``results/shift.json``, where one PTB-XL threshold was
-spent on all three corpora at once, so the panels differ in nothing but the
-population they describe.
-
-Figure 3 reads ``results/arms.json``, where each arm's cached representations
-went through the same linear probe, the same folds and the same frozen
-calibration, so a difference between two arms is a difference between two
-pre-trainings.  Until that file exists this script says what it is waiting for
-rather than drawing an empty frame.
+Figures 1, 5, 6, 7 and 8 are the five the report shows, and they also draw in
+French: ``--lang fr`` runs the same functions on the same files
+with the words of ``figure_text.py`` and writes ``*_fr.png`` beside the English
+set.
 
 The report numbers its own figures in its own text; the images carry titles,
 not numbers, so the two cannot drift apart.
 
-Usage: .venv/bin/python scripts/figures.py [--figure 1 2 3 4 5 6]
+Usage: .venv/bin/python scripts/figures.py [--figure 1 ... 8] [--lang en|fr]
 """
 
 from __future__ import annotations
@@ -43,19 +39,25 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
+from bilingual_figures import (  # noqa: E402
+    CORPUS_NAMES,
+    CORPUS_ORDER,
+    CORRECTION_ORDER,
+    _localise_ticks,
+    _panel_title,
+    _rows,
+    _save,
+    corpora_on,
+    figure_1_coverage,
+    figure_5_thresholds,
+    figure_6_outcomes,
+)
+from figure_text import LANGUAGES, SUFFIX, count, percent, words  # noqa: E402
 
 from ecs.config import RESULTS_DIR  # noqa: E402
 
 # Levels loosest first, so every figure reads left to right as confidence rising.
 LEVELS = (0.20, 0.10, 0.05)
-CLASS_NAMES = {"0": "no infarction", "1": "infarction"}
-# Source first, then the two corpora the threshold is spent on unchanged.
-CORPUS_ORDER = ("ptbxl", "sph", "acs")
-CORPUS_NAMES = {
-    "ptbxl": "PTB-XL (calibrated here)",
-    "sph": "Shandong",
-    "acs": "Chongqing",
-}
 # The arms in contamination order: the control, then the arms that saw no public
 # corpus, then the one that saw the calibration corpus, then the one that saw a
 # target too.  Reading the figure left to right is reading that order.
@@ -83,149 +85,7 @@ SET_COLOUR = {"empty_rate": "#bf4342", "one_label_rate": "#5f8d4e", "two_label_r
 SET_NAME = {"empty_rate": "no label", "one_label_rate": "one label", "two_label_rate": "both"}
 
 
-def _source_note(figure: plt.Figure, path: Path) -> None:
-    figure.text(
-        0.01,
-        0.01,
-        f"drawn by scripts/figures.py from {path.relative_to(RESULTS_DIR.parent)}",
-        fontsize=7,
-        color="#666666",
-    )
-
-
-def _rows(table: dict[str, Any], score: str, correction: str) -> list[dict[str, Any]]:
-    chosen = [r for r in table["rows"] if r["score"] == score and r["correction"] == correction]
-    return sorted(chosen, key=lambda r: -float(r["alpha"]))
-
-
-def corpora_on(table: dict[str, Any]) -> list[str]:
-    """The corpora on the table, source first."""
-    present = set(table["rows"][0]["by_corpus"])
-    return [name for name in CORPUS_ORDER if name in present]
-
-
-def _panel_title(table: dict[str, Any], corpus: str) -> str:
-    block = table["rows"][0]["by_corpus"][corpus]
-    return (
-        f"{CORPUS_NAMES[corpus]}\n"
-        f"{block['n_points']:,} tracings, {block['prevalence']:.1%} infarction"
-    )
-
-
-CORRECTION_ORDER = ("none", "mondrian", "weighted")
-CORRECTION_NAMES = {
-    "none": "no correction\none threshold for both classes",
-    "mondrian": "Mondrian\none threshold per class, exact",
-    "weighted": "label-shift weighted\ntarget prior estimated",
-}
-# The three readings inside a panel: the marginal figure, then the class it is
-# bought from and the class it is bought for.
-GROUP_ORDER = ("overall", "0", "1")
-GROUP_NAMES = {"overall": "every tracing", "0": CLASS_NAMES["0"], "1": CLASS_NAMES["1"]}
-GROUP_COLOUR = {"overall": "#adb5bd", "0": "#219ebc", "1": "#bf4342"}
-
-
-def corrections_on(table: dict[str, Any]) -> list[str]:
-    """The corrections the table holds, in the order the argument runs."""
-    present = {row["correction"] for row in table["rows"]}
-    return [name for name in CORRECTION_ORDER if name in present]
-
-
-def figure_1_coverage(table: dict[str, Any], out: Path, source: Path) -> Path:
-    """Coverage against the level asked for, at each hospital and under each correction.
-
-    One row per corpus, one column per correction, all from the same PTB-XL
-    calibration: the first row is the population the threshold was fitted on, the
-    two below it are populations it was merely spent on.  Reading a row left to
-    right is reading what each repair does to that hospital; reading the red bar
-    down a column is reading whether the sick are covered at all.
-    """
-    corpora = corpora_on(table)
-    corrections = corrections_on(table)
-    figure, axes = plt.subplots(
-        len(corpora),
-        len(corrections),
-        figsize=(4.4 * len(corrections), 3.7 * len(corpora)),
-        sharey=True,
-        sharex=True,
-        squeeze=False,
-    )
-
-    for row_index, corpus in enumerate(corpora):
-        for column, correction in enumerate(corrections):
-            axis = axes[row_index][column]
-            rows = _rows(table, "lac", correction)
-            width = 0.26
-            for offset, group in zip((-width, 0.0, width), GROUP_ORDER, strict=True):
-                pairs = []
-                for row in rows:
-                    block = row["by_corpus"][corpus]
-                    cell = (
-                        block["coverage"]
-                        if group == "overall"
-                        else block["coverage_by_class"][group]
-                    )
-                    pairs.append((cell["mean"], cell["sd"]))
-                axis.bar(
-                    np.arange(len(rows)) + offset,
-                    [value for value, _ in pairs],
-                    width,
-                    yerr=[sd for _, sd in pairs],
-                    capsize=3,
-                    label=GROUP_NAMES[group],
-                    color=GROUP_COLOUR[group],
-                    edgecolor="white",
-                )
-            for index, row in enumerate(rows):
-                axis.hlines(
-                    row["target_coverage"],
-                    index - 0.5,
-                    index + 0.5,
-                    colors="#333333",
-                    linestyles="--",
-                )
-            axis.set_xticks(range(len(rows)))
-            axis.set_xticklabels([f"{1 - float(r['alpha']):.0%}" for r in rows])
-            axis.set_ylim(0.0, 1.05)
-            if row_index == 0:
-                axis.set_title(CORRECTION_NAMES[correction], fontsize=9)
-            if row_index == len(corpora) - 1:
-                axis.set_xlabel("confidence asked for")
-        axes[row_index][0].set_ylabel(
-            f"{_panel_title(table, corpus)}\nshare whose set holds the true label", fontsize=8
-        )
-    axes[0][-1].legend(loc="lower right", fontsize=8, framealpha=0.95)
-
-    headline = _rows(table, "lac", "none")[1]["by_corpus"]
-    quoted = " · ".join(
-        f"{CORRECTION_NAMES[c].splitlines()[0]} "
-        f"{_rows(table, 'lac', c)[1]['by_corpus']['ptbxl']['coverage_by_class']['1']['mean']:.0%}"
-        for c in corrections
-    )
-    estimated = "; ".join(
-        f"{CORPUS_NAMES[corpus].split(' (')[0]} "
-        f"{block['calibration']['estimated_prevalence']['mean']:.1%} estimated for "
-        f"{headline[corpus]['prevalence']:.1%} true"
-        for corpus, block in _rows(table, "lac", "weighted")[1]["by_corpus"].items()
-    )
-    figure.suptitle(
-        "Coverage per hospital and correction\n"
-        f"Share of infarctions inside the 90% set on PTB-XL: {quoted}.\n"
-        f"Dashed line: the requested level. Bars: mean over {table['n_draws']} calibration "
-        "draws on PTB-XL, whiskers one standard deviation.\n"
-        f"The weighted thresholds use each corpus's estimated class mix: {estimated}.",
-        fontsize=9,
-        y=0.995,
-        va="top",
-    )
-    figure.tight_layout(rect=(0, 0.02, 1, 0.945))
-    _source_note(figure, source)
-    figure.savefig(out, dpi=200)
-    plt.close(figure)
-    return out
-
-
-def figure_2_set_sizes(table: dict[str, Any], out: Path, source: Path) -> Path:
+def figure_2_set_sizes(table: dict[str, Any], out: Path) -> Path:
     """How often the model answers with one label, both, or neither, per hospital."""
     corpora = corpora_on(table)
     figure, axes = plt.subplots(
@@ -278,10 +138,7 @@ def figure_2_set_sizes(table: dict[str, Any], out: Path, source: Path) -> Path:
         fontsize=10,
     )
     figure.tight_layout(rect=(0, 0.03, 1, 0.94))
-    _source_note(figure, source)
-    figure.savefig(out, dpi=200)
-    plt.close(figure)
-    return out
+    return _save(figure, out)
 
 
 def _headline_row(arms: dict[str, Any], arm: str) -> dict[str, Any]:
@@ -303,12 +160,12 @@ def _saw(arms: dict[str, Any], arm: str, corpus: str) -> bool:
     return corpus in arms["arms"][arm].get("saw", [])
 
 
-def figure_3_arms(arms: dict[str, Any], out: Path, source: Path) -> Path:
-    """The four encoder arms on the same break.
+def figure_3_arms(arms: dict[str, Any], out: Path) -> Path:
+    """The five encoder arms on the same change of hospital.
 
     One panel per target: how far each arm's coverage falls between PTB-XL and
-    that hospital, as a signed gap, so a bar above zero is a guarantee that
-    stopped holding and a bar below zero is one that over-covered.  The last
+    that hospital, as a signed gap, so a bar above zero is coverage lost at that
+    hospital and a bar below zero is coverage gained there.  The last
     panel is what each arm is worth at home, because a small gap earned by an
     arm that discriminates nothing is not the same achievement as a small gap
     earned by one that does; the panels have to be read together.
@@ -388,15 +245,10 @@ def figure_3_arms(arms: dict[str, Any], out: Path, source: Path) -> Path:
         fontsize=9.5,
     )
     figure.tight_layout(rect=(0, 0.035, 1, 0.925))
-    _source_note(figure, source)
-    figure.savefig(out, dpi=200)
-    plt.close(figure)
-    return out
+    return _save(figure, out)
 
 
-def figure_4_discrimination(
-    metrics: dict[str, Any], reference: dict[str, Any], out: Path, source: Path
-) -> Path:
+def figure_4_discrimination(metrics: dict[str, Any], reference: dict[str, Any], out: Path) -> Path:
     """The baseline against the published figure it has to reproduce."""
     figure, axis = plt.subplots(figsize=(6.6, 4.6))
     names = ["AUROC", "AUPRC"]
@@ -444,219 +296,21 @@ def figure_4_discrimination(
         fontsize=10,
     )
     figure.tight_layout(rect=(0, 0.04, 1, 1.0))
-    _source_note(figure, source)
-    figure.savefig(out, dpi=200)
-    plt.close(figure)
-    return out
-
-
-# The three schemes of the outcome table, in the order the report reads them.
-SCHEME_ORDER = ("plain", "pooled", "perlabel")
-SCHEME_NAMES = {
-    "plain": "Single tuned threshold\n90% sensitivity, no deferral",
-    "pooled": "Pooled conformal calibration\n90% coverage, all cases",
-    "perlabel": "Class-conditional calibration\n90% coverage within each label",
-}
-# Correct, deferred, wrong -- the three things that can happen to a case.
-OUTCOME_COLOURS = {"correct": "#4a7c59", "deferred": "#e0a458", "wrong": "#b4423a"}
-
-
-def figure_5_thresholds(
-    outcomes: dict[str, Any], scores: dict[str, Any], out: Path, source: Path
-) -> Path:
-    """Where each scheme puts its thresholds, and what that costs per label.
-
-    The score axis is the same in all three panels; only the thresholds move.
-    Each panel carries the consequence beside the placement, so the figure does
-    not need the table to be read.
-    """
-    probs = scores["probs"][:, 1]
-    labels = scores["labels"]
-    source_block = outcomes["by_corpus"]["ptbxl"]
-    prevalence = source_block["prevalence"]
-    thresholds = outcomes["thresholds"]
-    bands: dict[str, tuple[float, ...]] = {
-        "plain": (thresholds["plain:single"]["mean"],),
-        "pooled": (thresholds["pooled:lower"]["mean"], thresholds["pooled:upper"]["mean"]),
-        "perlabel": (thresholds["perlabel:lower"]["mean"], thresholds["perlabel:upper"]["mean"]),
-    }
-    bins = np.linspace(0.0, 1.0, 41)
-    figure, axes = plt.subplots(3, 1, figsize=(8.8, 8.4), sharex=True)
-    for axis, scheme in zip(axes, SCHEME_ORDER, strict=True):
-        for klass, colour, name in ((0, "#7d8a93", "non-MI"), (1, "#b4423a", "MI")):
-            of_class = labels == klass
-            axis.hist(
-                probs[of_class],
-                bins=bins,
-                weights=np.full(int(of_class.sum()), 100.0 / int(of_class.sum())),
-                color=colour,
-                alpha=0.7,
-                label=f"{name} (n={int(of_class.sum()):,})",
-            )
-        cuts = bands[scheme]
-        low, high = cuts[0], cuts[-1]
-        if high > low:
-            axis.axvspan(low, high, color="#e0a458", alpha=0.30, zorder=0)
-            axis.text((low + high) / 2, 52, "deferred", ha="center", fontsize=9.5, color="#8a5b1c")
-        for cut in dict.fromkeys(cuts):
-            axis.axvline(cut, color="black", lw=1.2, ls="--")
-            axis.text(cut + 0.009, 44, f"{cut:.2f}", fontsize=8.5, color="#333", va="top")
-        axis.text(low / 2, 52, "labelled non-MI", ha="center", fontsize=9.5, color="#3d474d")
-        axis.text((high + 1) / 2, 52, "labelled MI", ha="center", fontsize=9.5, color="#7a2f2a")
-        sick = source_block["schemes"][scheme]["1"]
-        healthy = source_block["schemes"][scheme]["0"]
-        deferred = (
-            prevalence * sick["deferred"]["mean"] + (1 - prevalence) * healthy["deferred"]["mean"]
-        )
-        axis.text(
-            0.985,
-            0.72,
-            f"MI missed  {sick['wrong']['mean'] * 100:.0f}%\n"
-            f"false alarms  {healthy['wrong']['mean'] * 100:.0f}%\n"
-            f"deferred  {deferred * 100:.0f}%",
-            transform=axis.transAxes,
-            ha="right",
-            va="top",
-            fontsize=10,
-            linespacing=1.55,
-            bbox={"boxstyle": "round,pad=0.5", "fc": "#f6f4ef", "ec": "#cfc9bd", "lw": 0.8},
-        )
-        axis.set_ylim(0, 58)
-        axis.set_title(SCHEME_NAMES[scheme].replace("\n", " -- "), fontsize=11.5, loc="left", pad=6)
-        axis.set_ylabel("% of that class", fontsize=9.5)
-        for spine in ("top", "right"):
-            axis.spines[spine].set_visible(False)
-    axes[0].legend(fontsize=9, frameon=False, loc="upper left", bbox_to_anchor=(0.30, 1.02))
-    axes[-1].set_xlabel("model score for MI", fontsize=10)
-    axes[-1].set_xlim(0, 1)
-    figure.text(
-        0.5,
-        0.055,
-        "MI missed: share of MI cases given the non-MI label alone.   "
-        "False alarms: share of non-MI cases given the MI label alone.",
-        ha="center",
-        fontsize=8.5,
-        color="#555",
-    )
-    figure.text(
-        0.5,
-        0.040,
-        "Deferred: share of all tracings returning both labels or neither, sent to a specialist.",
-        ha="center",
-        fontsize=8.5,
-        color="#555",
-    )
-    figure.text(
-        0.5,
-        0.025,
-        "Histograms show all of fold 10; the rates are means over the test halves.",
-        ha="center",
-        fontsize=8.5,
-        color="#555",
-    )
-    figure.tight_layout(rect=(0, 0.085, 1, 1))
-    _source_note(figure, source)
-    figure.savefig(out, dpi=200)
-    plt.close(figure)
-    return out
-
-
-def figure_6_outcomes(outcomes: dict[str, Any], out: Path, source: Path) -> Path:
-    """What a case of each label gets, under each of the three schemes."""
-    source_block = outcomes["by_corpus"]["ptbxl"]
-    # The halving is by patient, so the test half's size varies by draw; the
-    # counts are the means the table recorded, not a nominal half.
-    scored = source_block["n_scored"]["mean"]
-    positive = source_block["n_positive"]["mean"]
-    panels = (
-        ("1", f"MI cases (mean {positive:,.0f} per draw)"),
-        ("0", f"non-MI cases (mean {scored - positive:,.0f} per draw)"),
-    )
-    figure, axes = plt.subplots(1, 2, figsize=(13, 4.3), sharex=True)
-    positions = np.arange(len(SCHEME_ORDER))[::-1]
-    for axis, (klass, title) in zip(axes, panels, strict=True):
-        for position, scheme in zip(positions, SCHEME_ORDER, strict=True):
-            cell = source_block["schemes"][scheme][klass]
-            left = 0.0
-            for name in ("correct", "deferred", "wrong"):
-                width = cell[name]["mean"] * 100
-                axis.barh(position, width, left=left, color=OUTCOME_COLOURS[name], height=0.5)
-                if width > 5:
-                    axis.text(
-                        left + width / 2,
-                        position,
-                        f"{width:.0f}%",
-                        ha="center",
-                        va="center",
-                        color="#3a2c10" if name == "deferred" else "white",
-                        fontsize=10.5,
-                    )
-                left += width
-        axis.set_yticks(positions)
-        axis.set_yticklabels([SCHEME_NAMES[s] for s in SCHEME_ORDER], fontsize=9)
-        axis.set_xlim(0, 100)
-        axis.set_title(title, fontsize=11.5, pad=10)
-        axis.set_xlabel("share of cases carrying this label (%)", fontsize=9.5)
-        for spine in ("top", "right", "left"):
-            axis.spines[spine].set_visible(False)
-        axis.tick_params(axis="y", length=0)
-    handles = [
-        plt.Rectangle((0, 0), 1, 1, color=OUTCOME_COLOURS[name])
-        for name in ("correct", "deferred", "wrong")
-    ]
-    figure.legend(
-        handles,
-        ["correct label returned", "deferred to a specialist", "incorrect label returned"],
-        fontsize=10,
-        loc="lower center",
-        bbox_to_anchor=(0.5, 0.055),
-        ncol=3,
-        frameon=False,
-    )
-    figure.text(
-        0.5,
-        0.045,
-        f"PTB-XL fold 10, {outcomes['n_draws']} patient-level calibration draws. "
-        "The single threshold and per-label calibration meet at a ~10% MI miss rate "
-        "by construction; pooled calibration is matched to neither and lands at 27%.",
-        ha="center",
-        fontsize=8.5,
-        color="#555",
-    )
-    figure.tight_layout(rect=(0, 0.15, 1, 0.97))
-    _source_note(figure, source)
-    figure.savefig(out, dpi=200)
-    plt.close(figure)
-    return out
+    return _save(figure, out)
 
 
 # The rotation's five diagnoses, named as a cardiologist reads them, and the five
 # corpora that take turns as the source.
 ROTATION_LABEL_NAMES = {
-    "NSR": "sinus\nrhythm",
-    "AF": "atrial\nfibrillation",
-    "LBBB": "left bundle-\nbranch block",
-    "RBBB": "right bundle-\nbranch block",
-    "IAVB": "first-degree\nAV block",
+    key: words("en")[f"rotation.label.{key}"] for key in ("NSR", "AF", "LBBB", "RBBB", "IAVB")
 }
 SOURCE_ORDER = ("ptbxl", "sph", "chapman_ningbo", "georgia", "cpsc")
-SOURCE_NAMES = {
-    "ptbxl": "PTB-XL",
-    "sph": "Shandong",
-    "chapman_ningbo": "Chapman and Ningbo",
-    "georgia": "Georgia",
-    "cpsc": "CPSC",
-}
 SOURCE_COLOUR = {
     "ptbxl": "#023047",
     "sph": "#219ebc",
     "chapman_ningbo": "#8ecae6",
     "georgia": "#fb8500",
     "cpsc": "#bf4342",
-}
-FAMILY_NAMES = {
-    "recalibrated": "recalibrated on the target records alone",
-    "pooled": "target records added to the source calibration half",
 }
 FAMILY_COLOUR = {"recalibrated": "#5f8d4e", "pooled": "#bf4342"}
 
@@ -666,7 +320,7 @@ def _headline(table: dict[str, Any]) -> tuple[float, str]:
     return float(headline["alpha"]), str(headline["score"])
 
 
-def figure_7_rotation(table: dict[str, Any], out: Path, source: Path) -> Path:
+def figure_7_rotation(table: dict[str, Any], out: Path, lang: str = "en") -> Path:
     """Coverage of each diagnosis under each correction, every source-target pair drawn.
 
     One panel per correction, one column per diagnosis.  Each away pair is a dot
@@ -676,6 +330,7 @@ def figure_7_rotation(table: dict[str, Any], out: Path, source: Path) -> Path:
     is the mean over the away pairs with the spread across sources, which is what
     turns two hospitals into an estimate.
     """
+    text = words(lang)
     alpha, score = _headline(table)
     target = 1.0 - alpha
     corrections = [c for c in CORRECTION_ORDER if c in table["settings"]["corrections"]]
@@ -756,14 +411,16 @@ def figure_7_rotation(table: dict[str, Any], out: Path, source: Path) -> Path:
             )
         axis.axhline(target, color="#111111", linestyle="--", linewidth=1.0, zorder=1)
         axis.set_xticks(range(len(labels)))
-        axis.set_xticklabels([ROTATION_LABEL_NAMES[key] for key in labels], fontsize=8)
-        axis.set_title(CORRECTION_NAMES[correction], fontsize=9)
+        axis.set_xticklabels([text[f"rotation.label.{key}"] for key in labels], fontsize=8)
+        axis.set_title(text[f"correction.{correction}"], fontsize=9)
         axis.set_ylim(0.0, 1.02)
         axis.grid(axis="y", color="#eeeeee", zorder=0)
-    axes[0].set_ylabel(f"coverage of the diagnosis at the {target:.0%} level")
+    axes[0].set_ylabel(text["rotation.ylabel"].format(level=percent(target, 0, lang)))
 
     handles = [
-        plt.Line2D([], [], marker="o", linestyle="", color=SOURCE_COLOUR[s], label=SOURCE_NAMES[s])
+        plt.Line2D(
+            [], [], marker="o", linestyle="", color=SOURCE_COLOUR[s], label=text[f"source.{s}"]
+        )
         for s in SOURCE_ORDER
         if s in {e["source"] for lab in labels for e in table["bias"][lab][corrections[0]]["away"]}
     ]
@@ -775,7 +432,7 @@ def figure_7_rotation(table: dict[str, Any], out: Path, source: Path) -> Path:
             linestyle="",
             markerfacecolor="none",
             markeredgecolor="#111111",
-            label="the source on its own held-out records",
+            label=text["rotation.legend.home"],
         )
     )
     handles.append(
@@ -788,7 +445,7 @@ def figure_7_rotation(table: dict[str, Any], out: Path, source: Path) -> Path:
             markeredgecolor="#111111",
             markeredgewidth=1.1,
             markersize=6,
-            label="threshold infinite in some draws: covers by admitting both labels",
+            label=text["rotation.legend.infinite"],
         )
     )
     handles.append(
@@ -799,7 +456,7 @@ def figure_7_rotation(table: dict[str, Any], out: Path, source: Path) -> Path:
             linestyle="",
             color="#111111",
             markersize=14,
-            label="mean over the away pairs, spread across sources",
+            label=text["rotation.legend.mean"],
         )
     )
     figure.legend(handles=handles, loc="lower center", ncol=3, frameon=False, fontsize=8)
@@ -808,23 +465,22 @@ def figure_7_rotation(table: dict[str, Any], out: Path, source: Path) -> Path:
     # four columns of the figure.
     counted = {table["bias"][label][corrections[0]]["away_bias"]["n_pairs"] for label in labels}
     pairs = (
-        f"{min(counted)} to {max(counted)} ordered pairs"
+        text["rotation.pairs.range"].format(low=min(counted), high=max(counted))
         if len(counted) > 1
-        else f"{min(counted)} ordered pairs"
+        else text["rotation.pairs.one"].format(n=min(counted))
     )
     figure.suptitle(
-        f"Five sources, {pairs} per diagnosis, "
-        f"{table['settings']['n_draws']} calibration draws, {score.upper()} score",
+        text["rotation.title"].format(
+            pairs=pairs, draws=table["settings"]["n_draws"], score=score.upper()
+        ),
         fontsize=10,
     )
+    _localise_ticks(figure, lang)
     figure.tight_layout(rect=(0, 0.10, 1, 0.96))
-    _source_note(figure, source)
-    figure.savefig(out, dpi=200)
-    plt.close(figure)
-    return out
+    return _save(figure, out)
 
 
-def figure_8_target_scale(ladder: dict[str, Any], out: Path, source: Path) -> Path:
+def figure_8_target_scale(ladder: dict[str, Any], out: Path, lang: str = "en") -> Path:
     """What a hospital's own labelled tracings buy, against pooling them with the source.
 
     One panel per correction the ladder can carry above rung zero.  The x axis is
@@ -832,6 +488,7 @@ def figure_8_target_scale(ladder: dict[str, Any], out: Path, source: Path) -> Pa
     ways of spending them.  Rung zero is the frozen source threshold and is the
     same point on both lines, which is where the break table left off.
     """
+    text = words(lang)
     alpha, score = _headline(ladder)
     target = 1.0 - alpha
     rungs = list(ladder["settings"]["rungs"])
@@ -870,7 +527,7 @@ def figure_8_target_scale(ladder: dict[str, Any], out: Path, source: Path) -> Pa
                 "-o",
                 color=FAMILY_COLOUR[family],
                 markersize=5,
-                label=FAMILY_NAMES[family],
+                label=text[f"family.{family}"],
                 zorder=3,
             )
             axis.fill_between(
@@ -883,38 +540,53 @@ def figure_8_target_scale(ladder: dict[str, Any], out: Path, source: Path) -> Pa
             )
         axis.axhline(target, color="#111111", linestyle="--", linewidth=1.0, zorder=1)
         axis.set_xticks(positions)
-        axis.set_xticklabels([f"{r:,}" for r in rungs])
-        axis.set_xlabel("labelled target tracings the threshold saw")
-        axis.set_title(CORRECTION_NAMES[correction], fontsize=9)
+        axis.set_xticklabels([count(r, lang) for r in rungs])
+        axis.set_xlabel(text["target.xlabel"])
+        axis.set_title(text[f"correction.{correction}"], fontsize=9)
         axis.grid(axis="y", color="#eeeeee", zorder=0)
-    axes[0].set_ylabel(f"coverage of the diagnosis at the {target:.0%} level")
-    axes[0].legend(loc="lower right", frameon=False, fontsize=8)
+    axes[0].set_ylabel(text["rotation.ylabel"].format(level=percent(target, 0, lang)))
+    handles, names = axes[0].get_legend_handles_labels()
+    figure.legend(handles, names, loc="lower center", ncol=2, frameon=False, fontsize=8)
     pair = ladder["pair"]
-    plain = {"ptbxl": "PTB-XL", "sph": "Shandong", "acs": "Chongqing"}
+
+    def plain(corpus: str) -> str:
+        return text[f"corpus.{corpus}"].split(" (")[0] if f"corpus.{corpus}" in text else corpus
+
     figure.suptitle(
-        f"{plain.get(pair['source'], pair['source'])} to "
-        f"{plain.get(pair['target'], pair['target'])}, {pair['label']}, "
-        f"{ladder['settings']['n_draws']} draws, {score.upper()} score",
+        text["target.title"].format(
+            source=plain(pair["source"]),
+            target=plain(pair["target"]),
+            label=text.get(f"target.label.{pair['label']}", pair["label"]),
+            draws=ladder["settings"]["n_draws"],
+            score=score.upper(),
+        ),
         fontsize=10,
     )
-    figure.tight_layout(rect=(0, 0, 1, 0.94))
-    _source_note(figure, source)
-    figure.savefig(out, dpi=200)
-    plt.close(figure)
-    return out
+    _localise_ticks(figure, lang)
+    figure.tight_layout(rect=(0, 0.08, 1, 0.94))
+    return _save(figure, out)
+
+
+# The figures that carry words in every language of figure_text; the rest are English.
+TRANSLATED = (1, 5, 6, 7, 8)
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--figure",
-        nargs="+",
-        type=int,
-        default=[1, 2, 3, 4, 5, 6, 7, 8],
-        choices=[1, 2, 3, 4, 5, 6, 7, 8],
-    )
+    parser.add_argument("--figure", nargs="+", type=int, choices=[1, 2, 3, 4, 5, 6, 7, 8])
+    parser.add_argument("--lang", default="en", choices=LANGUAGES)
     parser.add_argument("--out", default=str(RESULTS_DIR / "figures"))
     args = parser.parse_args(argv)
+    lang = args.lang
+    if args.figure is None:
+        args.figure = [1, 2, 3, 4, 5, 6, 7, 8] if lang == "en" else list(TRANSLATED)
+    untranslated = sorted(set(args.figure) - set(TRANSLATED)) if lang != "en" else []
+    if untranslated:
+        parser.error(
+            f"figures {untranslated} are drawn in English only; --lang {lang} draws "
+            f"{list(TRANSLATED)}"
+        )
+    suffix = SUFFIX[lang]
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
 
@@ -928,15 +600,13 @@ def main(argv: list[str] | None = None) -> int:
     drawn = []
     if 1 in args.figure:
         table = json.loads(shift_path.read_text())
-        drawn.append(figure_1_coverage(table, out / "fig3_coverage.png", shift_path))
+        drawn.append(figure_1_coverage(table, out / f"fig3_coverage{suffix}.png", lang))
     if 2 in args.figure:
         table = json.loads(shift_path.read_text())
-        drawn.append(figure_2_set_sizes(table, out / "fig2_set_sizes.png", shift_path))
+        drawn.append(figure_2_set_sizes(table, out / "fig2_set_sizes.png"))
     if 3 in args.figure:
         if arms_path.exists():
-            drawn.append(
-                figure_3_arms(json.loads(arms_path.read_text()), out / "fig3_arms.png", arms_path)
-            )
+            drawn.append(figure_3_arms(json.loads(arms_path.read_text()), out / "fig3_arms.png"))
         else:
             print(
                 "figure 3 needs each encoder arm's cached representations turned into scores "
@@ -950,7 +620,6 @@ def main(argv: list[str] | None = None) -> int:
                 json.loads(metrics_path.read_text()),
                 json.loads(baseline_path.read_text()),
                 out / "fig4_discrimination.png",
-                metrics_path,
             )
         )
     outcomes_path = RESULTS_DIR / "outcomes.json"
@@ -959,17 +628,17 @@ def main(argv: list[str] | None = None) -> int:
         if 5 in args.figure:
             scores = dict(np.load(RESULTS_DIR / "baseline/scores.npz"))
             drawn.append(
-                figure_5_thresholds(outcomes, scores, out / "fig1_thresholds.png", outcomes_path)
+                figure_5_thresholds(outcomes, scores, out / f"fig1_thresholds{suffix}.png", lang)
             )
         if 6 in args.figure:
-            drawn.append(figure_6_outcomes(outcomes, out / "fig2_outcomes.png", outcomes_path))
+            drawn.append(figure_6_outcomes(outcomes, out / f"fig2_outcomes{suffix}.png", lang))
     if 7 in args.figure:
         if rotation_path.exists():
             drawn.append(
                 figure_7_rotation(
                     json.loads(rotation_path.read_text()),
-                    out / "fig7_rotation.png",
-                    rotation_path,
+                    out / f"fig7_rotation{suffix}.png",
+                    lang,
                 )
             )
         else:
@@ -984,8 +653,8 @@ def main(argv: list[str] | None = None) -> int:
             drawn.append(
                 figure_8_target_scale(
                     json.loads(ladder_path.read_text()),
-                    out / "fig8_target_scale.png",
-                    ladder_path,
+                    out / f"fig8_target_scale{suffix}.png",
+                    lang,
                 )
             )
         else:

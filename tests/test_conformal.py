@@ -1,4 +1,4 @@
-"""The coverage guarantee is a theorem, so it can be asserted, not eyeballed."""
+"""Split conformal coverage is a theorem, so it can be asserted, not eyeballed."""
 
 from __future__ import annotations
 

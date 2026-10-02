@@ -1,8 +1,8 @@
 """Seconds per hundred PTB-XL records through each encoder arm, on this machine.
 
 The number sizes the week: one forward pass over ~65,000 records on a CPU is
-the cost of adding an arm, and no training run starts before it is known
-(PLAN.md, day 1).  One row per arm goes to a JSON report; an arm that cannot be
+the cost of adding an arm, and no training run starts before it is known.
+One row per arm goes to a JSON report; an arm that cannot be
 loaded gets ``seconds_per_100: null`` and a note saying exactly why, so the next
 session does not rediscover the blocker.
 

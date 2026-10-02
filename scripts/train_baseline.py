@@ -4,7 +4,7 @@ If the coverage
 guarantee breaks on another hospital's tracings, the first question is whether
 the model was ever any good; a baseline that reproduces the published benchmark
 answers it, and one that does not means the break has to be explained before it
-is believed (C-19).
+is believed.
 
 The split is the one PTB-XL ships for benchmarking, so the number is comparable
 to the published one: folds 1-8 to train, fold 9 to decide when to stop, fold 10

@@ -1,9 +1,9 @@
 """Run every record of every corpus through the ingestion chain and write the
 counts to results/ingest_report.json: records read, records excluded with the
-reason (C-15), and the deviations the chain had to name (C-14).
+reason, and the deviations the chain had to name.
 
 Reads in chunks of a thousand records so that no corpus is ever held in memory
-whole; nothing transformed is written anywhere (C-14b).
+whole; nothing transformed is written anywhere.
 
 Usage: .venv/bin/python scripts/scan_corpora.py
 """

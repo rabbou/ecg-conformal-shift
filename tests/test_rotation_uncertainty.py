@@ -1,16 +1,16 @@
 """The two things the coverage table cannot say on its own.
 
-C-31, the interval: every spread in ``results/rotation.csv`` is taken over the
+The interval: every spread in ``results/rotation.csv`` is taken over the
 calibration draws on a target cohort that never moves, so it carries none of the
 uncertainty that comes from the cohort being a sample.  The bootstrap resamples
 that cohort by patient and is reported beside the draw spread, not instead of it.
 
-C-32, the comparator: Chow's rule is one plain empirical quantile per class,
+The comparator: Chow's rule is one plain empirical quantile per class,
 which is Mondrian without the finite-sample ``(n+1)`` correction.  If the two
 agree everywhere then the conformal formalism is a rename, and the file has to
 show that rather than the reader having to assume otherwise.
 
-C-33, the subgroups: a coverage that holds over a cohort can fail over half of
+The subgroups: a coverage that holds over a cohort can fail over half of
 it, so every row is repeated by sex and by age band, and a cell resting on too
 few positives is flagged rather than read.
 """
@@ -121,7 +121,7 @@ class TestTheCommittedUncertainty:
         }
 
     def test_every_row_carries_both_uncertainties(self, rows: list[dict[str, str]]) -> None:
-        """C-31. The draw spread and the cohort interval are reported together;
+        """The draw spread and the cohort interval are reported together;
         neither replaces the other."""
         for row in rows:
             coverage = float(row["coverage"])
@@ -150,7 +150,7 @@ class TestTheCommittedUncertainty:
         )
 
     def test_the_comparator_is_reported_for_every_pair(self, rows: list[dict[str, str]]) -> None:
-        """C-32. What the conformal formalism adds is a number on every row."""
+        """What the conformal formalism adds is a number on every row."""
         for row in rows:
             gap = float(row["conformal_minus_chow"])
             assert gap == pytest.approx(
@@ -181,7 +181,7 @@ class TestTheCommittedUncertainty:
 
 
 class TestTheSubgroups:
-    """C-33. A figure that holds over a cohort can fail over half of it."""
+    """A figure that holds over a cohort can fail over half of it."""
 
     def test_every_cohort_row_is_repeated_by_sex_and_by_age(
         self, rows: list[dict[str, str]]

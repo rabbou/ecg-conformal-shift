@@ -16,7 +16,7 @@ each is named where it is used.
 
 `dx_mapping_scored.csv` is the Challenge-2021 scored-diagnosis table. It gives
 the SNOMED CT code of every class the Challenge scored, the count of that class
-in each of its eight partitions, and — in its `Notes` column — the pairs of
+in each of its eight partitions, and, in its `Notes` column, the pairs of
 codes the Challenge scored as one diagnosis. Both the SNOMED codes the small
 set is defined by and the counts the label table is checked against are read
 from this file; none is typed in.

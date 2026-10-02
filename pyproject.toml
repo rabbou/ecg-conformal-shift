@@ -1,7 +1,7 @@
 [project]
 name = "ecg-conformal-shift"
 version = "0.1.0"
-description = "Does a conformal coverage guarantee survive a change of hospital? Measured on 12-lead ECG."
+description = "Threshold generalisation to external sites for ECG-AI diagnostic support: a decision threshold set at one hospital, tested at others, diagnosis by diagnosis across seven public 12-lead ECG corpora."
 requires-python = ">=3.11,<3.12"
 dependencies = [
     "numpy>=1.26,<2",

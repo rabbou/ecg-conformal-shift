@@ -16,7 +16,7 @@ partitions are an allow-list here, and asking for a forbidden one is an error
 rather than a filtered-out no-op.
 
 *The target must actually carry infarction.*  Coverage is reported per class
-(C-11), so a target whose infarction class is a handful of records measures
+, so a target whose infarction class is a handful of records measures
 nothing: the class-conditional figure would be noise however many draws it is
 averaged over.  This counts the records carrying an infarction code, per
 partition, and the count is what the decision rests on.

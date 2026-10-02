@@ -84,8 +84,50 @@ class TestCoverageGrid:
                 expected[column].fillna(-1).tolist()
             ), column
 
-    def test_the_two_pre_trained_arms_are_listed_as_not_run(self, result: dict[str, Any]) -> None:
-        assert set(result["not_run"]) == {"echonext_mini", "ecgfounder"}
+    def test_the_four_arms_of_the_protocol_ran(self, result: dict[str, Any]) -> None:
+        assert list(result["arms"]) == ["resnet", "random_init", "ecgfounder", "echonext_mini"]
+        assert "not_run" not in result
+
+
+# Composite figures per arm, as measured on 2 October 2026: AUROC on the whole
+# test split, then on outpatients the per-label coverage of the ill and of the
+# healthy, the share sent to a human, and the ill covered after 100 local labels.
+PINNED = {
+    "resnet": ("0.834", "71.6%", "98.1%", "29.4%", "93.4%"),
+    "random_init": ("0.792", "78.6%", "97.2%", "44.2%", "88.8%"),
+    "ecgfounder": ("0.824", "71.6%", "97.7%", "32.2%", "95.3%"),
+    "echonext_mini": ("0.820", "72.7%", "98.2%", "32.3%", "97.6%"),
+}
+PUBLISHED_MINI_AUROC = 0.820
+
+
+class TestArms:
+    def test_each_arm_keeps_its_composite_figures(self, result: dict[str, Any]) -> None:
+        for arm, pinned in PINNED.items():
+            f = arm_figures(result, arm)
+            measured = (
+                f["auroc_test"],
+                f["ill_covered"],
+                f["healthy_covered"],
+                f["to_a_human"],
+                f["ladder_100"],
+            )
+            assert measured == pinned, arm
+
+    def test_the_mini_model_replays_its_published_auroc(self, result: dict[str, Any]) -> None:
+        """82.0% on the test split in the EchoNext paper; a gap over half a point
+        would mean the architecture or the label order was rebuilt wrongly."""
+        auroc = result["arms"]["echonext_mini"]["auroc_test_all_contexts"][COMPOSITE]["auroc"]
+        assert auroc == pytest.approx(PUBLISHED_MINI_AUROC, abs=0.005)
+
+    def test_the_frozen_encoder_clears_the_card_kill_line(self, result: dict[str, Any]) -> None:
+        """T-065: the minimal version dies if frozen encoders stay under 0.75 AUROC."""
+        auroc = result["arms"]["ecgfounder"]["auroc_test_all_contexts"][COMPOSITE]["auroc"]
+        assert auroc > 0.75
+
+    def test_the_new_arms_say_how_their_weights_were_read(self, result: dict[str, Any]) -> None:
+        assert "weights_only=True" in result["arms"]["echonext_mini"]["run"]["weights"]
+        assert "z-score" in result["arms"]["ecgfounder"]["run"]["input"]
 
 
 class TestCohorts:

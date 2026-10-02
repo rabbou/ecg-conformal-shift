@@ -36,13 +36,15 @@ Three ways of deciding are compared at the 90% level: one threshold set at 90%
 sensitivity on the inpatients (plain), split conformal over all calibration
 ECGs (pooled), and one conformal threshold per class (per-label).
 
-Two arms ran. The study's ResNet, trained from scratch on the train split,
+Four arms ran. The study's ResNet, trained from scratch on the train split,
 reaches an AUROC of 0.834 for the composite on the whole test split and 0.805
-on outpatients. The same network frozen at random initialisation with one
-logistic probe per label, the floor a pre-trained encoder has to clear,
-reaches 0.792 and 0.758. Neither is the published EchoNext mini-model, whose
-AUROC of 82.0% on this test split is the reference; its arm did not run (see
-below).
+on outpatients. The published EchoNext mini-model, run on its own weights with
+nothing refitted, reaches 0.820, against the 82.0% its authors report on this
+test split; the gap is under a tenth of a point. ECGFounder, a foundation model
+pre-trained on more than ten million ECGs from another hospital, frozen with
+one logistic probe per label fitted on the train split, reaches 0.824. The
+study's ResNet frozen at random initialisation with the same probes, the floor
+a pre-trained encoder has to clear, reaches 0.792.
 
 ## Findings, for the trained ResNet
 
@@ -61,10 +63,26 @@ below).
   cover 69.3% of the ill; refitted on 100 outpatient ECGs drawn from the other
   half, 93.4%, with 90.5% of the healthy covered.
 
-The floor arm loses less coverage on outpatients (78.6%) because it sends more
-of them to a human (44.2%). Every figure for both arms, per label and per care
-context, is in `results/echonext_transfer.json` and
-`results/echonext_coverage.csv`, and the one-page reports are in
+## The four arms side by side
+
+The three arms that discriminate best lose the same coverage on outpatients:
+71.6% of the ill for the ResNet and for ECGFounder, 72.7% for the published
+mini-model. A network trained here, one trained by the EchoNext authors and
+one pre-trained elsewhere all fall to the same level, which points at the
+outpatients' ECGs rather than at any one model.
+
+| Arm | AUROC, whole test split | AUROC, outpatients | Ill outpatients covered | Healthy outpatients covered | Outpatients sent to a human | Ill emergency patients covered | Ill outpatients covered after 100 local labels |
+|---|---|---|---|---|---|---|---|
+| Study ResNet, trained | 0.834 | 0.805 | 71.6% | 98.1% | 29.4% | 86.2% | 93.4% |
+| EchoNext mini-model, published | 0.820 | 0.795 | 72.7% | 98.2% | 32.3% | 85.5% | 97.6% |
+| ECGFounder, frozen, probes | 0.824 | 0.791 | 71.6% | 97.7% | 32.2% | 82.9% | 95.3% |
+| Random initialisation, frozen, probes | 0.792 | 0.758 | 78.6% | 97.2% | 44.2% | 84.4% | 88.8% |
+
+Coverage is for the composite, with per-label thresholds calibrated on the
+inpatients at the 90% level. The floor arm loses less coverage on outpatients
+because it sends more of them to a human. Every figure for the four arms, per
+label and per care context, is in `results/echonext_transfer.json` and
+`results/echonext_coverage.csv`, and each arm has its one-page report in
 `reports/transfer/`.
 
 ## The unit of the tracings
@@ -96,15 +114,33 @@ uv run pytest -m data tests/test_echonext_data.py
 ```
 
 `echonext_transfer.py` scores an arm first when its scores are missing, which
-for the trained ResNet is a training run on the Apple GPU or the CPU.
+for the trained ResNet is a training run on the Apple GPU or the CPU. The two
+published arms read their weights from `data/weights/echonext_mini/weights.pt`
+and `data/weights/ecgfounder/12_lead_ECGFounder.pth`, each checked against the
+SHA-256 it had when it was fetched.
 
-## What did not run
+## How the published weights were run
 
-The protocol names two pre-trained arms that are absent: the published EchoNext
-mini-model (weights and architecture from the authors' IntroECG repository) and
-ECGFounder frozen with logistic probes. Both load third-party code or pickled
-weights, which this run was not cleared to execute. Their cells are empty and
-named in each report.
+The mini-model's weights come from the authors' IntroECG repository (commit
+15233e93) and hold tensors only, so `torch.load` reads them with
+`weights_only=True`. Its architecture is `EchoNextMini` in
+`src/ecs/echonext_mini.py`, written from the shapes of the checkpoint rather
+than copied, since the repository states no licence; every tensor of the
+checkpoint loads into it, with none missing. It reads the tracing as
+distributed and the seven tabular features the distribution ships already
+standardised (sex, age, rates and intervals), which the other three arms do not
+see. Scoring the validation and test splits took 2.9 seconds on the Apple GPU.
+
+ECGFounder's checkpoint holds one numpy scalar beside its tensors, which
+`weights_only=True` refuses on torch 2.2.2. It is read through an unpickler
+that resolves five names (the tensor rebuild, an ordered dict, the numpy
+scalar, its dtype and a byte codec) and refuses any other, so the file is never
+unpickled in full. Its network is the authors' Net1D, vendored in
+`third_party/ecgfounder`. The model card asks for 500 Hz, so each tracing is
+resampled from 250 Hz by polyphase filtering; the amplitude stays in z-score,
+since no millivolt scale exists to restore. The 1,024 features before the
+dense head feed one logistic probe per label. Embedding the 82,543 training,
+validation and test ECGs and fitting the probes took 332 seconds.
 
 EchoNext is under PhysioNet's restricted licence. Its tracings, and the
 per-record scores computed from them, stay outside this repository; the results

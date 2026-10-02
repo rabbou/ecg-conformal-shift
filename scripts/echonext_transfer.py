@@ -60,20 +60,8 @@ REPORTS_DIR = REPO_ROOT / "reports/transfer"
 ARMS = {
     "resnet": "the study's ResNet, trained on EchoNext",
     "random_init": "the study's ResNet frozen at random initialisation, with logistic probes",
-}
-
-# Arms the protocol names that did not run, and why.  They stay in the result
-# file so the report says what is missing instead of looking complete.
-NOT_RUN = {
-    "echonext_mini": (
-        "the published Columbia mini-model (github.com/PierreElias/IntroECG, "
-        "7-EchoNext Minimodel): running its architecture file and unpickling its "
-        "weights.pt needs Ruben's approval of third-party code in this environment"
-    ),
-    "ecgfounder": (
-        "ECGFounder frozen with logistic probes: its checkpoint loads only with "
-        "torch.load(weights_only=False) on torch 2.2.2, which needs the same approval"
-    ),
+    "ecgfounder": "ECGFounder frozen, with logistic probes",
+    "echonext_mini": "the published EchoNext mini-model",
 }
 
 EMPTY_CELLS = {
@@ -82,7 +70,6 @@ EMPTY_CELLS = {
         "T-065, ambitious version, after PhysioNet credentialing"
     ),
     "Gap between observed and recomputed PPV across sites": "T-067",
-    "Pre-trained arms (Columbia mini-model, ECGFounder)": "this task, once their code may run",
 }
 
 Probs = NDArray[np.float32]
@@ -221,7 +208,6 @@ def main() -> None:
         "patients_shared_between_roles": 0,  # transfer_cohorts raises otherwise
         "prevalence_by_context_val_and_test": prevalence_replay(meta),
         "arms": {},
-        "not_run": NOT_RUN,
         "empty_cells": EMPTY_CELLS,
     }
     for arm, title in ARMS.items():

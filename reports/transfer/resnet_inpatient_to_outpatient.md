@@ -118,4 +118,3 @@ The target is cut once by patient into a pool and an evaluation half. Rung 0 spe
 - Distance without labels between source and target ECGs: empty, filled by T-068.
 - The same pair at a second hospital, Columbia to Beth Israel (MIMIC-IV-Echo): empty, filled by T-065, ambitious version, after PhysioNet credentialing.
 - Gap between observed and recomputed PPV across sites: empty, filled by T-067.
-- Pre-trained arms (Columbia mini-model, ECGFounder): empty, filled by this task, once their code may run.

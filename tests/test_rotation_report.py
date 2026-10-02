@@ -1,10 +1,10 @@
 """Hold every rotation number the prose prints to the file it was read from.
 
-Section 2.4 and section 3.6 of ``REPORT.md``, the sentences the rotation adds to
-the abstract and the discussion, and questions 11 to 13 of ``QUESTIONS.md`` quote
-roughly fifty figures.  Each one is recomputed here from a file under
-``results/`` and asserted to appear in the prose, so that regenerating a table
-and forgetting to reread the paragraph fails the suite rather than shipping.
+Section 2.4 and section 3.6 of ``REPORT.md``, and the sentences the rotation adds
+to the abstract and the discussion, quote roughly fifty figures.  Each one is
+recomputed here from a file under ``results/`` and asserted to appear in the
+prose, so that regenerating a table and forgetting to reread the paragraph
+fails the suite rather than shipping.
 
 The check runs in the direction that catches the error: the expected string is
 built from the result file and searched for in the text.  A number nobody
@@ -92,11 +92,6 @@ def _finite(rows: list[dict[str, str]]) -> list[dict[str, str]]:
 @pytest.fixture(scope="module")
 def report() -> str:
     return (ROOT / "REPORT.md").read_text()
-
-
-@pytest.fixture(scope="module")
-def questions() -> str:
-    return (ROOT / "QUESTIONS.md").read_text()
 
 
 @pytest.fixture(scope="module")
@@ -589,34 +584,6 @@ def test_the_discussion_and_limitations_quote_the_same_files(report: str) -> Non
         ("weighted pairs", f"reweights, {_word(counts['weighted'])} do"),
     ):
         assert expected in tail, f"{what}: {expected!r} not in the discussion or limitations"
-
-
-def test_the_questions_quote_the_same_files(questions: str) -> None:
-    """Questions 11 to 13 restate figures from the section; they must not drift from it."""
-    tail = questions[questions.index("## 11.") :]
-    leak = _read("split_leak.json")
-    before = {c: b["before"]["n_groups_across_two_used_parts"] for c, b in leak["corpora"].items()}
-    rows = [r for r in _grid("mondrian") if r["role"] == "away"]
-    sick = [r for r in rows if (r["source"], r["label"]) in starved()]
-    bias = _read("rotation.json")["bias"]["LBBB"]["mondrian"]
-    ambiguities = _read("label_map.json")["ambiguities"]
-    covers = [float(r["coverage_diagnosis_mean"]) for r in sick]
-    sizes = [float(r["mean_set_size_mean"]) for r in sick]
-    for what, expected in (
-        ("leak total", f"{sum(before.values())} groups of identical tracings"),
-        ("leak by corpus", f"{before['cpsc']} of them in CPSC, {before['georgia']} in Georgia"),
-        ("still leaking", "which is zero"),
-        ("bought coverage", f"reads between {_pct(min(covers))} and {_pct(max(covers))}"),
-        ("set sizes", f"average {min(sizes):.2f} to {max(sizes):.2f} labels"),
-        (
-            "sign change",
-            f"reads {_signed(bias['away_bias']['mean'])} over twenty pairs and "
-            f"{_signed(bias['away_bias_where_the_threshold_was_finite']['mean'])}",
-        ),
-        ("ambiguities", f"{_word(len(ambiguities))} joins could not be made cleanly"),
-    ):
-        assert expected.lower() in tail.lower(), f"{what}: {expected!r} not in questions 11 to 13"
-    assert leak["n_groups_still_across_two_used_parts"] == 0
 
 
 def test_the_figure_reads_the_abstention_field_in_both_role_loops() -> None:

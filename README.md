@@ -1,141 +1,55 @@
-# ecg-conformal-shift
+# Threshold generalisation to external sites for ECG-AI diagnostic support
 
-An ECG classifier calibrated on one hospital's tracings can be set so that,
-for 90% of tracings, the diagnoses it cannot rule out include the right one. On
-PTB-XL, a German research corpus, that holds for 89.9% of all tracings and for
-73.2% of infarctions. Carried unchanged to a hospital in Chongqing, the same
-threshold covers 72.5% of infarctions across the cohort's 17,955 tracings. On
-the 8,984 tracings held out there for evaluation it covers 73.7%, and 100
-tracings labelled on site bring that half to 88.9%. The two Chongqing figures
-differ because they are measured on different tracings: the first on the whole
-cohort, the second on the half that never calibrates.
+Full study: [REPORT.md](REPORT.md) · Ruben Abbou · September 2026
 
-The calibration is split conformal prediction on the 12-lead ECG. Two standard
-corrections are compared on the same change of hospital: Mondrian calibration,
-with one threshold per class, and label-shift weighting.
+An ECG classifier's decision threshold is set on one population and used on others. Conformal calibration sets it so that 90% of tracings receive a set of possible diagnoses holding the right one. On PTB-XL, a German research corpus, the target holds over all tracings (89.9%) and fails within infarction (73.2%), because the commoner tracings without infarction carry the average. Carried unchanged to a hospital in Chongqing, the threshold covers 72.5% of infarctions. One threshold per diagnosis raises that to 84.0%, still short of 90%. Recalibrating on 100 tracings labelled there brings it to 88.9% on the held-out tracings. A site adopting such a tool has to measure coverage within each diagnosis on its own patients.
 
-The study has two parts. The first is infarction, calibrated on PTB-XL and
-applied to Shandong and Chongqing. The second rotates the calibration source
-over five corpora and five diagnoses a cardiologist reads at a glance, so that
-the result has a spread across sources instead of resting on a single pair.
-The study uses seven corpora, counting Chapman-Shaoxing and Ningbo apart:
-PTB-XL, Shandong, Chongqing, Chapman-Shaoxing, Ningbo, Georgia and CPSC.
+![Coverage by site and calibration scheme](results/figures/fig3_coverage.png)
 
-The findings, their figures and the limitations are in [REPORT.md](REPORT.md),
-and [QUESTIONS.md](QUESTIONS.md) answers the questions a clinician or a
-technical reader is likely to ask.
+Coverage by site (rows) and calibration scheme (columns) as the confidence asked for rises. Red: infarction cases. Grey: all cases. Dashed: the coverage asked for.
 
-## Cohorts
+## What a receiving site should measure
 
-| Cohort | Country, years | Records | Patients | MI prevalence | Role |
-|---|---|---|---|---|---|
-| PTB-XL v1.0.3 | Germany, 1989–96 | 21,799 | 18,869 | 25.09% | calibration |
-| SPH (Shandong) | China, 2019–20 | 25,770 | 24,666 | 1.01% | shifted test |
-| ACS-ECG (Chongqing) | China, 2015–24 | 17,960 | 17,018 | 14.92% acute MI | shifted test |
+The 90% is an average over patients and over draws of the calibration data, and an average can be met while one group of patients is failed: at PTB-XL, 89.9% of all sets hold the right diagnosis and 73.2% of infarction sets do. Fitting one threshold within each diagnosis makes the 90% hold inside each, which still depends on the patient's true diagnosis, unknown at the point of care. Nothing in this framework promises 90% to a single patient.
 
-All three are public and permissively licensed (CC BY 4.0, CC0, CC0). The
-counts are computed from each corpus's description file, not quoted from a
-paper, and are pinned by tests in `tests/test_labels.py`.
+When the model cannot rule a diagnosis out, the tracing receives a set holding both labels. That is a deferral: there is no machine answer, and a human reads the ECG. At the 90% target, PTB-XL defers about 5 tracings in 100 with one threshold for all tracings and about 10 in 100 with one threshold per diagnosis. `results/abstention.json` gives the rate per scheme and per confidence level.
 
-The source rotation adds four corpora from the PhysioNet/CinC Challenge-2021
-bundle (Chapman-Shaoxing and Ningbo, which rotate as one source, then Georgia
-and CPSC) and reuses PTB-XL and Shandong as sources in their turn. Chongqing
-is the seventh corpus.
+What happens at a third site cannot be predicted from these two. Infarction coverage rose at Shandong, to 93.6%, and fell at Chongqing. A site can reuse the measurement code, and what the measurement needs is cases of the rarer diagnosis: 865 infarctions pin coverage within that diagnosis to two points, about 5,800 tracings at Chongqing's prevalence and 86,000 at Shandong's.
 
-| Corpus | Country | Records | Role in the rotation |
+This is a retrospective measurement study on public, de-identified data. It is not a medical device and has no regulatory status, it involved no contact with patients, and nothing here is meant to guide the care of any patient. The ethics approvals and the author's competing interests open [REPORT.md](REPORT.md).
+
+## Design
+
+A residual network trained on PTB-XL supplies scores that are then held fixed (AUROC 0.932 for infarction on the benchmark's test fold). Three schemes turn those scores into an output. A single threshold tuned to 90% sensitivity labels every tracing. Split conformal prediction, which fits its threshold on tracings the model never trained on, either pools all of them, so the 90% holds on average, or fits one threshold within each diagnosis (Mondrian calibration), so it holds inside each. A fourth scheme, label-shift weighting, reweights the calibration tracings toward the target's estimated share of each diagnosis. Each figure is a mean over 200 draws that split PTB-XL's test patients in half.
+
+The study has two parts. Infarction is calibrated on PTB-XL and carried, with no target label reaching a threshold, to Shandong and Chongqing. Then five corpora take the calibration role in turn, each threshold spent unchanged on the other four, on five diagnoses all of them annotate: sinus rhythm, atrial fibrillation, left and right bundle-branch block, and first-degree atrioventricular block. [docs/data.md](docs/data.md) gives the label mapping.
+
+| Corpus | Country | Records in the release | Role |
 |---|---|---|---|
-| PTB-XL | Germany | 21,799 | source and target |
-| SPH (Shandong) | China | 25,770 | source and target |
-| Chapman-Shaoxing and Ningbo | China | 45,152 | source and target |
-| Georgia | United States | 10,344 | source and target |
-| CPSC 2018 and its extension | China | 10,330 | source and target |
+| PTB-XL | Germany | 21,799 | infarction source; rotation |
+| SPH (Shandong) | China | 25,770 | infarction target; rotation |
+| ACS-ECG (Chongqing) | China | 19,955 | infarction target |
+| Chapman-Shaoxing and Ningbo | China | 45,152 | rotation, as one source |
+| Georgia | United States | 10,344 | rotation |
+| CPSC 2018 and its extension | China | 10,330 | rotation |
 
-Three of these corpora file the same tracing more than once under different
-record identifiers, and the Challenge bundle ships no patient key, so a split by
-patient alone would put copies of one tracing on both sides: 421 groups of
-identical tracings in CPSC, 56 in Georgia, 8 in Chapman-Shaoxing with Ningbo.
-Each group of identical tracings is therefore one splitting unit, and
-`results/split_leak.json` carries the count of groups split across two parts
-with and without that rule; with it, the count is zero. Shandong repeats
-tracings too but files them under one patient, so its split already held them;
-PTB-XL's distribution repeats none.
+## Reproduce
 
-Five diagnoses: sinus rhythm, atrial fibrillation, left bundle-branch block,
-right bundle-branch block, first-degree atrioventricular block. The mapping
-that puts three annotation schemes (SNOMED CT, AHA, SCP-ECG) on those five
-classes is in `results/label_map.json`; it reproduces the Challenge's own
-published per-partition counts, and it names the five joins that could not be
-made cleanly. Sinus rhythm is refused on Shandong,
-whose "Normal ECG" code is a narrower statement than the Challenge's "sinus
-rhythm".
+Every number and figure the report prints is redrawn from the scores committed here, so no raw tracing is needed. `outcomes.py` and `subgroups.py` need PTB-XL's `ptbxl_database.csv` (6.6 MB from PhysioNet), which holds each record's patient, sex and age; point `ECS_PTBXL_DIR` at the directory holding it.
 
-## Corpora on disk
+```bash
+uv sync                                  # 1 min
+uv run pytest -m "not data"              # unit tests, no corpora needed, 2 min
+uv run python scripts/figures.py         # redraws every figure, 5 s
+uv run python scripts/figures.py --lang fr  # the report's five figures in French, *_fr.png
+export ECS_PTBXL_DIR=/path/to/ptbxl      # the directory with ptbxl_database.csv
+uv run python scripts/outcomes.py        # rebuilds results/outcomes.json, 3 s
+uv run python scripts/subgroups.py       # rebuilds results/subgroups.json, 23 s
+```
 
-Contents recorded from the distributed files on 2026-08-23.
+Timings are wall clock on a six-core i7-8700, CPU only; the full suite on a cold clone took 28 minutes. Re-scoring from the raw tracings, the corpus downloads and the rotation chain are in [docs/data.md](docs/data.md).
 
-| | PTB-XL | SPH (Shandong) | ACS-ECG (Chongqing) |
-|---|---|---|---|
-| Where | `~/Developer/ptbxl5d/data/records500/` | `data/sph/records/*.h5` | `data/acs/row_data/*.{dat,hea}` |
-| Format | WFDB, format 16 (int16), `.hea` header | HDF5, one dataset `ecg`, float16, no attributes | WFDB, format 16 (int16), `.hea` header |
-| Rate, length | 500 Hz, 5000 samples | 500 Hz, 5000–28,000 samples in steps of 500 (18,842 of 25,770 exactly 5000) | 500 Hz, 5000 samples |
-| Amplitude | 1000 ADC units per mV, baseline 0 (header) | mV, stored as float16 (paper: 24-bit ADC, "16-bit precision") | 1000 ADC units per mV, baseline 0 (header) |
-| Lead order | in each header (`AVR`/`AVL`/`AVF` upper-case) | not in the file; paper, Data Records: I, II, III, aVR, aVL, aVF, V1–V6 | in each header (`aVR` lower-case) |
-| Filtering at source | Schiller device | MedEx MECG-200: mains, baseline wander and muscle noise removed by the machine, nothing added by the authors | Mecg-300 (Medex); the paper describes none |
-| Records | 21,799 | 25,770 | 19,955 = 17,960 `train.csv` + 1,995 `test.csv` (no labels) |
-
-Two properties of the Chongqing files are absent from the paper. The header
-columns WFDB reserves for a lead's initial value and checksum hold the lead's
-maximum and minimum, so `wfdb` reads the samples but the checksum cannot
-validate them. Every sample is an even number of ADC units, so the effective
-resolution is 2 µV against PTB-XL's 1 µV. The CSV column `ecg_row_record`
-identifies the file (`04904.dat`); the CSV entries and the files on disk match
-one-to-one, and no patient appears in both CSVs.
-
-A full pass through the ingestion chain (`scripts/scan_corpora.py`, counts in
-`results/ingest_report.json`) keeps every PTB-XL and Shandong record and drops
-five of Chongqing's 19,955: two (`03228`, `14262`) whose `.dat` holds 3,500
-samples under a header stating 5,000, and three (`02008`, `03054`, `16558`)
-with WFDB's missing-sample code, which reads back as NaN. 6,928 Shandong
-records are longer than ten seconds and are cropped to the first ten.
-
-Reading cost: `wfdb.rdrecord` spends ~23 ms per record parsing the header
-(wfdb 4.3.1 does it through pandas) against 0.8 ms reading the samples, so a
-full pass over a WFDB corpus takes about eight minutes on a laptop; the HDF5
-corpus reads at ~7 ms per record.
-
-`scripts/fetch_open_corpora.sh` contains the figshare file ids and MD5 sums
-for the three Chongqing archives.
-
-## Prevalence gap
-
-Infarction is 25 times rarer in Shandong than in PTB-XL. The gap is not a
-labelling artefact: dropping PTB-XL's five subendocardial-injury statements
-moves prevalence only from 25.09% to 24.26%. PTB-XL is a research corpus
-enriched for pathology and Shandong is an unselected hospital series. 89.6% of
-Shandong's infarctions carry the AHA modifier for an old infarct, which is the
-target PTB-XL's label mostly describes; the remaining 10.4% are marked acute,
-recent, or carry no modifier at all, so the two label sets are close but not
-the same thing.
-
-The dominant shift is therefore in the class prior P(Y) rather than in the
-feature distribution P(X), and covariate-shift weighting does not apply. Two
-corrections are implemented:
-
-- Mondrian (class-conditional) conformal: one threshold per class. Exactly
-  valid in finite samples under any change of class proportions, with nothing
-  to estimate. Vovk (ACML 2012) calls this label conditional validity and
-  proves it in his Proposition 3.
-- Label-shift weighting: reweight by `w(y) = q(y)/p(y)` in the Tibshirani
-  form, with the target prior estimated by BBSE. Its coverage holds only
-  asymptotically and depends on that estimate, so effective sample size is
-  reported next to every result.
-
-Chongqing is the harder target: its positive is the dataset's `AMI` column, set
-from the discharge diagnosis, in a cohort every patient of which underwent
-coronary angiography. That is a different clinical event from an ECG diagnosis
-of an old infarct, so the label definition changes as well as the prevalence.
-
-## Layout
+## Code
 
 | Module | Role |
 |---|---|
@@ -149,171 +63,23 @@ of an old infarct, so the label definition changes as well as the prevalence.
 | `src/ecs/encoders.py` | the five encoder arms and the chain each one demands |
 | `mappings/` | the three published code tables the label mapping joins on, with provenance and digests |
 
-## Encoder arms
+`pre-commit` runs `ruff`, `mypy --disallow-untyped-defs` and `pytest` on every commit, and the unit tests run again before a push.
 
-Five ways of turning a tracing into a vector, compared on the same records.
-Four are published encoders; the fifth is this project's own ResNet1d frozen at
-its random initialisation, the floor the others have to clear.
+## Licence and citation
 
-| Arm | Pre-trained on | Saw PTB-XL | Licence |
-|---|---|---|---|
-| `random_init` | nothing (frozen random initialisation) | no | MIT |
-| `ecgfounder` | Harvard-Emory ECG Database, >10M recordings, no public corpus named | no | MIT |
-| `ecgfm` | MIMIC-IV-ECG and PhysioNet/CinC 2021 | **yes** | MIT |
-| `hubert_ecg` | CODE, CPSC and CPSC-Extra, PTB and PTB-XL, Georgia, Chapman-Shaoxing, Ningbo, Tianchi, Shandong, MIMIC-IV-ECG | **yes** | **CC BY-NC 4.0** |
-| `ecg_jepa` | Chapman-Shaoxing with Ningbo, and CODE-15 | no | MIT |
+The code is MIT ([LICENSE](LICENSE)), with three exceptions. `third_party/ecg_jepa/` is vendored from Sehun Kim's ECG-JEPA release under MIT, with its own LICENSE. `third_party/ecgfounder/` is not covered by the root licence; its MIT and Apache 2.0 notices are in [PROVENANCE.md](third_party/ecgfounder/PROVENANCE.md). The HuBERT-ECG weights are CC BY-NC 4.0, and so is every number computed from them: `results/embeddings/hubert_ecg/` and the HuBERT-ECG rows of `results/arms.json` are for research use only.
 
-**Two arms saw PTB-XL at pre-training.** ECG-FM's own README lists
-PhysioNet/CinC 2021 among its pre-training corpora, and that bundle contains
-PTB-XL; HuBERT-ECG's paper lists PTB-XL directly, and Shandong as well. Their
-figures on PTB-XL, and HuBERT-ECG's on Shandong, are therefore partly
-memorisation and not a measurement of transfer, and they are read as an upper
-bound rather than as a result. ECGFounder and ECG-JEPA are the two arms whose
-PTB-XL figure is external; ECG-JEPA in turn saw Chapman-Shaoxing and Ningbo, so
-its figure there carries the same caveat.
-
-What each arm was pre-trained on is written into every result file that uses
-it, sourced to the authors' own description, both as a sentence and as a list
-of the corpora it saw. The list is what a script should read: ECG-JEPA's
-sentence reads "not PTB-XL, not Shandong, not Chongqing", and matching on the
-name of a corpus would count it as having seen all three.
-
-On PTB-XL, a corpus both contaminated arms saw at pre-training, neither comes
-out ahead. ECGFounder, which saw no public corpus, reaches 0.919 [0.907, 0.932]
-on PTB-XL fold 10 against 0.891 for ECG-FM and 0.838 for HuBERT-ECG; ECG-JEPA
-reaches 0.858 [0.841, 0.876]. Extracting ECG-JEPA over the three corpora took 6
-h 53 on this machine's four threads.
-
-## Reproduce
-
-Every number and every figure the report prints is redrawn from the scores
-committed here, so none of the raw tracings are needed. Two of the three
-scripts do need one file that is not committed: PTB-XL's `ptbxl_database.csv`,
-6.6 MB from PhysioNet, which holds the patient each record belongs to and the
-sex and age the subgroup table reports. Point `ECS_PTBXL_DIR` at the directory
-holding it. The figures redraw without it.
-
-```bash
-uv sync                                  # 1 min
-uv run pytest -m "not data"              # unit tests, no corpora needed, 2 min
-uv run python scripts/figures.py         # redraws every figure, 5 s
-uv run python scripts/figures.py --lang fr  # the report's five figures in French, *_fr.png
-export ECS_PTBXL_DIR=/path/to/ptbxl      # the directory with ptbxl_database.csv
-uv run python scripts/outcomes.py        # rebuilds results/outcomes.json, 3 s
-uv run python scripts/subgroups.py       # rebuilds results/subgroups.json, 23 s
-```
-
-Timings are wall clock on a six-core i7-8700, CPU only. The full suite on a
-cold clone, where every test module is imported for the first time, took 28
-minutes. A clone without the corpora skips the
-corpus-backed tests and finishes much sooner, as measured below.
-
-The corpora themselves are only needed to re-score from the raw tracings,
-which the committed `.npz` files make unnecessary for reproducing the report. The three
-of them take 7.3 GB on disk, and the four auxiliary PhysioNet corpora the
-script also fetches take roughly 21 GB more:
-
-```bash
-./scripts/fetch_open_corpora.sh          # ACS-ECG and four PhysioNet corpora
-uv run pytest                            # adds the corpus-backed tests
-```
-
-`fetch_open_corpora.sh` does not fetch PTB-XL or SPH. PTB-XL is read in place
-from `ECS_PTBXL_DIR` (default `~/Developer/ptbxl5d/data`) and is downloaded
-from PhysioNet; SPH is downloaded from its figshare record and unpacked under
-`data/sph`. On a clone that holds only the committed files, none of the corpora
-and no optional `timm` extra, `uv run pytest -o addopts=""` ends with
-`540 passed, 59 skipped, 5 warnings` and exit code 0: the 59 skipped
-tests are the ones that read a corpus, the Challenge-2021 bundle or `timm`. The
-project's `addopts` already carries `-q`, so a bare `uv run pytest -q` prints
-the dots and the warnings without that summary line.
-
-The rotation, in order; each step writes the file the next one reads.
-
-```bash
-scripts/fetch_mappings.sh                              # check the three code tables
-uv run python scripts/label_table.py                   # results/label_map.json
-uv run python scripts/duplicate_scan.py                # results/duplicate_groups.json
-uv run python scripts/split_leak.py                    # results/split_leak.json
-uv run python scripts/train_source.py --source ptbxl   # once per source
-uv run python scripts/score_rotation.py                # every corpus by every model
-uv run python scripts/rotation_table.py --draws 200    # results/rotation.json and .csv
-uv run python scripts/rotation_uncertainty.py          # intervals, subgroups, comparator
-uv run python scripts/figures.py                       # the figures, from those files
-```
-
-The scan reads every record of the five corpora and takes about twenty minutes;
-everything after it reads the files the step before wrote. Training one source
-held 612 MB on a six-core i7-8700, and the whole chain after the scan took an
-hour.
-
-## Gates
-
-`ruff` for lint and format, `mypy --disallow-untyped-defs` and `pytest` run on
-every commit through `pre-commit`, and the unit tests again before a push.
-
-## Scope
-
-A retrospective measurement study on public, de-identified data. It is not a
-medical device and has no regulatory status, it involved no contact with
-patients, and nothing here is meant to guide the care of any patient. The
-ethics approvals under which each dataset was released, and the author's
-competing interests, are stated at the top of [REPORT.md](REPORT.md).
-
-## Licence
-
-The code is MIT ([LICENSE](LICENSE)), with three exceptions.
-
-`third_party/ecg_jepa/` is vendored from Sehun Kim's ECG-JEPA release under
-MIT, with its own LICENSE beside it.
-
-`third_party/ecgfounder/net1d.py` is vendored from PKUDigitalHealth's
-ECGFounder release under MIT, and is itself derived from `hsd1503/resnet1d` by
-Shenda Hong under the Apache License 2.0. Both notices and the chain between
-them are in
-[`third_party/ecgfounder/PROVENANCE.md`](third_party/ecgfounder/PROVENANCE.md).
-The root MIT licence does not cover that directory.
-
-The HuBERT-ECG weights are CC BY-NC 4.0. That restriction reaches further than
-the arm itself: any number in this repository computed from those weights is a
-derivative of them, so `results/embeddings/hubert_ecg/` and the HuBERT-ECG rows
-of `results/arms.json` are limited to research use, whatever the root licence
-says about the code that produced them.
-
-The three code tables in `mappings/` are redistributed under their own
-licences, with their digests and provenance in
-[`mappings/NOTICE.md`](mappings/NOTICE.md): BSD 2-Clause for the Challenge's
-scored-diagnosis table, MIT for Leinonen et al.'s AHA-to-SNOMED table, CC BY 4.0
-for PTB-XL+.
-
-No raw tracing is redistributed here, but the repository is not free of corpus
-data either. `results/baseline/scores.npz` and `results/external/*.npz` carry
-one row per record, holding the record identifier, its label and its model
-score, for 45,923 records across the three corpora. That is derived data under
-each corpus's licence and joinable against the public patient tables. PTB-XL is
-CC BY 4.0, which requires attribution: cite Wagner et al. 2020
-(doi:10.1038/s41597-020-0495-6), the PhysioNet resource
-(doi:10.13026/kfzx-aw45) and PhysioNet itself (Goldberger et al., Circulation
-2000;101(23):e215–e220). The Shandong and Chongqing datasets are CC0. The
-PhysioNet/CinC Challenge 2021 collection (CC BY 4.0), read only to count how
-much infarction its non-PTB-XL partitions carry for
-`results/seen_target.json`, is Reyna et al., Computing in Cardiology 2021.
-
-The rotation adds derived data of the same kind over two more corpora:
-`results/rotation/*/scores/*.npz` carry one row per record per model, 171,190
-rows over 42,238 distinct records of the five rotation corpora, and
-`results/duplicate_groups.json` names the records a corpus holds twice. Georgia,
-Chapman-Shaoxing, Ningbo and CPSC reach this study through that Challenge
-collection and are covered by its CC BY 4.0 attribution above; Shandong is
-CC0.
+The committed score files hold one row per record (identifier, label, score), derived data under each corpus's licence; [docs/data.md](docs/data.md) lists them. PTB-XL is CC BY 4.0, which requires attribution: cite Wagner et al. 2020 (doi:10.1038/s41597-020-0495-6), the PhysioNet resource (doi:10.13026/kfzx-aw45) and PhysioNet itself (Goldberger et al., Circulation 2000;101(23):e215–e220). To cite the study, use [CITATION.cff](CITATION.cff).
 
 ## Sources
 
-PTB-XL: Wagner et al., *Sci Data* 2020, 10.1038/s41597-020-0495-6 · SPH: Liu et
-al., *Sci Data* 2022, 10.1038/s41597-022-01403-5 · ACS-ECG: *Sci Data* 2026,
-10.1038/s41597-026-07278-0 · Split conformal: Angelopoulos & Bates,
-arXiv:2107.07511 · APS: Romano, Sesia & Candès, NeurIPS 2020 · Covariate shift:
-Tibshirani, Barber, Candès & Ramdas, NeurIPS 2019 · Label conditional
-validity: Vovk, ACML 2012, PMLR 25:475-490 · Conformal prediction under label
-shift: Podkopaev & Ramdas, UAI 2021, arXiv:2103.03323 · BBSE: Lipton, Wang &
-Smola, ICML 2018.
+- PTB-XL: Wagner et al., *Sci Data* 2020, 10.1038/s41597-020-0495-6
+- SPH: Liu et al., *Sci Data* 2022, 10.1038/s41597-022-01403-5
+- ACS-ECG: Du et al., *Sci Data* 2026, 10.1038/s41597-026-07278-0
+- PhysioNet/CinC Challenge 2021: Reyna et al., Computing in Cardiology 2021
+- Split conformal: Angelopoulos & Bates, arXiv:2107.07511
+- APS: Romano, Sesia & Candès, NeurIPS 2020
+- Covariate shift: Tibshirani, Barber, Candès & Ramdas, NeurIPS 2019
+- Label conditional validity: Vovk, ACML 2012, PMLR 25:475-490
+- Conformal prediction under label shift: Podkopaev & Ramdas, UAI 2021, arXiv:2103.03323
+- BBSE: Lipton, Wang & Smola, ICML 2018

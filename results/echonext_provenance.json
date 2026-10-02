@@ -1,0 +1,77 @@
+{
+  "distribution": "physionet.org/content/echonext/1.1.1",
+  "files_match_published_sha256": {
+    "EchoNext_no_split_tabular_features.npy": true,
+    "EchoNext_no_split_waveforms.npy": true,
+    "EchoNext_test_tabular_features.npy": true,
+    "EchoNext_test_waveforms.npy": true,
+    "EchoNext_train_tabular_features.npy": true,
+    "EchoNext_train_waveforms.npy": true,
+    "EchoNext_val_tabular_features.npy": true,
+    "EchoNext_val_waveforms.npy": true,
+    "LICENSE.txt": true,
+    "README.md": true,
+    "echonext_metadata_100k.csv": true
+  },
+  "records": 100000,
+  "records_per_split": {
+    "train": 72475,
+    "no_split": 17457,
+    "test": 5442,
+    "val": 4626
+  },
+  "metadata_rows": 100000,
+  "fields": [
+    "distribution",
+    "source_file",
+    "source_sha256",
+    "copy_group",
+    "quality_flat_leads",
+    "quality_non_finite",
+    "unit",
+    "lead_order"
+  ],
+  "columns_present": [
+    "distribution",
+    "source_file",
+    "source_sha256",
+    "copy_group",
+    "quality_flat_leads",
+    "quality_non_finite",
+    "unit",
+    "lead_order"
+  ],
+  "units": [
+    "z-score"
+  ],
+  "lead_order": [
+    "I",
+    "II",
+    "III",
+    "aVR",
+    "aVL",
+    "aVF",
+    "V1",
+    "V2",
+    "V3",
+    "V4",
+    "V5",
+    "V6"
+  ],
+  "copy_groups": 100000,
+  "copy_groups_with_more_than_one_record": 0,
+  "records_in_shared_copy_groups": 0,
+  "copy_groups_across_splits": 0,
+  "records_with_a_flat_lead": 5,
+  "records_with_non_finite_samples": 0,
+  "peak_rss_bytes": 3078291456,
+  "seconds": 113.3,
+  "machine": {
+    "cpu": "Apple M5",
+    "platform": "macOS-27.0.1-arm64-arm-64bit",
+    "python": "3.11.15",
+    "torch": "2.2.2",
+    "torch_threads": 10
+  },
+  "commit": "5e6835f110fb24a0ab4e0ee9a48527a60fbd052d"
+}

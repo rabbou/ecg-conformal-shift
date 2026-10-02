@@ -1,8 +1,8 @@
-# Threshold generalisation to external sites for ECG-AI diagnostic support
+# Threshold generalisation to new sites and care settings for ECG-AI diagnostic support
 
-Full study: [REPORT.md](REPORT.md) · Ruben Abbou · September 2026
+Infarction across hospitals: [REPORT.md](REPORT.md) · Structural heart disease, inpatients to outpatients: [ECHONEXT.md](ECHONEXT.md) · Ruben Abbou · 2026
 
-An ECG classifier's decision threshold is set on one population and used on others. Conformal calibration sets it so that 90% of tracings receive a set of possible diagnoses holding the right one. On PTB-XL, a German research corpus, the target holds over all tracings (89.9%) and fails within infarction (73.2%), because the commoner tracings without infarction carry the average. Carried unchanged to a hospital in Chongqing, the threshold covers 72.5% of infarctions. One threshold per diagnosis raises that to 84.0%, still short of 90%. Recalibrating on 100 tracings labelled there brings it to 88.9% on the held-out tracings. A site adopting such a tool has to measure coverage within each diagnosis on its own patients.
+An ECG classifier's decision threshold is set on one population and used on others. Conformal calibration sets it so that 90% of tracings receive a set of possible diagnoses holding the right one. On PTB-XL, a German research corpus, the target holds over all tracings (89.9%) and fails within infarction (73.2%). Carried unchanged to a hospital in Chongqing, the threshold covers 72.5% of infarctions; recalibrating on 100 tracings labelled there brings it to 88.9% on the held-out tracings. At Columbia, thresholds fitted on 1,903 inpatients cover about 72% of outpatients with structural heart disease for each of the three strongest models, so the cause is the outpatients' ECGs rather than one model. Refitting them on 100 labelled outpatient ECGs brings that to between 93.4% and 97.6%, averaged over 200 draws. A site adopting such a tool has to measure coverage within each diagnosis and care setting, on its own patients.
 
 ![Coverage by site and calibration scheme](results/figures/fig3_coverage.png)
 
@@ -22,7 +22,7 @@ This is a retrospective measurement study on public, de-identified data. It is n
 
 A residual network trained on PTB-XL supplies scores that are then held fixed (AUROC 0.932 for infarction on the benchmark's test fold). Three schemes turn those scores into an output. A single threshold tuned to 90% sensitivity labels every tracing. Split conformal prediction, which fits its threshold on tracings the model never trained on, either pools all of them, so the 90% holds on average, or fits one threshold within each diagnosis (Mondrian calibration), so it holds inside each. A fourth scheme, label-shift weighting, reweights the calibration tracings toward the target's estimated share of each diagnosis. Each figure is a mean over 200 draws that split PTB-XL's test patients in half.
 
-The study has two parts. Infarction is calibrated on PTB-XL and carried, with no target label reaching a threshold, to Shandong and Chongqing. Then five corpora take the calibration role in turn, each threshold spent unchanged on the other four, on five diagnoses all of them annotate: sinus rhythm, atrial fibrillation, left and right bundle-branch block, and first-degree atrioventricular block. [docs/data.md](docs/data.md) gives the label mapping.
+The infarction transfer calibrates on PTB-XL and carries the threshold, with no target label reaching it, to Shandong and Chongqing. The rotation gives five corpora the calibration role in turn, each threshold spent unchanged on the other four, on five diagnoses all of them annotate: sinus rhythm, atrial fibrillation, left and right bundle-branch block, and first-degree atrioventricular block. [docs/data.md](docs/data.md) gives the label mapping.
 
 | Corpus | Country | Records in the release | Role |
 |---|---|---|---|
@@ -33,13 +33,24 @@ The study has two parts. Infarction is calibrated on PTB-XL and carried, with no
 | Georgia | United States | 10,344 | rotation |
 | CPSC 2018 and its extension | China | 10,330 | rotation |
 
-## Fitted on inpatients, tested on outpatients
+## Structural heart disease, from inpatients to outpatients
 
-The same question inside one hospital, on EchoNext: 100,000 ECGs from Columbia, each read against an echocardiogram for eleven structural findings and their composite, moderate or worse structural heart disease. A ResNet trained on EchoNext's training split scores every ECG. Thresholds are fitted on 1,903 inpatient ECGs and applied unchanged to 1,059 outpatients, and no patient appears in two roles. The composite is present in 53.2% of those inpatients and 25.6% of those outpatients.
+EchoNext holds 100,000 ECGs from Columbia, each paired with an echocardiogram. The label studied is moderate or worse structural heart disease on echocardiography, a composite of eleven findings that EchoNext records for each ECG. Thresholds are fitted on the 1,903 inpatient ECGs of EchoNext's validation split and applied unchanged to the 1,059 outpatient ECGs of its test split, one ECG per patient and no patient in both. Structural heart disease is present in 53.2% of the 1,903 calibration inpatients and in 25.6% of the 1,059 test outpatients.
 
-Asked for 90%, one threshold per class covers 90.4% of the inpatients with the composite (the ill) in the test split, 86.2% of the ill emergency patients and 71.6% of the ill outpatients (95% interval 65.9 to 76.6%), against 98.1% of the healthy outpatients; 29.4% of outpatients receive both labels and go to a human. Because each class has its own threshold, the fall in prevalence alone cannot move that coverage: the ECGs of the ill outpatients differ, and milder disease is a likely reason not yet checked against the echocardiographic severity values. Refitting the thresholds on 100 labelled outpatient ECGs brings coverage of the ill back to 93.4% on the outpatients held out.
+Per-label conformal calibration fits one threshold on the calibration patients with the disease and another on those without it, each placed so that 90% of its group receive a set of labels holding the right one. A patient whose set holds both labels, disease and no disease, gets no machine answer and goes to a human reader. With a separate threshold for each class, a fall in prevalence from inpatients to outpatients cannot by itself lower the coverage of patients with the disease.
 
-EchoNext is under PhysioNet's restricted licence, so no tracing and no per-record score is in this repository. The arms, the per-label results and the commands are in [ECHONEXT.md](ECHONEXT.md), the one-page reports in `reports/transfer/`.
+Four models score every ECG: a residual network trained on EchoNext for this study; the published EchoNext mini-model, run on its authors' weights; ECGFounder, a foundation model pre-trained at another hospital and frozen under one logistic regression per label; and the study's residual network frozen at random initialisation under the same regressions, the floor a pre-trained model has to clear.
+
+| Model | AUROC for the composite, whole test split | Outpatients with the disease covered | Outpatients sent to a human |
+|---|---|---|---|
+| Residual network, trained on EchoNext | 0.834 | 71.6% | 29.4% |
+| EchoNext mini-model, published weights | 0.820 | 72.7% | 32.3% |
+| ECGFounder, frozen, logistic regressions | 0.824 | 71.6% | 32.2% |
+| Random initialisation, frozen, logistic regressions | 0.792 | 78.6% | 44.2% |
+
+Among outpatients with structural heart disease, the three models with the highest AUROC (the trained network, the mini-model and ECGFounder) each cover between 71.6% and 72.7%, against the 90% asked for. When a network trained here, a network trained by the EchoNext authors and a foundation model pre-trained elsewhere lose the same coverage, the cause lies in the outpatients' ECGs rather than in one model. Milder disease among outpatients may explain their lower coverage, and EchoNext's echocardiographic severity values, which would show it, have not yet been compared. The randomly initialised floor model covers 78.6% of outpatients with the disease because it sends 44.2% of all outpatients to a human reader. Refitting the per-label thresholds on 100 labelled outpatient ECGs, drawn 200 times from one half of the outpatients, covers between 93.4% and 97.6% of the other half's patients with the disease for the trained network, the mini-model and ECGFounder, on average over the draws.
+
+EchoNext is under PhysioNet's restricted licence, so no tracing and no per-record score is in this repository. The per-label results, the commands and how the published weights were run are in [ECHONEXT.md](ECHONEXT.md), and each model's one-page report is in [reports/transfer/](reports/transfer/).
 
 ## Reproduce
 
@@ -69,6 +80,12 @@ Timings are wall clock on a six-core i7-8700, CPU only; the full suite on a cold
 | `src/ecs/challenge.py` | the Challenge-2021 partitions: headers, SNOMED labels, completeness against the bundle manifest |
 | `src/ecs/rotation.py` | the five corpora split the same way, capped to a common size |
 | `src/ecs/encoders.py` | the five encoder arms and the chain each one demands |
+| `src/ecs/echonext.py` | EchoNext's files, one provenance row per tracing, and its inpatient, emergency and outpatient cohorts |
+| `src/ecs/transfer.py` | thresholds fitted on a source cohort and spent unchanged on a target, and refitted on 25 to 400 target labels |
+| `src/ecs/calibration.py` | calibration curve, slope and intercept, Brier score, net benefit and positive predictive value of a probability at one site |
+| `src/ecs/transfer_report.py` | the one-page transfer report, rendered from `results/echonext_transfer.json` alone |
+| `src/ecs/embedding_store.py` | encoder vectors filed by encoder, version and tracing digest, outside the repository |
+| `src/ecs/echonext_mini.py` | the published EchoNext mini-model, rebuilt to run its own checkpoint |
 | `mappings/` | the three published code tables the label mapping joins on, with provenance and digests |
 
 `pre-commit` runs `ruff`, `mypy --disallow-untyped-defs` and `pytest` on every commit, and the unit tests run again before a push.

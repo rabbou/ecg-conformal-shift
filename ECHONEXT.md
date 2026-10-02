@@ -1,4 +1,4 @@
-# Part 2. Per-label conformal calibration of an ECG classifier for structural heart disease, fitted on inpatients and tested on outpatients
+# Per-label conformal calibration of an ECG classifier for structural heart disease, fitted on inpatients and tested on outpatients
 
 Asked for 90% coverage, a per-label conformal threshold calibrated on Columbia
 inpatients covers 71.6% of Columbia outpatients who have moderate or worse

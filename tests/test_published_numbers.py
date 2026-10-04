@@ -298,13 +298,14 @@ def recomputed_subgroups() -> dict[str, float]:
     return {key: float(np.mean(values)) for key, values in tally.items()}
 
 
+@pytest.fixture(scope="module")
+def published() -> dict:
+    return json.loads((RESULTS_DIR / "subgroups.json").read_text())
+
+
 @pytest.mark.data
 class TestSubgroupCoverage:
     """Every cell of results/subgroups.json, recomputed without importing it."""
-
-    @pytest.fixture(scope="class")
-    def published(self) -> dict:
-        return json.loads((RESULTS_DIR / "subgroups.json").read_text())
 
     def test_every_cell_matches_the_file(
         self, published: dict, recomputed_subgroups: dict[str, float]

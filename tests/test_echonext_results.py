@@ -288,6 +288,8 @@ def readme_figures(result: dict[str, Any], provenance: dict[str, Any]) -> dict[s
         if row["labels"] == 100
     ]
     shared = shared_figures(result, provenance)
+    severity = json.loads(SEVERITY.read_text())
+    reweighted = [severity["arms"][a]["reweighted"]["reweighted"] for a in top]
     return {
         "tracings": shared["tracings"],
         "calibration_ecgs": shared["calibration_ecgs"],
@@ -304,6 +306,8 @@ def readme_figures(result: dict[str, Any], provenance: dict[str, Any]) -> dict[s
         "local_draws": str(local[0]["draws"]),
         "local_low": min(arm_figures(result, a)["ladder_100"] for a in top),
         "local_high": max(arm_figures(result, a)["ladder_100"] for a in top),
+        "reweighted_low": pct(min(reweighted)),
+        "reweighted_high": pct(max(reweighted)),
     }
 
 
@@ -359,6 +363,18 @@ class TestReadme:
         wanted += ["local_low", "local_high"]
         assert {k: figures[k] for k in wanted if figures[k] not in opening} == {}
         assert set(NUMBER.findall(opening)) - set(figures.values()) == set()
+
+    def test_the_severity_sentence_is_the_severity_results(
+        self, result: dict[str, Any], provenance: dict[str, Any]
+    ) -> None:
+        """'About a third' is the mean share of the lost coverage that severity explains."""
+        severity = json.loads(SEVERITY.read_text())
+        shares = [severity["arms"][a]["reweighted"]["share"] for a in strongest(result)]
+        assert abs(sum(shares) / len(shares) - 1 / 3) < 0.03
+        figures = readme_figures(result, provenance)
+        section = readme_section()
+        assert "explains about a third of that loss" in section
+        assert f"reaches {figures['reweighted_low']} to {figures['reweighted_high']}," in section
 
     def test_about_holds_for_each_of_the_three(self, result: dict[str, Any]) -> None:
         """'About 72%' is the mean of the three; each lies within a point and a half of it."""

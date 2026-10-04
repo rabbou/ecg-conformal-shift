@@ -34,16 +34,16 @@
     }
   },
   "provenance": {
-    "commit": "2087cb15c5ee890d65c3b9d251e94be6a5f8edec",
+    "commit": "34de7d3c303cf0aa8f059d87ca63d54a2646adeb",
     "producers": {
       "scripts/subgroups.py": "702601715da26caa6acd3c8c55e22d74d35e943473094d1d377563608223e110",
       "src/ecs/conformal.py": "05236c0192865fdecea3ffb28675509d390dcb20a95218a835e735786461bf92",
-      "src/ecs/ingest.py": "d7015a7c3997288a5248319f42c72ecff7d9877587131e5c3aa9e2921a5a60da",
+      "src/ecs/ingest.py": "85dae8d38d19678b510ebac9f04cd509861c49acbd19a9dbce82e2a85ce1de0f",
       "src/ecs/metrics.py": "bc3ca2b5779db9bc6145afad35dbd9764aae43956f29405aac243942780a7bea",
       "src/ecs/splits.py": "ed3665f4345c238edcbcb34081e0610838c18ae5383ad30776d66117032f4deb"
     }
   },
-  "seconds": 357.1,
+  "seconds": 161.8,
   "coverage": {
     "plain": {
       "age:0-49:all": {

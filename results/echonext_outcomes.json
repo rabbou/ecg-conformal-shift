@@ -10,11 +10,11 @@
     "false_alarm": "the healthy given the disease label alone"
   },
   "provenance": {
-    "commit": "2087cb15c5ee890d65c3b9d251e94be6a5f8edec",
+    "commit": "34de7d3c303cf0aa8f059d87ca63d54a2646adeb",
     "producers": {
-      "results/echonext_transfer.json": "ec7255c1dfbfbd306e1e403a550a98c9e1885564ada411cb9c3bc76c39565a74",
+      "results/echonext_transfer.json": "516978ec2b1c0d7328194fdf56ce1932b409792b776212f54960c75622076fe5",
       "scripts/echonext_outcomes.py": "a994fc30b9c9f7cbc54b5870a8f4c097c29469a53c7359e1e252e2f9ae1531b7",
-      "src/ecs/transfer.py": "de3e37860261228cb71cb222403c0c3035869c8d3554b8901bda532962779481"
+      "src/ecs/transfer.py": "9c26e6803c655d9cd0ceaa648ad4ef1ed75766fbc6a3fa6edc16f62d036f995c"
     }
   },
   "arms": {

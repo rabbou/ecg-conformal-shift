@@ -12,16 +12,16 @@
     "passed": true
   },
   "provenance": {
-    "commit": "2087cb15c5ee890d65c3b9d251e94be6a5f8edec",
+    "commit": "34de7d3c303cf0aa8f059d87ca63d54a2646adeb",
     "producers": {
       "scripts/perturbations.py": "a2106dc96cd752e6e544cd4722c90fdcfcd0b6bd788f6cd90523de426bc91e06",
       "src/ecs/conformal.py": "05236c0192865fdecea3ffb28675509d390dcb20a95218a835e735786461bf92",
-      "src/ecs/ingest.py": "d7015a7c3997288a5248319f42c72ecff7d9877587131e5c3aa9e2921a5a60da",
-      "src/ecs/report.py": "a54c532e710ebba85935ee64f01005c7a2f5fb9fc6199a03dcc7342efe928bce",
+      "src/ecs/ingest.py": "85dae8d38d19678b510ebac9f04cd509861c49acbd19a9dbce82e2a85ce1de0f",
+      "src/ecs/report.py": "3dfa1a180e0fe431ee7dd3639851a7f6ce4b295f94eb869b74ee53acdae09ebd",
       "src/ecs/splits.py": "ed3665f4345c238edcbcb34081e0610838c18ae5383ad30776d66117032f4deb"
     }
   },
-  "seconds": 0.3,
+  "seconds": 0.2,
   "conditions": {
     "clean": {
       "description": "the tracings as recorded; the row that must reproduce results/baseline/scores.npz",

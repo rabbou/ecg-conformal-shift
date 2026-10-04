@@ -104,6 +104,10 @@ NOT_REGENERABLE = {
         "needs EchoNext and the two arms' per-record scores, neither of which may be committed"
     ),
     "echonext_coverage.csv": "the coverage grid echonext_transfer.json carries, same run",
+    "echonext_severity.json": (
+        "needs EchoNext's metadata and the stored per-record scores, neither of which may be "
+        "committed; tests/test_echonext_data.py rebuilds it where they are"
+    ),
     "timing.json": "a measurement of one machine at one moment",
     "timing_esprimo.json": "a measurement of a second machine at one moment",
 }

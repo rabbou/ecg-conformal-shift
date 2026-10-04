@@ -95,6 +95,15 @@ NOT_REGENERABLE = {
         "six score arrays over PTB-XL fold 10: the five perturbed conditions of "
         "section 3.5 and the unperturbed pass they are read against"
     ),
+    # EchoNext is under a restricted licence and stays outside the repository,
+    # and so do the per-record scores computed from it.
+    "echonext_provenance.json": (
+        "a full read and hash of EchoNext's 23 GB, which cannot be redistributed"
+    ),
+    "echonext_transfer.json": (
+        "needs EchoNext and the two arms' per-record scores, neither of which may be committed"
+    ),
+    "echonext_coverage.csv": "the coverage grid echonext_transfer.json carries, same run",
     "timing.json": "a measurement of one machine at one moment",
     "timing_esprimo.json": "a measurement of a second machine at one moment",
 }

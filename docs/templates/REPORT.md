@@ -260,11 +260,11 @@ Discrimination does not show the loss. Among the test inpatients the trained net
 
 ![Figure 6](results/figures/fig9_care_settings.png)
 
-Figure 6. AUROC (left) and the sensitivity of the threshold set on calibration inpatients (right) in each care setting of the EchoNext test split, for the four arms. Dashed: the 90% the threshold was set for. From `results/echonext_transfer.json`.
+Figure 6. AUROC (left) and the sensitivity of the threshold set on calibration inpatients (right) in each care setting of the EchoNext test split, for the four arms. Dashed line: the 90% the threshold was set for. From `results/echonext_transfer.json`.
 
-The per-label scheme reaches its coverage of the ill outpatients mostly by deferring them. For the three arms it gave the disease label alone to {{recognised_low}} to {{recognised_high}} of the ill outpatients, referred {{referred_low}} to {{referred_high}} to a human, and missed the rest, who are the ill patients the plain threshold misses (table 5). It cleared the same healthy outpatients as the plain threshold and referred most of the others, so its false alarms fell to {{false_alarm_low}} to {{false_alarm_high}} of the healthy outpatients, at the price of referring {{referred_all_low}} to {{referred_all_high}} of all outpatients.
+Those coverages should be set side by side with the plain threshold in the same terms. The plain threshold gives the disease label to every ill outpatient it covers; the per-label scheme gives it alone to {{recognised_low}} to {{recognised_high}} of the ill outpatients for the three arms and refers a further {{referred_low}} to {{referred_high}} to a human, which is what its coverage of the ill is made of, and it misses the same ill patients as the plain threshold (table 5). On the healthy outpatients it clears the same patients as the plain threshold and moves most of the others out of the wrong column and into the referred one, so its false alarms fall to {{false_alarm_low}} to {{false_alarm_high}} of the healthy outpatients, and it refers {{referred_all_low}} to {{referred_all_high}} of all outpatients to do it.
 
-Table 5. What the per-label scheme gives each outpatient, composite, thresholds calibrated on the inpatients, from `results/echonext_outcomes.json`. Shares are of the ill and of the healthy outpatients; the last column is of all outpatients.
+Table 5. What the per-label scheme gives each outpatient, composite, thresholds calibrated on the inpatients, from `results/echonext_outcomes.json`. Each share is of the ill or of the healthy outpatients, and the last column of all outpatients.
 
 | Arm | Ill, recognised | Ill, referred | Ill, missed | Healthy, cleared | Healthy, referred | Healthy, falsely flagged | All referred |
 |---|---|---|---|---|---|---|---|

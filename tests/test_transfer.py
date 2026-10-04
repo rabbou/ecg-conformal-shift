@@ -10,6 +10,7 @@ import pandas as pd
 import pytest
 
 from ecs import transfer
+from ecs.conformal import conformal_quantile
 from ecs.transfer import conformal_sets, coverage_row, ladder_rows, ppv_row, subgroup_rows
 
 
@@ -78,7 +79,7 @@ def test_too_few_calibration_positives_flag_everyone() -> None:
     y_cal = np.r_[np.ones(8, dtype=int), np.zeros(100, dtype=int)]
     sets = conformal_sets(p_cal, y_cal, np.array([0.01, 0.5, 0.99]))
     assert sets["perlabel"][:, 1].all() and sets["plain"][:, 1].all()
-    assert math.isfinite(transfer.conformal_quantile(1 - p_cal[y_cal == 0], 0.1))
+    assert math.isfinite(conformal_quantile(1 - p_cal[y_cal == 0], 0.1))
 
 
 def test_subgroups_split_the_ill_by_sex_and_age_band() -> None:
@@ -180,3 +181,55 @@ class TestLadder:
         pool = set(np.flatnonzero(part == "pool").tolist())
         assert len(recording.drawn_from) == 5
         assert all(drawn == pool for drawn in recording.drawn_from)
+
+
+def _counted(sets: np.ndarray, y: np.ndarray) -> dict[str, int]:
+    """What each patient got, counted straight off the per-label sets."""
+    disease, healthy = sets[:, 1], sets[:, 0]
+    alone, both = disease & ~healthy, disease & healthy
+    return {
+        "recognised": int((alone & (y == 1)).sum()),
+        "ill_referred": int((both & (y == 1)).sum()),
+        "missed": int((~disease & (y == 1)).sum()),
+        "cleared": int((healthy & ~disease & (y == 0)).sum()),
+        "healthy_referred": int((both & (y == 0)).sum()),
+        "false_alarm": int((alone & (y == 0)).sum()),
+    }
+
+
+@pytest.mark.parametrize("seed", [0, 1, 2, 3])
+def test_the_outcomes_read_off_two_rows_are_the_outcomes_counted_on_the_sets(seed: int) -> None:
+    """The per-class split the report prints comes from the coverage grid alone.
+
+    Danger: a referral counted as a recognised patient.  The derivation rests on
+    identities between the plain and per-label rows; if a threshold moved in one
+    rule and not the other, these counts would part.
+    """
+    rng = np.random.default_rng(seed)
+    y_cal, y_tgt = rng.integers(0, 2, 600), rng.integers(0, 2, 400)
+    # Classes that overlap, as they do on the ECG, so the two per-label
+    # thresholds admit both labels in the middle and no set comes back empty.
+    p_cal = np.clip(0.4 + 0.15 * y_cal + rng.normal(0, 0.2, 600), 0.001, 0.999)
+    p_tgt = np.clip(0.35 + 0.1 * y_tgt + rng.normal(0, 0.25, 400), 0.001, 0.999)
+    sets = conformal_sets(p_cal, y_cal, p_tgt)
+    derived = transfer.outcomes_from_coverage(
+        coverage_row(sets["plain"], y_tgt), coverage_row(sets["perlabel"], y_tgt)
+    )
+    counted = _counted(sets["perlabel"], y_tgt)
+    assert counted["healthy_referred"] + counted["ill_referred"] > 0
+    assert derived["ill"]["recognised"]["count"] == counted["recognised"]
+    assert derived["ill"]["referred"]["count"] == counted["ill_referred"]
+    assert derived["ill"]["missed"]["count"] == counted["missed"]
+    assert derived["healthy"]["cleared"]["count"] == counted["cleared"]
+    assert derived["healthy"]["referred"]["count"] == counted["healthy_referred"]
+    assert derived["healthy"]["false_alarm"]["count"] == counted["false_alarm"]
+
+
+def test_the_outcomes_refuse_rows_whose_premise_fails() -> None:
+    """An empty set, or two rules that part on the ill, stops the derivation."""
+    plain = {"n": 4, "n_pos": 2, "coverage_pos": 0.5, "coverage_neg": 0.5, "abstention": 0.0}
+    perlabel = plain | {"coverage_neg": 1.0, "both": 0.25, "empty": 0.25}
+    with pytest.raises(ValueError, match="empty"):
+        transfer.outcomes_from_coverage(plain, perlabel)
+    with pytest.raises(ValueError, match="disagree"):
+        transfer.outcomes_from_coverage(plain, perlabel | {"empty": 0.0, "coverage_pos": 1.0})

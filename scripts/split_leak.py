@@ -23,19 +23,14 @@ from __future__ import annotations
 
 import argparse
 import json
-import subprocess
 import sys
 from pathlib import Path
 from typing import Any
 
 from ecs.config import RESULTS_DIR
 from ecs.duplicates import straddling_groups
+from ecs.provenance import head_commit
 from ecs.rotation import PARTS, SOURCES, corpus_index, duplicate_groups_of
-
-
-def commit() -> str:
-    out = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True, check=False)
-    return out.stdout.strip() or "unknown"
 
 
 def leak(corpus: str, widen: bool) -> dict[str, Any]:
@@ -69,7 +64,7 @@ def main(argv: list[str] | None = None) -> int:
 
     out: dict[str, Any] = {
         "written_by": "scripts/split_leak.py",
-        "commit": commit(),
+        "commit": head_commit(),
         "reading": (
             "before: every record is its own patient where the corpus ships no patient key, "
             "so a tracing filed twice is two patients. after: a group of identical tracings "

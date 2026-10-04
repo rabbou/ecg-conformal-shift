@@ -1,10 +1,8 @@
 """The committed EchoNext results, the pages rendered from them, the prose quoting them.
 
 EchoNext cannot be committed, so nothing here recomputes a number from the
-tracings.  What is held instead: every page under ``reports/transfer`` is
-exactly what the renderer makes of the committed JSON, the coverage CSV is the
-JSON's grid row for row, and every figure ECHONEXT.md prints is read back out of
-the JSON it came from.
+tracings.  What is held instead: the coverage CSV is the JSON's grid row for
+row, and the arms, cohorts and provenance carry what the report says of them.
 """
 
 from __future__ import annotations
@@ -15,12 +13,12 @@ from typing import Any
 
 import pandas as pd
 import pytest
+from report_text import pct
 from test_echonext_severity_results import SEVERITY, severity_figures
 
 from ecs.config import REPO_ROOT, RESULTS_DIR
 from ecs.echonext import LABELS, PROVENANCE_FIELDS
 from ecs.transfer import METHODS
-from ecs.transfer_report import pct, render
 
 TRANSFER = RESULTS_DIR / "echonext_transfer.json"
 PROVENANCE = RESULTS_DIR / "echonext_provenance.json"
@@ -49,21 +47,6 @@ def cell(result: dict[str, Any], arm: str, label: str, context: str, method: str
         if (row["label"], row["context"], row["method"]) == (label, context, method):
             return dict(row)
     raise KeyError((arm, label, context, method))
-
-
-class TestPages:
-    def test_each_page_is_what_the_renderer_makes_of_the_json(self, result: dict[str, Any]) -> None:
-        for arm in result["arms"]:
-            page = REPO_ROOT / f"reports/transfer/{arm}_inpatient_to_outpatient.md"
-            assert page.read_text() == render(result, arm, "outpatient"), (
-                f"{page.name} differs from its result file; rerun scripts/echonext_transfer.py"
-            )
-
-    def test_the_pages_name_the_cells_other_tasks_fill(self, result: dict[str, Any]) -> None:
-        for arm in result["arms"]:
-            page = (REPO_ROOT / f"reports/transfer/{arm}_inpatient_to_outpatient.md").read_text()
-            for filler in ("T-068", "T-067", "T-065, ambitious version"):
-                assert filler in page
 
 
 class TestCoverageGrid:

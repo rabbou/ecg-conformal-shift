@@ -19,7 +19,6 @@ from __future__ import annotations
 
 import ast
 import json
-import subprocess
 import sys
 import time
 from dataclasses import asdict
@@ -38,6 +37,7 @@ from ecs.challenge import (
     sph_small_set_labels,
 )
 from ecs.config import MAPPINGS_DIR, PTBXL_DIR, RESULTS_DIR, SPH_DIR
+from ecs.provenance import head_commit
 from ecs.small_set import (
     AMBIGUITIES,
     SMALL_SET,
@@ -54,12 +54,6 @@ SPH_DEVIATIONS = (
     "Challenge's own SNOMED annotation",
     "records run from ten to sixty seconds; the first ten are kept",
 )
-
-
-def commit() -> str:
-    return subprocess.run(
-        ["git", "rev-parse", "HEAD"], capture_output=True, text=True, check=False
-    ).stdout.strip()
 
 
 def class_rows() -> list[dict[str, Any]]:
@@ -205,7 +199,7 @@ def main() -> int:
 
     out = {
         "written_by": "scripts/label_table.py",
-        "commit": commit(),
+        "commit": head_commit(),
         "mappings": {
             "directory": str(MAPPINGS_DIR.name),
             "scored_diagnoses_rows": int(len(scored_diagnoses())),

@@ -20,6 +20,7 @@ calibration scores, then keep every class whose score falls at or below it.
 from __future__ import annotations
 
 import math
+from dataclasses import dataclass
 
 import numpy as np
 from numpy.typing import NDArray
@@ -28,11 +29,14 @@ Array = NDArray[np.float64]
 IntArray = NDArray[np.int_]
 
 __all__ = [
+    "SCHEMES",
+    "Thresholds",
     "aps_scores",
     "aps_scores_all",
     "bbse_target_prior",
     "class_prior",
     "conformal_quantile",
+    "fit_thresholds",
     "label_shift_quantiles",
     "label_shift_weights",
     "lac_scores",
@@ -339,3 +343,52 @@ def predict_sets_per_class(all_scores: Array, qhats: Array) -> NDArray[np.bool_]
     if qhats.shape != (all_scores.shape[1],):
         raise ValueError(f"need one quantile per class: {qhats.shape} vs {all_scores.shape[1]}")
     return all_scores <= qhats[None, :]
+
+
+# ---------------------------------------------------------------------------
+# The three decision rules both studies compare
+#
+#   plain     one threshold that 90% of the calibration positives clear: a
+#             sensitivity threshold.  Every case gets one label, none is deferred.
+#   pooled    split conformal over all calibration cases, one LAC quantile.
+#   perlabel  one LAC quantile per true class (Mondrian).
+#
+# The plain threshold is the per-label quantile of the positive class, the same
+# number: for the ill, a per-label conformal threshold is a sensitivity
+# threshold.  What the per-label rule adds is the second quantile, on the
+# negative class, which turns some wrong answers into deferrals.
+# ---------------------------------------------------------------------------
+
+SCHEMES = ("plain", "pooled", "perlabel")
+
+
+@dataclass(frozen=True)
+class Thresholds:
+    """The quantiles of the three rules, on the LAC score, from one calibration sample."""
+
+    pooled: float
+    perlabel: Array
+
+    @property
+    def plain(self) -> float:
+        """The positive class's per-label quantile, read as a sensitivity threshold."""
+        return float(self.perlabel[1])
+
+    def sets(self, probs: Array) -> dict[str, NDArray[np.bool_]]:
+        """The (n, 2) membership matrix of each rule on ``probs``, shape (n, 2)."""
+        scores = lac_scores_all(probs)
+        flagged = scores[:, 1] <= self.plain
+        return {
+            "plain": np.column_stack([~flagged, flagged]),
+            "pooled": predict_sets(scores, self.pooled),
+            "perlabel": predict_sets_per_class(scores, self.perlabel),
+        }
+
+
+def fit_thresholds(probs: Array, labels: IntArray, alpha: float) -> Thresholds:
+    """Fit the three rules of a two-class problem on one calibration sample."""
+    labels = np.asarray(labels, dtype=int)
+    scores = lac_scores(probs, labels)
+    return Thresholds(
+        conformal_quantile(scores, alpha), mondrian_quantiles(scores, labels, alpha, n_classes=2)
+    )

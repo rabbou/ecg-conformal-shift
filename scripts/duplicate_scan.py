@@ -27,7 +27,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import subprocess
 import sys
 import time
 from pathlib import Path
@@ -35,6 +34,7 @@ from typing import Any
 
 from ecs.config import RESULTS_DIR
 from ecs.duplicates import MICROVOLTS_PER_STEP, duplicate_groups, signal_digest
+from ecs.provenance import head_commit
 from ecs.rotation import SOURCES, corpus_index, load_waveforms
 
 CHUNK = 500
@@ -47,11 +47,6 @@ COMPARABLE = {
     "georgia": ("challenge-2021/georgia", lambda record: record),
     "cpsc": ("challenge-2021/cpsc_2018", lambda record: record),
 }
-
-
-def commit() -> str:
-    out = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True, check=False)
-    return out.stdout.strip() or "unknown"
 
 
 def digests_of(corpus: str) -> dict[str, str]:
@@ -108,7 +103,7 @@ def main(argv: list[str] | None = None) -> int:
     every: dict[str, dict[str, str]] = {}
     out: dict[str, Any] = {
         "written_by": "scripts/duplicate_scan.py",
-        "commit": commit(),
+        "commit": head_commit(),
         "screen": (
             "the first ten seconds of the twelve canonical leads, quantised to "
             f"{MICROVOLTS_PER_STEP:.0f} microvolts, SHA-256; the screen of "

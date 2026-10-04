@@ -41,65 +41,20 @@ from typing import Any
 
 import numpy as np
 from numpy.typing import NDArray
-from shift_table import patients_of
 
 from ecs.config import PTBXL_DIR, RESULTS_DIR
-from ecs.conformal import (
-    conformal_quantile,
-    lac_scores,
-    lac_scores_all,
-    mondrian_quantiles,
-    predict_sets,
-    predict_sets_per_class,
-)
+from ecs.conformal import SCHEMES, fit_thresholds
+from ecs.ingest import ptbxl_patients
+from ecs.metrics import outcome_shares
 from ecs.provenance import provenance_block
+from ecs.report import draw_summary
+from ecs.splits import calibration_halves
 
 # The setting the reading is written at, matching shift_table.py.
 ALPHA = 0.10
-# The sensitivity the plain threshold is fitted for.  Equal to 1 - ALPHA so the
-# schemes meet at a comparable miss rate rather than at an arbitrary pair.
-PLAIN_SENSITIVITY = 1.0 - ALPHA
-SCHEMES = ("plain", "pooled", "perlabel")
 CORPORA = ("ptbxl", "sph", "acs")
 CORPUS_NAMES = {"ptbxl": "PTB-XL", "sph": "Shandong", "acs": "Chongqing"}
 OUTCOMES = ("correct", "deferred", "wrong")
-
-
-def _split_outcomes(
-    sets: NDArray[np.bool_], labels: NDArray[np.int_], klass: int
-) -> tuple[float, float, float]:
-    """The three shares for one label: correct alone, deferred, wrong alone.
-
-    Deferral covers both a set holding both labels and a set holding neither:
-    from the reader's side they are the same event, no machine answer.  The
-    three shares are of every case carrying the label, so they sum to one and a
-    scheme with deferrals stays comparable with one without.
-    """
-    of_class = labels == klass
-    positive, negative = sets[:, 1], sets[:, 0]
-    deferred = (positive & negative) | (~positive & ~negative)
-    correct = (positive & ~negative) if klass == 1 else (negative & ~positive)
-    wrong = (negative & ~positive) if klass == 1 else (positive & ~negative)
-    return (
-        float(np.mean(correct[of_class])),
-        float(np.mean(deferred[of_class])),
-        float(np.mean(wrong[of_class])),
-    )
-
-
-def _plain_sets(probs: NDArray[np.float64], threshold: float) -> NDArray[np.bool_]:
-    """One threshold, every case labelled, nothing deferred."""
-    positive = probs[:, 1] >= threshold
-    return np.column_stack([~positive, positive])
-
-
-def _summary(values: list[float]) -> dict[str, float | int]:
-    array = np.asarray(values, dtype=np.float64)
-    return {
-        "mean": round(float(array.mean()), 4),
-        "sd": round(float(array.std(ddof=1)), 4),
-        "n_draws": int(array.size),
-    }
 
 
 def collect(
@@ -110,8 +65,6 @@ def collect(
 ) -> dict[str, Any]:
     """Re-draw the calibration half and record every scheme on every corpus."""
     source = scores_by_corpus["ptbxl"]
-    unique = np.unique(np.asarray(patients))
-    rng = np.random.default_rng(seed)
     tally: dict[tuple[str, str, str, str], list[float]] = {}
     thresholds: dict[tuple[str, str], list[float]] = {}
     # The halving is by patient, so the record counts on each side vary from
@@ -119,32 +72,21 @@ def collect(
     scored: dict[str, list[float]] = {}
     positives: dict[str, list[float]] = {}
 
-    for _ in range(draws):
-        rng.shuffle(unique)
-        held = set(unique[: len(unique) // 2].tolist())
-        is_calibration = np.array([p in held for p in patients])
-        calibration_probs = source["probs"][is_calibration]
-        calibration_labels = source["labels"][is_calibration]
-
-        scores = lac_scores(calibration_probs, calibration_labels)
-        pooled_q = conformal_quantile(scores, ALPHA)
-        perlabel_q = mondrian_quantiles(scores, calibration_labels, ALPHA, 2)
-        # The operating point a sensitivity target buys: the score below which
-        # PLAIN_SENSITIVITY of the calibration sick already sit.
-        plain_q = float(
-            np.quantile(calibration_probs[:, 1][calibration_labels == 1], 1.0 - PLAIN_SENSITIVITY)
+    for is_calibration in calibration_halves(np.asarray(patients), draws, seed):
+        fitted = fit_thresholds(
+            source["probs"][is_calibration], source["labels"][is_calibration], ALPHA
         )
         # The quantiles are on the LAC score, 1 - p(true label); the report and
         # its figures read the probability axis.  A label enters the set when
         # 1 - p <= q, so p >= 1 - q: the MI boundary is 1 - q(MI) and the non-MI
         # boundary is q(non-MI).  Recorded as boundaries so nothing downstream
         # has to redo the conversion and get it wrong.
-        thresholds.setdefault(("plain", "single"), []).append(plain_q)
-        thresholds.setdefault(("pooled", "lower"), []).append(1.0 - pooled_q)
-        thresholds.setdefault(("pooled", "upper"), []).append(pooled_q)
-        thresholds.setdefault(("perlabel", "lower"), []).append(1.0 - float(perlabel_q[1]))
-        thresholds.setdefault(("perlabel", "upper"), []).append(float(perlabel_q[0]))
-        for klass, value in enumerate(perlabel_q):
+        thresholds.setdefault(("plain", "single"), []).append(1.0 - fitted.plain)
+        thresholds.setdefault(("pooled", "lower"), []).append(1.0 - fitted.pooled)
+        thresholds.setdefault(("pooled", "upper"), []).append(fitted.pooled)
+        thresholds.setdefault(("perlabel", "lower"), []).append(1.0 - float(fitted.perlabel[1]))
+        thresholds.setdefault(("perlabel", "upper"), []).append(float(fitted.perlabel[0]))
+        for klass, value in enumerate(fitted.perlabel):
             thresholds.setdefault(("quantile", str(klass)), []).append(float(value))
 
         for corpus, bundle in scores_by_corpus.items():
@@ -154,15 +96,9 @@ def collect(
                 probs, labels = probs[~is_calibration], labels[~is_calibration]
             scored.setdefault(corpus, []).append(float(labels.size))
             positives.setdefault(corpus, []).append(float((labels == 1).sum()))
-            all_scores = lac_scores_all(probs)
-            built = {
-                "plain": _plain_sets(probs, plain_q),
-                "pooled": predict_sets(all_scores, pooled_q),
-                "perlabel": predict_sets_per_class(all_scores, perlabel_q),
-            }
-            for scheme, sets in built.items():
+            for scheme, sets in fitted.sets(probs).items():
                 for klass in (0, 1):
-                    shares = _split_outcomes(sets, labels, klass)
+                    shares = outcome_shares(sets, labels, klass)
                     for name, share in zip(OUTCOMES, shares, strict=True):
                         tally.setdefault((corpus, scheme, str(klass), name), []).append(share)
 
@@ -171,13 +107,14 @@ def collect(
         prevalence = float(np.mean(bundle["labels"] == 1))
         by_corpus[corpus] = {
             "name": CORPUS_NAMES[corpus],
-            "n_scored": _summary(scored[corpus]),
-            "n_positive": _summary(positives[corpus]),
+            "n_scored": draw_summary(scored[corpus]),
+            "n_positive": draw_summary(positives[corpus]),
             "prevalence": round(prevalence, 4),
             "schemes": {
                 scheme: {
                     klass: {
-                        name: _summary(tally[(corpus, scheme, klass, name)]) for name in OUTCOMES
+                        name: draw_summary(tally[(corpus, scheme, klass, name)])
+                        for name in OUTCOMES
                     }
                     for klass in ("0", "1")
                 }
@@ -187,7 +124,7 @@ def collect(
     return {
         "by_corpus": by_corpus,
         "thresholds": {
-            f"{scheme}:{which}": _summary(v) for (scheme, which), v in thresholds.items()
+            f"{scheme}:{which}": draw_summary(v) for (scheme, which), v in thresholds.items()
         },
         "threshold_note": (
             "Boundaries are on the model's probability axis. A case below the "
@@ -205,7 +142,7 @@ def build(draws: int, seed: int) -> dict[str, Any]:
         "sph": dict(np.load(RESULTS_DIR / "external/sph.npz")),
         "acs": dict(np.load(RESULTS_DIR / "external/acs.npz")),
     }
-    patients = patients_of([str(i) for i in scores_by_corpus["ptbxl"]["ids"]], PTBXL_DIR)
+    patients = ptbxl_patients(scores_by_corpus["ptbxl"]["ids"], PTBXL_DIR)
     body = collect(scores_by_corpus, patients, draws, seed)
     return {
         "question": (
@@ -220,11 +157,12 @@ def build(draws: int, seed: int) -> dict[str, Any]:
             "No external label reaches any threshold."
         ),
         "alpha": ALPHA,
-        "plain_sensitivity": PLAIN_SENSITIVITY,
+        "plain_sensitivity": 1.0 - ALPHA,
         "matched_operating_point": (
-            "The plain threshold's target is a sensitivity and the two conformal "
-            "targets are coverages. They are set to the same number so the schemes "
-            "meet at a comparable miss rate on the source corpus."
+            "The plain threshold is the per-label conformal quantile of the MI class: "
+            "the score that 90% of the calibration MI cases clear. The plain and "
+            "per-label schemes therefore share their MI threshold and miss the same "
+            "MI cases on every draw; per-label adds the non-MI threshold."
         ),
         "outcome_definitions": {
             "correct": "the set holds that label alone",
@@ -237,8 +175,10 @@ def build(draws: int, seed: int) -> dict[str, Any]:
         "provenance": provenance_block(
             [
                 "scripts/outcomes.py",
-                "scripts/shift_table.py",
                 "src/ecs/conformal.py",
+                "src/ecs/ingest.py",
+                "src/ecs/metrics.py",
+                "src/ecs/report.py",
                 "src/ecs/splits.py",
             ]
         ),

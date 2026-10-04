@@ -11,9 +11,14 @@ that calibrated before the fault, and spent on a perturbed test half.  The
 draws, the seed and the halving are the ones ``outcomes.py`` uses, so the clean
 row of the table is table 1's row and the difference is the fault alone.
 
-The identity condition is scored through the same path as everything else and
-checked against the committed ``results/baseline/scores.npz``.  If that check
-fails, nothing below is about perturbation.
+Two steps.  Scoring reads fold 10's raw tracings, applies each fault, runs the
+baseline model and writes the six score arrays to ``results/perturbations.npz``;
+it needs the checkpoint and the tracings and takes about forty minutes on six
+CPU cores.  Measuring reads that file alone and writes
+``results/perturbations.json`` in seconds.  The identity condition is scored
+through the same path as everything else and checked against the committed
+``results/baseline/scores.npz``.  If that check fails, nothing below is about
+perturbation.
 
 The transformations, in the canonical lead order I, II, III, aVR, aVL, aVF,
 V1-V6:
@@ -32,7 +37,8 @@ V1-V6:
                   per record, which is respiration and electrode drift.
   polarity        every lead multiplied by -1: the whole cable set inverted.
 
-Usage: .venv/bin/python scripts/perturbations.py [--draws 200]
+Usage: .venv/bin/python scripts/perturbations.py [--draws 200]       # measure
+       .venv/bin/python scripts/perturbations.py --rescore           # score, then measure
 """
 
 from __future__ import annotations
@@ -49,26 +55,19 @@ import pandas as pd
 import torch
 from numpy.typing import NDArray
 from scipy.stats import kendalltau
-from score_external import load_model, probabilities
+from score_external import load_model
 from sklearn.metrics import roc_auc_score
 
 from ecs.config import PTBXL_DIR, RESULTS_DIR, SAMPLING_RATE_HZ
-from ecs.conformal import (
-    conformal_quantile,
-    lac_scores,
-    lac_scores_all,
-    mondrian_quantiles,
-    predict_sets,
-    predict_sets_per_class,
-)
-from ecs.ingest import load_ptbxl
+from ecs.conformal import SCHEMES, fit_thresholds
+from ecs.ingest import load_ptbxl, ptbxl_patients
 from ecs.labels import MILabelSpec, ptbxl_mi_label
+from ecs.models import class_probabilities
 from ecs.provenance import provenance_block
-from ecs.splits import ptbxl_benchmark_split
+from ecs.report import draw_summary
+from ecs.splits import calibration_halves, ptbxl_benchmark_split
 
 ALPHA = 0.10
-PLAIN_SENSITIVITY = 1.0 - ALPHA
-SCHEMES = ("plain", "pooled", "perlabel")
 DRAWS = 200
 CHUNK = 500
 
@@ -148,29 +147,7 @@ def read_fold_ten(
         print(f"  read {len(ids):>6} / {len(wanted)}", flush=True)
     x = np.concatenate(blocks)
     y = labels.loc[[int(i) for i in ids]].to_numpy().astype(int)
-    patients = np.array([str(database.loc[int(i), "patient_id"]) for i in ids])
-    return x, y, patients, ids
-
-
-def _sets(
-    probs: NDArray[np.float64], plain_q: float, pooled_q: float, per_q: NDArray[np.float64]
-) -> dict[str, NDArray[np.bool_]]:
-    positive = probs[:, 1] >= plain_q
-    all_scores = lac_scores_all(probs)
-    return {
-        "plain": np.column_stack([~positive, positive]),
-        "pooled": predict_sets(all_scores, pooled_q),
-        "perlabel": predict_sets_per_class(all_scores, per_q),
-    }
-
-
-def _summary(values: list[float]) -> dict[str, float | int]:
-    array = np.asarray(values, dtype=np.float64)
-    return {
-        "mean": round(float(array.mean()), 4),
-        "sd": round(float(array.std(ddof=1)), 4),
-        "n_draws": int(array.size),
-    }
+    return x, y, np.array(ptbxl_patients(ids, root)), ids
 
 
 def _score_shift(clean: NDArray[np.float64], moved: NDArray[np.float64]) -> dict[str, Any]:
@@ -200,26 +177,15 @@ def measure(
     seed: int,
 ) -> dict[str, Any]:
     """Thresholds from the clean calibration half, spent on the perturbed half."""
-    unique = np.unique(patients)
-    rng = np.random.default_rng(seed)
     tally: dict[tuple[str, str, str], list[float]] = {}
 
-    for _ in range(draws):
-        rng.shuffle(unique)
-        held = set(unique[: len(unique) // 2].tolist())
-        is_cal = np.array([p in held for p in patients])
-
-        cal_probs, cal_labels = clean[is_cal], labels[is_cal]
-        scores = lac_scores(cal_probs, cal_labels)
-        pooled_q = conformal_quantile(scores, ALPHA)
-        per_q = mondrian_quantiles(scores, cal_labels, ALPHA, 2)
-        plain_q = float(np.quantile(cal_probs[:, 1][cal_labels == 1], 1.0 - PLAIN_SENSITIVITY))
-
+    for is_cal in calibration_halves(patients, draws, seed):
+        fitted = fit_thresholds(clean[is_cal], labels[is_cal], ALPHA)
         test_labels = labels[~is_cal]
         for name, probs in perturbed.items():
-            for scheme, sets in _sets(probs[~is_cal], plain_q, pooled_q, per_q).items():
+            for scheme, sets in fitted.sets(probs[~is_cal]).items():
                 covered = sets[np.arange(test_labels.size), test_labels]
-                deferred = sets[:, 0] & sets[:, 1] | ~(sets[:, 0] | sets[:, 1])
+                deferred = sets[:, 0] == sets[:, 1]
                 for klass, label in ((1, "mi"), (0, "non_mi")):
                     of_class = test_labels == klass
                     tally.setdefault((name, scheme, f"coverage_{label}"), []).append(
@@ -238,7 +204,7 @@ def measure(
             "score_shift": _score_shift(clean[:, 1], perturbed[name][:, 1]),
             "schemes": {
                 scheme: {
-                    key: _summary(values)
+                    key: draw_summary(values)
                     for (n, s, key), values in tally.items()
                     if n == name and s == scheme
                 }
@@ -249,21 +215,32 @@ def measure(
     }
 
 
-def build(
-    draws: int, seed: int, root: Path, checkpoint: Path, threads: int
-) -> tuple[dict[str, Any], dict[str, NDArray[Any]]]:
-    started = time.time()
+def score(seed: int, root: Path, checkpoint: Path, threads: int) -> dict[str, NDArray[Any]]:
+    """Fold 10 under each condition, scored by the baseline model: the slow step."""
     torch.set_num_threads(threads)
     model, centre, scale = load_model(checkpoint)
-    x, labels, patients, ids = read_fold_ten(root)
-
+    x, labels, _, ids = read_fold_ten(root)
     scored: dict[str, NDArray[np.float64]] = {}
     for name, transform in CONDITIONS.items():
         rng = np.random.default_rng(seed)
         moved = transform(x, rng)
-        scored[name] = probabilities(model, moved, centre, scale)
+        scored[name] = class_probabilities(model, moved, centre, scale).astype(np.float64)
         del moved
         print(f"  scored {name}", flush=True)
+    return {
+        "ids": np.array(ids),
+        "labels": labels,
+        **{f"probs_{name}": probs for name, probs in scored.items()},
+    }
+
+
+def build(scores: dict[str, NDArray[Any]], draws: int, seed: int, root: Path) -> dict[str, Any]:
+    """The table, from the six score arrays alone."""
+    started = time.time()
+    ids = [str(i) for i in scores["ids"]]
+    labels = scores["labels"].astype(int)
+    scored = {name: scores[f"probs_{name}"].astype(np.float64) for name in CONDITIONS}
+    patients = np.array(ptbxl_patients(ids, root))
 
     published = np.load(RESULTS_DIR / "baseline/scores.npz")
     if [str(i) for i in published["ids"]] != ids:
@@ -288,7 +265,6 @@ def build(
         "seed": seed,
         "n_records": int(labels.size),
         "n_positive": int((labels == 1).sum()),
-        "torch_threads": threads,
         "clean_matches_published_scores": {
             "largest_absolute_difference": largest,
             "tolerance": 1e-6,
@@ -297,20 +273,14 @@ def build(
         "provenance": provenance_block(
             [
                 "scripts/perturbations.py",
-                "scripts/score_external.py",
                 "src/ecs/conformal.py",
                 "src/ecs/ingest.py",
-                "src/ecs/labels.py",
-                "src/ecs/models.py",
+                "src/ecs/report.py",
                 "src/ecs/splits.py",
             ]
         ),
         "seconds": round(time.time() - started, 1),
         "conditions": measure(scored["clean"], scored, labels, patients, draws, seed),
-    }, {
-        "ids": np.array(ids),
-        "labels": labels,
-        **{f"probs_{name}": probs for name, probs in scored.items()},
     }
 
 
@@ -318,19 +288,26 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--draws", type=int, default=DRAWS)
     parser.add_argument("--seed", type=int, default=0)
+    parser.add_argument("--rescore", action="store_true", help="re-score fold 10 first")
     parser.add_argument("--threads", type=int, default=4)
     parser.add_argument("--ptbxl-dir", type=Path, default=PTBXL_DIR)
     parser.add_argument("--checkpoint", type=Path, default=RESULTS_DIR / "baseline/model.pt")
     parser.add_argument("--out", type=Path, default=RESULTS_DIR / "perturbations.json")
-    parser.add_argument("--scores-out", type=Path, default=RESULTS_DIR / "perturbations.npz")
+    parser.add_argument("--scores", type=Path, default=RESULTS_DIR / "perturbations.npz")
     args = parser.parse_args()
-    table, scores = build(args.draws, args.seed, args.ptbxl_dir, args.checkpoint, args.threads)
+    if args.rescore:
+        # The checkpoint and the raw tracings are not in the repository, so the
+        # scores go in beside the table: everything below the model is then
+        # recomputable from committed files, as it is for the external corpora.
+        np.savez_compressed(
+            args.scores, **score(args.seed, args.ptbxl_dir, args.checkpoint, args.threads)
+        )
+        print(f"wrote {args.scores}")
+    with np.load(args.scores, allow_pickle=False) as data:
+        scores = {key: data[key] for key in data.files}
+    table = build(scores, args.draws, args.seed, args.ptbxl_dir)
     args.out.write_text(json.dumps(table, indent=2) + "\n")
-    # The checkpoint and the raw tracings are not in the repository, so the
-    # scores go in beside the table: everything below the model is then
-    # recomputable from committed files, as it is for the external corpora.
-    np.savez_compressed(args.scores_out, **scores)
-    print(f"wrote {args.out} and {args.scores_out}")
+    print(f"wrote {args.out}")
     check = table["clean_matches_published_scores"]
     print(f"  clean vs published scores: max |diff| {check['largest_absolute_difference']:.2e}")
     for name, block in table["conditions"].items():

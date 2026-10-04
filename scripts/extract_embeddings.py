@@ -33,7 +33,6 @@ from __future__ import annotations
 import argparse
 import json
 import shutil
-import subprocess
 import sys
 import time
 from collections.abc import Callable, Sequence
@@ -46,6 +45,7 @@ import torch
 from ecs.config import ACS_DIR, EMBEDDINGS_DIR, PTBXL_DIR, SPH_DIR
 from ecs.encoders import ARMS, PRETRAINING, machine_info
 from ecs.ingest import Corpus, load_acs, load_ptbxl, load_sph
+from ecs.provenance import head_commit
 
 CHUNK = 200  # records read and embedded before anything is written
 BATCH = 20  # records through the network at once
@@ -140,7 +140,7 @@ def extract(
                 "preprocessing": meta["preprocessing"],
                 "notes": meta["notes"],
                 "n_params": meta["n_params"],
-                "git_commit": git_commit(),
+                "git_commit": head_commit(),
                 "n_records": len(ids),
                 "n_kept": len(all_ids),
                 "n_excluded": len(excluded),
@@ -180,11 +180,6 @@ def _merge(partial: Path) -> tuple[np.ndarray, np.ndarray]:
         np.concatenate(ids) if ids else np.array([], dtype=str),
         np.concatenate(kept) if kept else np.empty((0, 0), dtype=np.float32),
     )
-
-
-def git_commit() -> str:
-    out = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True, check=False)
-    return out.stdout.strip() or "unknown"
 
 
 def main(argv: Sequence[str] | None = None) -> int:

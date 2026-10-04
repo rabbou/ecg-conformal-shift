@@ -1,17 +1,12 @@
 """Every results file says what produced it, and the saying is checked.
 
-A results file used to carry a bare ``git_commit``, which is a claim nothing
-could test: the field keeps whatever value it was written with while the code
-that produced the file goes on changing.  Six of the seven files that carried
-one recorded a commit older than the last change to their own producer, and the
-numbers in them were in fact still right -- but nothing in the repository could
-have told a reader that, which is the same position as nothing being right.
-
-Two rules replace it:
+A bare commit is a claim nothing can test: the field keeps whatever value it
+was written with while the code that produced the file goes on changing.  Two
+rules hold instead:
 
   a file that can be regenerated in a session carries a ``provenance`` block
   naming every source file its numbers depend on, with that file's digest.  If
-  a producer changes, the digest no longer matches and the only way back to a
+  a producer changes, the digest stops matching and the only way back to a
   passing suite is to regenerate the result.
 
   a file that cannot be regenerated in a session -- a training run, a re-score
@@ -36,6 +31,7 @@ RESULTS = REPO_ROOT / "results"
 REGENERABLE = (
     "abstention.json",
     "auxiliary.json",
+    "echonext_outcomes.json",
     "outcomes.json",
     "perturbations.json",
     "shift.json",

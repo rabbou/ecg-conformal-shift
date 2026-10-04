@@ -12,10 +12,10 @@ import re
 from typing import Any
 
 import pytest
+from report_text import pct
 
 from ecs.config import REPO_ROOT, RESULTS_DIR
 from ecs.severity import GRADES, VERDICT_RULE, verdict
-from ecs.transfer_report import pct
 
 SEVERITY = RESULTS_DIR / "echonext_severity.json"
 TRANSFER = RESULTS_DIR / "echonext_transfer.json"

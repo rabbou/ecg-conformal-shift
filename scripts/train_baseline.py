@@ -43,14 +43,14 @@ import pandas as pd
 import torch
 from numpy.typing import NDArray
 from sklearn.metrics import average_precision_score, roc_auc_score
-from torch import Tensor, nn
+from torch import nn
 
 from ecs.config import PTBXL_DIR, RESULTS_DIR
 from ecs.encoders import machine_info
 from ecs.ingest import load_ptbxl
 from ecs.labels import MILabelSpec, ptbxl_mi_label
 from ecs.metrics import bootstrap_ci
-from ecs.models import ResNet1d
+from ecs.models import ResNet1d, class_probabilities, standardisation
 from ecs.splits import ptbxl_benchmark_split
 
 CHUNK = 500  # records read from disk at once, so no fold is read twice
@@ -99,27 +99,6 @@ def read_fold(
     return Fold(name, ids, x, y)
 
 
-def standardisation(x: NDArray[np.float32]) -> tuple[float, float]:
-    """One mean and one spread, taken from the training fold only.
-
-    Per-lead statistics were the alternative; one pair over all leads keeps the
-    relative amplitude between leads, which is part of what an infarct pattern
-    is, rather than flattening it away.
-    """
-    return float(x.mean()), float(x.std()) or 1.0
-
-
-def probabilities(model: nn.Module, x: NDArray[np.float32], centre: float, scale: float) -> Tensor:
-    """Class probabilities for every row, in batches, in the same order."""
-    model.eval()
-    out = []
-    with torch.no_grad():
-        for i in range(0, len(x), 128):
-            batch = torch.from_numpy((x[i : i + 128] - centre) / scale)
-            out.append(torch.softmax(model(batch), dim=1))
-    return torch.cat(out) if out else torch.empty((0, 2))
-
-
 def train(
     train_fold: Fold, validation: Fold, settings: Settings, log: Path
 ) -> tuple[nn.Module, float, float, int]:
@@ -151,7 +130,7 @@ def train(
                 loss.backward()
                 optimiser.step()
                 total += float(loss) * len(index)
-            scores = probabilities(model, validation.x, centre, scale)[:, 1].numpy()
+            scores = class_probabilities(model, validation.x, centre, scale)[:, 1]
             auroc = float(roc_auc_score(validation.y, scores))
             line = (
                 f"epoch {epoch:>2}  train loss {total / len(order):.4f}  "
@@ -176,13 +155,13 @@ def train(
 class Scored:
     """What fold 10 gave: one probability row per record, and the numbers on top."""
 
-    probs: NDArray[np.float64]
+    probs: NDArray[np.float32]
     metrics: dict[str, object]
 
 
 def score(model: nn.Module, test: Fold, centre: float, scale: float, settings: Settings) -> Scored:
     """Fold 10, scored once, with the interval that makes the number arguable."""
-    probs: NDArray[np.float64] = probabilities(model, test.x, centre, scale).numpy()
+    probs = class_probabilities(model, test.x, centre, scale)
     auroc, auroc_low, auroc_high = bootstrap_ci(
         lambda y, s: float(roc_auc_score(y, s)),
         test.y,

@@ -46,7 +46,7 @@ from .metrics import (
     mean_set_size,
     singleton_rate,
 )
-from .splits import patient_split
+from .splits import calibration_half
 
 Array = NDArray[np.float64]
 IntArray = NDArray[np.int_]
@@ -60,10 +60,13 @@ __all__ = [
     "Target",
     "WEIGHTING_NOTE",
     "estimated_prior",
+    "nonconformity_scores",
     "frozen_calibration_table",
     "frozen_threshold",
     "repeated_split_report",
+    "draw_summary",
     "spread",
+    "threshold_spread",
 ]
 
 SCORES = ("lac", "aps")
@@ -112,6 +115,16 @@ def spread(values: list[float]) -> Spread:
     )
 
 
+def draw_summary(values: list[float]) -> dict[str, float | int]:
+    """Mean and spread across the draws, rounded to the fourth decimal the tables print."""
+    array = np.asarray(values, dtype=np.float64)
+    return {
+        "mean": round(float(array.mean()), 4),
+        "sd": round(float(array.std(ddof=1)), 4),
+        "n_draws": int(array.size),
+    }
+
+
 def repeated_split_report(
     probs: Array,
     labels: IntArray,
@@ -151,8 +164,7 @@ def repeated_split_report(
 
     for draw in range(n_draws):
         rng = np.random.default_rng(seed + draw)
-        part = patient_split(keys, {"calibration": 0.5, "test": 0.5}, seed=seed + draw)
-        is_calibration = (part == "calibration").to_numpy()
+        is_calibration = calibration_half(keys, seed + draw)
         all_scores = lac_scores_all(probs) if score == "lac" else aps_scores_all(probs, rng=rng)
         calibration_true = all_scores[is_calibration, labels[is_calibration]]
         test_scores = all_scores[~is_calibration]
@@ -282,13 +294,13 @@ class Target:
     deviations: tuple[str, ...] = field(default_factory=tuple)
 
 
-def _all_scores(probs: Array, score: str, rng: np.random.Generator) -> Array:
+def nonconformity_scores(probs: Array, score: str, rng: np.random.Generator) -> Array:
     if score == "lac":
         return lac_scores_all(probs)
     return aps_scores_all(probs, rng=rng)
 
 
-def _threshold_spread(values: list[float]) -> dict[str, float | int]:
+def threshold_spread(values: list[float]) -> dict[str, float | int]:
     """Where a threshold sat across the draws, and how often it was infinite.
 
     An infinite threshold is not a large number to be averaged in: it means the
@@ -423,7 +435,7 @@ class _Calibration:
             block["n_unidentified"] = self.n_unidentified
         return {
             "threshold_by_class": {
-                str(c): _threshold_spread(list(drawn[:, c])) for c in range(n_classes)
+                str(c): threshold_spread(list(drawn[:, c])) for c in range(n_classes)
             },
             "calibration": block,
         }
@@ -506,15 +518,14 @@ def frozen_calibration_table(
     for score in SCORES:
         for draw in range(n_draws):
             rng = np.random.default_rng(seed + draw)
-            part = patient_split(keys, {"calibration": 0.5, "test": 0.5}, seed=seed + draw)
-            is_calibration = (part == "calibration").to_numpy()
-            source_all = _all_scores(source.probs, score, rng)
+            is_calibration = calibration_half(keys, seed + draw)
+            source_all = nonconformity_scores(source.probs, score, rng)
             calibration_true = source_all[is_calibration, source.labels[is_calibration]]
             calibration_labels = source.labels[is_calibration]
             evaluated: dict[str, tuple[Array, IntArray]] = {
                 source.name: (source_all[~is_calibration], source.labels[~is_calibration]),
                 **{
-                    name: (_all_scores(target.probs, score, rng), target.labels)
+                    name: (nonconformity_scores(target.probs, score, rng), target.labels)
                     for name, target in targets.items()
                 },
             }

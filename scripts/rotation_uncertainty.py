@@ -34,7 +34,6 @@ from __future__ import annotations
 import argparse
 import csv
 import json
-import subprocess
 import sys
 import time
 from pathlib import Path
@@ -52,8 +51,9 @@ from ecs.conformal import (
     predict_sets_per_class,
 )
 from ecs.encoders import machine_info
+from ecs.provenance import head_commit
 from ecs.rotation import AGE_BANDS, SOURCES, class_keys, corpus_index, usable_classes
-from ecs.splits import patient_split
+from ecs.splits import calibration_half
 
 ALPHA = 0.10
 SCORE = "lac"
@@ -91,11 +91,6 @@ COLUMNS = (
     "chow_coverage",
     "conformal_minus_chow",
 )
-
-
-def commit() -> str:
-    out = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True, check=False)
-    return out.stdout.strip() or "unknown"
 
 
 def chow_quantiles(
@@ -223,10 +218,7 @@ def run(draws: int, boot: int, seed: int) -> list[dict[str, Any]]:
             per_draw: dict[tuple[str, str, str, str], list[float]] = {k: [] for k in keys}
 
             for draw in range(draws):
-                part = patient_split(
-                    cal_patients, {"calibration": 0.5, "test": 0.5}, seed=seed + draw
-                )
-                is_calibration = (part == "calibration").to_numpy()
+                is_calibration = calibration_half(cal_patients, seed + draw)
                 true_scores = cal_all[is_calibration, cal_labels[is_calibration]]
                 fitted_labels = cal_labels[is_calibration]
                 thresholds = {
@@ -317,7 +309,7 @@ def summarise(rows: list[dict[str, Any]], draws: int, boot: int) -> dict[str, An
             spread.append(abs(pair[0]["coverage"] - pair[1]["coverage"]))
     return {
         "written_by": "scripts/rotation_uncertainty.py",
-        "commit": commit(),
+        "commit": head_commit(),
         "machine": machine_info(),
         "settings": {
             "alpha": ALPHA,

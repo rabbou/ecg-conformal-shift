@@ -1,13 +1,13 @@
-"""EchoNext inpatients to outpatients: the coverage table and the transfer reports, in one command.
+"""EchoNext inpatients to outpatients: the coverage table, in one command.
 
 Calibration is the inpatient ECGs of the validation split; the targets are the
 inpatient, emergency and outpatient ECGs of the test split, read without
 refitting.  An arm whose scores are not yet in ``$ECS_ECHONEXT_DERIVED/scores``
 is scored first by ``scripts/echonext_scores.py``.
 
-Writes ``results/echonext_transfer.json``, ``results/echonext_coverage.csv``
-and ``reports/transfer/<arm>_inpatient_to_<context>.md``.  The per-record scores
-stay outside the repository: they are derived from restricted data.
+Writes ``results/echonext_transfer.json`` and ``results/echonext_coverage.csv``;
+``scripts/echonext_outcomes.py`` reads the first.  The per-record scores stay
+outside the repository: they are derived from restricted data.
 
 Usage: PYTORCH_ENABLE_MPS_FALLBACK=1 .venv/bin/python scripts/echonext_transfer.py
 """
@@ -17,7 +17,6 @@ from __future__ import annotations
 import json
 import subprocess
 import sys
-from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -35,6 +34,7 @@ from ecs.echonext import (
     read_metadata,
     transfer_cohorts,
 )
+from ecs.provenance import head_commit
 from ecs.transfer import (
     ALPHA,
     METHODS,
@@ -48,14 +48,12 @@ from ecs.transfer import (
     ppv_row,
     subgroup_rows,
 )
-from ecs.transfer_report import CONTEXT_NAMES, render
 
 LVEF = "lvef_lte_45_flag"
 TARGETS = ("inpatient", "emergency", "outpatient")
-REPORTED_TARGETS = ("outpatient",)
 DETAIL_LABELS = (COMPOSITE, LVEF)
 SCORES_DIR = DERIVED_DIR / "scores"
-REPORTS_DIR = REPO_ROOT / "reports/transfer"
+CONTEXT_NAMES = {"inpatient": "inpatients", "emergency": "emergency", "outpatient": "outpatients"}
 
 ARMS = {
     "resnet": "the study's ResNet, trained on EchoNext",
@@ -64,22 +62,8 @@ ARMS = {
     "echonext_mini": "the published EchoNext mini-model",
 }
 
-EMPTY_CELLS = {
-    "Distance without labels between source and target ECGs": "T-068",
-    "The same pair at a second hospital, Columbia to Beth Israel (MIMIC-IV-Echo)": (
-        "T-065, ambitious version, after PhysioNet credentialing"
-    ),
-    "Gap between observed and recomputed PPV across sites": "T-067",
-}
 
 Probs = NDArray[np.float32]
-
-
-def git_commit() -> str:
-    out = subprocess.run(
-        ["git", "rev-parse", "HEAD"], capture_output=True, text=True, check=False, cwd=REPO_ROOT
-    )
-    return out.stdout.strip() or "unknown"
 
 
 def scores_for(arm: str, meta: pd.DataFrame) -> tuple[Probs, dict[str, Any]]:
@@ -208,7 +192,6 @@ def main() -> None:
         "patients_shared_between_roles": 0,  # transfer_cohorts raises otherwise
         "prevalence_by_context_val_and_test": prevalence_replay(meta),
         "arms": {},
-        "empty_cells": EMPTY_CELLS,
     }
     for arm, title in ARMS.items():
         probs, info = scores_for(arm, meta)
@@ -219,15 +202,9 @@ def main() -> None:
             "run": info,
             **measured,
         }
-    result["commit"] = git_commit()
+    result["commit"] = head_commit()
     (RESULTS_DIR / "echonext_transfer.json").write_text(json.dumps(result, indent=2) + "\n")
     coverage_table(result).to_csv(RESULTS_DIR / "echonext_coverage.csv", index=False)
-    REPORTS_DIR.mkdir(parents=True, exist_ok=True)
-    for arm in ARMS:
-        for target in REPORTED_TARGETS:
-            page: Path = REPORTS_DIR / f"{arm}_inpatient_to_{target}.md"
-            page.write_text(render(result, arm, target))
-            print(page.relative_to(REPO_ROOT))
 
 
 if __name__ == "__main__":

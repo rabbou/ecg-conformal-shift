@@ -10,7 +10,8 @@ cases.
 
 from __future__ import annotations
 
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
+from typing import Any
 
 import numpy as np
 from numpy.typing import NDArray
@@ -27,6 +28,8 @@ __all__ = [
     "coverage",
     "effective_sample_size",
     "mean_set_size",
+    "outcome_shares",
+    "percentile_interval",
     "singleton_rate",
     "wilson_interval",
 ]
@@ -41,6 +44,32 @@ def coverage(sets: BoolArray, labels: IntArray) -> float:
     """Fraction of test points whose prediction set contains the true class."""
     _check_sets(sets, labels)
     return float(sets[np.arange(len(labels)), labels].mean())
+
+
+def outcome_shares(sets: BoolArray, labels: IntArray, klass: int) -> tuple[float, float, float]:
+    """For the cases of one label of a two-label problem: correct alone, deferred, wrong alone.
+
+    A deferral is a set holding both labels or neither; either way there is no
+    machine answer and a human reads the tracing.  The three shares are of every
+    case carrying the label, so they sum to one, and a rule that defers stays
+    comparable with one that never does.
+    """
+    of_class = np.asarray(labels) == klass
+    positive, negative = sets[:, 1], sets[:, 0]
+    deferred = positive == negative
+    correct = (positive & ~negative) if klass == 1 else (negative & ~positive)
+    wrong = ~deferred & ~correct
+    return (
+        float(np.mean(correct[of_class])),
+        float(np.mean(deferred[of_class])),
+        float(np.mean(wrong[of_class])),
+    )
+
+
+def percentile_interval(values: Sequence[float] | Array) -> tuple[float, float]:
+    """The 95% percentile interval of a set of bootstrap replicates."""
+    low, high = np.percentile(np.asarray(values, dtype=np.float64), [2.5, 97.5])
+    return float(low), float(high)
 
 
 def wilson_interval(successes: int, n: int, confidence: float = 0.95) -> tuple[float, float]:
@@ -65,7 +94,7 @@ def wilson_interval(successes: int, n: int, confidence: float = 0.95) -> tuple[f
 def bootstrap_ci(
     statistic: Callable[[IntArray, Array], float],
     labels: IntArray,
-    scores: Array,
+    scores: NDArray[np.floating[Any]],
     n_draws: int = 1000,
     confidence: float = 0.95,
     seed: int = 0,

@@ -13,7 +13,6 @@ from __future__ import annotations
 
 import json
 import resource
-import subprocess
 import sys
 import time
 
@@ -29,13 +28,9 @@ from ecs.echonext import (
     verify_files,
 )
 from ecs.encoders import machine_info
+from ecs.provenance import head_commit
 
 OUT = RESULTS_DIR / "echonext_provenance.json"
-
-
-def git_commit() -> str:
-    out = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True, check=False)
-    return out.stdout.strip() or "unknown"
 
 
 def peak_rss_bytes() -> int:
@@ -73,7 +68,7 @@ def main() -> None:
         "peak_rss_bytes": peak_rss_bytes(),
         "seconds": round(time.time() - started, 1),
         "machine": machine_info(),
-        "commit": git_commit(),
+        "commit": head_commit(),
     }
     OUT.write_text(json.dumps(result, indent=2) + "\n")
     print(json.dumps(result, indent=2))

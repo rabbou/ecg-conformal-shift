@@ -7,7 +7,8 @@ sees.  Three ways of turning a probability into a decision are compared, with
 the names the study already uses:
 
 ``plain``     one threshold on the probability, placed so that 90% of the
-              calibration positives reach it; a committed yes or no.
+              calibration positives reach it; a committed yes or no.  It is the
+              per-label rule's threshold for the positive class.
 ``pooled``    split conformal with the LAC score over all calibration records:
               the set {0}, {1}, {0, 1} or the empty set.
 ``perlabel``  the same with one quantile per true class (Mondrian), which holds
@@ -16,7 +17,6 @@ the names the study already uses:
 
 from __future__ import annotations
 
-import math
 from typing import Any
 
 import numpy as np
@@ -34,14 +34,7 @@ from .calibration import (
     sensitivity_specificity,
     slope_intercept,
 )
-from .conformal import (
-    conformal_quantile,
-    lac_scores,
-    lac_scores_all,
-    mondrian_quantiles,
-    predict_sets,
-    predict_sets_per_class,
-)
+from .conformal import SCHEMES, fit_thresholds
 from .metrics import bootstrap_ci, wilson_interval
 from .splits import patient_split
 
@@ -54,6 +47,7 @@ __all__ = [
     "coverage_row",
     "decision_rows",
     "ladder_rows",
+    "outcomes_from_coverage",
     "ppv_row",
     "subgroup_rows",
 ]
@@ -63,7 +57,7 @@ IntArray = NDArray[np.int_]
 BoolArray = NDArray[np.bool_]
 
 ALPHA = 0.10
-METHODS = ("plain", "pooled", "perlabel")
+METHODS = SCHEMES
 AGE_BANDS = ((18, 50, "18-49"), (50, 65, "50-64"), (65, 80, "65-79"), (80, 200, "80+"))
 BOOTSTRAP_DRAWS = 500
 NET_BENEFIT_THRESHOLDS = (0.05, 0.10, 0.20, 0.30, 0.40, 0.50)
@@ -81,19 +75,7 @@ def conformal_sets(
     p_cal: Array, y_cal: IntArray, p_tgt: Array, alpha: float = ALPHA
 ) -> dict[str, BoolArray]:
     """The (n, 2) membership matrix of each method, fitted on calibration only."""
-    y_cal = np.asarray(y_cal, dtype=int)
-    cal_scores = lac_scores(_two_columns(p_cal), y_cal)
-    tgt_scores = lac_scores_all(_two_columns(p_tgt))
-    positives = cal_scores[y_cal == 1]
-    positive_q = conformal_quantile(positives, alpha) if positives.size else math.inf
-    flagged = tgt_scores[:, 1] <= positive_q
-    return {
-        "plain": np.column_stack([~flagged, flagged]),
-        "pooled": predict_sets(tgt_scores, conformal_quantile(cal_scores, alpha)),
-        "perlabel": predict_sets_per_class(
-            tgt_scores, mondrian_quantiles(cal_scores, y_cal, alpha, n_classes=2)
-        ),
-    }
+    return fit_thresholds(_two_columns(p_cal), y_cal, alpha).sets(_two_columns(p_tgt))
 
 
 def _share(mask: BoolArray) -> tuple[float | None, float | None, float | None, int]:
@@ -125,6 +107,65 @@ def coverage_row(sets: BoolArray, y: IntArray) -> dict[str, Any]:
         "abstention": float((size != 1).mean()),
         "both": float((size == 2).mean()),
         "empty": float((size == 0).mean()),
+    }
+
+
+def outcomes_from_coverage(plain: dict[str, Any], perlabel: dict[str, Any]) -> dict[str, Any]:
+    """What each patient gets under the per-label rule, read off two coverage rows.
+
+    The plain rule flags a patient exactly when the per-label rule admits the
+    disease, since the two share that threshold.  With no empty set, a patient
+    is then recognised (the disease alone), referred to a human (both labels) or
+    missed (no disease), and the counts follow from the two rows of one cell:
+
+      healthy cleared   = plain coverage of the healthy
+      healthy referred  = per-label coverage of the healthy - plain coverage of the healthy
+      ill referred      = every referral - the healthy referred
+      ill recognised    = coverage of the ill - the ill referred
+
+    Raises when a premise fails: a row with an empty set, two rows that disagree
+    on the ill, or a share that is not a whole number of patients.
+    """
+    if plain["n"] != perlabel["n"] or plain["n_pos"] != perlabel["n_pos"]:
+        raise ValueError("the two rows describe different cohorts")
+    if perlabel["empty"] != 0 or plain["abstention"] != 0:
+        raise ValueError("an empty set or a deferral under the plain rule breaks the identities")
+    n, n_ill = int(perlabel["n"]), int(perlabel["n_pos"])
+    n_healthy = n - n_ill
+
+    def whole(share: float, of: int) -> int:
+        count = share * of
+        if abs(count - round(count)) > 1e-6:
+            raise ValueError(f"{share} of {of} is not a whole number of patients")
+        return int(round(count))
+
+    covered = whole(perlabel["coverage_pos"], n_ill)
+    if covered != whole(plain["coverage_pos"], n_ill):
+        raise ValueError("the plain and per-label rules disagree on the ill")
+    cleared = whole(plain["coverage_neg"], n_healthy)
+    healthy_referred = whole(perlabel["coverage_neg"], n_healthy) - cleared
+    ill_referred = whole(perlabel["both"], n) - healthy_referred
+    counts = {
+        "ill": {
+            "recognised": covered - ill_referred,
+            "referred": ill_referred,
+            "missed": n_ill - covered,
+        },
+        "healthy": {
+            "cleared": cleared,
+            "referred": healthy_referred,
+            "false_alarm": n_healthy - cleared - healthy_referred,
+        },
+    }
+    if min(min(group.values()) for group in counts.values()) < 0:
+        raise ValueError(f"a negative count: {counts}")
+    totals = {"ill": n_ill, "healthy": n_healthy}
+    return {
+        group: {
+            "n": totals[group],
+            **{name: {"count": c, "share": c / totals[group]} for name, c in parts.items()},
+        }
+        for group, parts in counts.items()
     }
 
 

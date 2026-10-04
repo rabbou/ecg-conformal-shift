@@ -520,7 +520,7 @@ class TestTheCommittedRotation:
     ) -> None:
         """A results file outlives the code that wrote it. When the splitter
         changes -- a repeated tracing becoming one unit with its copies, say --
-        every number in the table describes a split that no longer exists, and
+        every number in the table describes a split the code does not draw, and
         nothing in its shape says so. This compares the part sizes the table
         recorded against the ones the current code draws."""
         for source in SOURCES:

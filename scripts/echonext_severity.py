@@ -16,7 +16,6 @@ Usage: .venv/bin/python scripts/echonext_severity.py
 from __future__ import annotations
 
 import json
-import subprocess
 from typing import Any
 
 import numpy as np
@@ -32,6 +31,7 @@ from ecs.echonext import (
     read_metadata,
     transfer_cohorts,
 )
+from ecs.provenance import head_commit
 from ecs.severity import (
     BOOTSTRAP_DRAWS,
     CONTINUOUS,
@@ -57,13 +57,6 @@ FINDINGS = LABELS[:-1]
 SCORES_DIR = DERIVED_DIR / "scores"
 COUNT_ORDER = ("1", "2+")
 BAND_ORDER = tuple(name for _, name in LVEF_BANDS)
-
-
-def git_commit() -> str:
-    out = subprocess.run(
-        ["git", "rev-parse", "HEAD"], capture_output=True, text=True, check=False, cwd=REPO_ROOT
-    )
-    return out.stdout.strip() or "unknown"
 
 
 def composite_scores(arm: str, meta: pd.DataFrame) -> NDArray[np.float64]:
@@ -188,7 +181,7 @@ def measure(meta: pd.DataFrame) -> dict[str, Any]:
 
 def main() -> None:
     result = measure(read_metadata())
-    result["commit"] = git_commit()
+    result["commit"] = head_commit()
     path = RESULTS_DIR / "echonext_severity.json"
     path.write_text(json.dumps(result, indent=2) + "\n")
     print(path.relative_to(REPO_ROOT))

@@ -50,7 +50,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import subprocess
 import sys
 import time
 from itertools import combinations
@@ -71,8 +70,10 @@ from ecs.config import (
     SPH_DIR,
 )
 from ecs.encoders import PRETRAINING, SAW
+from ecs.ingest import distinct_patients
 from ecs.labels import MILabelSpec, acs_mi_label, ptbxl_mi_label, sph_mi_label
 from ecs.metrics import bootstrap_ci
+from ecs.provenance import head_commit
 from ecs.report import Source, Target, frozen_calibration_table
 from ecs.splits import ptbxl_benchmark_split
 
@@ -92,11 +93,6 @@ ALPHAS = (0.20, 0.10, 0.05)
 
 TARGETS = ("sph", "acs")
 METRICS = {"auroc": auroc, "auprc": auprc}
-
-
-def git_commit() -> str:
-    out = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True, check=False)
-    return out.stdout.strip() or "unknown"
 
 
 def read_embeddings(root: Path, arm: str, corpus: str) -> tuple[list[str], NDArray[np.float64]]:
@@ -146,20 +142,6 @@ def corpus_labels() -> dict[str, pd.Series]:
     acs = acs_mi_label(acs_table, spec)
     acs.index = pd.Index([str(f).removesuffix(".dat") for f in acs_table["ecg_row_record"]])
     return {"ptbxl": ptbxl, "sph": sph, "acs": acs}
-
-
-def target_patients(corpus: str) -> int:
-    """How many distinct patients a target's records come from.
-
-    Descriptive rather than load-bearing -- a target is never split, so no
-    patient straddles a calibration boundary -- but it is read from the corpus
-    rather than substituted with the record count, because a corpus with several
-    tracings per patient carries fewer independent draws than its records
-    suggest and writing the larger number would say otherwise.
-    """
-    if corpus == "sph":
-        return int(pd.read_csv(SPH_DIR / "metadata.csv")["Patient_ID"].nunique())
-    return int(pd.read_csv(ACS_DIR / ACS_LABELLED_SPLIT)["Patient_id"].nunique())
 
 
 def ptbxl_parts() -> tuple[pd.Series, pd.Series]:
@@ -316,7 +298,7 @@ def main(argv: list[str] | None = None) -> int:
             corpus: Target(
                 scored[arm][corpus]["probs"],
                 scored[arm][corpus]["labels"],
-                target_patients(corpus),
+                distinct_patients(corpus),
             )
             for corpus in TARGETS
         }
@@ -411,7 +393,7 @@ def main(argv: list[str] | None = None) -> int:
         "n_draws": args.draws,
         "bootstrap_draws": args.bootstrap_draws,
         "seed": args.seed,
-        "git_commit": git_commit(),
+        "git_commit": head_commit(),
         "discrimination": metrics,
         "discrimination_paired": paired_metrics,
         "coverage": gaps,

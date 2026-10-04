@@ -30,9 +30,9 @@ from pathlib import Path
 from typing import Any, cast
 
 import numpy as np
-import pandas as pd
 
-from ecs.config import ACS_DIR, ACS_LABELLED_SPLIT, PTBXL_DIR, RESULTS_DIR, SPH_DIR
+from ecs.config import ACS_DIR, PTBXL_DIR, RESULTS_DIR, SPH_DIR
+from ecs.ingest import distinct_patients, ptbxl_patients
 from ecs.provenance import provenance_block
 from ecs.report import CORRECTIONS, Source, Target, frozen_calibration_table
 
@@ -60,25 +60,6 @@ PTBXL_DEVIATIONS = (
     "the infarct patterns PTB-XL records are undated, so the class is read as a "
     "chronic pattern rather than an acute event",
 )
-
-
-def patients_of(ids: list[str], root: Path) -> list[str]:
-    """The patient each fold-10 record belongs to, in the order of ``ids``."""
-    database = pd.read_csv(root / "ptbxl_database.csv", index_col="ecg_id")
-    return [str(database.loc[int(i), "patient_id"]) for i in ids]
-
-
-def n_patients(corpus: str, sph_dir: Path, acs_dir: Path) -> int:
-    """How many distinct patients a corpus's records come from.
-
-    Descriptive here rather than load-bearing: the external corpora are never
-    split, so no patient straddles a calibration boundary.  It is reported
-    because a corpus with several tracings per patient carries fewer independent
-    draws than its record count suggests.
-    """
-    if corpus == "sph":
-        return int(pd.read_csv(sph_dir / "metadata.csv")["Patient_ID"].nunique())
-    return int(pd.read_csv(acs_dir / ACS_LABELLED_SPLIT)["Patient_id"].nunique())
 
 
 def paired(rows: list[dict[str, Any]], corpus: str, key: str, klass: str = "1") -> dict[str, Any]:
@@ -109,11 +90,10 @@ def paired(rows: list[dict[str, Any]], corpus: str, key: str, klass: str = "1") 
 
 
 def reading(rows: list[dict[str, Any]], corpora: list[str]) -> dict[str, Any]:
-    """The answer the day was for, with every figure read back off the rows above.
+    """The reading of the table, with every figure read back off the rows above.
 
-    Nothing here is typed in: each sentence is assembled from the cells it names,
-    so a table that moves moves the answer with it rather than leaving a
-    conclusion behind that the numbers no longer support.
+    Each sentence is assembled from the cells it names, so a table that moves
+    moves the reading with it.
     """
     chosen = [r for r in rows if r["alpha"] == HEADLINE_ALPHA and r["score"] == HEADLINE_SCORE]
     by_correction = {row["correction"]: row for row in chosen}
@@ -309,7 +289,7 @@ def main(argv: list[str] | None = None) -> int:
         "ptbxl",
         probs,
         labels,
-        patients_of([str(i) for i in ids], Path(args.ptbxl_dir)),
+        ptbxl_patients(ids, Path(args.ptbxl_dir)),
         deviations=PTBXL_DEVIATIONS,
     )
 
@@ -322,7 +302,7 @@ def main(argv: list[str] | None = None) -> int:
             targets[corpus] = Target(
                 data["probs"],
                 data["labels"],
-                n_patients(corpus, Path(args.sph_dir), Path(args.acs_dir)),
+                distinct_patients(corpus, Path(args.sph_dir), Path(args.acs_dir)),
                 tuple(sidecar["deviations"]),
             )
         provenance[corpus] = {
@@ -382,7 +362,9 @@ def main(argv: list[str] | None = None) -> int:
             [
                 "scripts/shift_table.py",
                 "src/ecs/conformal.py",
+                "src/ecs/ingest.py",
                 "src/ecs/metrics.py",
+                "src/ecs/report.py",
                 "src/ecs/splits.py",
             ]
         ),

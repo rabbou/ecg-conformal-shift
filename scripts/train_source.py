@@ -42,7 +42,7 @@ from torch import nn
 
 from ecs.config import N_LEADS, RESULTS_DIR, WINDOW_SAMPLES
 from ecs.encoders import machine_info
-from ecs.models import ResNet1d
+from ecs.models import ResNet1d, class_probabilities, standardisation
 from ecs.rotation import (
     CAL_CAP,
     SOURCES,
@@ -114,26 +114,6 @@ def read_part(
     return x, index.labels(kept), kept
 
 
-def standardisation(x: NDArray[np.float32]) -> tuple[float, float]:
-    """One mean and one spread, from the training part of this source alone."""
-    return float(x.mean()), float(x.std()) or 1.0
-
-
-def probabilities(
-    model: nn.Module, x: NDArray[np.float32], centre: float, scale: float, batch: int = 64
-) -> NDArray[np.float64]:
-    """Per-class probability for every row, in the same order."""
-    model.eval()
-    out = []
-    with torch.no_grad():
-        for i in range(0, len(x), batch):
-            block = torch.from_numpy((x[i : i + batch] - centre) / scale)
-            out.append(torch.sigmoid(model(block)))
-    if not out:
-        return np.empty((0, len(class_keys())), dtype=np.float64)
-    return torch.cat(out).numpy().astype(np.float64)
-
-
 def per_class_auroc(
     y: NDArray[np.int_], p: NDArray[np.float64], keys: list[str]
 ) -> dict[str, float]:
@@ -194,7 +174,9 @@ def train(source: str, settings: Settings, results: Path) -> dict[str, Any]:
             loss.backward()
             optimiser.step()
             total += float(loss) * len(rows)
-        p_val = probabilities(model, x_val, centre, scale, settings.batch_size)
+        p_val = class_probabilities(
+            model, x_val, centre, scale, settings.batch_size, multilabel=True
+        ).astype(np.float64)
         auroc = per_class_auroc(y_val, p_val, keys)
         macro = float(np.mean(list(auroc.values()))) if auroc else float("nan")
         row = {

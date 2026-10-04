@@ -1,29 +1,21 @@
-"""The quantities the discussion and the limitations rest on, computed and kept.
+"""The infarction quantities the report argues from that are not a coverage table.
 
-Five arguments in sections 4 and 5 turned on numbers that no file in this
-repository held: the interval on the difference between two schemes, the reject
-rule the discussion compares against, the size of the finite-sample correction,
-the cases a site would need to measure its own coverage, and the predictive
-value at the low-prevalence site.  They were right, and they were unauditable,
-which for a report that asks its reader to check its arithmetic is the same
-fault as being wrong.
+Everything here reads the committed score files and nothing else, and every
+calibration draw is the one ``outcomes.py`` and ``shift_table.py`` read.
 
-Everything here reads the committed score files and nothing else.
-
-  differences        the per-patient bootstrap the limitations quote.  A
-                     replicate resamples the PTB-XL patients with replacement,
-                     halves the resampled patients, fits every threshold on one
-                     half, and evaluates on the other and on a resampled target
-                     cohort.  The target corpora are resampled by record, not by
-                     patient: the committed score files carry no patient
+  differences        a per-patient bootstrap on the gap between the pooled and
+                     per-label rules.  A replicate resamples the PTB-XL patients
+                     with replacement, halves the resampled patients, fits every
+                     threshold on one half, and evaluates on the other and on a
+                     resampled target cohort.  The target corpora are resampled
+                     by record: the committed score files carry no patient
                      identifier, and both corpora hold close to one tracing per
-                     patient, 25,770 from 24,666 at Shandong and 19,955 from
-                     18,909 at Chongqing.  Stated because it is the one place
-                     the bootstrap is coarser than the protocol it describes.
+                     patient, 25,770 from 24,666 at Shandong and 17,955 from
+                     17,018 at Chongqing.
   chow               a reject rule in Chow's sense (1970), thresholds placed at
                      the empirical 90th percentile of each label's calibration
                      scores, and the symmetric variant that refuses one band
-                     around a single threshold.  Nothing conformal in either.
+                     around the sensitivity threshold.  Nothing conformal in either.
   correction         what the (n+1) in the conformal quantile is worth, as the
                      coverage difference between the rank it takes and the rank
                      the plain empirical quantile takes, against the spread
@@ -33,6 +25,9 @@ Everything here reads the committed score files and nothing else.
                      site's prevalence.
   predictive_value   what a positive answer is worth at each site, which
                      coverage does not say.
+  site_intervals     each target site's MI coverage with the Wilson interval its
+                     own MI cases support.
+  discrimination     the baseline model's AUROC on each corpus.
 
 Usage: .venv/bin/python scripts/auxiliary.py [--bootstrap 2000]
 """
@@ -46,36 +41,24 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
+import pandas as pd
 from numpy.typing import NDArray
 from scipy.stats import norm
-from shift_table import patients_of
+from sklearn.metrics import roc_auc_score
 
 from ecs.config import PTBXL_DIR, RESULTS_DIR
-from ecs.conformal import (
-    conformal_quantile,
-    lac_scores,
-    lac_scores_all,
-    mondrian_quantiles,
-    predict_sets,
-    predict_sets_per_class,
-)
-from ecs.metrics import wilson_interval
+from ecs.conformal import fit_thresholds, lac_scores, lac_scores_all, predict_sets_per_class
+from ecs.ingest import ptbxl_patients
+from ecs.metrics import bootstrap_ci, percentile_interval, wilson_interval
 from ecs.provenance import provenance_block
+from ecs.splits import calibration_half, calibration_halves, resample_patients
 
 ALPHA = 0.10
 DRAWS = 200
 BOOTSTRAP_DRAWS = 2000
+AUROC_DRAWS = 1000
 TARGET_HALF_WIDTH = 0.02
 CORPUS_NAMES = {"ptbxl": "PTB-XL", "sph": "Shandong", "acs": "Chongqing"}
-
-
-def _fit(probs: NDArray[Any], labels: NDArray[np.int_]) -> tuple[float, float, NDArray[np.float64]]:
-    scores = lac_scores(probs, labels)
-    return (
-        float(np.quantile(probs[:, 1][labels == 1], ALPHA)),
-        conformal_quantile(scores, ALPHA),
-        mondrian_quantiles(scores, labels, ALPHA, 2),
-    )
 
 
 def _mi_coverage(sets: NDArray[np.bool_], labels: NDArray[np.int_]) -> float:
@@ -98,8 +81,7 @@ def _chow_sets(probs: NDArray[Any], mi_cut: float, non_mi_cut: float) -> NDArray
 
 
 def _percentile(values: list[float]) -> list[float]:
-    array = np.asarray(values, dtype=np.float64)
-    return [round(float(np.percentile(array, 2.5)), 4), round(float(np.percentile(array, 97.5)), 4)]
+    return [round(bound, 4) for bound in percentile_interval(values)]
 
 
 def differences(
@@ -110,21 +92,16 @@ def differences(
 ) -> dict[str, Any]:
     """Per-patient bootstrap on the gap between the two conformal schemes."""
     rng = np.random.default_rng(seed)
-    unique = np.unique(patients)
-    index_of = {p: np.flatnonzero(patients == p) for p in unique}
     gaps: dict[str, list[float]] = {}
     levels: dict[str, list[float]] = {}
 
     for _ in range(bootstrap):
-        picked = rng.choice(unique, size=unique.size, replace=True)
-        rows = np.concatenate([index_of[p] for p in picked])
-        tag = np.concatenate([np.full(index_of[p].size, i) for i, p in enumerate(picked)])
-        held = set(rng.permutation(np.unique(tag))[: unique.size // 2].tolist())
-        is_cal = np.isin(tag, list(held))
+        rows, keys = resample_patients(patients, rng)
+        is_cal = calibration_half(pd.Series(keys), int(rng.integers(2**31)))
 
         source = corpora["ptbxl"]
         probs, labels = source["probs"][rows], source["labels"][rows]
-        _, pooled_q, per_q = _fit(probs[is_cal], labels[is_cal])
+        fitted = fit_thresholds(probs[is_cal], labels[is_cal], ALPHA)
 
         for name, bundle in corpora.items():
             if name == "ptbxl":
@@ -132,9 +109,9 @@ def differences(
             else:
                 draw = rng.integers(0, bundle["labels"].size, bundle["labels"].size)
                 test_probs, test_labels = bundle["probs"][draw], bundle["labels"][draw]
-            scores = lac_scores_all(test_probs)
-            pooled = _mi_coverage(predict_sets(scores, pooled_q), test_labels)
-            per = _mi_coverage(predict_sets_per_class(scores, per_q), test_labels)
+            sets = fitted.sets(test_probs)
+            pooled = _mi_coverage(sets["pooled"], test_labels)
+            per = _mi_coverage(sets["perlabel"], test_labels)
             gaps.setdefault(name, []).append(per - pooled)
             levels.setdefault(f"{name}:pooled", []).append(pooled)
             levels.setdefault(f"{name}:perlabel", []).append(per)
@@ -174,17 +151,12 @@ def chow(
     seed: int,
 ) -> dict[str, Any]:
     """A reject rule against the conformal scheme it is said to reproduce."""
-    rng = np.random.default_rng(seed)
-    unique = np.unique(patients)
     tally: dict[tuple[str, str], list[float]] = {}
 
-    for _ in range(draws):
-        rng.shuffle(unique)
-        held = set(unique[: len(unique) // 2].tolist())
-        is_cal = np.array([p in held for p in patients])
+    for is_cal in calibration_halves(patients, draws, seed):
         source = corpora["ptbxl"]
         cal_probs, cal_labels = source["probs"][is_cal], source["labels"][is_cal]
-        _, _, per_q = _fit(cal_probs, cal_labels)
+        fitted = fit_thresholds(cal_probs, cal_labels, ALPHA)
 
         # Per-class Chow: the 10th percentile of the MI scores admits MI, the
         # 90th percentile of the non-MI scores admits non-MI. No (n+1).
@@ -195,8 +167,8 @@ def chow(
         # same calibration half. Comparing at a matched refusal rate is the only
         # way the two rules are comparable at all: any band can be made to look
         # better by refusing more.
-        middle = float(np.quantile(cal_probs[:, 1][cal_labels == 1], ALPHA))
-        conformal_sets = predict_sets_per_class(lac_scores_all(cal_probs), per_q)
+        middle = 1.0 - fitted.plain
+        conformal_sets = fitted.sets(cal_probs)["perlabel"]
         wanted = float((conformal_sets[:, 0] & conformal_sets[:, 1]).mean())
         distance = np.sort(np.abs(cal_probs[:, 1] - middle))
         rank = min(int(round(wanted * distance.size)), distance.size - 1)
@@ -207,7 +179,7 @@ def chow(
             if name == "ptbxl":
                 probs, labels = probs[~is_cal], labels[~is_cal]
             built = {
-                "conformal_perlabel": predict_sets_per_class(lac_scores_all(probs), per_q),
+                "conformal_perlabel": fitted.sets(probs)["perlabel"],
                 "chow_per_class": _chow_sets(probs, mi_cut, non_mi_cut),
                 "chow_symmetric": _chow_sets(probs, middle - half, middle + half),
             }
@@ -250,19 +222,14 @@ def correction(
     source: dict[str, NDArray[Any]], patients: NDArray[Any], draws: int, seed: int
 ) -> dict[str, Any]:
     """What the (n+1) buys, against the spread it has to be read beside."""
-    rng = np.random.default_rng(seed)
-    unique = np.unique(patients)
     with_correction: list[float] = []
     without: list[float] = []
 
-    for _ in range(draws):
-        rng.shuffle(unique)
-        held = set(unique[: len(unique) // 2].tolist())
-        is_cal = np.array([p in held for p in patients])
+    for is_cal in calibration_halves(patients, draws, seed):
         cal_probs, cal_labels = source["probs"][is_cal], source["labels"][is_cal]
         probs, labels = source["probs"][~is_cal], source["labels"][~is_cal]
         scores = lac_scores(cal_probs, cal_labels)
-        conformal_q = mondrian_quantiles(scores, cal_labels, ALPHA, 2)
+        conformal_q = fit_thresholds(cal_probs, cal_labels, ALPHA).perlabel
         # The plain empirical quantile of each label's scores: the same rule
         # without the finite-sample step the conformal construction adds.
         plain_q = np.array(
@@ -314,20 +281,15 @@ def predictive_value(
     seed: int,
 ) -> dict[str, Any]:
     """What a positive answer is worth, which a coverage figure does not say."""
-    rng = np.random.default_rng(seed)
-    unique = np.unique(patients)
     tally: dict[str, list[float]] = {}
-    for _ in range(draws):
-        rng.shuffle(unique)
-        held = set(unique[: len(unique) // 2].tolist())
-        is_cal = np.array([p in held for p in patients])
+    for is_cal in calibration_halves(patients, draws, seed):
         source = corpora["ptbxl"]
-        _, _, per_q = _fit(source["probs"][is_cal], source["labels"][is_cal])
+        fitted = fit_thresholds(source["probs"][is_cal], source["labels"][is_cal], ALPHA)
         for name, bundle in corpora.items():
             probs, labels = bundle["probs"], bundle["labels"]
             if name == "ptbxl":
                 probs, labels = probs[~is_cal], labels[~is_cal]
-            sets = predict_sets_per_class(lac_scores_all(probs), per_q)
+            sets = fitted.sets(probs)["perlabel"]
             flagged = sets[:, 1] & ~sets[:, 0]
             tally.setdefault(name, []).append(
                 float(labels[flagged].mean()) if flagged.any() else float("nan")
@@ -349,21 +311,68 @@ def predictive_value(
     }
 
 
-def shandong_wilson(corpora: dict[str, dict[str, NDArray[Any]]]) -> dict[str, Any]:
-    """The interval a site's own count supports, beside the spread between draws."""
-    labels = corpora["sph"]["labels"]
-    n_mi = int((labels == 1).sum())
-    low, high = wilson_interval(int(round(0.936 * n_mi)), n_mi)
+def discrimination(corpora: dict[str, dict[str, NDArray[Any]]], seed: int) -> dict[str, Any]:
+    """The baseline model's AUROC on each corpus, with a bootstrap interval by record.
+
+    AUROC is a property of the scores alone, so it is read on the whole of each
+    corpus, fold 10 included, without any calibration draw.
+    """
+    out: dict[str, Any] = {}
+    for name, bundle in corpora.items():
+        point, low, high = bootstrap_ci(
+            lambda y, p: float(roc_auc_score(y, p)),
+            bundle["labels"],
+            bundle["probs"][:, 1],
+            n_draws=AUROC_DRAWS,
+            seed=seed,
+        )
+        out[name] = {
+            "name": CORPUS_NAMES[name],
+            "auroc": round(point, 4),
+            "ci95": [round(low, 4), round(high, 4)],
+        }
+    return {"n_bootstrap": AUROC_DRAWS, "by_corpus": out}
+
+
+def site_intervals(
+    corpora: dict[str, dict[str, NDArray[Any]]], patients: NDArray[Any], draws: int, seed: int
+) -> dict[str, Any]:
+    """The interval each target site's own MI cases support, beside the spread between draws.
+
+    The coverage is the mean over the calibration draws; the Wilson interval is
+    on that coverage over the site's MI cases, which do not change from draw to
+    draw.  The spread across draws is the calibration's, a different and much
+    smaller quantity.
+    """
+    tally: dict[tuple[str, str], list[float]] = {}
+    for is_cal in calibration_halves(patients, draws, seed):
+        source = corpora["ptbxl"]
+        fitted = fit_thresholds(source["probs"][is_cal], source["labels"][is_cal], ALPHA)
+        for name in ("sph", "acs"):
+            sets = fitted.sets(corpora[name]["probs"])
+            for scheme in ("pooled", "perlabel"):
+                tally.setdefault((name, scheme), []).append(
+                    _mi_coverage(sets[scheme], corpora[name]["labels"])
+                )
+    out: dict[str, Any] = {}
+    for name in ("sph", "acs"):
+        n_mi = int((corpora[name]["labels"] == 1).sum())
+        out[name] = {"name": CORPUS_NAMES[name], "n_mi_cases": n_mi}
+        for scheme in ("pooled", "perlabel"):
+            observed = float(np.mean(tally[(name, scheme)]))
+            low, high = wilson_interval(int(round(observed * n_mi)), n_mi)
+            out[name][scheme] = {
+                "coverage": round(observed, 4),
+                "wilson_ci95": [round(low, 4), round(high, 4)],
+                "draw_sd": round(float(np.std(tally[(name, scheme)], ddof=1)), 4),
+            }
     return {
         "note": (
-            "Wilson interval on an observed MI coverage of 0.936 at Shandong, on that "
-            "site's own MI cases. It is the interval the site's count supports; the "
-            "spread across calibration draws is a different and much smaller quantity."
+            "MI coverage at each target site, mean over the calibration draws, with "
+            "the 95% Wilson interval its own MI cases support."
         ),
-        "n_mi_cases": n_mi,
-        "coverage": 0.936,
-        "wilson_ci95": [round(low, 4), round(high, 4)],
-        "half_width_points": round((high - low) / 2 * 100, 2),
+        "n_draws": draws,
+        "by_corpus": out,
     }
 
 
@@ -374,11 +383,11 @@ def build(draws: int, bootstrap: int, seed: int) -> dict[str, Any]:
         "sph": dict(np.load(RESULTS_DIR / "external/sph.npz")),
         "acs": dict(np.load(RESULTS_DIR / "external/acs.npz")),
     }
-    patients = np.asarray(patients_of([str(i) for i in corpora["ptbxl"]["ids"]], PTBXL_DIR))
+    patients = np.asarray(ptbxl_patients(corpora["ptbxl"]["ids"], PTBXL_DIR))
     return {
         "question": (
-            "The quantities sections 4 and 5 argue from, computed from the committed "
-            "scores so that each one has a file behind it."
+            "The infarction quantities the report argues from beside its coverage "
+            "tables, computed from the committed scores."
         ),
         "alpha": ALPHA,
         "n_draws": draws,
@@ -386,9 +395,10 @@ def build(draws: int, bootstrap: int, seed: int) -> dict[str, Any]:
         "provenance": provenance_block(
             [
                 "scripts/auxiliary.py",
-                "scripts/shift_table.py",
                 "src/ecs/conformal.py",
+                "src/ecs/ingest.py",
                 "src/ecs/metrics.py",
+                "src/ecs/splits.py",
             ]
         ),
         "seconds": 0.0,
@@ -397,7 +407,8 @@ def build(draws: int, bootstrap: int, seed: int) -> dict[str, Any]:
         "correction": correction(corpora["ptbxl"], patients, draws, seed),
         "sample_size": sample_size(corpora),
         "predictive_value": predictive_value(corpora, patients, draws, seed),
-        "shandong_wilson": shandong_wilson(corpora),
+        "site_intervals": site_intervals(corpora, patients, draws, seed),
+        "discrimination": discrimination(corpora, seed),
     } | {"seconds": round(time.time() - started, 1)}
 
 
@@ -432,7 +443,12 @@ def main() -> None:
     for name, row in table["predictive_value"]["by_corpus"].items():
         ppv = row["positive_predictive_value"] * 100
         print(f"  ppv {name:<6s} {ppv:6.2f}  (prevalence {row['prevalence'] * 100:.1f}%)")
-    print(f"  Shandong Wilson: {table['shandong_wilson']}")
+    for name, row in table["site_intervals"]["by_corpus"].items():
+        for scheme in ("pooled", "perlabel"):
+            cell = row[scheme]
+            print(
+                f"  {name:<4s} {scheme:<9s} MI {cell['coverage']:.4f} Wilson {cell['wilson_ci95']}"
+            )
 
 
 if __name__ == "__main__":

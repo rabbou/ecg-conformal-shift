@@ -46,19 +46,13 @@ import pandas as pd
 from numpy.typing import NDArray
 
 from ecs.config import PTBXL_DIR, RESULTS_DIR
-from ecs.conformal import (
-    conformal_quantile,
-    lac_scores,
-    lac_scores_all,
-    mondrian_quantiles,
-    predict_sets,
-    predict_sets_per_class,
-)
+from ecs.conformal import SCHEMES, fit_thresholds
+from ecs.ingest import read_ptbxl_database
+from ecs.metrics import percentile_interval
 from ecs.provenance import provenance_block
+from ecs.splits import calibration_half, calibration_halves, resample_patients
 
 ALPHA = 0.10
-PLAIN_SENSITIVITY = 1.0 - ALPHA
-SCHEMES = ("plain", "pooled", "perlabel")
 DRAWS = 200
 BOOTSTRAP_DRAWS = 2000
 
@@ -76,8 +70,7 @@ CONTRASTS = (("age", AGE_LEVELS[0], AGE_LEVELS[-1]), ("sex", "male", "female"))
 
 def read_metadata(ids: NDArray[Any], root: Path) -> pd.DataFrame:
     """Patient, sex and age band for each scored record, in the order of ``ids``."""
-    database = pd.read_csv(root / "ptbxl_database.csv", index_col="ecg_id")
-    rows = database.loc[[int(i) for i in ids]]
+    rows = read_ptbxl_database(root).loc[[int(i) for i in ids]]
     band = pd.Series("", index=rows.index, dtype=object)
     for (low, high), name in zip(AGE_EDGES, AGE_LEVELS, strict=True):
         band[(rows["age"] >= low) & (rows["age"] < high)] = name
@@ -95,29 +88,6 @@ def read_metadata(ids: NDArray[Any], root: Path) -> pd.DataFrame:
 def _covered(sets: NDArray[np.bool_], labels: NDArray[np.int_]) -> NDArray[np.bool_]:
     """Whether each returned set holds the true label."""
     return sets[np.arange(labels.size), labels]
-
-
-def _fit(
-    probs: NDArray[np.float64], labels: NDArray[np.int_]
-) -> tuple[float, float, NDArray[np.float64]]:
-    scores = lac_scores(probs, labels)
-    return (
-        float(np.quantile(probs[:, 1][labels == 1], 1.0 - PLAIN_SENSITIVITY)),
-        conformal_quantile(scores, ALPHA),
-        mondrian_quantiles(scores, labels, ALPHA, 2),
-    )
-
-
-def _sets(
-    probs: NDArray[np.float64], plain_q: float, pooled_q: float, perlabel_q: NDArray[np.float64]
-) -> dict[str, NDArray[np.bool_]]:
-    positive = probs[:, 1] >= plain_q
-    all_scores = lac_scores_all(probs)
-    return {
-        "plain": np.column_stack([~positive, positive]),
-        "pooled": predict_sets(all_scores, pooled_q),
-        "perlabel": predict_sets_per_class(all_scores, perlabel_q),
-    }
 
 
 def _cells(
@@ -139,30 +109,15 @@ def _cells(
     return out
 
 
-def _halve(
-    patients: NDArray[Any], unique: NDArray[Any], rng: np.random.Generator
-) -> NDArray[np.bool_]:
-    """One calibration half, drawn by patient.
-
-    ``unique`` is shuffled in place and handed back in across draws, which is
-    what ``outcomes.py`` does. Re-sorting it every draw would give a different
-    sequence of halves and the numbers here would no longer be comparable with
-    table 1 draw for draw.
-    """
-    rng.shuffle(unique)
-    held = set(unique[: len(unique) // 2].tolist())
-    return np.array([p in held for p in patients])
-
-
 def _one(
     probs: NDArray[np.float64],
     labels: NDArray[np.int_],
     meta: pd.DataFrame,
     is_calibration: NDArray[np.bool_],
 ) -> dict[str, dict[str, float]]:
-    plain_q, pooled_q, perlabel_q = _fit(probs[is_calibration], labels[is_calibration])
+    fitted = fit_thresholds(probs[is_calibration], labels[is_calibration], ALPHA)
     test = ~is_calibration
-    built = _sets(probs[test], plain_q, pooled_q, perlabel_q)
+    built = fitted.sets(probs[test])
     return {
         scheme: _cells(_covered(sets, labels[test]), labels[test], meta[test])
         for scheme, sets in built.items()
@@ -179,36 +134,26 @@ def collect(
 ) -> dict[str, Any]:
     patients = meta["patient"].to_numpy()
 
-    rng = np.random.default_rng(seed)
-    unique = np.unique(patients)
     protocol: dict[str, dict[str, list[float]]] = {s: {} for s in SCHEMES}
-    for _ in range(draws):
-        for scheme, cells in _one(probs, labels, meta, _halve(patients, unique, rng)).items():
+    for is_calibration in calibration_halves(patients, draws, seed):
+        for scheme, cells in _one(probs, labels, meta, is_calibration).items():
             for key, value in cells.items():
                 protocol[scheme].setdefault(key, []).append(value)
 
     # Each replicate resamples the patients themselves, so a subgroup's own
     # sampling error is inside the interval rather than held fixed.
     rng = np.random.default_rng(seed)
-    unique = np.unique(patients)
-    index_of = {p: np.flatnonzero(patients == p) for p in unique}
     resampled: dict[str, dict[str, list[float]]] = {s: {} for s in SCHEMES}
     for _ in range(bootstrap):
-        picked = rng.choice(unique, size=unique.size, replace=True)
-        rows = np.concatenate([index_of[p] for p in picked])
-        # A patient drawn twice must not straddle the halving, so the replicate's
-        # patient identity is its draw position and not its PTB-XL id.
+        rows, keys = resample_patients(patients, rng)
         replica = pd.DataFrame(
             {
-                "patient": np.concatenate(
-                    [np.full(index_of[p].size, f"{i}") for i, p in enumerate(picked)]
-                ),
+                "patient": keys,
                 "sex": meta["sex"].to_numpy()[rows],
                 "age_band": meta["age_band"].to_numpy()[rows],
             }
         )
-        replica_patients = replica["patient"].to_numpy()
-        held = _halve(replica_patients, np.unique(replica_patients), rng)
+        held = calibration_half(replica["patient"], int(rng.integers(2**31)))
         for scheme, cells in _one(probs[rows], labels[rows], replica, held).items():
             for key, value in cells.items():
                 resampled[scheme].setdefault(key, []).append(value)
@@ -220,8 +165,7 @@ def collect(
         return {
             "mean": round(float(np.nanmean(drawn)), 4),
             "sd": round(float(np.nanstd(drawn, ddof=1)), 4),
-            "ci95": [round(float(np.percentile(boot, 2.5)), 4)]
-            + [round(float(np.percentile(boot, 97.5)), 4)],
+            "ci95": [round(bound, 4) for bound in percentile_interval(boot)],
             "n_draws": int(drawn.size),
             "n_bootstrap": int(boot.size),
         }
@@ -243,8 +187,7 @@ def collect(
                 point = protocol[scheme][b]
                 differences[f"{scheme}:{group}:{second}-{first}:{label}"] = {
                     "mean": round(float(np.nanmean(point) - np.nanmean(protocol[scheme][a])), 4),
-                    "ci95": [round(float(np.percentile(gap, 2.5)), 4)]
-                    + [round(float(np.percentile(gap, 97.5)), 4)],
+                    "ci95": [round(bound, 4) for bound in percentile_interval(gap)],
                     "n_bootstrap": int(gap.size),
                 }
     return {"coverage": coverage, "differences": differences}
@@ -279,7 +222,7 @@ def build(draws: int, bootstrap: int, seed: int) -> dict[str, Any]:
             "oldest patients and to women than to the label as a whole."
         ),
         "protocol": (
-            "Same halving of PTB-XL fold 10 by patient as outcomes.py, same seed, "
+            "Same halving of PTB-XL fold 10 by patient as outcomes.py and shift.json, same seed, "
             "same three schemes. Coverage is the set holding the true label. "
             "Intervals are percentile intervals over bootstrap replicates that "
             "resample the patients of fold 10 with replacement before halving, so "
@@ -300,6 +243,9 @@ def build(draws: int, bootstrap: int, seed: int) -> dict[str, Any]:
             [
                 "scripts/subgroups.py",
                 "src/ecs/conformal.py",
+                "src/ecs/ingest.py",
+                "src/ecs/metrics.py",
+                "src/ecs/splits.py",
             ]
         ),
         "seconds": round(time.time() - started, 1),

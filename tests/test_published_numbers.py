@@ -7,20 +7,18 @@ evidence rather than a shared bug.  Breaking the quantile rank, the threshold
 placement or the outcome accounting in ``src/`` cannot move these expectations,
 because these expectations do not come from ``src/``.
 
-This is the check the suite lacked: shifting the conformal quantile by one rank
-used to fail six tests and none of them a coverage test, because no test
-recomputed any number that the report prints.
+Shifting the conformal quantile by one rank fails a coverage test here, which
+no test that reads only the shipped code can do.
 
-The two result files draw their 200 halves differently -- ``outcomes.py`` keeps
-one generator and reshuffles, ``splits.py`` builds a fresh one per draw -- so
-both draw orders are reproduced here and each file is checked against its own.
+Both result files draw the same 200 halves, a fresh generator per draw as
+``splits.py`` builds them, so one draw order is reproduced here and both files
+are checked against it.
 """
 
 from __future__ import annotations
 
 import json
 import math
-from collections.abc import Callable
 
 import numpy as np
 import pandas as pd
@@ -45,20 +43,8 @@ def conformal_quantile(scores: np.ndarray, alpha: float) -> float:
     return math.inf if rank > ordered.size else float(ordered[rank - 1])
 
 
-def halves_outcomes(patients: np.ndarray, draws: int, seed: int) -> list[np.ndarray]:
-    """The calibration masks scripts/outcomes.py draws: one generator, shuffled in place."""
-    unique = np.unique(patients)
-    rng = np.random.default_rng(seed)
-    masks = []
-    for _ in range(draws):
-        rng.shuffle(unique)
-        held = set(unique[: len(unique) // 2].tolist())
-        masks.append(np.array([p in held for p in patients]))
-    return masks
-
-
-def halves_shift(patients: np.ndarray, draws: int, seed: int) -> list[np.ndarray]:
-    """The calibration masks src/ecs/splits.py draws: a fresh generator per draw."""
+def halves(patients: np.ndarray, draws: int, seed: int) -> list[np.ndarray]:
+    """The calibration masks every table draws: a fresh generator per draw."""
     ids = np.sort(np.unique(patients))
     masks = []
     for draw in range(draws):
@@ -68,10 +54,14 @@ def halves_shift(patients: np.ndarray, draws: int, seed: int) -> list[np.ndarray
     return masks
 
 
-def _sets(probs: np.ndarray, plain_q: float, pooled_q: float, per_q: np.ndarray) -> dict:
-    """Membership matrices, one per scheme."""
+def _sets(probs: np.ndarray, pooled_q: float, per_q: np.ndarray) -> dict:
+    """Membership matrices, one per scheme.
+
+    The single threshold admits MI where 90% of the calibration MI cases sit,
+    by the same rank as the conformal quantile: it is the MI per-label threshold.
+    """
     scores = 1.0 - probs
-    positive = probs[:, 1] >= plain_q
+    positive = scores[:, 1] <= per_q[1]
     return {
         "plain": np.column_stack([~positive, positive]),
         "pooled": scores <= pooled_q,
@@ -92,7 +82,7 @@ def _shares(sets: np.ndarray, labels: np.ndarray, klass: int) -> tuple[float, fl
     )
 
 
-def _recompute(halves: Callable[..., list[np.ndarray]]) -> dict[tuple, float]:
+def _recompute() -> dict[tuple, float]:
     corpora = {
         "ptbxl": dict(np.load(RESULTS_DIR / "baseline/scores.npz", allow_pickle=False)),
         "sph": dict(np.load(RESULTS_DIR / "external/sph.npz", allow_pickle=False)),
@@ -108,12 +98,11 @@ def _recompute(halves: Callable[..., list[np.ndarray]]) -> dict[tuple, float]:
         true = 1.0 - probs[np.arange(labels.size), labels]
         pooled_q = conformal_quantile(true, ALPHA)
         per_q = np.array([conformal_quantile(true[labels == c], ALPHA) for c in (0, 1)])
-        plain_q = float(np.quantile(probs[:, 1][labels == 1], ALPHA))
         for name, bundle in corpora.items():
             probs_t, labels_t = bundle["probs"], bundle["labels"]
             if name == "ptbxl":
                 probs_t, labels_t = bundle["probs"][~is_cal], bundle["labels"][~is_cal]
-            for scheme, sets in _sets(probs_t, plain_q, pooled_q, per_q).items():
+            for scheme, sets in _sets(probs_t, pooled_q, per_q).items():
                 for klass in (0, 1):
                     outcome = _shares(sets, labels_t, klass)
                     for key, value in zip(("correct", "deferred", "wrong"), outcome, strict=True):
@@ -125,13 +114,8 @@ def _recompute(halves: Callable[..., list[np.ndarray]]) -> dict[tuple, float]:
 
 
 @pytest.fixture(scope="module")
-def as_outcomes() -> dict[tuple, float]:
-    return _recompute(halves_outcomes)
-
-
-@pytest.fixture(scope="module")
-def as_shift() -> dict[tuple, float]:
-    return _recompute(halves_shift)
+def recomputed() -> dict[tuple, float]:
+    return _recompute()
 
 
 @pytest.mark.data
@@ -142,21 +126,19 @@ class TestTableOne:
     @pytest.mark.parametrize("klass", [0, 1])
     @pytest.mark.parametrize("outcome", ["correct", "deferred", "wrong"])
     def test_cell_matches_outcomes_json(
-        self, as_outcomes: dict[tuple, float], scheme: str, klass: int, outcome: str
+        self, recomputed: dict[tuple, float], scheme: str, klass: int, outcome: str
     ) -> None:
         published = json.loads((RESULTS_DIR / "outcomes.json").read_text())
         expected = published["by_corpus"]["ptbxl"]["schemes"][scheme][str(klass)][outcome]["mean"]
-        assert as_outcomes[("ptbxl", scheme, klass, outcome)] == pytest.approx(
+        assert recomputed[("ptbxl", scheme, klass, outcome)] == pytest.approx(
             expected, abs=TOLERANCE
         )
 
-    def test_the_three_outcomes_of_a_label_exhaust_it(
-        self, as_outcomes: dict[tuple, float]
-    ) -> None:
+    def test_the_three_outcomes_of_a_label_exhaust_it(self, recomputed: dict[tuple, float]) -> None:
         for scheme in ("plain", "pooled", "perlabel"):
             for klass in (0, 1):
                 total = sum(
-                    as_outcomes[("ptbxl", scheme, klass, key)]
+                    recomputed[("ptbxl", scheme, klass, key)]
                     for key in ("correct", "deferred", "wrong")
                 )
                 assert total == pytest.approx(1.0, abs=1e-9), (scheme, klass)
@@ -173,7 +155,7 @@ class TestCoveragePerSite:
     @pytest.mark.parametrize("klass", [0, 1])
     def test_coverage_matches_shift_json(
         self,
-        as_shift: dict[tuple, float],
+        recomputed: dict[tuple, float],
         corpus: str,
         scheme: str,
         correction: str,
@@ -186,21 +168,21 @@ class TestCoveragePerSite:
             if r["alpha"] == ALPHA and r["score"] == "lac" and r["correction"] == correction
         )
         expected = row["by_corpus"][corpus]["coverage_by_class"][str(klass)]["mean"]
-        assert as_shift[(corpus, scheme, klass, "coverage")] == pytest.approx(
+        assert recomputed[(corpus, scheme, klass, "coverage")] == pytest.approx(
             expected, abs=TOLERANCE
         )
 
-    def test_coverage_is_correct_plus_deferred(self, as_shift: dict[tuple, float]) -> None:
+    def test_coverage_is_correct_plus_deferred(self, recomputed: dict[tuple, float]) -> None:
         """The identity the report asks the reader to check by hand."""
         for corpus in ("ptbxl", "sph", "acs"):
             for scheme in ("pooled", "perlabel"):
                 for klass in (0, 1):
                     parts = (
-                        as_shift[(corpus, scheme, klass, "correct")]
-                        + as_shift[(corpus, scheme, klass, "deferred")]
+                        recomputed[(corpus, scheme, klass, "correct")]
+                        + recomputed[(corpus, scheme, klass, "deferred")]
                     )
                     assert parts == pytest.approx(
-                        as_shift[(corpus, scheme, klass, "coverage")], abs=1e-9
+                        recomputed[(corpus, scheme, klass, "coverage")], abs=1e-9
                     ), (corpus, scheme, klass)
 
 
@@ -252,8 +234,8 @@ class TestTheShippedCodeAgreesWithTheDefinition:
             assert theirs == pytest.approx(mine, abs=1e-12), (n, alpha)
 
     def test_shifting_the_rank_by_one_would_be_visible(self) -> None:
-        """The guard the suite was missing: if this passed for both the correct
-        rank and its neighbour, the check above would be worthless."""
+        """If this passed for both the correct rank and its neighbour, the check
+        above would be worthless."""
         rng = np.random.default_rng(7)
         scores = np.sort(rng.random(200))
         correct = conformal_quantile(scores, ALPHA)
@@ -285,24 +267,23 @@ def _subgroup_masks(ids: np.ndarray) -> dict[str, np.ndarray]:
 
 @pytest.fixture(scope="module")
 def recomputed_subgroups() -> dict[str, float]:
-    """Coverage in every subgroup cell, over the same 200 halves as outcomes.py."""
+    """Coverage in every subgroup cell, over the same 200 halves as every table."""
     bundle = dict(np.load(RESULTS_DIR / "baseline/scores.npz", allow_pickle=False))
     database = pd.read_csv(PTBXL_DIR / "ptbxl_database.csv", index_col="ecg_id")
     patients = np.array([str(database.loc[int(i), "patient_id"]) for i in bundle["ids"]])
     masks = _subgroup_masks(bundle["ids"])
 
     tally: dict[str, list[float]] = {}
-    for is_cal in halves_outcomes(patients, DRAWS, SEED):
+    for is_cal in halves(patients, DRAWS, SEED):
         probs, labels = bundle["probs"][is_cal], bundle["labels"][is_cal]
         true = 1.0 - probs[np.arange(labels.size), labels]
         pooled_q = conformal_quantile(true, ALPHA)
         per_q = np.array([conformal_quantile(true[labels == c], ALPHA) for c in (0, 1)])
-        plain_q = float(np.quantile(probs[:, 1][labels == 1], ALPHA))
 
         probs_t, labels_t = bundle["probs"][~is_cal], bundle["labels"][~is_cal]
         covered_by = {
             scheme: sets[np.arange(labels_t.size), labels_t]
-            for scheme, sets in _sets(probs_t, plain_q, pooled_q, per_q).items()
+            for scheme, sets in _sets(probs_t, pooled_q, per_q).items()
         }
         for group, mask in masks.items():
             held = mask[~is_cal]

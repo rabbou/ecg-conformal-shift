@@ -20,7 +20,7 @@ import pandas as pd
 from numpy.typing import NDArray
 from scipy import stats
 
-from .metrics import wilson_interval
+from .metrics import percentile_interval, wilson_interval
 
 __all__ = [
     "BOOTSTRAP_DRAWS",
@@ -224,10 +224,6 @@ def bootstrap_reweighted(
         share.append((r - o) / (level - o))
     o, r = float(covered.mean()), reweighted(covered, strata, reference)
 
-    def interval(xs: list[float]) -> tuple[float, float]:
-        low, high = np.percentile(xs, [2.5, 97.5])
-        return float(low), float(high)
-
     out = {"observed": o, "reweighted": r, "gap": r - o, "share": (r - o) / (level - o)}
     for name, xs in (
         ("observed", observed),
@@ -235,7 +231,7 @@ def bootstrap_reweighted(
         ("gap", gap),
         ("share", share),
     ):
-        out[f"{name}_low"], out[f"{name}_high"] = interval(xs)
+        out[f"{name}_low"], out[f"{name}_high"] = percentile_interval(xs)
     return out
 
 

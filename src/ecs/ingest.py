@@ -30,10 +30,22 @@ import wfdb
 from numpy.typing import NDArray
 from scipy.signal import resample_poly
 
-from .config import ACS_DIR, N_LEADS, PTBXL_DIR, SAMPLING_RATE_HZ, SPH_DIR, WINDOW_SAMPLES
+from .config import (
+    ACS_DIR,
+    ACS_LABELLED_SPLIT,
+    N_LEADS,
+    PTBXL_DIR,
+    SAMPLING_RATE_HZ,
+    SPH_DIR,
+    WINDOW_SAMPLES,
+)
 
 __all__ = [
     "CANONICAL_LEADS",
+    "acs_patients",
+    "distinct_patients",
+    "ptbxl_patients",
+    "read_ptbxl_database",
     "Corpus",
     "Record",
     "assemble_corpus",
@@ -222,6 +234,42 @@ def assemble_corpus(
 # --------------------------------------------------------------------------
 # The three corpora, read in place
 # --------------------------------------------------------------------------
+
+
+def read_ptbxl_database(root: Path = PTBXL_DIR) -> pd.DataFrame:
+    """PTB-XL's record table, ``ptbxl_database.csv``, indexed by ``ecg_id``."""
+    return pd.read_csv(root / "ptbxl_database.csv", index_col="ecg_id")
+
+
+def ptbxl_patients(ids: Iterable[object], root: Path = PTBXL_DIR) -> list[str]:
+    """The patient each PTB-XL record belongs to, in the order of ``ids``."""
+    database = read_ptbxl_database(root)
+    return [str(database.loc[int(str(i)), "patient_id"]) for i in ids]
+
+
+def acs_patients(ids: Iterable[str], root: Path = ACS_DIR) -> list[str]:
+    """The patient each labelled Chongqing record belongs to, in the order of ``ids``."""
+    table = pd.read_csv(root / ACS_LABELLED_SPLIT)
+    by_record = {
+        str(f).removesuffix(".dat"): str(p)
+        for f, p in zip(table["ecg_row_record"], table["Patient_id"], strict=True)
+    }
+    return [by_record[i] for i in ids]
+
+
+def distinct_patients(corpus: str, sph_dir: Path = SPH_DIR, acs_dir: Path = ACS_DIR) -> int:
+    """How many distinct patients the records of a target corpus come from.
+
+    Descriptive rather than load-bearing: a target is never split, so no patient
+    straddles a calibration boundary.  A corpus with several tracings per patient
+    carries fewer independent draws than its record count suggests, which is why
+    the count is read from the corpus rather than taken to be the record count.
+    """
+    if corpus == "sph":
+        return int(pd.read_csv(sph_dir / "metadata.csv")["Patient_ID"].nunique())
+    if corpus == "acs":
+        return int(pd.read_csv(acs_dir / ACS_LABELLED_SPLIT)["Patient_id"].nunique())
+    raise ValueError(f"no patient table for {corpus!r}")
 
 
 def iter_ptbxl(

@@ -34,7 +34,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import subprocess
 import sys
 from collections import Counter
 from collections.abc import Iterator, Sequence
@@ -42,6 +41,7 @@ from pathlib import Path
 from typing import Any
 
 from ecs.config import CHALLENGE2021_DIR, RESULTS_DIR
+from ecs.provenance import head_commit
 from ecs.seen_target import (
     ALLOWED_PARTITIONS,
     INFARCTION_CODES,
@@ -55,11 +55,6 @@ from ecs.seen_target import (
 )
 
 __all__ = ["main"]
-
-
-def git_commit() -> str:
-    out = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True, check=False)
-    return out.stdout.strip() or "unknown"
 
 
 def iter_headers(root: Path) -> Iterator[Path]:
@@ -94,7 +89,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     named = [p for p in ALLOWED_PARTITIONS if p != "cpsc_2018_extra"]
     result: dict[str, Any] = {
         "bundle": str(Path(args.bundle).expanduser()),
-        "git_commit": git_commit(),
+        "git_commit": head_commit(),
         "partitions_read": list(ALLOWED_PARTITIONS),
         "partitions_refused": {
             name: "holds the calibration corpus or a corpus derived from it"

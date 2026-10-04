@@ -34,7 +34,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import subprocess
 import sys
 import time
 from pathlib import Path
@@ -44,22 +43,29 @@ import numpy as np
 import pandas as pd
 from numpy.typing import NDArray
 
-from ecs.config import ACS_DIR, ACS_LABELLED_SPLIT, PTBXL_DIR, RESULTS_DIR
+from ecs.config import RESULTS_DIR
 from ecs.conformal import (
-    aps_scores_all,
     class_prior,
     label_shift_weights,
-    lac_scores_all,
     predict_sets_per_class,
 )
 from ecs.encoders import machine_info
+from ecs.ingest import acs_patients, ptbxl_patients
 from ecs.metrics import (
     class_conditional_coverage,
     coverage,
     effective_sample_size,
     mean_set_size,
 )
-from ecs.report import SCORES, estimated_prior, frozen_threshold, spread
+from ecs.provenance import head_commit
+from ecs.report import (
+    SCORES,
+    estimated_prior,
+    frozen_threshold,
+    nonconformity_scores,
+    spread,
+    threshold_spread,
+)
 from ecs.splits import patient_split
 
 Array = NDArray[np.float64]
@@ -79,26 +85,6 @@ POOL_SHARE = 0.5  # of Chongqing's patients; the rest is the evaluation half
 # zero, where the source is still what calibrated the threshold.
 LADDER_CORRECTIONS = ("none", "mondrian")
 RUNG_ZERO_CORRECTIONS = ("none", "mondrian", "weighted")
-
-
-def git_commit() -> str:
-    out = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True, check=False)
-    return out.stdout.strip() or "unknown"
-
-
-def acs_patients(ids: list[str]) -> list[str]:
-    """The patient each Chongqing record belongs to, in the order of ``ids``."""
-    table = pd.read_csv(ACS_DIR / ACS_LABELLED_SPLIT)
-    by_record = {
-        str(f).removesuffix(".dat"): str(p)
-        for f, p in zip(table["ecg_row_record"], table["Patient_id"], strict=True)
-    }
-    return [by_record[i] for i in ids]
-
-
-def ptbxl_patients(ids: list[str]) -> list[str]:
-    database = pd.read_csv(PTBXL_DIR / "ptbxl_database.csv", index_col="ecg_id")
-    return [str(database.loc[int(i), "patient_id"]) for i in ids]
 
 
 def rows_by_patient(pool: NDArray[np.int_], patients: NDArray[np.str_]) -> list[NDArray[np.int_]]:
@@ -130,10 +116,6 @@ def draw_target_records(
         if len(chosen) == n_wanted:
             break
     return np.array(sorted(chosen), dtype=int)
-
-
-def _all_scores(probs: Array, score: str, rng: np.random.Generator) -> Array:
-    return lac_scores_all(probs) if score == "lac" else aps_scores_all(probs, rng=rng)
 
 
 class Cell:
@@ -185,27 +167,9 @@ class Cell:
                 "effective_sample_size": spread(self.ess).as_dict(),
             },
             "threshold_by_class": {
-                str(c): _threshold_spread(list(drawn[:, c])) for c in range(N_CLASSES)
+                str(c): threshold_spread(list(drawn[:, c])) for c in range(N_CLASSES)
             },
         }
-
-
-def _threshold_spread(values: list[float]) -> dict[str, float | int]:
-    """Where a threshold sat, with the infinite draws counted rather than averaged.
-
-    An infinite threshold is the honest answer when a class has fewer
-    calibration points than the level needs -- ceil(1/alpha) - 1 of them -- and it
-    is the reading the low rungs of this ladder are for.  Averaging it into a
-    finite mean would hide exactly what the rung is measuring.
-    """
-    array = np.asarray(values, dtype=np.float64)
-    finite = array[np.isfinite(array)]
-    return {
-        "mean": float(finite.mean()) if finite.size else float("inf"),
-        "sd": float(finite.std(ddof=1)) if finite.size > 1 else 0.0,
-        "n_draws": int(array.size),
-        "n_infinite": int(array.size - finite.size),
-    }
 
 
 def run(draws: int, seed: int) -> dict[str, Any]:
@@ -245,11 +209,11 @@ def run(draws: int, seed: int) -> dict[str, Any]:
                 source_keys, {"calibration": 0.5, "test": 0.5}, seed=seed + draw
             )
             is_calibration = (source_part == "calibration").to_numpy()
-            source_all = _all_scores(source_probs, score, rng)
+            source_all = nonconformity_scores(source_probs, score, rng)
             source_true = source_all[is_calibration, source_labels[is_calibration]]
             source_cal_labels = source_labels[is_calibration]
 
-            target_all = _all_scores(target_probs, score, rng)
+            target_all = nonconformity_scores(target_probs, score, rng)
             evaluated = target_all[held_out]
             evaluated_labels = target_labels[held_out]
             target_prior_prediction = target_probs[held_out].argmax(axis=1)
@@ -340,7 +304,7 @@ def run(draws: int, seed: int) -> dict[str, Any]:
 
     return {
         "written_by": "scripts/target_scale.py",
-        "commit": git_commit(),
+        "commit": head_commit(),
         "machine": machine_info(),
         "pair": {
             "source": "ptbxl",

@@ -9,12 +9,47 @@ uses: a wide stem, four stages of two residual blocks, global average pooling.
 
 from __future__ import annotations
 
+import numpy as np
 import torch
+from numpy.typing import NDArray
 from torch import Tensor, nn
 
 from .config import N_LEADS
 
-__all__ = ["ResNet1d", "ResidualBlock"]
+__all__ = ["ResNet1d", "ResidualBlock", "class_probabilities", "standardisation"]
+
+
+def standardisation(x: NDArray[np.float32]) -> tuple[float, float]:
+    """One mean and one spread over every lead, from the training records alone.
+
+    One pair for all leads keeps the relative amplitude between leads, which is
+    part of what an infarct pattern is, where per-lead statistics would flatten it.
+    """
+    return float(x.mean()), float(x.std()) or 1.0
+
+
+def class_probabilities(
+    model: nn.Module,
+    x: NDArray[np.float32],
+    centre: float,
+    scale: float,
+    batch: int = 128,
+    multilabel: bool = False,
+) -> NDArray[np.float32]:
+    """Probabilities for every row, in batches, in the order given.
+
+    Softmax over the classes of a single-label head; one sigmoid per output when
+    ``multilabel`` is set, for a head with one output per diagnosis.
+    """
+    model.eval()
+    out = []
+    with torch.no_grad():
+        for i in range(0, len(x), batch):
+            logits = model(torch.from_numpy((x[i : i + batch] - centre) / scale))
+            out.append(torch.sigmoid(logits) if multilabel else torch.softmax(logits, dim=1))
+    if not out:
+        return np.empty((0, 0), dtype=np.float32)
+    return torch.cat(out).numpy()
 
 
 class ResidualBlock(nn.Module):

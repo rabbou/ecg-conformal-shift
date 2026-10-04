@@ -24,7 +24,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import subprocess
 import sys
 import time
 from collections.abc import Callable
@@ -40,7 +39,8 @@ from ecs.config import ACS_DIR, ACS_LABELLED_SPLIT, RESULTS_DIR, SPH_DIR
 from ecs.encoders import machine_info
 from ecs.ingest import SPH_DEVIATION, Corpus, load_acs, load_sph
 from ecs.labels import MILabelSpec, acs_mi_label, sph_mi_label
-from ecs.models import ResNet1d
+from ecs.models import ResNet1d, class_probabilities
+from ecs.provenance import head_commit
 
 CHUNK = 500  # records read from disk at once, so the corpus is never held whole
 
@@ -80,19 +80,6 @@ def load_model(checkpoint: Path) -> tuple[ResNet1d, float, float]:
     return model, float(saved["centre"]), float(saved["scale"])
 
 
-def probabilities(
-    model: ResNet1d, x: NDArray[np.float32], centre: float, scale: float
-) -> NDArray[np.float64]:
-    """Class probabilities for every row, in batches, in the same order."""
-    out = []
-    with torch.no_grad():
-        for i in range(0, len(x), 128):
-            batch = torch.from_numpy((x[i : i + 128] - centre) / scale)
-            out.append(torch.softmax(model(batch), dim=1))
-    stacked = torch.cat(out) if out else torch.empty((0, 2))
-    return stacked.numpy().astype(np.float64)
-
-
 def score_in_chunks(
     name: str,
     wanted: list[str],
@@ -116,7 +103,7 @@ def score_in_chunks(
         cropped += corpus.n_cropped
         if corpus.ids:
             ids.extend(corpus.ids)
-            rows.append(probabilities(model, corpus.x, centre, scale))
+            rows.append(class_probabilities(model, corpus.x, centre, scale).astype(np.float64))
         print(f"  {name}: {len(ids):>6} / {len(wanted)}", flush=True)
     probs = np.concatenate(rows) if rows else np.empty((0, 2), dtype=np.float64)
     y = labels.loc[ids].to_numpy().astype(int)
@@ -166,11 +153,6 @@ def acs_job(model: ResNet1d, centre: float, scale: float, root: Path, limit: int
     )
 
 
-def git_commit() -> str:
-    out = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True, check=False)
-    return out.stdout.strip() or "unknown"
-
-
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--corpus", nargs="+", default=["sph", "acs"], choices=["sph", "acs"])
@@ -193,7 +175,7 @@ def main(argv: list[str] | None = None) -> int:
     baseline_config = json.loads((checkpoint.parent / "config.json").read_text())
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
-    commit = git_commit()
+    commit = head_commit()
 
     jobs = {
         "sph": (sph_job, Path(args.sph_dir), "Shandong Provincial Hospital"),

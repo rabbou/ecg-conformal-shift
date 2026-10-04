@@ -28,6 +28,7 @@ results/baseline/model.pt
 !results/echonext_transfer.json
 !results/echonext_coverage.csv
 !results/echonext_severity.json
+!results/echonext_outcomes.json
 !results/rotation/
 results/rotation/**/model.pt
 !results/embeddings/

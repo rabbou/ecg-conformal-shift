@@ -16,10 +16,11 @@ from typing import Any
 
 import numpy as np
 import pytest
-from outcomes import ALPHA, OUTCOMES, SCHEMES, _plain_sets, _split_outcomes, collect
+from outcomes import ALPHA, OUTCOMES, SCHEMES, collect
 
 from ecs.config import RESULTS_DIR
-from ecs.conformal import conformal_quantile, lac_scores
+from ecs.conformal import Thresholds, conformal_quantile, lac_scores
+from ecs.metrics import outcome_shares
 
 TABLE = RESULTS_DIR / "outcomes.json"
 
@@ -39,21 +40,21 @@ class TestTheSplitItself:
         # both labels, one holding neither.
         sets = np.array([[False, True], [True, False], [True, True], [False, False]], dtype=bool)
         labels = np.array([1, 1, 1, 1])
-        correct, deferred, wrong = _split_outcomes(sets, labels, 1)
+        correct, deferred, wrong = outcome_shares(sets, labels, 1)
         assert (correct, deferred, wrong) == (0.25, 0.5, 0.25)
 
     def test_the_same_split_read_from_the_other_label(self) -> None:
         sets = np.array([[True, False], [False, True]], dtype=bool)
         labels = np.array([0, 0])
-        correct, deferred, wrong = _split_outcomes(sets, labels, 0)
+        correct, deferred, wrong = outcome_shares(sets, labels, 0)
         assert (correct, deferred, wrong) == (0.5, 0.0, 0.5)
 
     def test_a_single_threshold_defers_nothing(self) -> None:
         probs = np.array([[0.9, 0.1], [0.2, 0.8]])
-        sets = _plain_sets(probs, 0.5)
+        sets = Thresholds(0.5, np.array([0.5, 0.5])).sets(probs)["plain"]
         labels = np.array([0, 1])
         for klass in (0, 1):
-            assert _split_outcomes(sets, labels, klass)[1] == 0.0
+            assert outcome_shares(sets, labels, klass)[1] == 0.0
 
 
 class TestTheCommittedOutcomeTable:
@@ -98,7 +99,7 @@ class TestTheCommittedOutcomeTable:
         """
         source = table["by_corpus"]["ptbxl"]["schemes"]
         assert source["pooled"]["1"]["wrong"]["mean"] == pytest.approx(0.268, abs=0.01)
-        assert source["plain"]["1"]["wrong"]["mean"] == pytest.approx(0.104, abs=0.01)
+        assert source["plain"]["1"]["wrong"]["mean"] == pytest.approx(0.099, abs=0.01)
         assert source["pooled"]["1"]["wrong"]["mean"] > 2 * source["plain"]["1"]["wrong"]["mean"]
 
     def test_label_conditional_calibration_holds_the_miss_rate_and_halves_false_alarms(
@@ -111,14 +112,31 @@ class TestTheCommittedOutcomeTable:
         )
         assert perlabel["0"]["wrong"]["mean"] < 0.6 * plain["0"]["wrong"]["mean"]
 
+    @pytest.mark.parametrize("corpus", ["ptbxl", "sph", "acs"])
+    def test_the_single_threshold_is_the_per_label_threshold_of_the_ill(
+        self, table: dict[str, Any], corpus: str
+    ) -> None:
+        """For the MI class the per-label threshold is the sensitivity threshold.
+
+        Both rules admit MI above the same score, so on every draw they miss the
+        same MI cases and give the non-MI label alone to the same non-MI cases;
+        what per-label adds is the non-MI threshold, which defers the rest.  A
+        table whose single threshold were fitted any other way would let the
+        two rules part on the MI miss rate and the comparison would mix a moved
+        threshold with an added one.
+        """
+        schemes = table["by_corpus"][corpus]["schemes"]
+        plain, perlabel = schemes["plain"], schemes["perlabel"]
+        assert plain["1"]["wrong"]["mean"] == perlabel["1"]["wrong"]["mean"]
+        assert plain["0"]["correct"]["mean"] == perlabel["0"]["correct"]["mean"]
+
     def test_the_table_says_the_two_targets_are_different_quantities(
         self, table: dict[str, Any]
     ) -> None:
         """A sensitivity and a coverage both written 90% is the table's one trap."""
         assert table["alpha"] == pytest.approx(0.10)
         assert table["plain_sensitivity"] == pytest.approx(0.90)
-        assert "sensitivity" in table["matched_operating_point"]
-        assert "coverage" in table["matched_operating_point"]
+        assert "per-label conformal quantile" in table["matched_operating_point"]
 
     def test_the_denominator_is_named_in_the_file(self, table: dict[str, Any]) -> None:
         assert "sum to one" in table["outcome_definitions"]["denominator"]

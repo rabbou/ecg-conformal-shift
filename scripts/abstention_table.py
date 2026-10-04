@@ -16,31 +16,19 @@ from __future__ import annotations
 
 import argparse
 import json
-import subprocess
 import sys
 import time
 from pathlib import Path
 
 import numpy as np
-import pandas as pd
 
 from ecs.config import PTBXL_DIR, RESULTS_DIR
+from ecs.ingest import ptbxl_patients
 from ecs.provenance import provenance_block
 from ecs.report import REDRAW_CORRECTIONS, SCORES, repeated_split_report
 
 # Confidence levels, loosest first.
 ALPHAS = (0.20, 0.10, 0.05)
-
-
-def patients_of(ids: list[str], root: Path) -> list[str]:
-    """The patient each fold-10 record belongs to, in the order of ``ids``."""
-    database = pd.read_csv(root / "ptbxl_database.csv", index_col="ecg_id")
-    return [str(database.loc[int(i), "patient_id"]) for i in ids]
-
-
-def git_commit() -> str:
-    out = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True, check=False)
-    return out.stdout.strip() or "unknown"
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -54,7 +42,7 @@ def main(argv: list[str] | None = None) -> int:
 
     with np.load(args.scores, allow_pickle=False) as data:
         ids, labels, probs = list(data["ids"]), data["labels"], data["probs"]
-    patients = patients_of([str(i) for i in ids], Path(args.ptbxl_dir))
+    patients = ptbxl_patients(ids, Path(args.ptbxl_dir))
 
     started = time.perf_counter()
     rows = [
@@ -78,7 +66,9 @@ def main(argv: list[str] | None = None) -> int:
             [
                 "scripts/abstention_table.py",
                 "src/ecs/conformal.py",
+                "src/ecs/ingest.py",
                 "src/ecs/metrics.py",
+                "src/ecs/report.py",
                 "src/ecs/splits.py",
             ]
         ),

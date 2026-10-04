@@ -27,7 +27,6 @@ from __future__ import annotations
 import argparse
 import csv
 import json
-import subprocess
 import sys
 import time
 from collections.abc import Iterator
@@ -39,6 +38,7 @@ from numpy.typing import NDArray
 
 from ecs.config import RESULTS_DIR
 from ecs.encoders import machine_info
+from ecs.provenance import head_commit
 from ecs.report import (
     CORRECTIONS,
     SCORES,
@@ -74,12 +74,6 @@ CORPUS_NAMES = {
 def _patients_for(index: CorpusIndex, ids: list[str]) -> list[str]:
     """The patient of each scored record, in the order the scores were written."""
     return [str(p) for p in index.frame.loc[ids, "patient"]]
-
-
-def commit() -> str:
-    return subprocess.run(
-        ["git", "rev-parse", "HEAD"], capture_output=True, text=True, check=False
-    ).stdout.strip()
 
 
 class Scores:
@@ -358,7 +352,7 @@ def main() -> int:
     }
     out: dict[str, Any] = {
         "written_by": "scripts/rotation_table.py",
-        "commit": commit(),
+        "commit": head_commit(),
         "machine": machine_info(),
         "settings": {
             "alphas": list(ALPHAS),

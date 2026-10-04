@@ -1,6 +1,6 @@
 {
   "written_by": "scripts/label_table.py",
-  "commit": "5a80601f854db05c34b9bcce19e3377bc180c55c",
+  "commit": "2087cb15c5ee890d65c3b9d251e94be6a5f8edec",
   "mappings": {
     "directory": "mappings",
     "scored_diagnoses_rows": 30,
@@ -222,7 +222,7 @@
       "deviations": [
         "the Challenge bundle ships no patient identifier, so each record is its own patient for splitting"
       ],
-      "seconds": 2.1,
+      "seconds": 56.3,
       "as_read_by_this_study": {
         "n_records": 21799,
         "n_patients": 18869,
@@ -433,7 +433,7 @@
         "the Challenge bundle ships no patient identifier, so each record is its own patient for splitting",
         "record lengths run from 2500 to 5000 samples; the first ten seconds are kept"
       ],
-      "seconds": 1.1
+      "seconds": 1.4
     },
     "cpsc": {
       "route": "SNOMED CT codes on the Challenge-2021 '# Dx:' header line",
@@ -487,7 +487,7 @@
         "the Challenge bundle ships no patient identifier, so each record is its own patient for splitting",
         "record lengths run from 3000 to 72000 samples; the first ten seconds are kept"
       ],
-      "seconds": 1.2
+      "seconds": 1.4
     },
     "sph": {
       "route": "AHA codes bridged to SNOMED by Leinonen et al.'s published table",

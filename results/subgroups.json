@@ -1,6 +1,6 @@
 {
   "question": "Inside each label, is coverage flat across sex and age, or does the scheme this report recommends deliver a different coverage to the oldest patients and to women than to the label as a whole.",
-  "protocol": "Same halving of PTB-XL fold 10 by patient as outcomes.py, same seed, same three schemes. Coverage is the set holding the true label. Intervals are percentile intervals over bootstrap replicates that resample the patients of fold 10 with replacement before halving, so they carry the subgroup's sampling error and not only the calibration draw. Differences are taken inside each replicate.",
+  "protocol": "Same halving of PTB-XL fold 10 by patient as outcomes.py and shift.json, same seed, same three schemes. Coverage is the set holding the true label. Intervals are percentile intervals over bootstrap replicates that resample the patients of fold 10 with replacement before halving, so they carry the subgroup's sampling error and not only the calibration draw. Differences are taken inside each replicate.",
   "sex_encoding": "PTB-XL sex: 0 male, 1 female (Wagner et al. 2020).",
   "age_note": "PTB-XL stores every age above 89 as 300 for privacy (v1.0.2 changelog); those 293 records of the release, 34 of fold 10, sit in the oldest band.",
   "alpha": 0.1,
@@ -34,191 +34,194 @@
     }
   },
   "provenance": {
-    "commit": "40bffc58b28c7ed685af6305daa921aedfc6119e",
+    "commit": "2087cb15c5ee890d65c3b9d251e94be6a5f8edec",
     "producers": {
-      "scripts/subgroups.py": "d4849aa28d57845e49bf6b34d636909643a3c7868783c511c8085100ae03e2ea",
-      "src/ecs/conformal.py": "c434998b704a551d55bc2206a1a3ada6d42309947b0b92db11607746dcd068dc"
+      "scripts/subgroups.py": "702601715da26caa6acd3c8c55e22d74d35e943473094d1d377563608223e110",
+      "src/ecs/conformal.py": "05236c0192865fdecea3ffb28675509d390dcb20a95218a835e735786461bf92",
+      "src/ecs/ingest.py": "d7015a7c3997288a5248319f42c72ecff7d9877587131e5c3aa9e2921a5a60da",
+      "src/ecs/metrics.py": "bc3ca2b5779db9bc6145afad35dbd9764aae43956f29405aac243942780a7bea",
+      "src/ecs/splits.py": "ed3665f4345c238edcbcb34081e0610838c18ae5383ad30776d66117032f4deb"
     }
   },
-  "seconds": 38.6,
+  "seconds": 357.1,
   "coverage": {
     "plain": {
       "age:0-49:all": {
-        "mean": 0.9428,
-        "sd": 0.0111,
+        "mean": 0.9421,
+        "sd": 0.0109,
         "ci95": [
-          0.9084,
-          0.9707
+          0.9046,
+          0.9706
         ],
         "n_draws": 200,
         "n_bootstrap": 2000
       },
       "age:0-49:mi": {
-        "mean": 0.8755,
-        "sd": 0.0683,
+        "mean": 0.8866,
+        "sd": 0.0616,
         "ci95": [
-          0.6842,
+          0.6818,
           1.0
         ],
         "n_draws": 200,
         "n_bootstrap": 2000
       },
       "age:0-49:non_mi": {
-        "mean": 0.9481,
-        "sd": 0.0121,
+        "mean": 0.9463,
+        "sd": 0.0124,
         "ci95": [
-          0.9072,
-          0.9784
+          0.9032,
+          0.9773
         ],
         "n_draws": 200,
         "n_bootstrap": 2000
       },
       "age:50-64:all": {
-        "mean": 0.8323,
-        "sd": 0.0206,
+        "mean": 0.8297,
+        "sd": 0.0192,
         "ci95": [
-          0.769,
-          0.8851
+          0.7607,
+          0.8848
         ],
         "n_draws": 200,
         "n_bootstrap": 2000
       },
       "age:50-64:mi": {
-        "mean": 0.8813,
-        "sd": 0.0341,
+        "mean": 0.8803,
+        "sd": 0.0318,
         "ci95": [
-          0.7826,
-          0.9516
+          0.78,
+          0.9565
         ],
         "n_draws": 200,
         "n_bootstrap": 2000
       },
       "age:50-64:non_mi": {
-        "mean": 0.819,
-        "sd": 0.03,
+        "mean": 0.816,
+        "sd": 0.0265,
         "ci95": [
-          0.7395,
-          0.8889
+          0.73,
+          0.8858
         ],
         "n_draws": 200,
         "n_bootstrap": 2000
       },
       "age:65-74:all": {
-        "mean": 0.786,
-        "sd": 0.0201,
+        "mean": 0.7814,
+        "sd": 0.0198,
         "ci95": [
-          0.7216,
-          0.8491
+          0.7092,
+          0.8465
         ],
         "n_draws": 200,
         "n_bootstrap": 2000
       },
       "age:65-74:mi": {
-        "mean": 0.8706,
-        "sd": 0.0439,
+        "mean": 0.8801,
+        "sd": 0.0414,
         "ci95": [
-          0.7727,
-          0.9546
+          0.7808,
+          0.9559
         ],
         "n_draws": 200,
         "n_bootstrap": 2000
       },
       "age:65-74:non_mi": {
-        "mean": 0.7504,
-        "sd": 0.0369,
+        "mean": 0.7394,
+        "sd": 0.0352,
         "ci95": [
-          0.6495,
-          0.8391
+          0.6301,
+          0.8353
         ],
         "n_draws": 200,
         "n_bootstrap": 2000
       },
       "age:75+:all": {
-        "mean": 0.7663,
-        "sd": 0.0202,
+        "mean": 0.761,
+        "sd": 0.0196,
         "ci95": [
-          0.6961,
-          0.8216
+          0.6873,
+          0.8201
         ],
         "n_draws": 200,
         "n_bootstrap": 2000
       },
       "age:75+:mi": {
-        "mean": 0.923,
-        "sd": 0.0279,
+        "mean": 0.929,
+        "sd": 0.0248,
         "ci95": [
-          0.8559,
-          0.976
+          0.8592,
+          0.982
         ],
         "n_draws": 200,
         "n_bootstrap": 2000
       },
       "age:75+:non_mi": {
-        "mean": 0.6521,
-        "sd": 0.0428,
+        "mean": 0.6403,
+        "sd": 0.0403,
         "ci95": [
-          0.5228,
-          0.7546
+          0.497,
+          0.7447
         ],
         "n_draws": 200,
         "n_bootstrap": 2000
       },
       "sex:female:all": {
-        "mean": 0.8181,
-        "sd": 0.0148,
+        "mean": 0.8145,
+        "sd": 0.0155,
         "ci95": [
-          0.7635,
-          0.8604
+          0.7527,
+          0.8582
         ],
         "n_draws": 200,
         "n_bootstrap": 2000
       },
       "sex:female:mi": {
-        "mean": 0.8697,
-        "sd": 0.0394,
+        "mean": 0.8777,
+        "sd": 0.0325,
         "ci95": [
-          0.7938,
-          0.9362
+          0.7959,
+          0.9444
         ],
         "n_draws": 200,
         "n_bootstrap": 2000
       },
       "sex:female:non_mi": {
-        "mean": 0.8022,
-        "sd": 0.0273,
+        "mean": 0.7949,
+        "sd": 0.0262,
         "ci95": [
-          0.7216,
-          0.8639
+          0.7048,
+          0.8608
         ],
         "n_draws": 200,
         "n_bootstrap": 2000
       },
       "sex:male:all": {
-        "mean": 0.8439,
-        "sd": 0.0139,
+        "mean": 0.8407,
+        "sd": 0.0128,
         "ci95": [
-          0.8018,
-          0.8838
+          0.7924,
+          0.8816
         ],
         "n_draws": 200,
         "n_bootstrap": 2000
       },
       "sex:male:mi": {
-        "mean": 0.9178,
-        "sd": 0.0245,
+        "mean": 0.9214,
+        "sd": 0.0242,
         "ci95": [
-          0.8595,
-          0.966
+          0.8652,
+          0.9716
         ],
         "n_draws": 200,
         "n_bootstrap": 2000
       },
       "sex:male:non_mi": {
-        "mean": 0.8173,
-        "sd": 0.0234,
+        "mean": 0.8118,
+        "sd": 0.0214,
         "ci95": [
-          0.754,
-          0.8776
+          0.7398,
+          0.8724
         ],
         "n_draws": 200,
         "n_bootstrap": 2000
@@ -226,181 +229,181 @@
     },
     "pooled": {
       "age:0-49:all": {
-        "mean": 0.9637,
+        "mean": 0.9642,
         "sd": 0.0097,
         "ci95": [
           0.9375,
-          0.9876
+          0.9861
         ],
         "n_draws": 200,
         "n_bootstrap": 2000
       },
       "age:0-49:mi": {
-        "mean": 0.5959,
-        "sd": 0.0886,
+        "mean": 0.5939,
+        "sd": 0.0962,
         "ci95": [
           0.3333,
-          0.8333
+          0.8462
         ],
         "n_draws": 200,
         "n_bootstrap": 2000
       },
       "age:0-49:non_mi": {
         "mean": 0.9929,
-        "sd": 0.0044,
+        "sd": 0.0045,
         "ci95": [
-          0.9789,
+          0.9794,
           1.0
         ],
         "n_draws": 200,
         "n_bootstrap": 2000
       },
       "age:50-64:all": {
-        "mean": 0.9088,
-        "sd": 0.0155,
+        "mean": 0.9098,
+        "sd": 0.0167,
         "ci95": [
-          0.8667,
-          0.9433
+          0.8711,
+          0.9471
         ],
         "n_draws": 200,
         "n_bootstrap": 2000
       },
       "age:50-64:mi": {
-        "mean": 0.7146,
-        "sd": 0.0489,
+        "mean": 0.7103,
+        "sd": 0.0522,
         "ci95": [
-          0.5694,
-          0.8272
+          0.5789,
+          0.8393
         ],
         "n_draws": 200,
         "n_bootstrap": 2000
       },
       "age:50-64:non_mi": {
-        "mean": 0.9613,
-        "sd": 0.011,
+        "mean": 0.9629,
+        "sd": 0.0106,
         "ci95": [
           0.933,
-          0.9878
+          0.9877
         ],
         "n_draws": 200,
         "n_bootstrap": 2000
       },
       "age:65-74:all": {
-        "mean": 0.8733,
-        "sd": 0.02,
+        "mean": 0.8731,
+        "sd": 0.0206,
         "ci95": [
-          0.8243,
-          0.9213
+          0.8248,
+          0.9224
         ],
         "n_draws": 200,
         "n_bootstrap": 2000
       },
       "age:65-74:mi": {
-        "mean": 0.6906,
-        "sd": 0.0498,
+        "mean": 0.6938,
+        "sd": 0.0479,
         "ci95": [
-          0.5714,
-          0.8182
+          0.5733,
+          0.8082
         ],
         "n_draws": 200,
         "n_bootstrap": 2000
       },
       "age:65-74:non_mi": {
-        "mean": 0.9498,
-        "sd": 0.0141,
+        "mean": 0.9494,
+        "sd": 0.0142,
         "ci95": [
-          0.9086,
-          0.984
+          0.9123,
+          0.9837
         ],
         "n_draws": 200,
         "n_bootstrap": 2000
       },
       "age:75+:all": {
-        "mean": 0.8494,
-        "sd": 0.0239,
+        "mean": 0.8525,
+        "sd": 0.0233,
         "ci95": [
-          0.8015,
-          0.9027
+          0.7985,
+          0.9038
         ],
         "n_draws": 200,
         "n_bootstrap": 2000
       },
       "age:75+:mi": {
-        "mean": 0.791,
-        "sd": 0.0365,
+        "mean": 0.7966,
+        "sd": 0.0356,
         "ci95": [
-          0.7025,
-          0.8776
+          0.7048,
+          0.8824
         ],
         "n_draws": 200,
         "n_bootstrap": 2000
       },
       "age:75+:non_mi": {
-        "mean": 0.892,
-        "sd": 0.0225,
+        "mean": 0.8928,
+        "sd": 0.0233,
         "ci95": [
-          0.8353,
-          0.9484
+          0.8378,
+          0.9455
         ],
         "n_draws": 200,
         "n_bootstrap": 2000
       },
       "sex:female:all": {
-        "mean": 0.8905,
-        "sd": 0.0154,
+        "mean": 0.8915,
+        "sd": 0.0139,
         "ci95": [
-          0.8577,
-          0.9229
+          0.859,
+          0.9223
         ],
         "n_draws": 200,
         "n_bootstrap": 2000
       },
       "sex:female:mi": {
-        "mean": 0.6693,
-        "sd": 0.0398,
+        "mean": 0.6721,
+        "sd": 0.0353,
         "ci95": [
-          0.5839,
-          0.7679
+          0.5774,
+          0.7652
         ],
         "n_draws": 200,
         "n_bootstrap": 2000
       },
       "sex:female:non_mi": {
         "mean": 0.9594,
-        "sd": 0.0097,
+        "sd": 0.0093,
         "ci95": [
-          0.9331,
+          0.9357,
           0.9809
         ],
         "n_draws": 200,
         "n_bootstrap": 2000
       },
       "sex:male:all": {
-        "mean": 0.9066,
-        "sd": 0.0139,
+        "mean": 0.9078,
+        "sd": 0.0157,
         "ci95": [
-          0.8745,
-          0.9377
+          0.8761,
+          0.9387
         ],
         "n_draws": 200,
         "n_bootstrap": 2000
       },
       "sex:male:mi": {
-        "mean": 0.7854,
-        "sd": 0.0327,
+        "mean": 0.7875,
+        "sd": 0.0371,
         "ci95": [
-          0.6933,
-          0.864
+          0.6992,
+          0.8667
         ],
         "n_draws": 200,
         "n_bootstrap": 2000
       },
       "sex:male:non_mi": {
-        "mean": 0.95,
-        "sd": 0.01,
+        "mean": 0.9508,
+        "sd": 0.011,
         "ci95": [
-          0.9269,
-          0.9751
+          0.9263,
+          0.9742
         ],
         "n_draws": 200,
         "n_bootstrap": 2000
@@ -408,181 +411,181 @@
     },
     "perlabel": {
       "age:0-49:all": {
-        "mean": 0.9726,
-        "sd": 0.0101,
+        "mean": 0.9727,
+        "sd": 0.0094,
         "ci95": [
-          0.9458,
-          0.9922
+          0.947,
+          0.9925
         ],
         "n_draws": 200,
         "n_bootstrap": 2000
       },
       "age:0-49:mi": {
-        "mean": 0.8887,
-        "sd": 0.0694,
+        "mean": 0.8866,
+        "sd": 0.0616,
         "ci95": [
-          0.6923,
+          0.6818,
           1.0
         ],
         "n_draws": 200,
         "n_bootstrap": 2000
       },
       "age:0-49:non_mi": {
-        "mean": 0.9792,
-        "sd": 0.0087,
+        "mean": 0.9793,
+        "sd": 0.009,
         "ci95": [
-          0.9542,
-          0.9959
+          0.9544,
+          0.996
         ],
         "n_draws": 200,
         "n_bootstrap": 2000
       },
       "age:50-64:all": {
-        "mean": 0.8928,
-        "sd": 0.0156,
+        "mean": 0.8942,
+        "sd": 0.0157,
         "ci95": [
-          0.8553,
-          0.931
+          0.8567,
+          0.9299
         ],
         "n_draws": 200,
         "n_bootstrap": 2000
       },
       "age:50-64:mi": {
-        "mean": 0.8822,
-        "sd": 0.0336,
+        "mean": 0.8803,
+        "sd": 0.0318,
         "ci95": [
-          0.7884,
-          0.9529
+          0.78,
+          0.9565
         ],
         "n_draws": 200,
         "n_bootstrap": 2000
       },
       "age:50-64:non_mi": {
-        "mean": 0.8955,
-        "sd": 0.0191,
+        "mean": 0.8978,
+        "sd": 0.018,
         "ci95": [
-          0.8534,
-          0.939
+          0.8541,
+          0.9402
         ],
         "n_draws": 200,
         "n_bootstrap": 2000
       },
       "age:65-74:all": {
-        "mean": 0.8864,
-        "sd": 0.0205,
+        "mean": 0.8873,
+        "sd": 0.0206,
         "ci95": [
-          0.835,
-          0.9303
+          0.8372,
+          0.9317
         ],
         "n_draws": 200,
         "n_bootstrap": 2000
       },
       "age:65-74:mi": {
-        "mean": 0.877,
-        "sd": 0.0432,
+        "mean": 0.8801,
+        "sd": 0.0414,
         "ci95": [
-          0.7766,
-          0.9583
+          0.7808,
+          0.9559
         ],
         "n_draws": 200,
         "n_bootstrap": 2000
       },
       "age:65-74:non_mi": {
-        "mean": 0.8902,
+        "mean": 0.8904,
         "sd": 0.0225,
         "ci95": [
-          0.8269,
-          0.9398
+          0.8304,
+          0.9429
         ],
         "n_draws": 200,
         "n_bootstrap": 2000
       },
       "age:75+:all": {
-        "mean": 0.8518,
-        "sd": 0.0222,
+        "mean": 0.8541,
+        "sd": 0.0235,
         "ci95": [
-          0.7993,
-          0.9021
+          0.8,
+          0.9049
         ],
         "n_draws": 200,
         "n_bootstrap": 2000
       },
       "age:75+:mi": {
-        "mean": 0.9268,
-        "sd": 0.026,
+        "mean": 0.929,
+        "sd": 0.0248,
         "ci95": [
-          0.8657,
-          0.9804
+          0.8592,
+          0.982
         ],
         "n_draws": 200,
         "n_bootstrap": 2000
       },
       "age:75+:non_mi": {
-        "mean": 0.7972,
-        "sd": 0.0332,
+        "mean": 0.8002,
+        "sd": 0.036,
         "ci95": [
-          0.7152,
-          0.8771
+          0.7123,
+          0.8733
         ],
         "n_draws": 200,
         "n_bootstrap": 2000
       },
       "sex:female:all": {
-        "mean": 0.8909,
+        "mean": 0.8928,
         "sd": 0.0156,
         "ci95": [
-          0.856,
-          0.9242
+          0.8584,
+          0.9257
         ],
         "n_draws": 200,
         "n_bootstrap": 2000
       },
       "sex:female:mi": {
-        "mean": 0.8759,
-        "sd": 0.0372,
+        "mean": 0.8777,
+        "sd": 0.0325,
         "ci95": [
-          0.7982,
-          0.9416
+          0.7959,
+          0.9444
         ],
         "n_draws": 200,
         "n_bootstrap": 2000
       },
       "sex:female:non_mi": {
-        "mean": 0.8956,
-        "sd": 0.0175,
+        "mean": 0.8974,
+        "sd": 0.0169,
         "ci95": [
-          0.8564,
-          0.9342
+          0.8542,
+          0.9347
         ],
         "n_draws": 200,
         "n_bootstrap": 2000
       },
       "sex:male:all": {
-        "mean": 0.9084,
-        "sd": 0.0142,
+        "mean": 0.9088,
+        "sd": 0.0143,
         "ci95": [
-          0.8788,
-          0.9369
+          0.8794,
+          0.9374
         ],
         "n_draws": 200,
         "n_bootstrap": 2000
       },
       "sex:male:mi": {
-        "mean": 0.9207,
-        "sd": 0.0246,
+        "mean": 0.9214,
+        "sd": 0.0242,
         "ci95": [
-          0.8684,
-          0.9702
+          0.8652,
+          0.9716
         ],
         "n_draws": 200,
         "n_bootstrap": 2000
       },
       "sex:male:non_mi": {
-        "mean": 0.9039,
-        "sd": 0.0172,
+        "mean": 0.9042,
+        "sd": 0.0178,
         "ci95": [
-          0.869,
-          0.9393
+          0.8682,
+          0.9372
         ],
         "n_draws": 200,
         "n_bootstrap": 2000
@@ -591,146 +594,146 @@
   },
   "differences": {
     "plain:age:75+-0-49:mi": {
-      "mean": 0.0475,
+      "mean": 0.0424,
       "ci95": [
-        -0.0901,
-        0.2375
+        -0.0909,
+        0.2259
       ],
       "n_bootstrap": 2000
     },
     "pooled:age:75+-0-49:mi": {
-      "mean": 0.195,
+      "mean": 0.2026,
       "ci95": [
-        -0.0514,
-        0.4658
+        -0.0482,
+        0.4652
       ],
       "n_bootstrap": 2000
     },
     "perlabel:age:75+-0-49:mi": {
-      "mean": 0.0381,
+      "mean": 0.0424,
       "ci95": [
-        -0.0923,
-        0.2251
+        -0.0909,
+        0.2259
       ],
       "n_bootstrap": 2000
     },
     "plain:age:75+-0-49:non_mi": {
-      "mean": -0.296,
+      "mean": -0.306,
       "ci95": [
-        -0.4128,
-        -0.2006
+        -0.432,
+        -0.2046
       ],
       "n_bootstrap": 2000
     },
     "pooled:age:75+-0-49:non_mi": {
-      "mean": -0.1009,
+      "mean": -0.1001,
       "ci95": [
-        -0.1585,
-        -0.047
+        -0.1582,
+        -0.0477
       ],
       "n_bootstrap": 2000
     },
     "perlabel:age:75+-0-49:non_mi": {
-      "mean": -0.1821,
+      "mean": -0.1791,
       "ci95": [
-        -0.263,
-        -0.102
+        -0.2674,
+        -0.1063
       ],
       "n_bootstrap": 2000
     },
     "plain:age:75+-0-49:all": {
-      "mean": -0.1764,
+      "mean": -0.1811,
       "ci95": [
-        -0.2461,
-        -0.1184
+        -0.2531,
+        -0.1171
       ],
       "n_bootstrap": 2000
     },
     "pooled:age:75+-0-49:all": {
-      "mean": -0.1143,
+      "mean": -0.1117,
       "ci95": [
-        -0.1652,
-        -0.0584
+        -0.1677,
+        -0.0599
       ],
       "n_bootstrap": 2000
     },
     "perlabel:age:75+-0-49:all": {
-      "mean": -0.1207,
+      "mean": -0.1186,
       "ci95": [
-        -0.1729,
-        -0.0685
+        -0.1739,
+        -0.0683
       ],
       "n_bootstrap": 2000
     },
     "plain:sex:female-male:mi": {
-      "mean": -0.0482,
+      "mean": -0.0437,
       "ci95": [
-        -0.1258,
-        0.0255
+        -0.1247,
+        0.0253
       ],
       "n_bootstrap": 2000
     },
     "pooled:sex:female-male:mi": {
-      "mean": -0.1161,
+      "mean": -0.1154,
       "ci95": [
-        -0.2264,
-        0.0025
+        -0.2282,
+        -0.0064
       ],
       "n_bootstrap": 2000
     },
     "perlabel:sex:female-male:mi": {
-      "mean": -0.0447,
+      "mean": -0.0437,
       "ci95": [
-        -0.1228,
-        0.0255
+        -0.1247,
+        0.0253
       ],
       "n_bootstrap": 2000
     },
     "plain:sex:female-male:non_mi": {
-      "mean": -0.0151,
+      "mean": -0.0169,
       "ci95": [
-        -0.0775,
-        0.0358
+        -0.0802,
+        0.036
       ],
       "n_bootstrap": 2000
     },
     "pooled:sex:female-male:non_mi": {
-      "mean": 0.0094,
+      "mean": 0.0086,
       "ci95": [
-        -0.0222,
-        0.0362
+        -0.0206,
+        0.0373
       ],
       "n_bootstrap": 2000
     },
     "perlabel:sex:female-male:non_mi": {
-      "mean": -0.0083,
+      "mean": -0.0067,
       "ci95": [
-        -0.0531,
+        -0.0503,
         0.036
       ],
       "n_bootstrap": 2000
     },
     "plain:sex:female-male:all": {
-      "mean": -0.0258,
+      "mean": -0.0262,
       "ci95": [
-        -0.0751,
-        0.0163
+        -0.0762,
+        0.0155
       ],
       "n_bootstrap": 2000
     },
     "pooled:sex:female-male:all": {
-      "mean": -0.0161,
+      "mean": -0.0163,
       "ci95": [
-        -0.0561,
-        0.0206
+        -0.0531,
+        0.0202
       ],
       "n_bootstrap": 2000
     },
     "perlabel:sex:female-male:all": {
-      "mean": -0.0174,
+      "mean": -0.0159,
       "ci95": [
-        -0.0545,
-        0.017
+        -0.0532,
+        0.0197
       ],
       "n_bootstrap": 2000
     }

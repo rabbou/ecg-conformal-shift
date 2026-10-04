@@ -1,6 +1,6 @@
 {
-  "bundle": "~/data/challenge2021",
-  "git_commit": "ef8b501ba0713b20ac15d9e1bbc56f18e1a01e29",
+  "bundle": "/home/ruben/data/challenge2021",
+  "git_commit": "2087cb15c5ee890d65c3b9d251e94be6a5f8edec",
   "partitions_read": [
     "chapman_shaoxing",
     "cpsc_2018",
@@ -28,11 +28,11 @@
   },
   "by_partition": {
     "chapman_shaoxing": {
-      "n_records": 10237,
+      "n_records": 10247,
       "n_infarction": 40,
       "n_ischaemia": 0,
       "n_infarction_or_ischaemia": 40,
-      "infarction_prevalence": 0.003907394744554068
+      "infarction_prevalence": 0.0039035815360593342
     },
     "cpsc_2018": {
       "n_records": 6877,
@@ -49,11 +49,11 @@
       "infarction_prevalence": 0.43874891398783666
     },
     "georgia": {
-      "n_records": 10343,
+      "n_records": 10344,
       "n_infarction": 7,
       "n_ischaemia": 1588,
       "n_infarction_or_ischaemia": 1593,
-      "infarction_prevalence": 0.0006767862322343614
+      "infarction_prevalence": 0.0006767208043310132
     },
     "ningbo": {
       "n_records": 34905,
@@ -97,11 +97,11 @@
         "georgia",
         "ningbo"
       ],
-      "n_records": 62362,
+      "n_records": 62373,
       "n_infarction": 212,
       "n_ischaemia": 1588,
       "n_infarction_or_ischaemia": 1798,
-      "infarction_prevalence": 0.0033995061094897533,
+      "infarction_prevalence": 0.003398906578166835,
       "enough_infarction": {
         "holds": false,
         "n_infarction": 212,
@@ -124,11 +124,11 @@
         "georgia",
         "ningbo"
       ],
-      "n_records": 65815,
+      "n_records": 65826,
       "n_infarction": 1727,
       "n_ischaemia": 2132,
       "n_infarction_or_ischaemia": 3648,
-      "infarction_prevalence": 0.0262402187951075,
+      "infarction_prevalence": 0.02623583386503813,
       "enough_infarction": {
         "holds": true,
         "n_infarction": 1727,

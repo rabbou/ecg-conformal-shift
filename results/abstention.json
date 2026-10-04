@@ -11,15 +11,17 @@
   "n_draws": 200,
   "seed": 0,
   "provenance": {
-    "commit": "0189b865c34b070570281db70ccb41bd9e3c18e5",
+    "commit": "2087cb15c5ee890d65c3b9d251e94be6a5f8edec",
     "producers": {
-      "scripts/abstention_table.py": "7c5272c87c676d97fa03aa8d8b66f929c3457910fe027fc765ea90bde3974d51",
-      "src/ecs/conformal.py": "c434998b704a551d55bc2206a1a3ada6d42309947b0b92db11607746dcd068dc",
-      "src/ecs/metrics.py": "e04509abce93b400ac90cbd102a63a747f0559de4d2c9d20cdc2ee4ce1cf90e6",
-      "src/ecs/splits.py": "17f1d2fea5970c37b989ad0df925b3d19f355012bfca02aed6983ce142b5a946"
+      "scripts/abstention_table.py": "0904a6518613e7d2adea93bf56be6b81cf2a12cc53efab716fac59c9b959a1ed",
+      "src/ecs/conformal.py": "05236c0192865fdecea3ffb28675509d390dcb20a95218a835e735786461bf92",
+      "src/ecs/ingest.py": "d7015a7c3997288a5248319f42c72ecff7d9877587131e5c3aa9e2921a5a60da",
+      "src/ecs/metrics.py": "bc3ca2b5779db9bc6145afad35dbd9764aae43956f29405aac243942780a7bea",
+      "src/ecs/report.py": "a54c532e710ebba85935ee64f01005c7a2f5fb9fc6199a03dcc7342efe928bce",
+      "src/ecs/splits.py": "ed3665f4345c238edcbcb34081e0610838c18ae5383ad30776d66117032f4deb"
     }
   },
-  "seconds": 2.0,
+  "seconds": 10.6,
   "rows": [
     {
       "alpha": 0.2,

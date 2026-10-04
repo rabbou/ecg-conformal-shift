@@ -1,0 +1,558 @@
+{
+  "question": "Of the ill and the healthy in each care setting, how many are given the disease alone, both labels, or the other label alone.",
+  "label": "shd_moderate_or_greater_flag",
+  "alpha": 0.1,
+  "definitions": {
+    "recognised": "the ill given the disease label alone",
+    "referred": "given both labels: no machine answer, a human reads the ECG",
+    "missed": "the ill given the healthy label alone",
+    "cleared": "the healthy given the healthy label alone",
+    "false_alarm": "the healthy given the disease label alone"
+  },
+  "provenance": {
+    "commit": "2087cb15c5ee890d65c3b9d251e94be6a5f8edec",
+    "producers": {
+      "results/echonext_transfer.json": "ec7255c1dfbfbd306e1e403a550a98c9e1885564ada411cb9c3bc76c39565a74",
+      "scripts/echonext_outcomes.py": "a994fc30b9c9f7cbc54b5870a8f4c097c29469a53c7359e1e252e2f9ae1531b7",
+      "src/ecs/transfer.py": "de3e37860261228cb71cb222403c0c3035869c8d3554b8901bda532962779481"
+    }
+  },
+  "arms": {
+    "resnet": {
+      "inpatient": {
+        "n": 2203,
+        "n_ill": 1156,
+        "prevalence": 0.5247389922832502,
+        "sensitivity_threshold": {
+          "sensitivity": 0.9039792387543253,
+          "specificity": 0.4221585482330468,
+          "ppv": 0.6333333333333333,
+          "npv": 0.7992766726943942
+        },
+        "perlabel": {
+          "ill": {
+            "n": 1156,
+            "recognised": {
+              "count": 622,
+              "share": 0.5380622837370242
+            },
+            "referred": {
+              "count": 423,
+              "share": 0.36591695501730104
+            },
+            "missed": {
+              "count": 111,
+              "share": 0.09602076124567474
+            }
+          },
+          "healthy": {
+            "n": 1047,
+            "cleared": {
+              "count": 442,
+              "share": 0.4221585482330468
+            },
+            "referred": {
+              "count": 508,
+              "share": 0.48519579751671443
+            },
+            "false_alarm": {
+              "count": 97,
+              "share": 0.09264565425023878
+            }
+          },
+          "referred_all": 0.42260553790285976
+        }
+      },
+      "emergency": {
+        "n": 1971,
+        "n_ill": 788,
+        "prevalence": 0.3997970573313039,
+        "sensitivity_threshold": {
+          "sensitivity": 0.8616751269035533,
+          "specificity": 0.610312764158918,
+          "ppv": 0.5956140350877193,
+          "npv": 0.8688327316486161
+        },
+        "perlabel": {
+          "ill": {
+            "n": 788,
+            "recognised": {
+              "count": 365,
+              "share": 0.4631979695431472
+            },
+            "referred": {
+              "count": 314,
+              "share": 0.39847715736040606
+            },
+            "missed": {
+              "count": 109,
+              "share": 0.1383248730964467
+            }
+          },
+          "healthy": {
+            "n": 1183,
+            "cleared": {
+              "count": 722,
+              "share": 0.610312764158918
+            },
+            "referred": {
+              "count": 390,
+              "share": 0.32967032967032966
+            },
+            "false_alarm": {
+              "count": 71,
+              "share": 0.060016906170752324
+            }
+          },
+          "referred_all": 0.3571790969051243
+        }
+      },
+      "outpatient": {
+        "n": 1059,
+        "n_ill": 271,
+        "prevalence": 0.2559017941454202,
+        "sensitivity_threshold": {
+          "sensitivity": 0.7158671586715867,
+          "specificity": 0.7106598984771574,
+          "ppv": 0.4597156398104265,
+          "npv": 0.8791208791208791
+        },
+        "perlabel": {
+          "ill": {
+            "n": 271,
+            "recognised": {
+              "count": 96,
+              "share": 0.35424354243542433
+            },
+            "referred": {
+              "count": 98,
+              "share": 0.36162361623616235
+            },
+            "missed": {
+              "count": 77,
+              "share": 0.28413284132841327
+            }
+          },
+          "healthy": {
+            "n": 788,
+            "cleared": {
+              "count": 560,
+              "share": 0.7106598984771574
+            },
+            "referred": {
+              "count": 213,
+              "share": 0.2703045685279188
+            },
+            "false_alarm": {
+              "count": 15,
+              "share": 0.01903553299492386
+            }
+          },
+          "referred_all": 0.29367327667610954
+        }
+      }
+    },
+    "random_init": {
+      "inpatient": {
+        "n": 2203,
+        "n_ill": 1156,
+        "prevalence": 0.5247389922832502,
+        "sensitivity_threshold": {
+          "sensitivity": 0.9091695501730104,
+          "specificity": 0.3658070678127985,
+          "ppv": 0.6128279883381924,
+          "npv": 0.7848360655737705
+        },
+        "perlabel": {
+          "ill": {
+            "n": 1156,
+            "recognised": {
+              "count": 474,
+              "share": 0.4100346020761246
+            },
+            "referred": {
+              "count": 577,
+              "share": 0.4991349480968858
+            },
+            "missed": {
+              "count": 105,
+              "share": 0.09083044982698962
+            }
+          },
+          "healthy": {
+            "n": 1047,
+            "cleared": {
+              "count": 383,
+              "share": 0.3658070678127985
+            },
+            "referred": {
+              "count": 584,
+              "share": 0.5577841451766953
+            },
+            "false_alarm": {
+              "count": 80,
+              "share": 0.07640878701050621
+            }
+          },
+          "referred_all": 0.5270086246028144
+        }
+      },
+      "emergency": {
+        "n": 1971,
+        "n_ill": 788,
+        "prevalence": 0.3997970573313039,
+        "sensitivity_threshold": {
+          "sensitivity": 0.8439086294416244,
+          "specificity": 0.5452240067624683,
+          "ppv": 0.5527847049044057,
+          "npv": 0.83984375
+        },
+        "perlabel": {
+          "ill": {
+            "n": 788,
+            "recognised": {
+              "count": 291,
+              "share": 0.36928934010152287
+            },
+            "referred": {
+              "count": 374,
+              "share": 0.4746192893401015
+            },
+            "missed": {
+              "count": 123,
+              "share": 0.15609137055837563
+            }
+          },
+          "healthy": {
+            "n": 1183,
+            "cleared": {
+              "count": 645,
+              "share": 0.5452240067624683
+            },
+            "referred": {
+              "count": 473,
+              "share": 0.39983093829247673
+            },
+            "false_alarm": {
+              "count": 65,
+              "share": 0.054945054945054944
+            }
+          },
+          "referred_all": 0.42973110096397765
+        }
+      },
+      "outpatient": {
+        "n": 1059,
+        "n_ill": 271,
+        "prevalence": 0.2559017941454202,
+        "sensitivity_threshold": {
+          "sensitivity": 0.7859778597785978,
+          "specificity": 0.5736040609137056,
+          "ppv": 0.3879781420765027,
+          "npv": 0.8862745098039215
+        },
+        "perlabel": {
+          "ill": {
+            "n": 271,
+            "recognised": {
+              "count": 59,
+              "share": 0.2177121771217712
+            },
+            "referred": {
+              "count": 154,
+              "share": 0.5682656826568265
+            },
+            "missed": {
+              "count": 58,
+              "share": 0.2140221402214022
+            }
+          },
+          "healthy": {
+            "n": 788,
+            "cleared": {
+              "count": 452,
+              "share": 0.5736040609137056
+            },
+            "referred": {
+              "count": 314,
+              "share": 0.39847715736040606
+            },
+            "false_alarm": {
+              "count": 22,
+              "share": 0.027918781725888325
+            }
+          },
+          "referred_all": 0.44192634560906513
+        }
+      }
+    },
+    "ecgfounder": {
+      "inpatient": {
+        "n": 2203,
+        "n_ill": 1156,
+        "prevalence": 0.5247389922832502,
+        "sensitivity_threshold": {
+          "sensitivity": 0.8953287197231834,
+          "specificity": 0.4278892072588348,
+          "ppv": 0.6334149326805385,
+          "npv": 0.7873462214411248
+        },
+        "perlabel": {
+          "ill": {
+            "n": 1156,
+            "recognised": {
+              "count": 540,
+              "share": 0.4671280276816609
+            },
+            "referred": {
+              "count": 495,
+              "share": 0.4282006920415225
+            },
+            "missed": {
+              "count": 121,
+              "share": 0.1046712802768166
+            }
+          },
+          "healthy": {
+            "n": 1047,
+            "cleared": {
+              "count": 448,
+              "share": 0.4278892072588348
+            },
+            "referred": {
+              "count": 515,
+              "share": 0.4918815663801337
+            },
+            "false_alarm": {
+              "count": 84,
+              "share": 0.08022922636103152
+            }
+          },
+          "referred_all": 0.4584657285519746
+        }
+      },
+      "emergency": {
+        "n": 1971,
+        "n_ill": 788,
+        "prevalence": 0.3997970573313039,
+        "sensitivity_threshold": {
+          "sensitivity": 0.8286802030456852,
+          "specificity": 0.6001690617075233,
+          "ppv": 0.5799289520426287,
+          "npv": 0.8402366863905325
+        },
+        "perlabel": {
+          "ill": {
+            "n": 788,
+            "recognised": {
+              "count": 317,
+              "share": 0.4022842639593909
+            },
+            "referred": {
+              "count": 336,
+              "share": 0.4263959390862944
+            },
+            "missed": {
+              "count": 135,
+              "share": 0.1713197969543147
+            }
+          },
+          "healthy": {
+            "n": 1183,
+            "cleared": {
+              "count": 710,
+              "share": 0.6001690617075233
+            },
+            "referred": {
+              "count": 426,
+              "share": 0.36010143702451397
+            },
+            "false_alarm": {
+              "count": 47,
+              "share": 0.039729501267962805
+            }
+          },
+          "referred_all": 0.3866057838660578
+        }
+      },
+      "outpatient": {
+        "n": 1059,
+        "n_ill": 271,
+        "prevalence": 0.2559017941454202,
+        "sensitivity_threshold": {
+          "sensitivity": 0.7158671586715867,
+          "specificity": 0.7131979695431472,
+          "ppv": 0.46190476190476193,
+          "npv": 0.8794992175273866
+        },
+        "perlabel": {
+          "ill": {
+            "n": 271,
+            "recognised": {
+              "count": 61,
+              "share": 0.22509225092250923
+            },
+            "referred": {
+              "count": 133,
+              "share": 0.4907749077490775
+            },
+            "missed": {
+              "count": 77,
+              "share": 0.28413284132841327
+            }
+          },
+          "healthy": {
+            "n": 788,
+            "cleared": {
+              "count": 562,
+              "share": 0.7131979695431472
+            },
+            "referred": {
+              "count": 208,
+              "share": 0.2639593908629442
+            },
+            "false_alarm": {
+              "count": 18,
+              "share": 0.02284263959390863
+            }
+          },
+          "referred_all": 0.32200188857412654
+        }
+      }
+    },
+    "echonext_mini": {
+      "inpatient": {
+        "n": 2203,
+        "n_ill": 1156,
+        "prevalence": 0.5247389922832502,
+        "sensitivity_threshold": {
+          "sensitivity": 0.907439446366782,
+          "specificity": 0.387774594078319,
+          "ppv": 0.6207100591715976,
+          "npv": 0.7914230019493177
+        },
+        "perlabel": {
+          "ill": {
+            "n": 1156,
+            "recognised": {
+              "count": 539,
+              "share": 0.4662629757785467
+            },
+            "referred": {
+              "count": 510,
+              "share": 0.4411764705882353
+            },
+            "missed": {
+              "count": 107,
+              "share": 0.092560553633218
+            }
+          },
+          "healthy": {
+            "n": 1047,
+            "cleared": {
+              "count": 406,
+              "share": 0.387774594078319
+            },
+            "referred": {
+              "count": 545,
+              "share": 0.5205348615090736
+            },
+            "false_alarm": {
+              "count": 96,
+              "share": 0.09169054441260745
+            }
+          },
+          "referred_all": 0.47889241942805266
+        }
+      },
+      "emergency": {
+        "n": 1971,
+        "n_ill": 788,
+        "prevalence": 0.3997970573313039,
+        "sensitivity_threshold": {
+          "sensitivity": 0.8553299492385786,
+          "specificity": 0.5765004226542688,
+          "ppv": 0.5736170212765958,
+          "npv": 0.8567839195979899
+        },
+        "perlabel": {
+          "ill": {
+            "n": 788,
+            "recognised": {
+              "count": 331,
+              "share": 0.4200507614213198
+            },
+            "referred": {
+              "count": 343,
+              "share": 0.4352791878172589
+            },
+            "missed": {
+              "count": 114,
+              "share": 0.1446700507614213
+            }
+          },
+          "healthy": {
+            "n": 1183,
+            "cleared": {
+              "count": 682,
+              "share": 0.5765004226542688
+            },
+            "referred": {
+              "count": 445,
+              "share": 0.37616229923922234
+            },
+            "false_alarm": {
+              "count": 56,
+              "share": 0.047337278106508875
+            }
+          },
+          "referred_all": 0.3997970573313039
+        }
+      },
+      "outpatient": {
+        "n": 1059,
+        "n_ill": 271,
+        "prevalence": 0.2559017941454202,
+        "sensitivity_threshold": {
+          "sensitivity": 0.7269372693726938,
+          "specificity": 0.7106598984771574,
+          "ppv": 0.46352941176470586,
+          "npv": 0.8832807570977917
+        },
+        "perlabel": {
+          "ill": {
+            "n": 271,
+            "recognised": {
+              "count": 69,
+              "share": 0.25461254612546125
+            },
+            "referred": {
+              "count": 128,
+              "share": 0.47232472324723246
+            },
+            "missed": {
+              "count": 74,
+              "share": 0.2730627306273063
+            }
+          },
+          "healthy": {
+            "n": 788,
+            "cleared": {
+              "count": 560,
+              "share": 0.7106598984771574
+            },
+            "referred": {
+              "count": 214,
+              "share": 0.2715736040609137
+            },
+            "false_alarm": {
+              "count": 14,
+              "share": 0.017766497461928935
+            }
+          },
+          "referred_all": 0.32294617563739375
+        }
+      }
+    }
+  }
+}

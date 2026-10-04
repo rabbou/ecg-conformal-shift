@@ -1,18 +1,19 @@
 {
-  "question": "The quantities sections 4 and 5 argue from, computed from the committed scores so that each one has a file behind it.",
+  "question": "The infarction quantities the report argues from beside its coverage tables, computed from the committed scores.",
   "alpha": 0.1,
   "n_draws": 200,
   "seed": 0,
   "provenance": {
-    "commit": "4b589da48a0eea54bf29629ecd6e5f3bc05e1ee0",
+    "commit": "2087cb15c5ee890d65c3b9d251e94be6a5f8edec",
     "producers": {
-      "scripts/auxiliary.py": "8acc434edf14cb88780b5af56b53c32abf18104a1febfa57ce0d744062a92bf0",
-      "scripts/shift_table.py": "b8d35d311a44d187d5ca0f92f14caf8b543409792123a9a09c3ed0318f3453d6",
-      "src/ecs/conformal.py": "c434998b704a551d55bc2206a1a3ada6d42309947b0b92db11607746dcd068dc",
-      "src/ecs/metrics.py": "e04509abce93b400ac90cbd102a63a747f0559de4d2c9d20cdc2ee4ce1cf90e6"
+      "scripts/auxiliary.py": "28e7ede2d1176bc8314e59730a3cd25084a59944c0f9e4624772c7d39fbc0a93",
+      "src/ecs/conformal.py": "05236c0192865fdecea3ffb28675509d390dcb20a95218a835e735786461bf92",
+      "src/ecs/ingest.py": "d7015a7c3997288a5248319f42c72ecff7d9877587131e5c3aa9e2921a5a60da",
+      "src/ecs/metrics.py": "bc3ca2b5779db9bc6145afad35dbd9764aae43956f29405aac243942780a7bea",
+      "src/ecs/splits.py": "ed3665f4345c238edcbcb34081e0610838c18ae5383ad30776d66117032f4deb"
     }
   },
-  "seconds": 5.3,
+  "seconds": 122.8,
   "differences": {
     "note": "MI coverage under class-conditional calibration minus MI coverage under pooled calibration, formed inside each replicate. The source cohort is resampled by patient and the target cohorts by record.",
     "n_bootstrap": 2000,
@@ -20,72 +21,72 @@
       "ptbxl": {
         "name": "PTB-XL",
         "difference": {
-          "mean": 0.1678,
+          "mean": 0.1667,
           "ci95": [
-            0.1086,
-            0.234
+            0.1111,
+            0.2321
           ]
         },
         "pooled": {
-          "mean": 0.735,
+          "mean": 0.7357,
           "ci95": [
-            0.6602,
-            0.8017
+            0.6655,
+            0.8008
           ]
         },
         "perlabel": {
-          "mean": 0.9028,
+          "mean": 0.9024,
           "ci95": [
-            0.8459,
-            0.95
+            0.8456,
+            0.9492
           ]
         }
       },
       "sph": {
         "name": "Shandong",
         "difference": {
-          "mean": 0.0373,
+          "mean": 0.0376,
           "ci95": [
-            0.015,
-            0.0645
+            0.0144,
+            0.0655
           ]
         },
         "pooled": {
-          "mean": 0.9369,
+          "mean": 0.937,
           "ci95": [
-            0.9044,
-            0.9667
+            0.9018,
+            0.9668
           ]
         },
         "perlabel": {
-          "mean": 0.9742,
+          "mean": 0.9746,
           "ci95": [
-            0.9518,
-            0.9922
+            0.9528,
+            0.9924
           ]
         }
       },
       "acs": {
         "name": "Chongqing",
         "difference": {
-          "mean": 0.116,
+          "mean": 0.1151,
           "ci95": [
-            0.0893,
-            0.1464
+            0.0881,
+            0.1459
           ]
         },
         "pooled": {
-          "mean": 0.7248,
+          "mean": 0.7249,
           "ci95": [
-            0.6941,
-            0.7529
+            0.6931,
+            0.7503
           ]
         },
         "perlabel": {
-          "mean": 0.8408,
+          "mean": 0.84,
           "ci95": [
-            0.814,
-            0.8688
+            0.8118,
+            0.8702
           ]
         }
       }
@@ -98,69 +99,69 @@
       "ptbxl": {
         "name": "PTB-XL",
         "conformal_perlabel": {
-          "mi": 0.9001,
-          "non_mi": 0.8998,
-          "deferred": 0.1044
+          "mi": 0.9014,
+          "non_mi": 0.9009,
+          "deferred": 0.1051
         },
         "chow_per_class": {
-          "mi": 0.8957,
-          "non_mi": 0.8982,
-          "deferred": 0.0959
+          "mi": 0.8967,
+          "non_mi": 0.8993,
+          "deferred": 0.0967
         },
         "chow_symmetric": {
-          "mi": 0.9289,
-          "non_mi": 0.8567,
-          "deferred": 0.1058
+          "mi": 0.9321,
+          "non_mi": 0.8523,
+          "deferred": 0.1068
         },
-        "conformal_minus_chow_per_class_mi_points": 0.44
+        "conformal_minus_chow_per_class_mi_points": 0.47
       },
       "sph": {
         "name": "Shandong",
         "conformal_perlabel": {
-          "mi": 0.9739,
-          "non_mi": 0.9042,
-          "deferred": 0.0799
+          "mi": 0.9737,
+          "non_mi": 0.9047,
+          "deferred": 0.0804
         },
         "chow_per_class": {
           "mi": 0.9733,
-          "non_mi": 0.9031,
-          "deferred": 0.0739
+          "non_mi": 0.9034,
+          "deferred": 0.0743
         },
         "chow_symmetric": {
-          "mi": 0.9792,
-          "non_mi": 0.8616,
-          "deferred": 0.0828
+          "mi": 0.9799,
+          "non_mi": 0.8574,
+          "deferred": 0.0849
         },
-        "conformal_minus_chow_per_class_mi_points": 0.06
+        "conformal_minus_chow_per_class_mi_points": 0.04
       },
       "acs": {
         "name": "Chongqing",
         "conformal_perlabel": {
-          "mi": 0.8398,
-          "non_mi": 0.6929,
-          "deferred": 0.1164
+          "mi": 0.84,
+          "non_mi": 0.6938,
+          "deferred": 0.1175
         },
         "chow_per_class": {
-          "mi": 0.8365,
-          "non_mi": 0.6907,
-          "deferred": 0.1083
+          "mi": 0.8366,
+          "non_mi": 0.6913,
+          "deferred": 0.109
         },
         "chow_symmetric": {
-          "mi": 0.8661,
-          "non_mi": 0.6252,
-          "deferred": 0.1007
+          "mi": 0.8694,
+          "non_mi": 0.6189,
+          "deferred": 0.1012
         },
-        "conformal_minus_chow_per_class_mi_points": 0.33
+        "conformal_minus_chow_per_class_mi_points": 0.34
       }
     }
   },
   "correction": {
     "note": "MI coverage with the ceil((n+1)(1-alpha)) rank against the plain empirical quantile of the same calibration scores, on the same draws.",
     "n_draws": 200,
-    "coverage_with_correction": 0.9001,
-    "coverage_without_correction": 0.8957,
-    "correction_worth_points": 0.44,
-    "between_draw_sd_points": 2.75
+    "coverage_with_correction": 0.9014,
+    "coverage_without_correction": 0.8967,
+    "correction_worth_points": 0.47,
+    "between_draw_sd_points": 2.48
   },
   "sample_size": {
     "note": "Cases of the rarer label needed for a 95% normal interval of +/-0.02 on a coverage near 0.90, and the tracings that implies at each site's observed MI prevalence.",
@@ -178,29 +179,94 @@
     "by_corpus": {
       "ptbxl": {
         "name": "PTB-XL",
-        "positive_predictive_value": 0.7226,
+        "positive_predictive_value": 0.7239,
         "prevalence": 0.2502
       },
       "sph": {
         "name": "Shandong",
-        "positive_predictive_value": 0.092,
+        "positive_predictive_value": 0.0924,
         "prevalence": 0.0101
       },
       "acs": {
         "name": "Chongqing",
-        "positive_predictive_value": 0.299,
+        "positive_predictive_value": 0.2994,
         "prevalence": 0.1492
       }
     }
   },
-  "shandong_wilson": {
-    "note": "Wilson interval on an observed MI coverage of 0.936 at Shandong, on that site's own MI cases. It is the interval the site's count supports; the spread across calibration draws is a different and much smaller quantity.",
-    "n_mi_cases": 260,
-    "coverage": 0.936,
-    "wilson_ci95": [
-      0.8978,
-      0.9588
-    ],
-    "half_width_points": 3.05
+  "site_intervals": {
+    "note": "MI coverage at each target site, mean over the calibration draws, with the 95% Wilson interval its own MI cases support.",
+    "n_draws": 200,
+    "by_corpus": {
+      "sph": {
+        "name": "Shandong",
+        "n_mi_cases": 260,
+        "pooled": {
+          "coverage": 0.9359,
+          "wilson_ci95": [
+            0.8978,
+            0.9588
+          ],
+          "draw_sd": 0.0034
+        },
+        "perlabel": {
+          "coverage": 0.9737,
+          "wilson_ci95": [
+            0.9455,
+            0.9869
+          ],
+          "draw_sd": 0.0015
+        }
+      },
+      "acs": {
+        "name": "Chongqing",
+        "n_mi_cases": 2679,
+        "pooled": {
+          "coverage": 0.7247,
+          "wilson_ci95": [
+            0.7073,
+            0.7411
+          ],
+          "draw_sd": 0.008
+        },
+        "perlabel": {
+          "coverage": 0.84,
+          "wilson_ci95": [
+            0.8255,
+            0.8533
+          ],
+          "draw_sd": 0.0099
+        }
+      }
+    }
+  },
+  "discrimination": {
+    "n_bootstrap": 1000,
+    "by_corpus": {
+      "ptbxl": {
+        "name": "PTB-XL",
+        "auroc": 0.9322,
+        "ci95": [
+          0.9208,
+          0.9431
+        ]
+      },
+      "sph": {
+        "name": "Shandong",
+        "auroc": 0.9782,
+        "ci95": [
+          0.9696,
+          0.9855
+        ]
+      },
+      "acs": {
+        "name": "Chongqing",
+        "auroc": 0.7934,
+        "ci95": [
+          0.7843,
+          0.8029
+        ]
+      }
+    }
   }
 }

@@ -15,12 +15,14 @@
   "n_draws": 200,
   "seed": 0,
   "provenance": {
-    "commit": "4b589da48a0eea54bf29629ecd6e5f3bc05e1ee0",
+    "commit": "2087cb15c5ee890d65c3b9d251e94be6a5f8edec",
     "producers": {
-      "scripts/shift_table.py": "b8d35d311a44d187d5ca0f92f14caf8b543409792123a9a09c3ed0318f3453d6",
-      "src/ecs/conformal.py": "c434998b704a551d55bc2206a1a3ada6d42309947b0b92db11607746dcd068dc",
-      "src/ecs/metrics.py": "e04509abce93b400ac90cbd102a63a747f0559de4d2c9d20cdc2ee4ce1cf90e6",
-      "src/ecs/splits.py": "17f1d2fea5970c37b989ad0df925b3d19f355012bfca02aed6983ce142b5a946"
+      "scripts/shift_table.py": "b7f08109e97a4db19304e47afb166b2a57b7cf9b951a70a9b8eecd53e54f0074",
+      "src/ecs/conformal.py": "05236c0192865fdecea3ffb28675509d390dcb20a95218a835e735786461bf92",
+      "src/ecs/ingest.py": "d7015a7c3997288a5248319f42c72ecff7d9877587131e5c3aa9e2921a5a60da",
+      "src/ecs/metrics.py": "bc3ca2b5779db9bc6145afad35dbd9764aae43956f29405aac243942780a7bea",
+      "src/ecs/report.py": "a54c532e710ebba85935ee64f01005c7a2f5fb9fc6199a03dcc7342efe928bce",
+      "src/ecs/splits.py": "ed3665f4345c238edcbcb34081e0610838c18ae5383ad30776d66117032f4deb"
     }
   },
   "corpora": {
@@ -49,7 +51,7 @@
       "n_excluded": 0
     }
   },
-  "seconds": 6.6,
+  "seconds": 25.3,
   "reading": {
     "asked_at": "the 90% set on the lac score, over 200 draws",
     "restored_within": 0.02,
@@ -5657,7 +5659,7 @@
             "weighting": "w(y) = q(y)/p(y), the estimated target prior over the source prior, carried by every calibration point of label y; q is estimated by BBSE from this corpus's unlabelled predictions alone",
             "effective_sample_size": {
               "mean": 1091.850621282261,
-              "sd": 14.07912851130994,
+              "sd": 14.079128511309937,
               "n_draws": 200
             },
             "weight_by_class": {
@@ -5667,14 +5669,14 @@
                 "n_draws": 200
               },
               "1": {
-                "mean": 1.0139515857931929,
+                "mean": 1.0139515857931927,
                 "sd": 0.13863412100881384,
                 "n_draws": 200
               }
             },
             "estimated_prevalence": {
-              "mean": 0.2524446981263974,
-              "sd": 0.02800340091540682,
+              "mean": 0.25244469812639747,
+              "sd": 0.028003400915406818,
               "n_draws": 200
             },
             "n_unidentified": 0
@@ -6559,7 +6561,7 @@
             "weighting": "w(y) = q(y)/p(y), the estimated target prior over the source prior, carried by every calibration point of label y; q is estimated by BBSE from this corpus's unlabelled predictions alone",
             "effective_sample_size": {
               "mean": 863.7541594499972,
-              "sd": 22.084580302184612,
+              "sd": 22.084580302184616,
               "n_draws": 198
             },
             "weight_by_class": {
@@ -6569,13 +6571,13 @@
                 "n_draws": 198
               },
               "1": {
-                "mean": 0.09669728812175861,
-                "sd": 0.040789298514691576,
+                "mean": 0.09669728812175857,
+                "sd": 0.04078929851469157,
                 "n_draws": 198
               }
             },
             "estimated_prevalence": {
-              "mean": 0.024095771541534226,
+              "mean": 0.024095771541534215,
               "sd": 0.010084199529167413,
               "n_draws": 198
             },
@@ -7472,7 +7474,7 @@
               },
               "1": {
                 "mean": 1.6378988495728573,
-                "sd": 0.10158709484714312,
+                "sd": 0.10158709484714315,
                 "n_draws": 200
               }
             },
@@ -13826,7 +13828,7 @@
             "weighting": "w(y) = q(y)/p(y), the estimated target prior over the source prior, carried by every calibration point of label y; q is estimated by BBSE from this corpus's unlabelled predictions alone",
             "effective_sample_size": {
               "mean": 1091.850621282261,
-              "sd": 14.07912851130994,
+              "sd": 14.079128511309937,
               "n_draws": 200
             },
             "weight_by_class": {
@@ -13836,14 +13838,14 @@
                 "n_draws": 200
               },
               "1": {
-                "mean": 1.0139515857931929,
+                "mean": 1.0139515857931927,
                 "sd": 0.13863412100881384,
                 "n_draws": 200
               }
             },
             "estimated_prevalence": {
-              "mean": 0.2524446981263974,
-              "sd": 0.02800340091540682,
+              "mean": 0.25244469812639747,
+              "sd": 0.028003400915406818,
               "n_draws": 200
             },
             "n_unidentified": 0
@@ -14728,7 +14730,7 @@
             "weighting": "w(y) = q(y)/p(y), the estimated target prior over the source prior, carried by every calibration point of label y; q is estimated by BBSE from this corpus's unlabelled predictions alone",
             "effective_sample_size": {
               "mean": 863.7541594499972,
-              "sd": 22.084580302184612,
+              "sd": 22.084580302184616,
               "n_draws": 198
             },
             "weight_by_class": {
@@ -14738,13 +14740,13 @@
                 "n_draws": 198
               },
               "1": {
-                "mean": 0.09669728812175861,
-                "sd": 0.040789298514691576,
+                "mean": 0.09669728812175857,
+                "sd": 0.04078929851469157,
                 "n_draws": 198
               }
             },
             "estimated_prevalence": {
-              "mean": 0.024095771541534226,
+              "mean": 0.024095771541534215,
               "sd": 0.010084199529167413,
               "n_draws": 198
             },
@@ -15641,7 +15643,7 @@
               },
               "1": {
                 "mean": 1.6378988495728573,
-                "sd": 0.10158709484714312,
+                "sd": 0.10158709484714315,
                 "n_draws": 200
               }
             },
@@ -21995,7 +21997,7 @@
             "weighting": "w(y) = q(y)/p(y), the estimated target prior over the source prior, carried by every calibration point of label y; q is estimated by BBSE from this corpus's unlabelled predictions alone",
             "effective_sample_size": {
               "mean": 1091.850621282261,
-              "sd": 14.07912851130994,
+              "sd": 14.079128511309937,
               "n_draws": 200
             },
             "weight_by_class": {
@@ -22005,14 +22007,14 @@
                 "n_draws": 200
               },
               "1": {
-                "mean": 1.0139515857931929,
+                "mean": 1.0139515857931927,
                 "sd": 0.13863412100881384,
                 "n_draws": 200
               }
             },
             "estimated_prevalence": {
-              "mean": 0.2524446981263974,
-              "sd": 0.02800340091540682,
+              "mean": 0.25244469812639747,
+              "sd": 0.028003400915406818,
               "n_draws": 200
             },
             "n_unidentified": 0
@@ -22897,7 +22899,7 @@
             "weighting": "w(y) = q(y)/p(y), the estimated target prior over the source prior, carried by every calibration point of label y; q is estimated by BBSE from this corpus's unlabelled predictions alone",
             "effective_sample_size": {
               "mean": 863.7541594499972,
-              "sd": 22.084580302184612,
+              "sd": 22.084580302184616,
               "n_draws": 198
             },
             "weight_by_class": {
@@ -22907,13 +22909,13 @@
                 "n_draws": 198
               },
               "1": {
-                "mean": 0.09669728812175861,
-                "sd": 0.040789298514691576,
+                "mean": 0.09669728812175857,
+                "sd": 0.04078929851469157,
                 "n_draws": 198
               }
             },
             "estimated_prevalence": {
-              "mean": 0.024095771541534226,
+              "mean": 0.024095771541534215,
               "sd": 0.010084199529167413,
               "n_draws": 198
             },
@@ -23810,7 +23812,7 @@
               },
               "1": {
                 "mean": 1.6378988495728573,
-                "sd": 0.10158709484714312,
+                "sd": 0.10158709484714315,
                 "n_draws": 200
               }
             },
@@ -30164,7 +30166,7 @@
             "weighting": "w(y) = q(y)/p(y), the estimated target prior over the source prior, carried by every calibration point of label y; q is estimated by BBSE from this corpus's unlabelled predictions alone",
             "effective_sample_size": {
               "mean": 1091.850621282261,
-              "sd": 14.07912851130994,
+              "sd": 14.079128511309937,
               "n_draws": 200
             },
             "weight_by_class": {
@@ -30174,14 +30176,14 @@
                 "n_draws": 200
               },
               "1": {
-                "mean": 1.0139515857931929,
+                "mean": 1.0139515857931927,
                 "sd": 0.13863412100881384,
                 "n_draws": 200
               }
             },
             "estimated_prevalence": {
-              "mean": 0.2524446981263974,
-              "sd": 0.02800340091540682,
+              "mean": 0.25244469812639747,
+              "sd": 0.028003400915406818,
               "n_draws": 200
             },
             "n_unidentified": 0
@@ -31066,7 +31068,7 @@
             "weighting": "w(y) = q(y)/p(y), the estimated target prior over the source prior, carried by every calibration point of label y; q is estimated by BBSE from this corpus's unlabelled predictions alone",
             "effective_sample_size": {
               "mean": 863.7541594499972,
-              "sd": 22.084580302184612,
+              "sd": 22.084580302184616,
               "n_draws": 198
             },
             "weight_by_class": {
@@ -31076,13 +31078,13 @@
                 "n_draws": 198
               },
               "1": {
-                "mean": 0.09669728812175861,
-                "sd": 0.040789298514691576,
+                "mean": 0.09669728812175857,
+                "sd": 0.04078929851469157,
                 "n_draws": 198
               }
             },
             "estimated_prevalence": {
-              "mean": 0.024095771541534226,
+              "mean": 0.024095771541534215,
               "sd": 0.010084199529167413,
               "n_draws": 198
             },
@@ -31979,7 +31981,7 @@
               },
               "1": {
                 "mean": 1.6378988495728573,
-                "sd": 0.10158709484714312,
+                "sd": 0.10158709484714315,
                 "n_draws": 200
               }
             },
@@ -38333,7 +38335,7 @@
             "weighting": "w(y) = q(y)/p(y), the estimated target prior over the source prior, carried by every calibration point of label y; q is estimated by BBSE from this corpus's unlabelled predictions alone",
             "effective_sample_size": {
               "mean": 1091.850621282261,
-              "sd": 14.07912851130994,
+              "sd": 14.079128511309937,
               "n_draws": 200
             },
             "weight_by_class": {
@@ -38343,14 +38345,14 @@
                 "n_draws": 200
               },
               "1": {
-                "mean": 1.0139515857931929,
+                "mean": 1.0139515857931927,
                 "sd": 0.13863412100881384,
                 "n_draws": 200
               }
             },
             "estimated_prevalence": {
-              "mean": 0.2524446981263974,
-              "sd": 0.02800340091540682,
+              "mean": 0.25244469812639747,
+              "sd": 0.028003400915406818,
               "n_draws": 200
             },
             "n_unidentified": 0
@@ -39235,7 +39237,7 @@
             "weighting": "w(y) = q(y)/p(y), the estimated target prior over the source prior, carried by every calibration point of label y; q is estimated by BBSE from this corpus's unlabelled predictions alone",
             "effective_sample_size": {
               "mean": 863.7541594499972,
-              "sd": 22.084580302184612,
+              "sd": 22.084580302184616,
               "n_draws": 198
             },
             "weight_by_class": {
@@ -39245,13 +39247,13 @@
                 "n_draws": 198
               },
               "1": {
-                "mean": 0.09669728812175861,
-                "sd": 0.040789298514691576,
+                "mean": 0.09669728812175857,
+                "sd": 0.04078929851469157,
                 "n_draws": 198
               }
             },
             "estimated_prevalence": {
-              "mean": 0.024095771541534226,
+              "mean": 0.024095771541534215,
               "sd": 0.010084199529167413,
               "n_draws": 198
             },
@@ -40148,7 +40150,7 @@
               },
               "1": {
                 "mean": 1.6378988495728573,
-                "sd": 0.10158709484714312,
+                "sd": 0.10158709484714315,
                 "n_draws": 200
               }
             },
@@ -46502,7 +46504,7 @@
             "weighting": "w(y) = q(y)/p(y), the estimated target prior over the source prior, carried by every calibration point of label y; q is estimated by BBSE from this corpus's unlabelled predictions alone",
             "effective_sample_size": {
               "mean": 1091.850621282261,
-              "sd": 14.07912851130994,
+              "sd": 14.079128511309937,
               "n_draws": 200
             },
             "weight_by_class": {
@@ -46512,14 +46514,14 @@
                 "n_draws": 200
               },
               "1": {
-                "mean": 1.0139515857931929,
+                "mean": 1.0139515857931927,
                 "sd": 0.13863412100881384,
                 "n_draws": 200
               }
             },
             "estimated_prevalence": {
-              "mean": 0.2524446981263974,
-              "sd": 0.02800340091540682,
+              "mean": 0.25244469812639747,
+              "sd": 0.028003400915406818,
               "n_draws": 200
             },
             "n_unidentified": 0
@@ -47404,7 +47406,7 @@
             "weighting": "w(y) = q(y)/p(y), the estimated target prior over the source prior, carried by every calibration point of label y; q is estimated by BBSE from this corpus's unlabelled predictions alone",
             "effective_sample_size": {
               "mean": 863.7541594499972,
-              "sd": 22.084580302184612,
+              "sd": 22.084580302184616,
               "n_draws": 198
             },
             "weight_by_class": {
@@ -47414,13 +47416,13 @@
                 "n_draws": 198
               },
               "1": {
-                "mean": 0.09669728812175861,
-                "sd": 0.040789298514691576,
+                "mean": 0.09669728812175857,
+                "sd": 0.04078929851469157,
                 "n_draws": 198
               }
             },
             "estimated_prevalence": {
-              "mean": 0.024095771541534226,
+              "mean": 0.024095771541534215,
               "sd": 0.010084199529167413,
               "n_draws": 198
             },
@@ -48317,7 +48319,7 @@
               },
               "1": {
                 "mean": 1.6378988495728573,
-                "sd": 0.10158709484714312,
+                "sd": 0.10158709484714315,
                 "n_draws": 200
               }
             },

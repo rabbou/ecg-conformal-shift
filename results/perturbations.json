@@ -6,25 +6,22 @@
   "seed": 0,
   "n_records": 2198,
   "n_positive": 550,
-  "torch_threads": 4,
   "clean_matches_published_scores": {
     "largest_absolute_difference": 2.980232238769531e-07,
     "tolerance": 1e-06,
     "passed": true
   },
   "provenance": {
-    "commit": "0189b865c34b070570281db70ccb41bd9e3c18e5",
+    "commit": "2087cb15c5ee890d65c3b9d251e94be6a5f8edec",
     "producers": {
-      "scripts/perturbations.py": "f099000142db6a185fc652ac8072676cb920286cc4dcde2d0f591aced4169ecb",
-      "scripts/score_external.py": "4ee99a952debb3302eba58439f7b76883d56420edec911929ae530f48ff7d384",
-      "src/ecs/conformal.py": "c434998b704a551d55bc2206a1a3ada6d42309947b0b92db11607746dcd068dc",
-      "src/ecs/ingest.py": "5327f33c672dc4e5c2cc5a6223ca08b60dd663d8061ea50aff620338537f9f74",
-      "src/ecs/labels.py": "c6160e7781de27bda116d8c9b09a518340d1e2f84d95ca13ee26679e78b9a965",
-      "src/ecs/models.py": "998bc0a636b4f2aaff97ad5cad704036ae45644b2cfa979187275a590e4d1048",
-      "src/ecs/splits.py": "17f1d2fea5970c37b989ad0df925b3d19f355012bfca02aed6983ce142b5a946"
+      "scripts/perturbations.py": "a2106dc96cd752e6e544cd4722c90fdcfcd0b6bd788f6cd90523de426bc91e06",
+      "src/ecs/conformal.py": "05236c0192865fdecea3ffb28675509d390dcb20a95218a835e735786461bf92",
+      "src/ecs/ingest.py": "d7015a7c3997288a5248319f42c72ecff7d9877587131e5c3aa9e2921a5a60da",
+      "src/ecs/report.py": "a54c532e710ebba85935ee64f01005c7a2f5fb9fc6199a03dcc7342efe928bce",
+      "src/ecs/splits.py": "ed3665f4345c238edcbcb34081e0610838c18ae5383ad30776d66117032f4deb"
     }
   },
-  "seconds": 2332.3,
+  "seconds": 0.3,
   "conditions": {
     "clean": {
       "description": "the tracings as recorded; the row that must reproduce results/baseline/scores.npz",
@@ -39,8 +36,8 @@
       "schemes": {
         "plain": {
           "coverage_mi": {
-            "mean": 0.8957,
-            "sd": 0.0282,
+            "mean": 0.9014,
+            "sd": 0.0248,
             "n_draws": 200
           },
           "deferred_mi": {
@@ -49,8 +46,8 @@
             "n_draws": 200
           },
           "coverage_non_mi": {
-            "mean": 0.8098,
-            "sd": 0.0233,
+            "mean": 0.8035,
+            "sd": 0.0215,
             "n_draws": 200
           },
           "deferred_non_mi": {
@@ -59,8 +56,8 @@
             "n_draws": 200
           },
           "coverage_all": {
-            "mean": 0.8314,
-            "sd": 0.0117,
+            "mean": 0.828,
+            "sd": 0.0111,
             "n_draws": 200
           },
           "deferred_all": {
@@ -71,65 +68,65 @@
         },
         "pooled": {
           "coverage_mi": {
-            "mean": 0.7322,
-            "sd": 0.0313,
+            "mean": 0.7347,
+            "sd": 0.0303,
             "n_draws": 200
           },
           "deferred_mi": {
-            "mean": 0.0996,
-            "sd": 0.033,
+            "mean": 0.1016,
+            "sd": 0.0336,
             "n_draws": 200
           },
           "coverage_non_mi": {
-            "mean": 0.9546,
-            "sd": 0.0086,
+            "mean": 0.955,
+            "sd": 0.009,
             "n_draws": 200
           },
           "deferred_non_mi": {
-            "mean": 0.0354,
-            "sd": 0.0122,
+            "mean": 0.0358,
+            "sd": 0.0115,
             "n_draws": 200
           },
           "coverage_all": {
-            "mean": 0.8988,
-            "sd": 0.0134,
+            "mean": 0.8999,
+            "sd": 0.0132,
             "n_draws": 200
           },
           "deferred_all": {
-            "mean": 0.0515,
-            "sd": 0.0165,
+            "mean": 0.0522,
+            "sd": 0.0161,
             "n_draws": 200
           }
         },
         "perlabel": {
           "coverage_mi": {
-            "mean": 0.9001,
-            "sd": 0.0275,
+            "mean": 0.9014,
+            "sd": 0.0248,
             "n_draws": 200
           },
           "deferred_mi": {
-            "mean": 0.1266,
-            "sd": 0.0273,
+            "mean": 0.1284,
+            "sd": 0.0266,
             "n_draws": 200
           },
           "coverage_non_mi": {
-            "mean": 0.8998,
+            "mean": 0.9009,
             "sd": 0.0157,
             "n_draws": 200
           },
           "deferred_non_mi": {
-            "mean": 0.097,
-            "sd": 0.0239,
+            "mean": 0.0974,
+            "sd": 0.0225,
             "n_draws": 200
           },
           "coverage_all": {
-            "mean": 0.8999,
-            "sd": 0.0134,
+            "mean": 0.901,
+            "sd": 0.0135,
             "n_draws": 200
           },
           "deferred_all": {
-            "mean": 0.1044,
-            "sd": 0.023,
+            "mean": 0.1051,
+            "sd": 0.0218,
             "n_draws": 200
           }
         }
@@ -148,8 +145,8 @@
       "schemes": {
         "plain": {
           "coverage_mi": {
-            "mean": 0.983,
-            "sd": 0.0073,
+            "mean": 0.9851,
+            "sd": 0.0074,
             "n_draws": 200
           },
           "deferred_mi": {
@@ -158,8 +155,8 @@
             "n_draws": 200
           },
           "coverage_non_mi": {
-            "mean": 0.0867,
-            "sd": 0.0167,
+            "mean": 0.0809,
+            "sd": 0.0161,
             "n_draws": 200
           },
           "deferred_non_mi": {
@@ -168,8 +165,8 @@
             "n_draws": 200
           },
           "coverage_all": {
-            "mean": 0.3117,
-            "sd": 0.0145,
+            "mean": 0.3073,
+            "sd": 0.0154,
             "n_draws": 200
           },
           "deferred_all": {
@@ -180,64 +177,64 @@
         },
         "pooled": {
           "coverage_mi": {
-            "mean": 0.9331,
-            "sd": 0.0148,
+            "mean": 0.9355,
+            "sd": 0.0151,
             "n_draws": 200
           },
           "deferred_mi": {
-            "mean": 0.0706,
-            "sd": 0.0206,
+            "mean": 0.0732,
+            "sd": 0.0214,
             "n_draws": 200
           },
           "coverage_non_mi": {
-            "mean": 0.4329,
-            "sd": 0.0253,
+            "mean": 0.4337,
+            "sd": 0.025,
             "n_draws": 200
           },
           "deferred_non_mi": {
-            "mean": 0.1455,
-            "sd": 0.0429,
+            "mean": 0.1494,
+            "sd": 0.0421,
             "n_draws": 200
           },
           "coverage_all": {
-            "mean": 0.5585,
-            "sd": 0.0203,
+            "mean": 0.5594,
+            "sd": 0.0202,
             "n_draws": 200
           },
           "deferred_all": {
-            "mean": 0.1268,
-            "sd": 0.0367,
+            "mean": 0.1304,
+            "sd": 0.0363,
             "n_draws": 200
           }
         },
         "perlabel": {
           "coverage_mi": {
-            "mean": 0.9845,
-            "sd": 0.0078,
+            "mean": 0.9851,
+            "sd": 0.0074,
             "n_draws": 200
           },
           "deferred_mi": {
             "mean": 0.0328,
-            "sd": 0.0096,
+            "sd": 0.0098,
             "n_draws": 200
           },
           "coverage_non_mi": {
-            "mean": 0.2335,
-            "sd": 0.025,
+            "mean": 0.2343,
+            "sd": 0.0251,
             "n_draws": 200
           },
           "deferred_non_mi": {
-            "mean": 0.152,
-            "sd": 0.0273,
+            "mean": 0.1534,
+            "sd": 0.0268,
             "n_draws": 200
           },
           "coverage_all": {
-            "mean": 0.422,
-            "sd": 0.0199,
+            "mean": 0.4224,
+            "sd": 0.0194,
             "n_draws": 200
           },
           "deferred_all": {
-            "mean": 0.122,
+            "mean": 0.1232,
             "sd": 0.022,
             "n_draws": 200
           }
@@ -257,8 +254,8 @@
       "schemes": {
         "plain": {
           "coverage_mi": {
-            "mean": 0.9191,
-            "sd": 0.026,
+            "mean": 0.9245,
+            "sd": 0.0227,
             "n_draws": 200
           },
           "deferred_mi": {
@@ -267,8 +264,8 @@
             "n_draws": 200
           },
           "coverage_non_mi": {
-            "mean": 0.7501,
-            "sd": 0.0249,
+            "mean": 0.7429,
+            "sd": 0.0223,
             "n_draws": 200
           },
           "deferred_non_mi": {
@@ -277,8 +274,8 @@
             "n_draws": 200
           },
           "coverage_all": {
-            "mean": 0.7925,
-            "sd": 0.0136,
+            "mean": 0.7884,
+            "sd": 0.0125,
             "n_draws": 200
           },
           "deferred_all": {
@@ -289,65 +286,65 @@
         },
         "pooled": {
           "coverage_mi": {
-            "mean": 0.787,
-            "sd": 0.0288,
+            "mean": 0.7891,
+            "sd": 0.028,
             "n_draws": 200
           },
           "deferred_mi": {
-            "mean": 0.0882,
-            "sd": 0.0345,
+            "mean": 0.0901,
+            "sd": 0.0337,
             "n_draws": 200
           },
           "coverage_non_mi": {
-            "mean": 0.9364,
-            "sd": 0.0099,
+            "mean": 0.9375,
+            "sd": 0.0097,
             "n_draws": 200
           },
           "deferred_non_mi": {
-            "mean": 0.043,
-            "sd": 0.0131,
+            "mean": 0.0446,
+            "sd": 0.0121,
             "n_draws": 200
           },
           "coverage_all": {
-            "mean": 0.8989,
-            "sd": 0.0131,
+            "mean": 0.9003,
+            "sd": 0.013,
             "n_draws": 200
           },
           "deferred_all": {
-            "mean": 0.0543,
-            "sd": 0.0175,
+            "mean": 0.0559,
+            "sd": 0.0163,
             "n_draws": 200
           }
         },
         "perlabel": {
           "coverage_mi": {
-            "mean": 0.9239,
-            "sd": 0.0259,
+            "mean": 0.9245,
+            "sd": 0.0227,
             "n_draws": 200
           },
           "deferred_mi": {
-            "mean": 0.0957,
-            "sd": 0.0211,
+            "mean": 0.0962,
+            "sd": 0.0207,
             "n_draws": 200
           },
           "coverage_non_mi": {
-            "mean": 0.8755,
-            "sd": 0.0162,
+            "mean": 0.8771,
+            "sd": 0.0156,
             "n_draws": 200
           },
           "deferred_non_mi": {
-            "mean": 0.1327,
-            "sd": 0.0254,
+            "mean": 0.1342,
+            "sd": 0.0234,
             "n_draws": 200
           },
           "coverage_all": {
-            "mean": 0.8877,
-            "sd": 0.0136,
+            "mean": 0.889,
+            "sd": 0.0129,
             "n_draws": 200
           },
           "deferred_all": {
-            "mean": 0.1234,
-            "sd": 0.0227,
+            "mean": 0.1246,
+            "sd": 0.0211,
             "n_draws": 200
           }
         }
@@ -366,8 +363,8 @@
       "schemes": {
         "plain": {
           "coverage_mi": {
-            "mean": 0.8587,
-            "sd": 0.0308,
+            "mean": 0.8648,
+            "sd": 0.0267,
             "n_draws": 200
           },
           "deferred_mi": {
@@ -376,8 +373,8 @@
             "n_draws": 200
           },
           "coverage_non_mi": {
-            "mean": 0.8424,
-            "sd": 0.0203,
+            "mean": 0.8365,
+            "sd": 0.0199,
             "n_draws": 200
           },
           "deferred_non_mi": {
@@ -386,8 +383,8 @@
             "n_draws": 200
           },
           "coverage_all": {
-            "mean": 0.8465,
-            "sd": 0.01,
+            "mean": 0.8436,
+            "sd": 0.0106,
             "n_draws": 200
           },
           "deferred_all": {
@@ -398,65 +395,65 @@
         },
         "pooled": {
           "coverage_mi": {
-            "mean": 0.6758,
-            "sd": 0.0348,
+            "mean": 0.679,
+            "sd": 0.0339,
             "n_draws": 200
           },
           "deferred_mi": {
-            "mean": 0.1079,
-            "sd": 0.0345,
+            "mean": 0.113,
+            "sd": 0.0339,
             "n_draws": 200
           },
           "coverage_non_mi": {
-            "mean": 0.9674,
-            "sd": 0.0074,
+            "mean": 0.9683,
+            "sd": 0.0079,
             "n_draws": 200
           },
           "deferred_non_mi": {
-            "mean": 0.0286,
-            "sd": 0.0081,
+            "mean": 0.0297,
+            "sd": 0.0083,
             "n_draws": 200
           },
           "coverage_all": {
-            "mean": 0.8941,
-            "sd": 0.0136,
+            "mean": 0.8959,
+            "sd": 0.0137,
             "n_draws": 200
           },
           "deferred_all": {
-            "mean": 0.0484,
-            "sd": 0.0139,
+            "mean": 0.0505,
+            "sd": 0.0135,
             "n_draws": 200
           }
         },
         "perlabel": {
           "coverage_mi": {
-            "mean": 0.8634,
-            "sd": 0.0304,
+            "mean": 0.8648,
+            "sd": 0.0267,
             "n_draws": 200
           },
           "deferred_mi": {
-            "mean": 0.1439,
-            "sd": 0.0264,
+            "mean": 0.1465,
+            "sd": 0.026,
             "n_draws": 200
           },
           "coverage_non_mi": {
-            "mean": 0.9213,
-            "sd": 0.0142,
+            "mean": 0.9222,
+            "sd": 0.0146,
             "n_draws": 200
           },
           "deferred_non_mi": {
-            "mean": 0.085,
-            "sd": 0.021,
+            "mean": 0.0856,
+            "sd": 0.0201,
             "n_draws": 200
           },
           "coverage_all": {
-            "mean": 0.9068,
-            "sd": 0.0129,
+            "mean": 0.9078,
+            "sd": 0.013,
             "n_draws": 200
           },
           "deferred_all": {
-            "mean": 0.0997,
-            "sd": 0.0206,
+            "mean": 0.1008,
+            "sd": 0.0195,
             "n_draws": 200
           }
         }
@@ -475,8 +472,8 @@
       "schemes": {
         "plain": {
           "coverage_mi": {
-            "mean": 0.9745,
-            "sd": 0.0115,
+            "mean": 0.9768,
+            "sd": 0.0102,
             "n_draws": 200
           },
           "deferred_mi": {
@@ -485,8 +482,8 @@
             "n_draws": 200
           },
           "coverage_non_mi": {
-            "mean": 0.3752,
-            "sd": 0.053,
+            "mean": 0.3581,
+            "sd": 0.049,
             "n_draws": 200
           },
           "deferred_non_mi": {
@@ -495,8 +492,8 @@
             "n_draws": 200
           },
           "coverage_all": {
-            "mean": 0.5257,
-            "sd": 0.0374,
+            "mean": 0.513,
+            "sd": 0.0354,
             "n_draws": 200
           },
           "deferred_all": {
@@ -507,65 +504,65 @@
         },
         "pooled": {
           "coverage_mi": {
-            "mean": 0.8047,
-            "sd": 0.033,
+            "mean": 0.8099,
+            "sd": 0.0327,
             "n_draws": 200
           },
           "deferred_mi": {
-            "mean": 0.1975,
-            "sd": 0.0583,
+            "mean": 0.2069,
+            "sd": 0.0599,
             "n_draws": 200
           },
           "coverage_non_mi": {
-            "mean": 0.9259,
-            "sd": 0.016,
+            "mean": 0.9285,
+            "sd": 0.0166,
             "n_draws": 200
           },
           "deferred_non_mi": {
-            "mean": 0.1248,
-            "sd": 0.039,
+            "mean": 0.128,
+            "sd": 0.0382,
             "n_draws": 200
           },
           "coverage_all": {
-            "mean": 0.8954,
-            "sd": 0.0195,
+            "mean": 0.8988,
+            "sd": 0.0199,
             "n_draws": 200
           },
           "deferred_all": {
-            "mean": 0.1429,
-            "sd": 0.0429,
+            "mean": 0.1477,
+            "sd": 0.0427,
             "n_draws": 200
           }
         },
         "perlabel": {
           "coverage_mi": {
-            "mean": 0.9764,
-            "sd": 0.0105,
+            "mean": 0.9768,
+            "sd": 0.0102,
             "n_draws": 200
           },
           "deferred_mi": {
-            "mean": 0.1196,
-            "sd": 0.0216,
+            "mean": 0.12,
+            "sd": 0.0217,
             "n_draws": 200
           },
           "coverage_non_mi": {
-            "mean": 0.7258,
-            "sd": 0.0414,
+            "mean": 0.7303,
+            "sd": 0.0399,
             "n_draws": 200
           },
           "deferred_non_mi": {
-            "mean": 0.3674,
-            "sd": 0.0636,
+            "mean": 0.3723,
+            "sd": 0.0617,
             "n_draws": 200
           },
           "coverage_all": {
-            "mean": 0.7887,
-            "sd": 0.0308,
+            "mean": 0.7921,
+            "sd": 0.0298,
             "n_draws": 200
           },
           "deferred_all": {
-            "mean": 0.3052,
-            "sd": 0.0502,
+            "mean": 0.3091,
+            "sd": 0.0491,
             "n_draws": 200
           }
         }
@@ -584,8 +581,8 @@
       "schemes": {
         "plain": {
           "coverage_mi": {
-            "mean": 0.9997,
-            "sd": 0.0011,
+            "mean": 0.9998,
+            "sd": 0.0009,
             "n_draws": 200
           },
           "deferred_mi": {
@@ -604,8 +601,8 @@
             "n_draws": 200
           },
           "coverage_all": {
-            "mean": 0.2514,
-            "sd": 0.0099,
+            "mean": 0.2508,
+            "sd": 0.0112,
             "n_draws": 200
           },
           "deferred_all": {
@@ -616,45 +613,45 @@
         },
         "pooled": {
           "coverage_mi": {
-            "mean": 0.9965,
-            "sd": 0.0026,
+            "mean": 0.9963,
+            "sd": 0.0025,
             "n_draws": 200
           },
           "deferred_mi": {
-            "mean": 0.0057,
-            "sd": 0.0041,
+            "mean": 0.0056,
+            "sd": 0.0043,
             "n_draws": 200
           },
           "coverage_non_mi": {
-            "mean": 0.009,
-            "sd": 0.0027,
+            "mean": 0.0089,
+            "sd": 0.0028,
             "n_draws": 200
           },
           "deferred_non_mi": {
             "mean": 0.006,
-            "sd": 0.0024,
+            "sd": 0.0026,
             "n_draws": 200
           },
           "coverage_all": {
-            "mean": 0.2569,
-            "sd": 0.0095,
+            "mean": 0.2562,
+            "sd": 0.011,
             "n_draws": 200
           },
           "deferred_all": {
             "mean": 0.0059,
-            "sd": 0.0023,
+            "sd": 0.0025,
             "n_draws": 200
           }
         },
         "perlabel": {
           "coverage_mi": {
             "mean": 0.9998,
-            "sd": 0.0008,
+            "sd": 0.0009,
             "n_draws": 200
           },
           "deferred_mi": {
-            "mean": 0.0033,
-            "sd": 0.0026,
+            "mean": 0.0034,
+            "sd": 0.0025,
             "n_draws": 200
           },
           "coverage_non_mi": {
@@ -668,8 +665,8 @@
             "n_draws": 200
           },
           "coverage_all": {
-            "mean": 0.2531,
-            "sd": 0.0099,
+            "mean": 0.2525,
+            "sd": 0.0113,
             "n_draws": 200
           },
           "deferred_all": {

@@ -3,7 +3,7 @@
   "protocol": "Every threshold is fitted on a PTB-XL calibration half drawn by patient and spent unchanged on the held-out half and on both external corpora. No external label reaches any threshold.",
   "alpha": 0.1,
   "plain_sensitivity": 0.9,
-  "matched_operating_point": "The plain threshold's target is a sensitivity and the two conformal targets are coverages. They are set to the same number so the schemes meet at a comparable miss rate on the source corpus.",
+  "matched_operating_point": "The plain threshold is the per-label conformal quantile of the MI class: the score that 90% of the calibration MI cases clear. The plain and per-label schemes therefore share their MI threshold and miss the same MI cases on every draw; per-label adds the non-MI threshold.",
   "outcome_definitions": {
     "correct": "the set holds that label alone",
     "deferred": "the set holds both labels or neither; no machine answer",
@@ -13,26 +13,28 @@
   "n_draws": 200,
   "seed": 0,
   "provenance": {
-    "commit": "4b589da48a0eea54bf29629ecd6e5f3bc05e1ee0",
+    "commit": "2087cb15c5ee890d65c3b9d251e94be6a5f8edec",
     "producers": {
-      "scripts/outcomes.py": "ff9b268d351d0678c1e223274686fbb1e9e6098d1c0dd91848993ba1cfeb6114",
-      "scripts/shift_table.py": "b8d35d311a44d187d5ca0f92f14caf8b543409792123a9a09c3ed0318f3453d6",
-      "src/ecs/conformal.py": "c434998b704a551d55bc2206a1a3ada6d42309947b0b92db11607746dcd068dc",
-      "src/ecs/splits.py": "17f1d2fea5970c37b989ad0df925b3d19f355012bfca02aed6983ce142b5a946"
+      "scripts/outcomes.py": "f05549535bbac831b4ba80bc5d785140e6613188e4f0523addc735eb2ccd83d6",
+      "src/ecs/conformal.py": "05236c0192865fdecea3ffb28675509d390dcb20a95218a835e735786461bf92",
+      "src/ecs/ingest.py": "d7015a7c3997288a5248319f42c72ecff7d9877587131e5c3aa9e2921a5a60da",
+      "src/ecs/metrics.py": "bc3ca2b5779db9bc6145afad35dbd9764aae43956f29405aac243942780a7bea",
+      "src/ecs/report.py": "a54c532e710ebba85935ee64f01005c7a2f5fb9fc6199a03dcc7342efe928bce",
+      "src/ecs/splits.py": "ed3665f4345c238edcbcb34081e0610838c18ae5383ad30776d66117032f4deb"
     }
   },
-  "seconds": 0.5,
+  "seconds": 2.4,
   "by_corpus": {
     "ptbxl": {
       "name": "PTB-XL",
       "n_scored": {
-        "mean": 1099.14,
-        "sd": 10.0656,
+        "mean": 1099.21,
+        "sd": 10.3727,
         "n_draws": 200
       },
       "n_positive": {
-        "mean": 275.91,
-        "sd": 11.3899,
+        "mean": 275.225,
+        "sd": 12.929,
         "n_draws": 200
       },
       "prevalence": 0.2502,
@@ -40,8 +42,8 @@
         "plain": {
           "0": {
             "correct": {
-              "mean": 0.8098,
-              "sd": 0.0233,
+              "mean": 0.8035,
+              "sd": 0.0215,
               "n_draws": 200
             },
             "deferred": {
@@ -50,15 +52,15 @@
               "n_draws": 200
             },
             "wrong": {
-              "mean": 0.1902,
-              "sd": 0.0233,
+              "mean": 0.1965,
+              "sd": 0.0215,
               "n_draws": 200
             }
           },
           "1": {
             "correct": {
-              "mean": 0.8957,
-              "sd": 0.0282,
+              "mean": 0.9014,
+              "sd": 0.0248,
               "n_draws": 200
             },
             "deferred": {
@@ -67,8 +69,8 @@
               "n_draws": 200
             },
             "wrong": {
-              "mean": 0.1043,
-              "sd": 0.0282,
+              "mean": 0.0986,
+              "sd": 0.0248,
               "n_draws": 200
             }
           }
@@ -76,35 +78,35 @@
         "pooled": {
           "0": {
             "correct": {
-              "mean": 0.9192,
-              "sd": 0.0076,
+              "mean": 0.9193,
+              "sd": 0.0069,
               "n_draws": 200
             },
             "deferred": {
-              "mean": 0.0354,
-              "sd": 0.0122,
+              "mean": 0.0358,
+              "sd": 0.0116,
               "n_draws": 200
             },
             "wrong": {
-              "mean": 0.0453,
-              "sd": 0.0086,
+              "mean": 0.0449,
+              "sd": 0.009,
               "n_draws": 200
             }
           },
           "1": {
             "correct": {
-              "mean": 0.6326,
-              "sd": 0.0189,
+              "mean": 0.6331,
+              "sd": 0.0197,
               "n_draws": 200
             },
             "deferred": {
-              "mean": 0.0996,
-              "sd": 0.033,
+              "mean": 0.1016,
+              "sd": 0.0336,
               "n_draws": 200
             },
             "wrong": {
-              "mean": 0.2678,
-              "sd": 0.0313,
+              "mean": 0.2653,
+              "sd": 0.0303,
               "n_draws": 200
             }
           }
@@ -112,35 +114,35 @@
         "perlabel": {
           "0": {
             "correct": {
-              "mean": 0.8028,
-              "sd": 0.0241,
+              "mean": 0.8035,
+              "sd": 0.0215,
               "n_draws": 200
             },
             "deferred": {
-              "mean": 0.097,
-              "sd": 0.0239,
+              "mean": 0.0974,
+              "sd": 0.0225,
               "n_draws": 200
             },
             "wrong": {
-              "mean": 0.1002,
+              "mean": 0.0991,
               "sd": 0.0157,
               "n_draws": 200
             }
           },
           "1": {
             "correct": {
-              "mean": 0.7736,
-              "sd": 0.0279,
+              "mean": 0.773,
+              "sd": 0.0257,
               "n_draws": 200
             },
             "deferred": {
-              "mean": 0.1266,
-              "sd": 0.0273,
+              "mean": 0.1284,
+              "sd": 0.0266,
               "n_draws": 200
             },
             "wrong": {
-              "mean": 0.0999,
-              "sd": 0.0275,
+              "mean": 0.0986,
+              "sd": 0.0248,
               "n_draws": 200
             }
           }
@@ -164,7 +166,7 @@
         "plain": {
           "0": {
             "correct": {
-              "mean": 0.8286,
+              "mean": 0.8237,
               "sd": 0.0142,
               "n_draws": 200
             },
@@ -174,15 +176,15 @@
               "n_draws": 200
             },
             "wrong": {
-              "mean": 0.1714,
+              "mean": 0.1763,
               "sd": 0.0142,
               "n_draws": 200
             }
           },
           "1": {
             "correct": {
-              "mean": 0.9733,
-              "sd": 0.0012,
+              "mean": 0.9737,
+              "sd": 0.0015,
               "n_draws": 200
             },
             "deferred": {
@@ -191,8 +193,8 @@
               "n_draws": 200
             },
             "wrong": {
-              "mean": 0.0267,
-              "sd": 0.0012,
+              "mean": 0.0263,
+              "sd": 0.0015,
               "n_draws": 200
             }
           }
@@ -200,35 +202,35 @@
         "pooled": {
           "0": {
             "correct": {
-              "mean": 0.9176,
+              "mean": 0.9172,
               "sd": 0.0047,
               "n_draws": 200
             },
             "deferred": {
-              "mean": 0.0297,
-              "sd": 0.0083,
+              "mean": 0.0305,
+              "sd": 0.0081,
               "n_draws": 200
             },
             "wrong": {
-              "mean": 0.0526,
+              "mean": 0.0523,
               "sd": 0.0035,
               "n_draws": 200
             }
           },
           "1": {
             "correct": {
-              "mean": 0.9183,
-              "sd": 0.0024,
+              "mean": 0.9181,
+              "sd": 0.0028,
               "n_draws": 200
             },
             "deferred": {
-              "mean": 0.0173,
-              "sd": 0.0048,
+              "mean": 0.0178,
+              "sd": 0.006,
               "n_draws": 200
             },
             "wrong": {
-              "mean": 0.0644,
-              "sd": 0.0028,
+              "mean": 0.0641,
+              "sd": 0.0034,
               "n_draws": 200
             }
           }
@@ -237,34 +239,34 @@
           "0": {
             "correct": {
               "mean": 0.8237,
-              "sd": 0.0156,
+              "sd": 0.0142,
               "n_draws": 200
             },
             "deferred": {
-              "mean": 0.0805,
-              "sd": 0.0164,
+              "mean": 0.081,
+              "sd": 0.0154,
               "n_draws": 200
             },
             "wrong": {
-              "mean": 0.0958,
+              "mean": 0.0953,
               "sd": 0.0059,
               "n_draws": 200
             }
           },
           "1": {
             "correct": {
-              "mean": 0.9495,
-              "sd": 0.0057,
-              "n_draws": 200
-            },
-            "deferred": {
-              "mean": 0.0244,
+              "mean": 0.9494,
               "sd": 0.006,
               "n_draws": 200
             },
+            "deferred": {
+              "mean": 0.0243,
+              "sd": 0.0063,
+              "n_draws": 200
+            },
             "wrong": {
-              "mean": 0.0261,
-              "sd": 0.0018,
+              "mean": 0.0263,
+              "sd": 0.0015,
               "n_draws": 200
             }
           }
@@ -288,8 +290,8 @@
         "plain": {
           "0": {
             "correct": {
-              "mean": 0.5789,
-              "sd": 0.0187,
+              "mean": 0.5723,
+              "sd": 0.0183,
               "n_draws": 200
             },
             "deferred": {
@@ -298,15 +300,15 @@
               "n_draws": 200
             },
             "wrong": {
-              "mean": 0.4211,
-              "sd": 0.0187,
+              "mean": 0.4277,
+              "sd": 0.0183,
               "n_draws": 200
             }
           },
           "1": {
             "correct": {
-              "mean": 0.8365,
-              "sd": 0.0101,
+              "mean": 0.84,
+              "sd": 0.0099,
               "n_draws": 200
             },
             "deferred": {
@@ -315,8 +317,8 @@
               "n_draws": 200
             },
             "wrong": {
-              "mean": 0.1635,
-              "sd": 0.0101,
+              "mean": 0.16,
+              "sd": 0.0099,
               "n_draws": 200
             }
           }
@@ -324,35 +326,35 @@
         "pooled": {
           "0": {
             "correct": {
-              "mean": 0.7191,
+              "mean": 0.7183,
               "sd": 0.0089,
               "n_draws": 200
             },
             "deferred": {
-              "mean": 0.0597,
-              "sd": 0.0173,
+              "mean": 0.0612,
+              "sd": 0.0171,
               "n_draws": 200
             },
             "wrong": {
-              "mean": 0.2212,
-              "sd": 0.0084,
+              "mean": 0.2205,
+              "sd": 0.0082,
               "n_draws": 200
             }
           },
           "1": {
             "correct": {
-              "mean": 0.6578,
-              "sd": 0.0103,
+              "mean": 0.6568,
+              "sd": 0.0102,
               "n_draws": 200
             },
             "deferred": {
-              "mean": 0.0662,
-              "sd": 0.0185,
+              "mean": 0.0679,
+              "sd": 0.0182,
               "n_draws": 200
             },
             "wrong": {
-              "mean": 0.276,
-              "sd": 0.0082,
+              "mean": 0.2753,
+              "sd": 0.008,
               "n_draws": 200
             }
           }
@@ -360,35 +362,35 @@
         "perlabel": {
           "0": {
             "correct": {
-              "mean": 0.5725,
-              "sd": 0.0201,
+              "mean": 0.5723,
+              "sd": 0.0183,
               "n_draws": 200
             },
             "deferred": {
-              "mean": 0.1204,
-              "sd": 0.0227,
+              "mean": 0.1215,
+              "sd": 0.0217,
               "n_draws": 200
             },
             "wrong": {
-              "mean": 0.3071,
-              "sd": 0.0117,
+              "mean": 0.3062,
+              "sd": 0.0116,
               "n_draws": 200
             }
           },
           "1": {
             "correct": {
-              "mean": 0.7462,
-              "sd": 0.0097,
+              "mean": 0.7455,
+              "sd": 0.0096,
               "n_draws": 200
             },
             "deferred": {
-              "mean": 0.0936,
-              "sd": 0.0141,
+              "mean": 0.0946,
+              "sd": 0.0138,
               "n_draws": 200
             },
             "wrong": {
-              "mean": 0.1602,
-              "sd": 0.0107,
+              "mean": 0.16,
+              "sd": 0.0099,
               "n_draws": 200
             }
           }
@@ -398,38 +400,38 @@
   },
   "thresholds": {
     "plain:single": {
-      "mean": 0.2201,
-      "sd": 0.0209,
+      "mean": 0.2128,
+      "sd": 0.0198,
       "n_draws": 200
     },
     "pooled:lower": {
-      "mean": 0.4356,
-      "sd": 0.0183,
+      "mean": 0.434,
+      "sd": 0.0181,
       "n_draws": 200
     },
     "pooled:upper": {
-      "mean": 0.5644,
-      "sd": 0.0183,
+      "mean": 0.566,
+      "sd": 0.0181,
       "n_draws": 200
     },
     "perlabel:lower": {
-      "mean": 0.2132,
-      "sd": 0.0216,
+      "mean": 0.2128,
+      "sd": 0.0198,
       "n_draws": 200
     },
     "perlabel:upper": {
-      "mean": 0.3866,
-      "sd": 0.0198,
+      "mean": 0.3882,
+      "sd": 0.0199,
       "n_draws": 200
     },
     "quantile:0": {
-      "mean": 0.3866,
-      "sd": 0.0198,
+      "mean": 0.3882,
+      "sd": 0.0199,
       "n_draws": 200
     },
     "quantile:1": {
-      "mean": 0.7868,
-      "sd": 0.0216,
+      "mean": 0.7872,
+      "sd": 0.0198,
       "n_draws": 200
     }
   },

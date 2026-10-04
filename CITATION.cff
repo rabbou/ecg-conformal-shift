@@ -1,5 +1,5 @@
 cff-version: 1.2.0
-title: Threshold generalisation to external sites for ECG-AI diagnostic support
+title: Threshold generalisation across care settings and hospitals for ECG-AI diagnostic support
 message: If you use this repository, please cite it as below.
 type: software
 authors:
@@ -10,16 +10,18 @@ version: 1.0.0
 date-released: 2026-09-30
 license: MIT
 abstract: >-
-  Measures what three ways of turning the same frozen ECG classifier scores
-  into a clinical output deliver per label, and what happens to each when its
-  calibration threshold is carried unchanged to hospitals of different
-  myocardial infarction prevalence. PTB-XL as source, SPH (Shandong) and
-  ACS-ECG (Chongqing) as targets. The design is then repeated with each of
-  five corpus sources in the calibration role in turn, on five diagnoses.
-  Seven public corpora in all, counting Chapman-Shaoxing and Ningbo apart.
+  Measures the share of ill patients an ECG model's decision threshold
+  recognises once it leaves the population it was set on. On EchoNext,
+  thresholds fitted on Columbia inpatients are read on outpatients for three
+  models, beside the AUROC, the severity of disease and the local labels that
+  refit them; an infarction model is carried from PTB-XL to two Chinese
+  hospitals, and five corpora take the calibration role in turn on five
+  rhythm and conduction diagnoses. Each threshold is read as a sensitivity
+  threshold and as the per-class conformal rule that adds a referral band.
 keywords:
   - conformal prediction
   - electrocardiography
+  - structural heart disease
   - myocardial infarction
   - distribution shift
   - class-conditional coverage

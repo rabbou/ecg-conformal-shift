@@ -1,31 +1,30 @@
-# Threshold generalisation to new sites and care settings for ECG-AI diagnostic support
+# Threshold generalisation across care settings and hospitals for ECG-AI diagnostic support
 
-Infarction across hospitals: [REPORT.md](REPORT.md) · Structural heart disease, inpatients to outpatients: [ECHONEXT.md](ECHONEXT.md) · Ruben Abbou · 2026
+[REPORT.md](REPORT.md) · Ruben Abbou · 2026
 
-An ECG classifier's decision threshold is set on one population and used on others. Conformal calibration sets it so that 90% of tracings receive a set of possible diagnoses holding the right one. On PTB-XL, a German research corpus, the target holds over all tracings (89.9%) and fails within infarction (73.2%). Carried unchanged to a hospital in Chongqing, the threshold covers 72.5% of infarctions; recalibrating on 100 tracings labelled there brings it to 88.9% on the held-out tracings. At Columbia, thresholds fitted on 1,903 inpatients cover about 72% of outpatients with structural heart disease for each of the three strongest models, so the cause is the outpatients' ECGs rather than one model. Refitting them on 100 labelled outpatient ECGs brings that to between 93.4% and 97.6%, averaged over 200 draws. A site adopting such a tool has to measure coverage within each diagnosis and care setting, on its own patients.
+An ECG model's decision threshold is set on one population and used on others. At Columbia, on EchoNext, a threshold set to recognise 90% of inpatients with moderate or worse structural heart disease recognised 71.6% to 72.7% of outpatients with it, for a network trained here, the published EchoNext mini-model and the ECGFounder foundation model. Over the same move specificity rose and the AUROC barely changed, 0.815 to 0.805 for the network trained here, so a report of AUROC by care setting does not show the loss. Milder disease among outpatients explains about a third of it. Refitting on 100 labelled outpatient ECGs, about 25 of them ill, brought coverage of the ill to 93.4% to 97.6%, at a cost in specificity. An infarction model carried from a German research corpus to two Chinese hospitals lost coverage at Chongqing, where the label definition also changes, and kept it at Shandong. A site adopting such a tool has to measure sensitivity within each diagnosis and care setting, on its own patients.
 
-![Coverage by site and calibration scheme](results/figures/fig3_coverage.png)
+![AUROC and sensitivity by care setting](results/figures/fig9_care_settings.png)
 
-Coverage by site (rows) and calibration scheme (columns) as the confidence asked for rises. Red: infarction cases. Grey: all cases. Dashed: the coverage asked for.
+AUROC (left) and the sensitivity of the threshold set on inpatients (right) in each care setting of EchoNext's test split. Dashed: the 90% the threshold was set for.
 
 ## What a receiving site should measure
 
-The 90% is an average over patients and over draws of the calibration data, and an average can be met while one group of patients is failed: at PTB-XL, 89.9% of all sets hold the right diagnosis and 73.2% of infarction sets do. Fitting one threshold within each diagnosis makes the 90% hold inside each, which still depends on the patient's true diagnosis, unknown at the point of care. Nothing in this framework promises 90% to a single patient.
+The share of ill patients a threshold recognises is a property of the threshold and the population together, and it moved between care settings of one hospital while the ranking of patients held. Measuring it needs labelled cases of the disease from the receiving site: the per-class thresholds of the trained network were infinite in 86.5% of draws refitted on 25 outpatient ECGs, and usable from 100.
 
-When the model cannot rule a diagnosis out, the tracing receives a set holding both labels. That is a deferral: there is no machine answer, and a human reads the ECG. At the 90% target, PTB-XL defers about 5 tracings in 100 with one threshold for all tracings and about 10 in 100 with one threshold per diagnosis. `results/abstention.json` gives the rate per scheme and per confidence level.
-
-What happens at a third site cannot be predicted from these two. Infarction coverage rose at Shandong, to 93.6%, and fell at Chongqing. A site can reuse the measurement code, and what the measurement needs is cases of the rarer diagnosis: 865 infarctions pin coverage within that diagnosis to two points, about 5,800 tracings at Chongqing's prevalence and 86,000 at Shandong's.
+The per-class conformal rule is no substitute for that measurement. For the ill, its threshold is the sensitivity threshold; the second threshold it adds sends some patients to a human with both labels. On outpatients it gave the disease label alone to 22.5% to 35.4% of the ill and referred 36.2% to 49.1% of them, and the share it referred fell from 42.3% to 29.4% while its coverage of the ill fell, so the one figure it reports without labels gave no warning.
 
 This is a retrospective measurement study on public, de-identified data. It is not a medical device and has no regulatory status, it involved no contact with patients, and nothing here is meant to guide the care of any patient. The ethics approvals and the author's competing interests open [REPORT.md](REPORT.md).
 
 ## Design
 
-A residual network trained on PTB-XL supplies scores that are then held fixed (AUROC 0.932 for infarction on the benchmark's test fold). Three schemes turn those scores into an output. A single threshold tuned to 90% sensitivity labels every tracing. Split conformal prediction, which fits its threshold on tracings the model never trained on, either pools all of them, so the 90% holds on average, or fits one threshold within each diagnosis (Mondrian calibration), so it holds inside each. A fourth scheme, label-shift weighting, reweights the calibration tracings toward the target's estimated share of each diagnosis. Each figure is a mean over 200 draws that split PTB-XL's test patients in half.
+EchoNext holds 100,000 ECGs from Columbia, each paired with an echocardiogram. Thresholds are fitted on 1,903 inpatient ECGs of its validation split and read on the inpatient, emergency and outpatient ECGs of its test split, one per patient, with no patient in two roles. Four models score every ECG: a residual network trained on EchoNext, the published EchoNext mini-model on its authors' weights, ECGFounder frozen under one logistic regression per finding, and the same residual network frozen at random initialisation as the floor.
 
-The infarction transfer calibrates on PTB-XL and carries the threshold, with no target label reaching it, to Shandong and Chongqing. The rotation gives five corpora the calibration role in turn, each threshold spent unchanged on the other four, on five diagnoses all of them annotate: sinus rhythm, atrial fibrillation, left and right bundle-branch block, and first-degree atrioventricular block. [docs/data.md](docs/data.md) gives the label mapping.
+The infarction study trains a residual network on PTB-XL, fits its thresholds on held-out PTB-XL patients, and carries them unchanged to Shandong and Chongqing. Five corpora then take the calibration role in turn on five rhythm and conduction diagnoses. [docs/data.md](docs/data.md) gives the corpora and the label mapping.
 
 | Corpus | Country | Records in the release | Role |
 |---|---|---|---|
+| EchoNext | United States | 100,000 | structural heart disease, inpatients to outpatients |
 | PTB-XL | Germany | 21,799 | infarction source; rotation |
 | SPH (Shandong) | China | 25,770 | infarction target; rotation |
 | ACS-ECG (Chongqing) | China | 19,955 | infarction target |
@@ -33,62 +32,59 @@ The infarction transfer calibrates on PTB-XL and carries the threshold, with no 
 | Georgia | United States | 10,344 | rotation |
 | CPSC 2018 and its extension | China | 10,330 | rotation |
 
-## Structural heart disease, from inpatients to outpatients
-
-EchoNext holds 100,000 ECGs from Columbia, each paired with an echocardiogram. The label studied is moderate or worse structural heart disease on echocardiography, a composite of eleven findings that EchoNext records for each ECG. Thresholds are fitted on the 1,903 inpatient ECGs of EchoNext's validation split and applied unchanged to the 1,059 outpatient ECGs of its test split, one ECG per patient and no patient in both. Structural heart disease is present in 53.2% of the 1,903 calibration inpatients and in 25.6% of the 1,059 test outpatients.
-
-Per-label conformal calibration fits one threshold on the calibration patients with the disease and another on those without it, each placed so that 90% of its group receive a set of labels holding the right one. A patient whose set holds both labels, disease and no disease, gets no machine answer and goes to a human reader. With a separate threshold for each class, a fall in prevalence from inpatients to outpatients cannot by itself lower the coverage of patients with the disease.
-
-Four models score every ECG: a residual network trained on EchoNext for this study; the published EchoNext mini-model, run on its authors' weights; ECGFounder, a foundation model pre-trained at another hospital and frozen under one logistic regression per label; and the study's residual network frozen at random initialisation under the same regressions, the floor a pre-trained model has to clear.
-
-| Model | AUROC for the composite, whole test split | Outpatients with the disease covered | Outpatients sent to a human |
-|---|---|---|---|
-| Residual network, trained on EchoNext | 0.834 | 71.6% | 29.4% |
-| EchoNext mini-model, published weights | 0.820 | 72.7% | 32.3% |
-| ECGFounder, frozen, logistic regressions | 0.824 | 71.6% | 32.2% |
-| Random initialisation, frozen, logistic regressions | 0.792 | 78.6% | 44.2% |
-
-Among outpatients with structural heart disease, the three models with the highest AUROC (the trained network, the mini-model and ECGFounder) each cover between 71.6% and 72.7%, against the 90% asked for. When a network trained here, a network trained by the EchoNext authors and a foundation model pre-trained elsewhere lose the same coverage, the cause lies in the outpatients' ECGs rather than in one model. Milder disease among outpatients explains about a third of that loss: reweighted to the inpatients' severity, coverage of the ill reaches 76.9% to 78.7%, still short of 90%. The randomly initialised floor model covers 78.6% of outpatients with the disease because it sends 44.2% of all outpatients to a human reader. Refitting the per-label thresholds on 100 labelled outpatient ECGs, drawn 200 times from one half of the outpatients, covers between 93.4% and 97.6% of the other half's patients with the disease for the trained network, the mini-model and ECGFounder, on average over the draws.
-
-EchoNext is under PhysioNet's restricted licence, so no tracing and no per-record score is in this repository. The per-label results, the commands and how the published weights were run are in [ECHONEXT.md](ECHONEXT.md), and each model's one-page report is in [reports/transfer/](reports/transfer/).
+EchoNext is under PhysioNet's restricted licence, so no tracing and no per-record score from it is in this repository; the results hold counts and aggregate figures only.
 
 ## Reproduce
 
-Every number and figure the report prints is redrawn from the scores committed here, so no raw tracing is needed. `outcomes.py` and `subgroups.py` need PTB-XL's `ptbxl_database.csv` (6.6 MB from PhysioNet), which holds each record's patient, sex and age; point `ECS_PTBXL_DIR` at the directory holding it.
+Every number and figure the report prints is redrawn from files committed here, and `tests/test_report_numbers.py` holds the report and this page to those files. `outcomes.py`, `subgroups.py` and the other infarction tables need PTB-XL's `ptbxl_database.csv` (6.6 MB from PhysioNet), which holds each record's patient, sex and age; point `ECS_PTBXL_DIR` at the directory holding it.
 
 ```bash
-uv sync                                  # 1 min
-uv run pytest -m "not data"              # unit tests, no corpora needed, 2 min
-uv run python scripts/figures.py         # redraws every figure, 5 s
-uv run python scripts/figures.py --lang fr  # the report's five figures in French, *_fr.png
-export ECS_PTBXL_DIR=/path/to/ptbxl      # the directory with ptbxl_database.csv
-uv run python scripts/outcomes.py        # rebuilds results/outcomes.json, 3 s
-uv run python scripts/subgroups.py       # rebuilds results/subgroups.json, 23 s
+uv sync                                     # 1 min
+uv run pytest -m "not data"                 # unit tests and the report's numbers, no corpora, 2 min
+uv run python scripts/echonext_outcomes.py  # results/echonext_outcomes.json from the coverage grid, 2 s
+uv run python scripts/figures.py            # redraws every figure, 10 s
+uv run python scripts/figures.py --lang fr  # five of them in French, *_fr.png
+export ECS_PTBXL_DIR=/path/to/ptbxl         # the directory with ptbxl_database.csv
+uv run python scripts/outcomes.py           # results/outcomes.json, 5 s
+uv run python scripts/shift_table.py        # results/shift.json, 30 s
+uv run python scripts/auxiliary.py          # results/auxiliary.json, 2 min
+uv run python scripts/perturbations.py      # results/perturbations.json from the committed scores, 20 s
+uv run python scripts/subgroups.py          # results/subgroups.json, 5 min
 ```
 
-Timings are wall clock on a six-core i7-8700, CPU only; the full suite on a cold clone took 28 minutes. Re-scoring from the raw tracings, the corpus downloads and the rotation chain are in [docs/data.md](docs/data.md).
+EchoNext's own steps need the distribution. Point `ECS_ECHONEXT_DIR` at it (default `~/data/echonext`); `ECS_ECHONEXT_DERIVED` (default `~/data/echonext-derived`) and `ECS_EMBEDDING_STORE` (default `~/data/ecg-embeddings`) receive what the scripts derive from it. `scripts/echonext_transfer.py` scores a model first when its scores are missing, which for the trained network is a training run; the two published models read their weights from `data/weights/`, each checked against the SHA-256 it had when it was fetched.
+
+```bash
+uv run python scripts/echonext_provenance.py   # results/echonext_provenance.json, 5 min on CPU
+uv run python scripts/echonext_transfer.py     # the coverage grid, then echonext_outcomes.py
+uv run python scripts/echonext_severity.py     # results/echonext_severity.json
+uv run pytest -m data tests/test_echonext_data.py
+```
+
+Timings are wall clock on a six-core i7-8700, CPU only. Re-scoring from the raw tracings, the corpus downloads and the rotation chain are in [docs/data.md](docs/data.md).
 
 ## Code
 
 | Module | Role |
 |---|---|
-| `src/ecs/conformal.py` | split conformal (LAC + APS scores), Mondrian quantiles, covariate- and label-shift weighting, BBSE |
-| `src/ecs/metrics.py` | coverage, Wilson intervals, class-conditional coverage, set size, abstention, effective sample size |
-| `src/ecs/labels.py` | one comparable MI label across three annotation schemes (SCP-ECG, AHA, discharge diagnosis) |
-| `src/ecs/config.py` | corpus paths and the label vocabulary |
-| `src/ecs/small_set.py` | the five rotation diagnoses, the codes each corpus names them by, and the joins that stayed ambiguous |
-| `src/ecs/challenge.py` | the Challenge-2021 partitions: headers, SNOMED labels, completeness against the bundle manifest |
-| `src/ecs/rotation.py` | the five corpora split the same way, capped to a common size |
-| `src/ecs/encoders.py` | the five encoder arms and the chain each one demands |
+| `src/ecs/conformal.py` | the three decision rules both studies compare (`fit_thresholds`), split conformal scores and quantiles, Mondrian quantiles, label-shift weighting, BBSE |
+| `src/ecs/metrics.py` | coverage, the three outcomes of a case, Wilson and percentile intervals, set size, effective sample size |
+| `src/ecs/splits.py` | splits by patient, the calibration halves every table draws, the patient bootstrap |
+| `src/ecs/report.py` | coverage as a distribution over calibration draws, at one site and carried to others |
+| `src/ecs/transfer.py` | EchoNext: thresholds fitted on inpatients and read on each care setting, the outcome split, the ladder of local labels |
+| `src/ecs/severity.py` | EchoNext: severity of the ill and the reweighting to the inpatients' mix |
 | `src/ecs/echonext.py` | EchoNext's files, one provenance row per tracing, and its inpatient, emergency and outpatient cohorts |
-| `src/ecs/transfer.py` | thresholds fitted on a source cohort and spent unchanged on a target, and refitted on 25 to 400 target labels |
-| `src/ecs/calibration.py` | calibration curve, slope and intercept, Brier score, net benefit and positive predictive value of a probability at one site |
-| `src/ecs/transfer_report.py` | the one-page transfer report, rendered from `results/echonext_transfer.json` alone |
-| `src/ecs/embedding_store.py` | encoder vectors filed by encoder, version and tracing digest, outside the repository |
 | `src/ecs/echonext_mini.py` | the published EchoNext mini-model, rebuilt to run its own checkpoint |
+| `src/ecs/calibration.py` | calibration curve, slope and intercept, Brier score, net benefit and positive predictive value |
+| `src/ecs/ingest.py` | every corpus read into one canonical form, and the patient of each record |
+| `src/ecs/labels.py` | one comparable infarction label across three annotation schemes (SCP-ECG, AHA, discharge diagnosis) |
+| `src/ecs/models.py` | the residual network and its batched probabilities |
+| `src/ecs/small_set.py`, `src/ecs/challenge.py`, `src/ecs/rotation.py`, `src/ecs/duplicates.py` | the five rotation diagnoses, the Challenge-2021 partitions, the rotation splits and the repeated tracings |
+| `src/ecs/encoders.py`, `src/ecs/arms.py`, `src/ecs/embedding_store.py` | the five encoder arms, their probes and their cached vectors |
+| `src/ecs/provenance.py` | the producers and commit a results file records |
 | `mappings/` | the three published code tables the label mapping joins on, with provenance and digests |
 
-`pre-commit` runs `ruff`, `mypy --disallow-untyped-defs` and `pytest` on every commit, and the unit tests run again before a push.
+`pre-commit` runs `ruff`, `ruff format`, `mypy` and the unit tests, and CI runs them again on every push and pull request.
 
 ## Licence and citation
 
@@ -98,13 +94,14 @@ The committed score files hold one row per record (identifier, label, score), de
 
 ## Sources
 
+- EchoNext: Poterucha et al., *Nature* 2025, 10.1038/s41586-025-09227-0
+- EchoNext-Mini: Hughes et al., *NEJM AI* 2026, 10.1056/AIdbp2500516; dataset 10.13026/r9pp-3y42
+- ECGFounder: Li et al., arXiv:2410.04133
 - PTB-XL: Wagner et al., *Sci Data* 2020, 10.1038/s41597-020-0495-6
 - SPH: Liu et al., *Sci Data* 2022, 10.1038/s41597-022-01403-5
 - ACS-ECG: Du et al., *Sci Data* 2026, 10.1038/s41597-026-07278-0
-- PhysioNet/CinC Challenge 2021: Reyna et al., Computing in Cardiology 2021
+- PhysioNet/CinC Challenge 2021: Reyna et al., Computing in Cardiology 2021, 10.23919/CinC53138.2021.9662687
 - Split conformal: Angelopoulos & Bates, arXiv:2107.07511
-- APS: Romano, Sesia & Candès, NeurIPS 2020
-- Covariate shift: Tibshirani, Barber, Candès & Ramdas, NeurIPS 2019
 - Label conditional validity: Vovk, ACML 2012, PMLR 25:475-490
 - Conformal prediction under label shift: Podkopaev & Ramdas, UAI 2021, arXiv:2103.03323
-- BBSE: Lipton, Wang & Smola, ICML 2018
+- BBSE: Lipton, Wang & Smola, ICML 2018, arXiv:1802.03916

@@ -196,11 +196,13 @@ class TestTheFiguresDrawnFromIt:
         report = (RESULTS_DIR.parent / "REPORT.md").read_text()
         shown = re.findall(r"!\[[^\]]*\]\(([^)]+)\)", report)
         assert shown == [
+            "results/figures/fig9_care_settings.png",
             "results/figures/fig1_thresholds.png",
             "results/figures/fig2_outcomes.png",
             "results/figures/fig3_coverage.png",
             "results/figures/fig7_rotation.png",
             "results/figures/fig8_target_scale.png",
+            "results/figures/fig3_arms.png",
         ]
         for relative in shown:
             assert (RESULTS_DIR.parent / relative).exists(), relative

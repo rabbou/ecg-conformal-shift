@@ -11,7 +11,7 @@ README = REPO_ROOT / "README.md"
 
 # A number as prose prints it: digits with thousands commas, an optional decimal
 # part, an optional per cent sign; a leading minus sign is part of the number.
-NUMBER = re.compile(r"(?<![\w.])[-−]?\d[\d,]*(?:\.\d+)?%?")
+NUMBER = re.compile(r"(?<![\w.])[-−]?\d+(?:,\d{3})*(?:\.\d+)?%?")
 
 
 def pct(x: float | None, digits: int = 1) -> str:

@@ -88,7 +88,7 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     named = [p for p in ALLOWED_PARTITIONS if p != "cpsc_2018_extra"]
     result: dict[str, Any] = {
-        "bundle": str(Path(args.bundle).expanduser()),
+        "bundle": str(Path(args.bundle).expanduser()).replace(str(Path.home()), "~", 1),
         "git_commit": head_commit(),
         "partitions_read": list(ALLOWED_PARTITIONS),
         "partitions_refused": {

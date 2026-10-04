@@ -1,6 +1,6 @@
 # Corpus reference
 
-Seven public corpora feed the study, counting Chapman-Shaoxing and Ningbo apart. Each count below is of the full release unless it says otherwise; [REPORT.md](../REPORT.md) section 2.1 gives the smaller counts that were scored.
+Seven public corpora feed the study, counting Chapman-Shaoxing and Ningbo apart. Each count below is of the full release unless it says otherwise; [REPORT.md](../REPORT.md) gives the smaller counts that were scored in section 3.5 and appendix H. EchoNext is described in the report itself, section 3.1.
 
 ## Corpora, licences and downloads
 
@@ -77,7 +77,7 @@ The corpora are needed only to re-score from the raw tracings, which the committ
 uv run pytest                            # adds the corpus-backed tests
 ```
 
-On a clone that holds only the committed files, none of the corpora and no optional `timm` extra, `uv run pytest -o addopts=""` ends with `540 passed, 59 skipped, 5 warnings` and exit code 0. The 59 skipped tests are the ones that read a corpus, the Challenge-2021 collection or `timm`. The project's `addopts` already carries `-q`, so a bare `uv run pytest -q` prints the dots and the warnings without that summary line.
+On a clone that holds only the committed files, the tests that read a corpus, the Challenge-2021 collection or the optional `timm` extra skip, and the rest pass; `uv run pytest -q -m "not data"` is the selection CI runs.
 
 The rotation runs in this order, each step writing the file the next one reads.
 

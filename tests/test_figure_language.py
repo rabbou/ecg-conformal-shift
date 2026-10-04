@@ -166,7 +166,7 @@ class TestTheCleanTitles:
         monkeypatch.setattr(bilingual_figures, "_save", keep)
         assert figures.main(["--out", str(tmp_path)]) == 0
         assert figures.main(["--lang", "fr", "--out", str(tmp_path)]) == 0
-        assert len(kept) == 8 + 5
+        assert len(kept) == 7 + 5
         for figure in kept:
             for text in _texts(figure):
                 assert "--" not in text, text

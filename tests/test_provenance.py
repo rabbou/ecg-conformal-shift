@@ -89,7 +89,7 @@ NOT_REGENERABLE = {
     "external/sph.npz": "the same model's scores over 25,770 Shandong tracings",
     "perturbations.npz": (
         "six score arrays over PTB-XL fold 10: the five perturbed conditions of "
-        "section 3.5 and the unperturbed pass they are read against"
+        "appendix E and the unperturbed pass they are read against"
     ),
     # EchoNext is under a restricted licence and stays outside the repository,
     # and so do the per-record scores computed from it.

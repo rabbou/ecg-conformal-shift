@@ -195,7 +195,7 @@ def test_no_empty_set_arises_in_the_two_schemes_the_report_discusses() -> None:
     condition "below 0.5"; for the class-conditional pair it is the sum that
     matters, and the two are not interchangeable.  The weighted scheme, which
     the report reports but does not recommend, does produce empty sets at
-    Shandong, so this covers only the two schemes section 2.2 speaks for.
+    Shandong, so this covers only the two schemes the report reads at the source.
     """
     scores = dict(np.load(RESULTS_DIR / "baseline/scores.npz", allow_pickle=False))
     probs, labels = scores["probs"], scores["labels"]

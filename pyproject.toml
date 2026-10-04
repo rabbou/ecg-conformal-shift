@@ -1,7 +1,7 @@
 [project]
 name = "ecg-conformal-shift"
 version = "0.1.0"
-description = "Threshold generalisation to external sites for ECG-AI diagnostic support: a decision threshold set at one hospital, tested at others, diagnosis by diagnosis across seven public 12-lead ECG corpora."
+description = "Threshold generalisation across care settings and hospitals for ECG-AI diagnostic support: the share of ill patients a decision threshold recognises once it leaves the population it was set on, on EchoNext and seven public 12-lead ECG corpora."
 requires-python = ">=3.11,<3.12"
 dependencies = [
     "numpy>=1.26,<2",

@@ -207,13 +207,12 @@ class TestTheFigures:
 
     NAMED = {
         1: ("fig3_coverage.png", RESULTS_DIR / "shift.json"),
-        2: ("fig2_set_sizes.png", RESULTS_DIR / "shift.json"),
         3: ("fig3_arms.png", RESULTS_DIR / "arms.json"),
-        4: ("fig4_discrimination.png", RESULTS_DIR / "baseline/metrics.json"),
         5: ("fig1_thresholds.png", RESULTS_DIR / "outcomes.json"),
         6: ("fig2_outcomes.png", RESULTS_DIR / "outcomes.json"),
         7: ("fig7_rotation.png", RESULTS_DIR / "rotation.json"),
         8: ("fig8_target_scale.png", RESULTS_DIR / "target_scale.json"),
+        9: ("fig9_care_settings.png", RESULTS_DIR / "echonext_transfer.json"),
     }
 
     def test_each_figure_redraws_from_the_committed_numbers(self, tmp_path: Path) -> None:
@@ -233,7 +232,7 @@ class TestTheFigures:
         out of ``scripts/figures.py`` and the file it names.  Checking that the
         source is tracked cannot fail on that -- ``git ls-files`` succeeds for any
         tracked file whatever the commit order -- so the property is checked the
-        only way that can fail: redraw all six into a scratch directory and
+        only way that can fail: redraw every one into a scratch directory and
         compare them to the committed images pixel by pixel.  PNG bytes differ
         with the zlib level, so the pixels are compared, not the file.
         """

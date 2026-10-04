@@ -1,8 +1,9 @@
-"""The committed severity results and the ECHONEXT.md section that quotes them.
+"""The committed severity results, and the figures the report prints from them.
 
-Every figure the section prints is rebuilt here from ``results/echonext_severity.json``
-and looked for in the section's text, and the section may print no number the
-file does not hold; the verdict is replayed from the rule the file states.
+``severity_figures`` formats every figure the report's severity table and
+appendix C print, read from ``results/echonext_severity.json``;
+``tests/test_report_numbers.py`` looks for them in the report.  The verdict is
+replayed here from the rule the file states.
 """
 
 from __future__ import annotations
@@ -14,19 +15,13 @@ from typing import Any
 import pytest
 from report_text import pct
 
-from ecs.config import REPO_ROOT, RESULTS_DIR
+from ecs.config import RESULTS_DIR
 from ecs.severity import GRADES, VERDICT_RULE, verdict
 
 SEVERITY = RESULTS_DIR / "echonext_severity.json"
 TRANSFER = RESULTS_DIR / "echonext_transfer.json"
-PIECE = REPO_ROOT / "ECHONEXT.md"
-HEADING = "## Severity explains about a third of the lost coverage"
 COMPOSITE = "shd_moderate_or_greater_flag"
 ARMS = ("resnet", "echonext_mini", "ecgfounder")
-NUMBER = re.compile(r"\d[\d,]*(?:\.\d+)?%?")
-# Read in the text but not measured: the level asked for, the interval level,
-# the band edges, the bootstrap draws and the smallest stratum judged.
-CONSTANTS = {"90%", "95%", "35", "36", "45", "45,", "45%", "2,000", "30", "11"}
 NAMES = {
     "rv_systolic_function_value": (
         "normal",
@@ -43,12 +38,6 @@ VALVE_NAMES = ("none", "mild", "moderate", "severe")
 def severity() -> dict[str, Any]:
     loaded: dict[str, Any] = json.loads(SEVERITY.read_text())
     return loaded
-
-
-def section() -> str:
-    text = PIECE.read_text()
-    start = text.index(HEADING)
-    return text[start : text.index("\n## ", start + 1)]
 
 
 def interval(row: dict[str, Any], point: str, low: str, high: str) -> str:
@@ -108,39 +97,22 @@ def severity_figures(severity: dict[str, Any]) -> dict[str, str]:
     arms = [severity["arms"][a] for a in ARMS]
     shares = [a["reweighted"]["share"] for a in arms]
     reweighted = [a["reweighted"]["reweighted"] for a in arms]
-    out["share_range"] = f"between {whole(min(shares))} and\n{whole(max(shares))} of it"
+    out["share_range"] = f"between {whole(min(shares))} and {whole(max(shares))} of it"
     out["reweighted_range"] = f"{pct(min(reweighted))} to {pct(max(reweighted))}"
     above = [next(r for r in a["by_lvef"]["outpatient"] if r["stratum"] == ">45") for a in arms]
     inside = [
         next(r for r in a["by_lvef"]["inpatient_in_sample"] if r["stratum"] == ">45") for a in arms
     ]
-    out["above_45_n"] = f"{above[0]['n']}\nill outpatients"
+    out["above_45_n"] = f"{above[0]['n']} ill outpatients"
     out["above_45_range"] = (
         f"{pct(min(r['coverage'] for r in above))} to {pct(max(r['coverage'] for r in above))}"
     )
     out["above_45_inpatient_range"] = (
-        f"{pct(min(r['coverage'] for r in inside))} to\n{pct(max(r['coverage'] for r in inside))}"
+        f"{pct(min(r['coverage'] for r in inside))} to {pct(max(r['coverage'] for r in inside))}"
     )
     small = sum(not r["judged"] for r in severity["arms"]["resnet"]["by_cell"]["outpatient"])
-    out["cells_unjudged"] = f"{['None', 'One', 'Two', 'Three', 'Four', 'Five', 'Six'][small]}\nof"
+    out["cells_unjudged"] = f"{['None', 'One', 'Two', 'Three', 'Four', 'Five', 'Six'][small]} of"
     return out
-
-
-class TestSection:
-    def test_every_figure_is_in_the_section(self, severity: dict[str, Any]) -> None:
-        text = section()
-        missing = {k: v for k, v in severity_figures(severity).items() if v not in text}
-        assert missing == {}
-
-    def test_the_section_prints_no_number_the_results_do_not_hold(
-        self, severity: dict[str, Any]
-    ) -> None:
-        allowed = set(NUMBER.findall(" ".join(severity_figures(severity).values()))) | CONSTANTS
-        assert set(NUMBER.findall(section())) - allowed == set()
-
-    def test_the_verdict_the_section_states_is_the_files(self, severity: dict[str, Any]) -> None:
-        assert severity["verdict"] == "part"
-        assert "Severity explains part of the drop for each of the three arms" in section()
 
 
 class TestFile:

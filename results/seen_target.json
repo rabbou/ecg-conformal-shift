@@ -1,6 +1,6 @@
 {
-  "bundle": "/home/ruben/data/challenge2021",
-  "git_commit": "2087cb15c5ee890d65c3b9d251e94be6a5f8edec",
+  "bundle": "~/data/challenge2021",
+  "git_commit": "5da056e943907999742ccf9c792678d5056ddd8c",
   "partitions_read": [
     "chapman_shaoxing",
     "cpsc_2018",

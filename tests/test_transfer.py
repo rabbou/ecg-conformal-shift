@@ -150,6 +150,42 @@ class TestLadder:
         assert ten["coverage_pos_mean"] == 1.0
         assert zero["n_eval_pos"] > 0
 
+    def test_the_recognised_and_the_referred_add_up_to_the_coverage_of_the_ill(self) -> None:
+        for row in self.rows():
+            split = row["recognised_pos_mean"] + row["referred_pos_mean"]
+            assert split == pytest.approx(row["coverage_pos_mean"])
+            assert 0 < row["referred_pos_mean"] < row["coverage_pos_mean"]
+
+    def test_the_ill_a_rung_fits_on_are_counted_in_every_draw(self) -> None:
+        # Eight records; the split by patient puts records 2, 3, 4 and 6 in the
+        # pool, of which 4 and 6 are ill.  Three draws of two records hold two,
+        # one and no ill records.
+        y = np.array([1, 1, 0, 0, 1, 0, 1, 0])
+        p = np.where(y == 1, 0.8, 0.2)
+        patients = pd.Series([f"w{i}" for i in range(8)])
+
+        class Fixed:
+            def __init__(self) -> None:
+                self.draws = iter([np.array([4, 6]), np.array([2, 4]), np.array([2, 3])])
+
+            def choice(self, a: np.ndarray, **kw: Any) -> np.ndarray:
+                assert {4, 6, 2, 3} == set(np.asarray(a).tolist())
+                return next(self.draws)
+
+        zero, rung = ladder_rows(
+            p,
+            y,
+            p,
+            y,
+            patients,
+            rungs=(0, 2),
+            draws=3,
+            rng=Fixed(),  # type: ignore[arg-type]
+        )
+        assert (zero["fit_ill_min"], zero["fit_ill_max"]) == (4, 4)
+        assert (rung["fit_ill_min"], rung["fit_ill_max"]) == (0, 2)
+        assert rung["fit_ill_mean"] == pytest.approx(1.0)
+
     def test_target_labels_shrink_the_calibration_intercept(self) -> None:
         rows = self.rows()
         assert rows[-1]["abs_intercept_mean"] < rows[0]["abs_intercept_mean"]

@@ -111,6 +111,56 @@ class TestArms:
         assert "z-score" in result["arms"]["ecgfounder"]["run"]["input"]
 
 
+# The ladder at 100 local labels, as measured on 4 October 2026: the ill outpatients
+# recognised and referred on the evaluation half, and the ill among the 100 ECGs a
+# draw refits on (mean, fewest, most over the 200 draws).
+PINNED_LADDER = {
+    "resnet": ("55.4%", "38.0%", "24.5", 15, 36),
+    "random_init": ("41.9%", "46.9%", "24.5", 15, 36),
+    "ecgfounder": ("52.8%", "42.5%", "24.5", 15, 36),
+    "echonext_mini": ("52.3%", "45.2%", "24.5", 15, 36),
+}
+
+
+class TestLadderSplit:
+    def test_each_arm_keeps_its_split_and_its_count_of_the_ill(
+        self, result: dict[str, Any]
+    ) -> None:
+        for arm, pinned in PINNED_LADDER.items():
+            row = ladder_at(result, arm, 100)
+            measured = (
+                pct(row["recognised_pos_mean"]),
+                pct(row["referred_pos_mean"]),
+                f"{row['fit_ill_mean']:.1f}",
+                row["fit_ill_min"],
+                row["fit_ill_max"],
+            )
+            assert measured == pinned, arm
+
+    def test_the_recognised_and_the_referred_are_the_coverage_of_the_ill(
+        self, result: dict[str, Any]
+    ) -> None:
+        for arm, measured in result["arms"].items():
+            for row in measured["ladder"]["outpatient"][COMPOSITE]:
+                split = row["recognised_pos_mean"] + row["referred_pos_mean"]
+                assert split == pytest.approx(row["coverage_pos_mean"]), (arm, row["labels"])
+
+    def test_rung_zero_recognises_what_the_outcome_table_recognises_on_all_outpatients(
+        self, result: dict[str, Any]
+    ) -> None:
+        """Rung zero reads half the outpatients; it stays within its own sampling error."""
+        outcomes = json.loads((RESULTS_DIR / "echonext_outcomes.json").read_text())
+        for arm in result["arms"]:
+            whole = outcomes["arms"][arm]["outpatient"]["perlabel"]["ill"]["recognised"]["share"]
+            half = ladder_at(result, arm, 0)["recognised_pos_mean"]
+            assert abs(whole - half) < 0.05, arm
+
+
+def ladder_at(result: dict[str, Any], arm: str, rung: int) -> dict[str, Any]:
+    rows = result["arms"][arm]["ladder"]["outpatient"][COMPOSITE]
+    return dict(next(r for r in rows if r["labels"] == rung))
+
+
 class TestCohorts:
     def test_one_ecg_per_patient_in_calibration_and_targets(self, result: dict[str, Any]) -> None:
         assert result["source"]["n"] == result["source"]["patients"]

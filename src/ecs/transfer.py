@@ -313,7 +313,9 @@ def ladder_rows(
     The target is cut once, by patient, into a pool and an evaluation half.  Rung
     zero spends the source thresholds; rung n refits the per-label thresholds and
     an intercept shift on n records drawn from the pool, and every rung is read
-    on the same evaluation half.
+    on the same evaluation half.  Coverage of the ill is split, draw by draw, into
+    the recognised (the disease label alone) and the referred (both labels), and
+    the ill among the records a rung fits on are counted in every draw.
     """
     y_tgt = np.asarray(y_tgt, dtype=int)
     part = patient_split(patients, {"pool": POOL_SHARE, "eval": 1 - POOL_SHARE}, seed).to_numpy()
@@ -325,6 +327,7 @@ def ladder_rows(
         if rung > len(pool):
             break
         pos, neg, citl, infinite = [], [], [], 0
+        recognised, referred, referred_all, fit_ill = [], [], [], []
         for _ in range(draws if rung else 1):
             if rung:
                 drawn = rng.choice(pool, size=rung, replace=False)
@@ -334,6 +337,11 @@ def ladder_rows(
             sets = conformal_sets(fit_p, fit_y, p_eval)["perlabel"]
             covered = sets[np.arange(len(y_eval)), y_eval]
             pos.append(covered[y_eval == 1].mean())
+            ill = sets[y_eval == 1]
+            recognised.append((ill[:, 1] & ~ill[:, 0]).mean())
+            referred.append(ill.all(axis=1).mean())
+            referred_all.append(sets.all(axis=1).mean())
+            fit_ill.append(int(fit_y.sum()))
             neg.append(covered[y_eval == 0].mean())
             infinite += int(sets[:, 1].all())
             shift = _intercept_shift(fit_y, fit_p) if rung else 0.0
@@ -346,6 +354,12 @@ def ladder_rows(
                 "coverage_pos_p10": float(np.percentile(pos, 10)),
                 "coverage_pos_p90": float(np.percentile(pos, 90)),
                 "coverage_neg_mean": float(np.mean(neg)),
+                "recognised_pos_mean": float(np.mean(recognised)),
+                "referred_pos_mean": float(np.mean(referred)),
+                "referred_all_mean": float(np.mean(referred_all)),
+                "fit_ill_mean": float(np.mean(fit_ill)),
+                "fit_ill_min": min(fit_ill),
+                "fit_ill_max": max(fit_ill),
                 "share_all_flagged": infinite / (draws if rung else 1),
                 "abs_intercept_mean": float(np.mean(citl)),
                 "n_eval": len(held),

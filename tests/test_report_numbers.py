@@ -42,6 +42,9 @@ LITERATURE = {
     "[23] Millar 2026": {"85.8%", "77.5%", "3", "1.5"},
 }
 
+# Figures of the tagged release v1.0.0 that the text quotes as such.
+EARLIER = {"v1.0.0, section 3.4, the pooled sex gap's interval": {"−0.2", "22.6"}}
+
 # Constants of the design, not results: each is named with what it is.
 CONSTANTS = {
     "0": "seed 0, and the records a corpus loses at read time where it loses none",
@@ -137,7 +140,7 @@ def typed(template: str) -> set[str]:
 
 
 def allowed() -> set[str]:
-    cited = " ".join(" ".join(v) for v in LITERATURE.values())
+    cited = " ".join(" ".join(v) for v in (LITERATURE | EARLIER).values())
     return set(NUMBER.findall(cited)) | set(NUMBER.findall(" ".join(CONSTANTS)))
 
 
@@ -160,7 +163,7 @@ def test_every_constant_and_cited_figure_is_still_typed() -> None:
         (TEMPLATES / "README.md").read_text()
     )
     named = set(NUMBER.findall(" ".join(CONSTANTS)))
-    cited = {n for v in LITERATURE.values() for n in NUMBER.findall(" ".join(v))}
+    cited = {n for v in (LITERATURE | EARLIER).values() for n in NUMBER.findall(" ".join(v))}
     assert (named | cited) - used == set()
 
 
@@ -214,6 +217,44 @@ class TestClaims:
             assert ill["recognised"]["share"] + ill["referred"]["share"] == pytest.approx(covered)
             assert ill["recognised"]["share"] < covered
 
+    def test_the_sex_gap_is_not_called_established(self) -> None:
+        """One of eighteen uncorrected differences, whose sign flipped with the code path."""
+        text = REPORT.read_text()
+        assert "neither the gap nor its repair is established" in text
+        assert "cannot settle either claim" in text
+        assert "excludes zero by under a point" not in text
+        assert "excludes it by under a point" not in text
+
+    def test_age_gradients_are_read_within_the_label(self) -> None:
+        """Class-conditional coverage at a fixed threshold cannot see prevalence."""
+        text = REPORT.read_text()
+        assert "prevalence gradient" not in text
+        assert "depends only on how that label's tracings score" in text
+
+    def test_the_rotation_chow_gap_is_read_as_the_correction(self) -> None:
+        """The rotation's Chow rule is section 4's construction minus the correction."""
+        text = REPORT.read_text()
+        assert "the conformal apparatus still adds only the correction" in text
+        assert "does not carry to other corpora" not in text
+        assert "not about the rotation" not in text
+
+    def test_a_hundred_labels_come_within_a_point_and_a_tenth_of_draws_fall_short(
+        self,
+    ) -> None:
+        """The conclusion's reading of the two ladders at 100 labels."""
+        rungs = {
+            r["n_target_records"]: r["coverage_by_class"]["1"]["mean"]
+            for r in f.read("target_scale.json")["rows"]
+            if (r["alpha"], r["score"], r["correction"], r["family"])
+            == (0.1, "lac", "none", "recalibrated")
+        }
+        assert 0.885 <= rungs[100] < 0.9
+        at_100 = [f.ladder(arm)[100] for arm in f.STRONGEST]
+        assert all(s["coverage_pos_mean"] >= 0.9 for s in at_100)
+        assert any(s["coverage_pos_p10"] < 0.9 for s in at_100)
+        assert "one draw in ten still fell below 90% on EchoNext" in REPORT.read_text()
+        assert "were enough here" not in REPORT.read_text()
+
 
 class TestReadme:
     def test_the_page_points_at_the_one_report(self) -> None:
@@ -221,3 +262,9 @@ class TestReadme:
         assert "](REPORT.md)" in text
         assert "ECHONEXT.md" not in text
         assert "reports/transfer" not in text
+
+    def test_the_page_states_the_shared_training_split(self) -> None:
+        """Three arms fitted to one split are not three independent tests of the cause."""
+        text = README.read_text()
+        assert "the cause" not in text
+        assert text.count("fitted to the same EchoNext training split") == 2

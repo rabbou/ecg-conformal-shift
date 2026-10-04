@@ -6,8 +6,8 @@ authors:
   - family-names: Abbou
     given-names: Ruben
 repository-code: https://github.com/rabbou/ecg-conformal-shift
-version: 1.0.0
-date-released: 2026-09-30
+version: 1.2.0
+date-released: 2026-10-05
 license: MIT
 abstract: >-
   Measures what three ways of turning the same frozen ECG classifier scores

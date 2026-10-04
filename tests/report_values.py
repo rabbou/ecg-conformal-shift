@@ -14,7 +14,7 @@ from functools import cache
 from typing import Any
 
 import report_figures as f
-from report_infarction import infarction_values, word
+from report_infarction import _shift_rows, infarction_values, word
 from report_text import pct
 from test_rotation_report import GROUPS, _cases, _finite, _grid, _mean_pct, _read, starved
 
@@ -148,6 +148,15 @@ def rotation_values() -> dict[str, str]:
     median = chow["by_correction"]["mondrian"]["median"]
     correction = f.read("auxiliary.json")["correction"]["correction_worth_points"] / 100
     marginal = statistics.mean(float(r["coverage_mean"]) for r in home["none"])
+    infarction = _shift_rows()["none"]["by_corpus"]["ptbxl"]["prevalence"]
+    rarer = [r for r in home["none"] if float(r["prevalence"]) < infarction]
+    (common,) = [r for r in home["none"] if r not in rarer]
+    assert (common["source"], common["label"]) == ("ptbxl", "NSR"), "the one exception named"
+    # The rotation's Chow gap is the correction itself, larger because the
+    # per-class calibration samples are smaller than PTB-XL's infarctions.
+    per_class = [float(r["prevalence"]) * float(r["calibration_n_mean"]) for r in home["none"]]
+    minority = f.read("outcomes.json")["by_corpus"]["ptbxl"]["n_positive"]["mean"]
+    assert statistics.median(per_class) < minority
     diagnosis = statistics.mean(float(r["coverage_diagnosis_mean"]) for r in home["none"])
     starving = {
         c: len(
@@ -170,10 +179,16 @@ def rotation_values() -> dict[str, str]:
         "w.rot.starved": word(len(starved())),
         "w.rot.home_gap": word(round(100 * (marginal - diagnosis))),
         "w.rot.chow_times": word(round(median / correction)),
+        "rot.rarer_n": str(len(rarer)),
+        "rot.home_median_prevalence": pct(
+            statistics.median(float(r["prevalence"]) for r in home["none"])
+        ),
+        "rot.nsr_ptbxl.prevalence": pct(float(common["prevalence"])),
+        "rot.nsr_ptbxl.diagnosis": pct(float(common["coverage_diagnosis_mean"])),
         "rot.cells.away_n": str(sum(r["role"] == "away" for r in grid)),
         "rot.cells.home_n": str(sum(r["role"] == "home" for r in grid)),
         "rot.cells.holdout_n": str(sum(r["role"] not in ("home", "away") for r in grid)),
-        "rot.discussion.chow": f"differ by a median of {median:.3f} in coverage",
+        "rot.discussion.chow": f"correction is worth a median of {100 * median:.1f} points",
         "rot.limitations.mondrian_pairs": f"{word(starving['mondrian'])} source-diagnosis pairs "
         "of section 3.6",
         "rot.limitations.weighted_pairs": f"reweights, {word(starving['weighted'])} do",

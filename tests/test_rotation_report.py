@@ -578,7 +578,8 @@ def test_the_discussion_and_limitations_quote_the_same_files(report: str) -> Non
     for what, expected in (
         (
             "chow over the rotation",
-            f"differ by a median of {chow['by_correction']['mondrian']['median']:.3f} in coverage",
+            "correction is worth a median of "
+            f"{100 * chow['by_correction']['mondrian']['median']:.1f} points",
         ),
         ("mondrian pairs", f"{_word(counts['mondrian'])} source-diagnosis pairs of section 3.6"),
         ("weighted pairs", f"reweights, {_word(counts['weighted'])} do"),

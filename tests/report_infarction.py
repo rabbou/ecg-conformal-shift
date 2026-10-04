@@ -230,7 +230,7 @@ def subgroup_figures() -> dict[str, str]:
     # The claims of section 3.4 and of the subgroup limitation.
     assert age_all_ci[0] > 0 and age_non_ci[0] > 0
     assert age_mi["ci95"][0] < 0 < age_mi["ci95"][1]
-    assert 0 < sex_pooled_ci[0] < 0.01, "the pooled sex gap excludes zero by under a point"
+    assert abs(sex_pooled_ci[0]) < 0.01, "the pooled sex gap's interval sits at zero's edge"
     assert sex_per_ci[0] < 0 < sex_per_ci[1]
     young, old = counts[SUBGROUPS["young"]], counts[SUBGROUPS["old"]]
     out |= {
@@ -253,6 +253,7 @@ def subgroup_figures() -> dict[str, str]:
         "sg.women_mi_n": str(counts[SUBGROUPS["women"]]["n_mi"]),
         "sg.old_mi_n": str(old["n_mi"]),
         "w.subgroup_cells": word(sum(len(cells) for cells in cov.values())),
+        "w.sg.differences": word(len(diff)),
     }
     return out
 

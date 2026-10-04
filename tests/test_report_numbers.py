@@ -1,126 +1,116 @@
-"""Every number REPORT.md and README.md print is a number a file under ``results/`` holds.
+"""Every number REPORT.md and README.md print is a named figure read from ``results/``.
 
-Three checks, each on the text as committed:
+The two documents are rendered from ``docs/templates/``, where each computed
+number is written as ``{{name}}`` and resolved by ``tests/report_values.py``.
+Three checks hold the text to the files:
 
-  every table row is rebuilt from its results file and must appear verbatim;
-  every figure the prose quotes is rebuilt with the words around it and must
-  appear verbatim, so a figure that moved in its file fails here;
-  every number left in the prose must be one of those, a figure of a cited
-  source, or a constant of the design named below with its reason, so a
-  number typed by hand fails here.
+  the committed text is the template rendered from the committed results, so a
+  number changed by hand fails here even when it equals another figure a file
+  holds, and a results file that moved fails here until the text is rendered;
+  every number the template still types is a figure of a cited source or a
+  constant of the design named below with its reason;
+  every claim the prose makes about its figures is asserted where the figure is
+  built, in ``report_infarction.py`` and ``report_values.py``.
 
-The rotation appendix is held figure by figure by ``tests/test_rotation_report.py``;
-its figures join the allowed set here.
+Rendering: ``uv run python tests/report_render.py --write``.
 """
 
 from __future__ import annotations
 
 import re
-from functools import cache
+from pathlib import Path
 
 import pytest
 import report_figures as f
+from report_render import PLACEHOLDER, TEMPLATES, render, rendered
 from report_text import NUMBER, README, REPORT
-from test_rotation_report import GROUPS, _cases
 
 # Figures quoted from the cited papers, by the reference that holds them.
 LITERATURE = {
-    "[1] Poterucha 2025, Table 2": {"84.3%", "84.1%"},
-    "[2] Hughes 2026": {"82.0%", "70.1%", "77.9%", "70%", "100,000", "0.1", "99.9"},
-    "[3] Holste 2025, Figure 2": {"0.92", "0.98", "0.97", "0.99", "0.80", "0.94"},
-    "[4] Attia 2021": {"4,277", "0.82", "0.256", "26.9%"},
-    "[5] Carter 2026": {"84.5%", "83.6%", "0.45"},
-    "[6] Otabor 2026": {"0.790", "0.820", "0.796", "0.773"},
-    "[7] Poterucha 2026": {"65", "85"},
-    "[11] de Vries 2023": {"13.0%"},
-    "[13] Millar 2026": {"85.8%", "77.5%", "3", "1.5"},
-    "[17] El Allam 2026": {"3.06", "0.12"},
-    "[18] Li 2024": set(),
+    "[7] Dzikowicz 2025": {"0.923", "0.932", "0.943", "84.8%", "86.7%"},
+    "[8] Folgado 2025": {"62", "20", "0.53", "0.67", "0.62", "-0.20"},
+    "[9] Wagner 2020, the privacy age and the recording years": {"89", "300", "1989", "1996"},
+    "[14] Kinalioglu 2026": {"90.0%", "7.5%", "82.5%"},
+    "[15] El Allam 2026": {"36.4%", "91.64%", "88.59%", "90.65%", "90.53%", "3.06", "0.12"},
+    "[16] Chow 1970": {"1970"},
+    "[17] Poterucha 2025, Table 2": {"84.3%", "84.1%"},
+    "[18] Hughes 2026": {"82.0%", "0.1", "99.9"},
+    "[19] Attia 2021": {"4,277", "0.82", "26.9%"},
+    "[20] Carter 2026": {"84.5%", "83.6%"},
+    "[21] Otabor 2026": {"0.790", "0.820"},
+    "[22] Poterucha 2026": {"65", "85"},
+    "[23] Millar 2026": {"85.8%", "77.5%", "3", "1.5"},
 }
 
 # Constants of the design, not results: each is named with what it is.
 CONSTANTS = {
-    "90%": "the sensitivity and the coverage the thresholds are set for",
-    "0.9": "the same level, in the rank formula",
-    "1": "the (n+1) of the conformal rank",
-    "95%": "the level of every interval",
-    "80%": "the target of the encoder comparison",
-    "100": "the rung of the ladder the report reads",
-    "25": "the lowest rung of the ladder",
-    "50": "a rung of the ladder; also the lower edge of an age band",
-    "200": "the calibration draws, and a rung of the ladder",
-    "400": "the top rung of the EchoNext ladder",
-    "500": "a rung of the Chongqing ladder, and the AUROC bootstrap draws",
-    "2,000": "the severity bootstrap draws and the top rung of the Chongqing ladder",
-    "30": "the smallest severity cell judged on its own",
-    "10": "the length of an EchoNext tracing in seconds; ten ill patients, the floor of appendix D",
-    "250": "EchoNext's sampling rate in Hz",
-    "500 Hz": "ECGFounder's sampling rate",
-    "12": "the leads, and the outputs of the trained network",
-    "45%": "the ejection-fraction threshold of the EchoNext label",
-    "35%": "a severity band edge of ejection fraction",
-    "36%": "a severity band edge of ejection fraction",
-    "35": "a severity band edge",
-    "36": "a severity band edge",
-    "45": "a severity band edge and the pulmonary pressure threshold of the label",
-    "1.3": "the wall-thickness threshold of the label, cm",
-    "3.2": "the tricuspid velocity threshold of the label, m/s",
-    "8": "the folds of PTB-XL used for training (1 to 8)",
+    "0": "seed 0, and the records a corpus loses at read time where it loses none",
+    "1": "the (n+1) of the conformal rank, and the first PTB-XL fold",
+    "2": "a stride of the network; the 2 September literature search",
+    "4": "the 4 September search; the 4·10⁻³ of the determinism probe",
+    "5": "the day of the draft",
+    "7": "the kernel width of the network",
+    "8": "the PTB-XL training folds (1 to 8); the 8 September search",
     "9": "PTB-XL's validation fold",
-    "2018": "part of a corpus name, CPSC 2018",
-    "2021": "part of a corpus name, the Challenge-2021 collection",
-    "8700": "the CPU model the timings were taken on, i7-8700",
-    "0": "seed 0",
-    "15233e93": "the IntroECG commit the weights come from",
-    "4,082,306": "the parameter count of the infarction network, results/timing.json",
-    "19,955": "Chongqing's released tracings, results/ingest_report.json",
-    "1,995": "Chongqing's unlabelled tracings",
-    "17,955": "Chongqing's tracings read",
-    "2017": "Wang et al. 2017, the architecture's source",
+    "10": "PTB-XL's test fold; the 10% that the 90% sensitivity leaves out",
+    "12": "the leads",
+    "15": "the stem convolution's width",
+    "23": "the download date of the public corpora, 23 August 2026",
+    "25": "the lowest rung of the EchoNext ladder",
+    "30": "the smallest severity cell judged on its own",
+    "35": "a severity band edge of ejection fraction",
+    "36": "a severity band edge of ejection fraction",
+    "45": "the ejection-fraction threshold of the EchoNext label and a severity band edge",
+    "50": "a rung of the ladder and the lower edge of an age band",
+    "64": "the stem's channels and the batch size; the upper edge of an age band",
+    "75": "the lower edge of the oldest age band",
+    "90": "the 90 cases in 100 of a 90% target; the 90th percentile",
+    "100": "the rung of the ladders the report reads; per 100 patients",
+    "128": "a stage width of the network",
+    "200": "the calibration draws, and a rung of the EchoNext ladder",
+    "250": "EchoNext's sampling rate in Hz",
+    "256": "a stage width of the network",
+    "400": "the top rung of the EchoNext ladder",
+    "500": "PTB-XL's sampling rate in Hz; the AUROC bootstrap draws; a Chongqing rung",
+    "2,000": "the bootstrap replicates, and the top rung of the Chongqing ladder",
+    "5,000": "the samples of a ten-second tracing at 500 Hz",
+    "0.10": "the α of the 90% target",
+    "0.3": "the frequency of the baseline wander fault, Hz",
+    "0.5": "the amplitude of the baseline wander fault, mV",
+    "0.8": "the gain of the first scaling fault",
+    "1.25": "the gain of the second scaling fault",
+    "10%": "the calibration MI cases below the 90%-sensitivity point",
+    "45%": "the ejection-fraction threshold of the EchoNext label",
+    "80%": "the second confidence level the results files carry",
+    "90%": "the sensitivity and the coverage the thresholds are set for",
+    "95%": "the level of every interval",
     "1989–96": "PTB-XL's recording years",
     "2019–20": "Shandong's recording years",
     "2015–24": "Chongqing's recording years",
-    "2026": "the year of the report and of several sources",
-    "4": "the day of the report's date",
+    "2017": "Wang et al. 2017, the architecture's source",
+    "2018": "part of a corpus name, CPSC 2018",
+    "2021": "part of a corpus name, the Challenge-2021 collection",
+    "2026": "the year of the draft and of the download",
     "2024-256-01": "the Chongqing ethics approval number",
     "2020-1": "the PTB-XL ethics approval number, PTB-2020-1",
-    "1.1.1": "the EchoNext release",
-    "10⁻³": "the learning rate",
-    "10⁻²": "the weight decay",
-    "64": "the batch size",
+    "2.2.2": "the PyTorch release the runs used",
+    "3.11.15": "the Python release the runs used",
+    "8700": "the CPU model the timings were taken on, i7-8700",
+    "15233e93": "the IntroECG commit the weights come from",
+    "4,082,306": "the parameter count of the infarction network, results/timing.json",
     "21,799": "PTB-XL's released records",
     "25,770": "Shandong's released records",
+    "19,955": "Chongqing's released records",
     "45,152": "Chapman-Shaoxing and Ningbo's released records",
     "10,344": "Georgia's released records",
     "10,330": "CPSC's released records",
     "6.6": "the size of ptbxl_database.csv in MB",
-    "2": "a timing in the README",
-    "5": "a timing in the README",
-    "20": "a timing in the README",
+    "28": "the minutes the full suite took on a cold clone",
 }
 
-
-@cache
-def figures() -> dict[str, str]:
-    out = f.echonext_figures() | f.extra_figures()
-    out |= {f"inf.{k}": v for k, v in f.infarction_figures().items()}
-    out |= {f"pool.{k}": v for k, v in f.pooled_figures().items()}
-    out |= {f"sev.{k}": v.replace("\n", " ") for k, v in f.severity_strings().items()}
-    out |= {f"sev.{k}": v for k, v in f.severity_counts().items()}
-    return out
-
-
-TABLES = (
-    "cohort_rows",
-    "operating_rows",
-    "split_rows",
-    "severity_rows",
-    "ladder_rows",
-    "site_rows",
-    "severity_compare_rows",
-    "finding_rows",
-    "perturbation_rows",
-    "subgroup_rows",
+SECTION = re.compile(
+    r"\b(?:Tables?|Figures?|figures?|tables?|[Ss]ections?) [A-H]?\d+(?:\.\d+)?"
+    r"(?:(?:,| to| and) \d+(?:\.\d+)?)*"
 )
 
 
@@ -138,136 +128,70 @@ def prose(text: str) -> str:
     text = re.sub(r"doi:\S+|arXiv:\S+|PMID \d+|\b10\.\d{4,5}/\S+", " ", text)
     text = re.sub(r"^#+ .*$", " ", text, flags=re.M)
     text = re.sub(r"^\d+\. ", " ", text, flags=re.M)
-    text = re.sub(r"(Table|Figure|figure|table|section|appendix|Appendix) [A-H]?\d+", " ", text)
-    return text
+    return SECTION.sub(" ", text)
+
+
+def typed(template: str) -> set[str]:
+    """The numbers a template writes itself rather than reading them from a file."""
+    return set(NUMBER.findall(prose(PLACEHOLDER.sub(" ", template))))
 
 
 def allowed() -> set[str]:
-    values = set(figures().values())
-    for name in TABLES:
-        values |= set(getattr(f, name)())
-    for group in GROUPS:
-        values |= {expected for _, expected in _cases(group)}
-    numbers = set(NUMBER.findall(" ".join(values)))
-    for cited in LITERATURE.values():
-        numbers |= set(NUMBER.findall(" ".join(cited)))
-    return numbers | set(NUMBER.findall(" ".join(CONSTANTS)))
+    cited = " ".join(" ".join(v) for v in LITERATURE.values())
+    return set(NUMBER.findall(cited)) | set(NUMBER.findall(" ".join(CONSTANTS)))
 
 
-# The prose's figures with the words around them, rebuilt from the files.
-def report_fragments() -> dict[str, str]:
-    g = figures()
-    return {
-        "abstract cohorts": f"{g['records']} ECGs from Columbia",
-        "abstract fit": f"fitted on {g['calibration_ecgs']} inpatient ECGs and applied unchanged "
-        f"to {g['outpatient_ecgs']} outpatient ECGs",
-        "abstract sensitivity": f"recognised {g['strongest_low']} to {g['strongest_high']} of the "
-        f"{g['ill_out_n']} outpatients",
-        "abstract specificity": f"from {g['spec_in_low']}–{g['spec_in_high']} among test "
-        f"inpatients to {g['spec_out_low']}–{g['spec_out_high']} among outpatients",
-        "abstract auroc": f"from {g['resnet_auroc_in']} to {g['resnet_auroc_out']}",
-        "abstract recognised": f"alone to {g['recognised_low']} to {g['recognised_high']} of ill "
-        f"outpatients and referred {g['referred_low']} to {g['referred_high']}",
-        "abstract severity": f"accounted for {g['share_low']} to {g['share_high']} of the lost",
-        "abstract ladder": f"coverage of the ill to {g['ladder_low']} to {g['ladder_high']}",
-        "abstract infarction": f"covered {g['inf.acs_per_mi']} of infarctions at Chongqing",
-        "abstract shandong": f"and {g['inf.sph_per_mi']} at Shandong",
-        "training split": f"The training split ({g['training_ecgs']} ECGs)",
-        "mini auroc": f"test-split AUROC of {g['mini_auroc_test']} replays",
-        "ladder halves": f"evaluation half of {g['ladder_eval']} ECGs, {g['ladder_eval_ill']} of "
-        "them ill",
-        "ladder draws": f"drawn from the pool, {g['ladder_draws']} times",
-        "inpatient sensitivity": f"it recognised {g['sens_in_low']} to {g['sens_in_high']}.",
-        "ppv": f"was right for {g['resnet_ppv_out']} of outpatients flagged",
-        "ppv from inpatients": f"would have been {g['resnet_ppv_from_in']}",
-        "prevalence": f"At the outpatients' prevalence of {g['prevalence_out']}",
-        "emergency": f"recognised {g['emergency_sens']} of the ill",
-        "lvef": f"the finding the model reads best, {g['lvef_sens_out']}",
-        "spread": f"within {g['spread_points']} points of one another",
-        "floor": f"recognised more of the ill, {g['floor_sens_out']}",
-        "floor specificity": f"specificity among outpatients was {g['floor_spec_out']}",
-        "floor referred": f"it referred {g['floor_referred_out']} of outpatients",
-        "false alarms": f"false alarms fell to {g['false_alarm_low']} to {g['false_alarm_high']}",
-        "referred all": f"referring {g['referred_all_low']} to {g['referred_all_high']} of all",
-        "no alarm": f"fell from {g['resnet_referred_in']} among test inpatients to "
-        f"{g['resnet_referred_out']} among outpatients",
-        "no alarm coverage": f"fell from {g['resnet_sens_in']} to {g['resnet_sens_out']}",
-        "one finding": f"recognised {g['sev.resnet:by_findings:1']} of ill outpatients with one",
-        "two findings": f"and {g['sev.resnet:by_findings:2+']} of those with two or more",
-        "reweighted": f"rose to {g['reweighted_low']} to {g['reweighted_high']} across",
-        "share": f"severity explained {g['share_low']} to {g['share_high']} of the drop",
-        "above 45": f"Of the {g['sev.above_45_n']} whose ejection fraction is above 45%, "
-        f"{g['sev.above_45_range']} were covered, against {g['sev.above_45_inpatient_range']}",
-        "ladder 100": f"covered {g['ladder_low']} to {g['ladder_high']} of the ill outpatients",
-        "ill in 100": f"hold about {g['ladder_ill_in_100']} ill patients",
-        "healthy cost": f"fell from {g['healthy_before']} to {g['healthy_after']}",
-        "ladder 25": f"infinite in {g['ladder_25_flagged']} of draws",
-        "ptbxl": f"covered {g['inf.ptbxl_per_mi']} of infarctions on held-out PTB-XL",
-        "shandong": f"{g['inf.sph_per_mi']} at Shandong ({g['inf.sph_wilson']} on its "
-        f"{g['inf.sph_mi_n']} infarctions)",
-        "chongqing": f"{g['inf.acs_per_mi']} at Chongqing ({g['inf.acs_wilson']} on "
-        f"{g['inf.acs_mi_n']})",
-        "chongqing other": f"non-infarction class fell to {g['inf.acs_per_non']}",
-        "auroc chongqing": f"fell from {g['inf.baseline_auroc']} on PTB-XL to {g['acs_auroc']}",
-        "chongqing ladder": f"from {g['inf.ladder_0']} to {g['inf.ladder_100']} on the tracings",
-        "chongqing ladder tail": f"leaving it at {g['inf.ladder_500']} and {g['inf.ladder_2000']}",
-        "chongqing infarctions": f"hold {g['inf.ladder_100_mi']} infarctions on average",
-        "about": f"recognised about {g['strongest_about']} of outpatients with it",
-        "women": f"recognised {g['women']} of ill women ({g['women_ci']})",
-        "men": f"and {g['men']} of ill men ({g['men_ci']})",
-        "pooled ptbxl": f"covered {g['pool.ptbxl_all']} of all tracings and {g['pool.ptbxl_mi']} "
-        f"of infarctions, giving the non-infarction label alone to {g['pool.ptbxl_mi_wrong']}",
-        "pooled targets": f"covered {g['pool.sph_mi']} of infarctions at Shandong and "
-        f"{g['pool.acs_mi']} at Chongqing",
-        "pooled echonext": f"covered {g['pool.resnet_pooled_out']} of ill outpatients",
-        "baseline": f"its AUROC is {g['inf.baseline_auroc']} ({g['inf.baseline_low']} to "
-        f"{g['inf.baseline_high']})",
-        "fold 10": f"({g['inf.fold10']} tracings, {g['inf.fold10_mi']} infarctions)",
-        "correction": f"is worth {g['inf.correction_points']} of a coverage point",
-        "provenance": f"records for all {g['records']}",
-    }
+@pytest.mark.parametrize("target", [REPORT, README], ids=lambda p: p.name)
+class TestRendering:
+    def test_the_committed_text_is_its_template_rendered_from_results(self, target: Path) -> None:
+        assert target.read_text() == rendered(target), (
+            f"{target.name} differs from its rendering: "
+            "uv run python tests/report_render.py --write"
+        )
+
+    def test_the_template_types_no_number_a_file_should_give(self, target: Path) -> None:
+        template = (TEMPLATES / target.name).read_text()
+        assert typed(template) - allowed() == set()
 
 
-def readme_fragments() -> dict[str, str]:
-    g = figures()
-    return {
-        "auroc": f"{g['resnet_auroc_in']} to {g['resnet_auroc_out']} for the network trained here",
-        "no alarm": f"fell from {g['resnet_referred_in']} to {g['resnet_referred_out']} while",
-        "sensitivity": f"recognised {g['strongest_low']} to {g['strongest_high']} of outpatients",
-        "ladder": f"about {g['ladder_ill_in_100']} of them ill, brought coverage of the ill to "
-        f"{g['ladder_low']} to {g['ladder_high']}",
-        "ladder 25": f"infinite in {g['ladder_25_flagged']} of draws refitted on 25",
-        "recognised": f"alone to {g['recognised_low']} to {g['recognised_high']} of the ill and "
-        f"referred {g['referred_low']} to {g['referred_high']}",
-        "records": f"EchoNext holds {g['records']} ECGs",
-        "calibration": f"fitted on {g['calibration_ecgs']} inpatient ECGs",
-        "releases": f"| EchoNext | United States | {g['records']} |",
-    }
+def test_every_constant_and_cited_figure_is_still_typed() -> None:
+    """A constant nobody types any more is a door left open for a typed number."""
+    used = typed((TEMPLATES / "REPORT.md").read_text()) | typed(
+        (TEMPLATES / "README.md").read_text()
+    )
+    named = set(NUMBER.findall(" ".join(CONSTANTS)))
+    cited = {n for v in LITERATURE.values() for n in NUMBER.findall(" ".join(v))}
+    assert (named | cited) - used == set()
 
 
-class TestReport:
-    @pytest.mark.parametrize("table", TABLES)
-    def test_every_row_of_the_table_is_its_results_file(self, table: str) -> None:
-        lines = set(REPORT.read_text().splitlines())
-        rows = getattr(f, table)()
-        assert rows, table
-        assert [row for row in rows if row not in lines] == []
+def test_a_figure_swapped_for_another_figure_of_the_same_file_is_caught() -> None:
+    """The text rendered from results is the only text that passes, whatever the number."""
+    figures = f.echonext_figures()
+    specificity = f"from {figures['spec_in_low']}–"
+    other = f"from {figures['spec_out_low']}–"
+    text = REPORT.read_text()
+    assert specificity in text and other != specificity
+    assert text.replace(specificity, other, 1) != rendered(REPORT)
 
-    def test_every_figure_the_prose_quotes_is_its_results_file(self) -> None:
-        text = REPORT.read_text()
-        assert {k: v for k, v in report_fragments().items() if v not in text} == {}
 
-    def test_the_text_prints_no_number_nothing_accounts_for(self) -> None:
-        printed = set(NUMBER.findall(prose(REPORT.read_text())))
-        assert printed - allowed() == set()
+def test_a_name_no_file_defines_is_refused() -> None:
+    with pytest.raises(KeyError, match="no_such_figure"):
+        render("covered {{no_such_figure}} of them")
 
+
+def test_a_number_typed_by_hand_in_the_template_is_refused() -> None:
+    assert typed("The threshold recognised 71.9% of them.") - allowed() == {"71.9%"}
+    assert typed("The threshold recognised {{strongest_low}} of them.") - allowed() == set()
+
+
+class TestClaims:
     def test_about_a_third_is_the_mean_share_severity_explains(self) -> None:
         """'About a third' in the report and the README is the severity results' mean share."""
         severity = f.read("echonext_severity.json")["arms"]
         shares = [severity[a]["reweighted"]["share"] for a in f.STRONGEST]
         assert abs(sum(shares) / len(shares) - 1 / 3) < 0.03
         assert "explains about a third" in README.read_text()
-        assert "Milder disease explains about a third" in REPORT.read_text()
+        assert "Severity explains about a third" in REPORT.read_text()
 
     def test_about_72_holds_for_each_of_the_three(self) -> None:
         """'About 72%' is the mean of the three; each lies within a point and a half of it."""
@@ -275,8 +199,8 @@ class TestReport:
         mean = sum(ill) / len(ill)
         assert all(abs(x - mean) < 0.015 for x in ill)
 
-    def test_the_per_class_rule_and_the_sensitivity_threshold_flag_the_same_ill(self) -> None:
-        """The report says the rule's threshold for the ill is the sensitivity threshold."""
+    def test_the_per_label_scheme_and_the_plain_threshold_flag_the_same_ill(self) -> None:
+        """The report says the per-label threshold for the ill is the plain threshold."""
         for arm in f.ARMS:
             for context in f.CONTEXTS:
                 plain = f.cell(arm, context, "plain")["coverage_pos"]
@@ -292,23 +216,8 @@ class TestReport:
 
 
 class TestReadme:
-    def test_every_figure_the_page_quotes_is_its_results_file(self) -> None:
-        text = README.read_text()
-        assert {k: v for k, v in readme_fragments().items() if v not in text} == {}
-
-    def test_the_page_prints_no_number_nothing_accounts_for(self) -> None:
-        printed = set(NUMBER.findall(prose(README.read_text())))
-        assert printed - allowed() == set()
-
     def test_the_page_points_at_the_one_report(self) -> None:
         text = README.read_text()
         assert "](REPORT.md)" in text
         assert "ECHONEXT.md" not in text
-
-
-def test_a_number_typed_by_hand_would_be_caught() -> None:
-    """The refusal bites: a figure no file holds is reported, one a file holds is not."""
-    typed = prose("The threshold recognised 71.9% of them.")
-    held = prose(f"The threshold recognised {figures()['strongest_low']} of them.")
-    assert set(NUMBER.findall(typed)) - allowed() == {"71.9%"}
-    assert set(NUMBER.findall(held)) - allowed() == set()
+        assert "reports/transfer" not in text

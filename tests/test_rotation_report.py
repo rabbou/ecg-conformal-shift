@@ -1,7 +1,7 @@
 """Hold every rotation number the prose prints to the file it was read from.
 
-Appendices B and F of ``REPORT.md`` quote some forty figures of the rotation and
-the encoder comparison.  Each one is
+Section 2.4 and section 3.6 of ``REPORT.md``, and the sentences the rotation adds
+to the abstract and the discussion, quote roughly fifty figures.  Each one is
 recomputed here from a file under ``results/`` and asserted to appear in the
 prose, so that regenerating a table and forgetting to reread the paragraph
 fails the suite rather than shipping.
@@ -96,12 +96,12 @@ def report() -> str:
 
 @pytest.fixture(scope="module")
 def rotation_section(report: str) -> str:
-    """Appendices B and F, which is where every figure below is printed."""
-    rotation = report.index("## Appendix B.")
-    rotation_end = report.index("## Appendix C.")
-    arms = report.index("## Appendix F.")
-    arms_end = report.index("## Appendix G.")
-    return report[rotation:rotation_end] + report[arms:arms_end]
+    """Section 2.4 and section 3.6, which is where every figure below is printed."""
+    method = report.index("### 2.4 The source rotation")
+    method_end = report.index("## 3. Results")
+    results = report.index("### 3.6 Five corpora in the calibration role")
+    results_end = report.index("## 4. Discussion")
+    return report[method:method_end] + report[results:results_end]
 
 
 def _cases(name: str) -> Iterator[tuple[str, str]]:
@@ -145,6 +145,9 @@ def _cases(name: str) -> Iterator[tuple[str, str]]:
         }
         yield "caps", f"{max(t for t, _ in caps):,} and {max(c for _, c in caps):,} records"
         yield "draws", f"{rot['settings']['n_draws']} calibration draws"
+        settings = _read("rotation_uncertainty.json")["settings"]
+        yield "bootstrap", f"{settings['n_bootstrap']:,} times"
+        yield "thin", f"fewer than {settings['thin_below']} cases"
 
     elif name == "cells":
         rows = _grid("mondrian")
@@ -173,6 +176,10 @@ def _cases(name: str) -> Iterator[tuple[str, str]]:
         pooled_cells = _grid("none")
         assert all(int(r["threshold_diagnosis_n_infinite"]) == 0 for r in pooled_cells), (
             "the prose says no pooled coverage is bought by abstaining"
+        )
+        yield (
+            "pooled cells",
+            f"every one of the {len(pooled_cells)} cells the grid holds at this setting",
         )
         # The class-conditional figures are quoted twice, and the second reading
         # is the one the paragraph rests on, so both are rebuilt from the grid.
@@ -216,6 +223,10 @@ def _cases(name: str) -> Iterator[tuple[str, str]]:
         # The prose leans on both being real transfers rather than abstention.
         for row in (worst, second):
             assert row[4]["n_draws_threshold_infinite"] == 0, row[:4]
+        homes = {label: bias[label]["mondrian"]["home_bias"]["mean"] for label in bias}
+        yield "home nsr", f"within {abs(homes['NSR']) * 100:.1f} points of the target"
+        others = [v for k, v in homes.items() if k != "NSR"]
+        yield "home others", f"by {min(others) * 100:.1f} to {max(others) * 100:.1f} points"
 
     elif name == "abstention_by_correction":
         # The caption counts rings, so it has to count over the roles the figure
@@ -234,9 +245,22 @@ def _cases(name: str) -> Iterator[tuple[str, str]]:
         assert drawn["none"] == 0, drawn
         yield (
             "caption mondrian",
-            f"{_word(drawn['mondrian'])} source-diagnosis pairs under the per-class rule",
+            f"{_word(drawn['mondrian'])} source-diagnosis pairs under class-conditional",
         )
         yield "caption weighted", f"and {_word(drawn['weighted'])} under label-shift weighting"
+        # The unringed pair the caption names is the difference between the two
+        # counts, so the caption owes the reader that pair by name.
+        hidden = {
+            (r["source"], r["label"])
+            for r in _grid("weighted")
+            if int(r["threshold_diagnosis_n_infinite"]) > 0
+        } - {
+            (r["source"], r["label"])
+            for r in _grid("weighted")
+            if r["role"] in DRAWN_ROLES and int(r["threshold_diagnosis_n_infinite"]) > 0
+        }
+        assert hidden == {("sph", "AF")}, sorted(hidden)
+        yield "unringed pair", "Shandong's atrial fibrillation, starves in a role no panel shows"
 
     elif name == "starved":
         rows = [r for r in _grid("mondrian") if r["role"] == "away"]
@@ -249,6 +273,144 @@ def _cases(name: str) -> Iterator[tuple[str, str]]:
         yield "sph lbbb", f"infinite in {infinite[('sph', 'LBBB')]} of 200 draws"
         yield "sph iavb", f"atrioventricular block in {infinite[('sph', 'IAVB')]}"
         yield "chapman lbbb", f"left bundle-branch block in {infinite[('chapman_ningbo', 'LBBB')]}"
+        sick = [r for r in rows if (r["source"], r["label"]) in starved()]
+        well = _finite(rows)
+        sizes = [float(r["mean_set_size_mean"]) for r in sick]
+        yield "starved sizes", f"average {min(sizes):.2f} to {max(sizes):.2f} labels"
+        clean = statistics.mean(float(r["mean_set_size_mean"]) for r in well)
+        yield "clean size", f"against {clean:.3f} on the other {_word(len(well))} away pairs"
+        covers = [float(r["coverage_diagnosis_mean"]) for r in sick]
+        yield "starved coverage", f"reads {min(covers):.3f} to {max(covers):.3f}"
+        bias = _read("rotation.json")["bias"]
+        for label, text in (
+            ("LBBB", "from {a} over {n} pairs to {b} over the {m}"),
+            ("IAVB", "block from {a} to {b}"),
+        ):
+            block = bias[label]["mondrian"]
+            finite = block["away_bias_where_the_threshold_was_finite"]
+            yield (
+                f"{label} finite",
+                text.format(
+                    a=_signed(block["away_bias"]["mean"]),
+                    b=_signed(finite["mean"]),
+                    n=_word(block["away_bias"]["n_pairs"]),
+                    m=_word(finite["n_pairs"]),
+                ),
+            )
+
+    elif name == "uncertainty":
+        reading = _read("rotation_uncertainty.json")["reading"]
+        widths = reading["bootstrap_width_against_draw_spread"]
+        yield "rows", f"{reading['n_rows']:,} rows"
+        # A pair carries one row per correction, so the stacked row count is
+        # twice the number of pairs and naming it "pairs" overstated the design.
+        by_correction = widths["by_correction"]
+        pair_counts = {c["n_pairs"] for c in by_correction.values()}
+        assert (
+            len(pair_counts) == 1
+            and pair_counts.pop() * len(by_correction) == widths["n_rows_compared"]
+        )
+        pairs = by_correction["mondrian"]["n_pairs"]
+        yield "pairs compared", f"Over the {pairs} source-target-diagnosis pairs"
+        # The two corrections invert, so each is quoted with its own figures and
+        # neither is read off the stacked median.
+        for correction, phrase in (
+            (
+                "mondrian",
+                "median bootstrap width of {boot:.3f} against a draw spread of {draw:.3f} "
+                "on the same scale, the draw being the wider on {wider} of the {n}",
+            ),
+            (
+                "none",
+                "inverts it, at {boot:.3f} against {draw:.3f}, the draw being the wider on {wider}",
+            ),
+        ):
+            block = by_correction[correction]
+            yield (
+                f"{correction} widths",
+                phrase.format(
+                    boot=block["median_bootstrap_width"],
+                    draw=block["median_draw_spread_as_a_95_percent_width"],
+                    wider=block["n_pairs_where_the_draw_spread_is_the_wider"],
+                    n=block["n_pairs"],
+                ),
+            )
+        assert (
+            by_correction["mondrian"]["n_pairs_where_the_draw_spread_is_the_wider"]
+            > by_correction["mondrian"]["n_pairs"] / 2
+            > by_correction["none"]["n_pairs_where_the_draw_spread_is_the_wider"]
+        ), "the prose rests on the two corrections falling on opposite sides"
+        yield "thin rows", f"{reading['n_rows_too_thin_to_read']} of the file's"
+        # Only the class-conditional column compares like with like: Chow's rule
+        # is a per-class quantile, so the pooled column has no counterpart in it.
+        chow = reading["conformal_minus_chow"]["by_correction"]["mondrian"]
+        yield "chow pairs", f"over its {chow['n_rows']} away pairs"
+        yield "chow median", f"median of {chow['median']:.3f} in coverage"
+        yield "chow max", f"by as much as {chow['max']:.3f}"
+        sexes = reading["between_the_sexes"]
+        yield (
+            "sex median",
+            f"over {sexes['n_pairs_compared']} pairs is "
+            f"{sexes['median_absolute_gap'] * 100:.1f} points",
+        )
+        yield "sex widest", f"widest is {sexes['widest_gap'] * 100:.1f}"
+
+    elif name == "chow_outliers":
+        rows = [
+            r
+            for r in _uncertainty_rows()
+            if r["conformal_minus_chow"] and abs(float(r["conformal_minus_chow"])) > 0.35
+        ]
+        assert rows, "the prose claims departures above 0.35 exist"
+        assert {(r["source"], r["label"]) for r in rows} <= starved()
+        yield "chow outliers", "Every departure above 0.35 sits on the three pairs"
+
+    elif name == "ages":
+        rows = [
+            r
+            for r in _uncertainty_rows()
+            if r["role"] == "away"
+            and r["correction"] == "mondrian"
+            and r["subgroup_kind"] == "age"
+            and r["thin"] == "False"
+        ]
+        bands = ["<50", "50-64", "65-74", ">=75"]
+        for label, text in (
+            ("NSR", "from {0} below 50 to {1}, {2} and {3} in the oldest band"),
+            ("RBBB", "bands, from {0} to {1}, {2} and {3}"),
+        ):
+            means = [
+                _pct(
+                    statistics.mean(
+                        float(r["coverage"])
+                        for r in rows
+                        if r["label"] == label and r["subgroup"] == band
+                    )
+                )
+                for band in bands
+            ]
+            yield f"{label} ages", text.format(*means)
+
+    elif name == "target_scale":
+        ladder: list[dict[str, Any]] = [
+            r
+            for r in _read("target_scale.json")["rows"]
+            if r["alpha"] == 0.10 and r["score"] == "lac" and r["correction"] == "none"
+        ]
+        by_family: dict[str, dict[int, float]] = {}
+        for rung in ladder:
+            by_family.setdefault(rung["family"], {})[rung["n_target_records"]] = rung[
+                "coverage_by_class"
+            ]["1"]["mean"]
+        recal, pooled = by_family["recalibrated"], by_family["pooled"]
+        assert recal[0] == pooled[0], "rung zero is the same frozen threshold on both lines"
+        yield "rung zero", f"reads {_pct(recal[0])} with no target records"
+        yield "recalibrated 100", f"takes it to {_pct(recal[100])}"
+        yield "recalibrated tail", f"leave it at {_pct(recal[500])} and {_pct(recal[2000])}"
+        yield (
+            "pooled",
+            (f"reaches {_pct(pooled[100])}, {_pct(pooled[500])} and {_pct(pooled[2000])}"),
+        )
 
     elif name == "arms":
         arms = _read("arms.json")
@@ -337,6 +499,10 @@ GROUPS = [
     "bias",
     "abstention_by_correction",
     "starved",
+    "uncertainty",
+    "chow_outliers",
+    "ages",
+    "target_scale",
     "arms",
 ]
 
@@ -350,6 +516,74 @@ def test_the_rotation_section_prints_what_the_results_files_hold(
         assert expected.lower() in rotation_section.lower(), (
             f"{group}/{what}: {expected!r} not in the section"
         )
+
+
+def test_the_abstract_carries_the_rotation_figures_it_claims(report: str) -> None:
+    """The abstract quotes five of the section's numbers and must quote them alike."""
+    abstract = report[report.index("## Abstract") : report.index("## 1. Introduction")]
+    home_none = [r for r in _grid("none") if r["role"] == "home"]
+    home_mondrian = [r for r in _grid("mondrian") if r["role"] == "home"]
+    away_mondrian = [r for r in _grid("mondrian") if r["role"] == "away"]
+    scale = {
+        (r["family"], r["n_target_records"]): r["coverage_by_class"]["1"]["mean"]
+        for r in _read("target_scale.json")["rows"]
+        if r["alpha"] == 0.10 and r["score"] == "lac" and r["correction"] == "none"
+    }
+    for what, expected in (
+        ("marginal at home", f"cover {_mean_pct(home_none, 'coverage_mean')} of all cases"),
+        (
+            "diagnosis at home",
+            f"and {_mean_pct(home_none, 'coverage_diagnosis_mean')} of the cases",
+        ),
+        # The abstract leads with the reading that excludes the pairs covering
+        # by abstention, and carries the inclusive pair after it.
+        (
+            "repaired at home",
+            f"at home, at {_mean_pct(_finite(home_mondrian), 'coverage_diagnosis_mean')}",
+        ),
+        (
+            "not on transfer",
+            f"on transfer, at {_mean_pct(_finite(away_mondrian), 'coverage_diagnosis_mean')}",
+        ),
+        (
+            "inclusive pair",
+            f"to {_mean_pct(home_mondrian, 'coverage_diagnosis_mean')} and "
+            f"{_mean_pct(away_mondrian, 'coverage_diagnosis_mean')}",
+        ),
+        ("ladder foot", f"from {_pct(scale[('recalibrated', 0)])}"),
+        ("ladder at 100", f"to {_pct(scale[('recalibrated', 100)])}"),
+    ):
+        assert expected in abstract, f"{what}: {expected!r} not in the abstract"
+
+
+def test_the_discussion_and_limitations_quote_the_same_files(report: str) -> None:
+    """The rotation reaches past section 3.6, and those sentences went unpinned.
+
+    The discussion qualifies its Chow reading with a rotation figure and the
+    limitations count the pairs that cover by abstaining under two schemes.
+    Neither sits inside the section slice the other tests read.
+    """
+    tail = report[report.index("## 4. Discussion") :]
+    chow = _read("rotation_uncertainty.json")["reading"]["conformal_minus_chow"]
+    counts = {
+        correction: len(
+            {
+                (r["source"], r["label"])
+                for r in _grid(correction)
+                if int(r["threshold_diagnosis_n_infinite"]) > 0
+            }
+        )
+        for correction in ("mondrian", "weighted")
+    }
+    for what, expected in (
+        (
+            "chow over the rotation",
+            f"differ by a median of {chow['by_correction']['mondrian']['median']:.3f} in coverage",
+        ),
+        ("mondrian pairs", f"{_word(counts['mondrian'])} source-diagnosis pairs of section 3.6"),
+        ("weighted pairs", f"reweights, {_word(counts['weighted'])} do"),
+    ):
+        assert expected in tail, f"{what}: {expected!r} not in the discussion or limitations"
 
 
 def test_the_figure_reads_the_abstention_field_in_both_role_loops() -> None:

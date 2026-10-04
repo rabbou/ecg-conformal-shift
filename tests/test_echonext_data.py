@@ -81,3 +81,15 @@ def test_both_published_checkpoints_load_whole_without_full_unpickling() -> None
     EchoNextMini().load_state_dict(mini["model"], strict=True)
     founder = allowlisted_load(verified("ecgfounder/12_lead_ECGFounder.pth"))
     ecgfounder_net().load_state_dict(founder["state_dict"], strict=True)
+
+
+def test_the_severity_file_is_what_the_corpus_and_stored_scores_give(meta: pd.DataFrame) -> None:
+    """Rebuilt from the metadata and the stored scores, with nothing refitted, the
+    severity results equal the committed file in every figure but the commit."""
+    from echonext_severity import ARMS, measure
+
+    for arm in ARMS:
+        require(DERIVED_DIR / f"scores/{arm}.npz")
+    committed = json.loads((RESULTS_DIR / "echonext_severity.json").read_text())
+    committed.pop("commit")
+    assert json.loads(json.dumps(measure(meta))) == committed

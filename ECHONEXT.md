@@ -19,9 +19,9 @@ ejection fraction of 45% or less, in 24.5% and 6.6%.
 Calibration per label (Mondrian) is built for this case: each class gets its
 own threshold, so a change in prevalence alone cannot move the coverage of
 either class. A coverage of the ill that still falls on outpatients points to
-a change in the ECGs of the ill themselves. Milder disease among outpatients is a
-likely reason; the echocardiographic severity values that would show it are in
-the metadata and have not been compared.
+a change in the ECGs of the ill themselves. Milder disease among outpatients
+accounts for about a third of that fall, as the section on severity below
+measures.
 
 ## What was measured
 
@@ -84,6 +84,59 @@ because it sends more of them to a human. Every figure for the four arms, per
 label and per care context, is in `results/echonext_transfer.json` and
 `results/echonext_coverage.csv`, and each arm has its one-page report in
 `reports/transfer/`.
+
+## Severity explains about a third of the lost coverage
+
+The ill outpatients are ill more mildly than the ill inpatients who calibrate
+the thresholds. They carry fewer of the eleven findings, keep a higher ejection
+fraction, and have less right ventricular dysfunction, tricuspid regurgitation
+and pericardial effusion. Aortic stenosis is the exception, more frequent among
+outpatients. The two-sided test is Mann-Whitney's, on ranks; grades read none,
+mild, moderate, severe (the right ventricle normal to severely reduced, the
+effusion none, trace, small, moderate, large).
+
+| Among the ill, median (quartiles) | Inpatients, 1,013 | Outpatients, 271 | p |
+|---|---|---|---|
+| Findings present | 2 (1 to 3) | 1 (1 to 2) | < 0.001 |
+| Ejection fraction, % | 50.0 (32.5 to 57.5) | 57.5 (45.0 to 62.5) | < 0.001 |
+| Pulmonary artery systolic pressure, mmHg | 43.0 (33.0 to 53.0), 661 measured | 39.0 (31.0 to 49.2), 172 measured | 0.007 |
+| Tricuspid regurgitation peak velocity, m/s | 2.8 (2.4 to 3.3), 483 measured | 2.7 (2.4 to 3.2), 125 measured | 0.109 |
+| Septal thickness, cm | 1.2 (1.0 to 1.3) | 1.2 (1.0 to 1.3) | 0.011 |
+| Posterior wall thickness, cm | 1.1 (0.9 to 1.3) | 1.1 (0.9 to 1.3) | 0.387 |
+| Aortic stenosis, moderate or worse | none (none to none), 12.7% | none (none to none), 18.8% | 0.056 |
+| Aortic regurgitation, moderate or worse | none (none to none), 3.2% | none (none to mild), 1.5% | 0.117 |
+| Mitral regurgitation, moderate or worse | mild (none to mild), 14.4% | none (none to mild), 11.1% | 0.053 |
+| Tricuspid regurgitation, moderate or worse | mild (none to mild), 17.2% | mild (none to mild), 9.6% | 0.002 |
+| Pulmonary regurgitation, moderate or worse | none (none to none), 1.1% | none (none to none), 0.0% | 0.026 |
+| Right ventricular dysfunction, moderate or worse | normal (normal to mildly reduced), 21.6% | normal (normal to normal), 7.4% | < 0.001 |
+| Pericardial effusion, moderate or large | trace (none to trace), 3.4% | none (none to trace), 0.8% | < 0.001 |
+
+Severity matters to coverage: with the inpatient thresholds, outpatients with
+two findings or more are covered more often than those with one, and those
+with an ejection fraction of 45% or less more often than those above it. The
+test that decides was fixed before any coverage by stratum was computed, and
+`results/echonext_severity.json` states it: the outpatients' coverage is
+reweighted to the share of ill inpatients in six cells (one finding or two and
+more, by ejection fraction at 35 or less, 36 to 45, above 45), with intervals
+from 2,000 bootstrap draws. Severity would explain all of the drop if the
+reweighted coverage could reach 90%, and none of it if it could not differ from
+the observed one.
+
+| Arm | Ill outpatients covered | One finding, 165 | Two or more, 106 | Ejection fraction 35 or less, 37 | 36 to 45, 33 | Above 45, 201 | Reweighted to the inpatients' severity | Share of the drop explained |
+|---|---|---|---|---|---|---|---|---|
+| Study ResNet, trained | 71.6% | 64.2% (56.7% to 71.2%) | 83.0% (74.7% to 89.0%) | 86.5% (72.0% to 94.1%) | 97.0% (84.7% to 99.5%) | 64.7% (57.9% to 71.0%) | 77.3% (72.3% to 81.9%) | 31% (16% to 47%) |
+| EchoNext mini-model, published | 72.7% | 65.5% (57.9% to 72.3%) | 84.0% (75.8% to 89.7%) | 94.6% (82.3% to 98.5%) | 84.8% (69.1% to 93.3%) | 66.7% (59.9% to 72.8%) | 78.7% (74.0% to 83.1%) | 35% (21% to 51%) |
+| ECGFounder, frozen, probes | 71.6% | 66.7% (59.2% to 73.4%) | 79.2% (70.6% to 85.9%) | 89.2% (75.3% to 95.7%) | 90.9% (76.4% to 96.9%) | 65.2% (58.4% to 71.4%) | 76.9% (71.7% to 81.7%) | 29% (15% to 45%) |
+
+Severity explains part of the drop for each of the three arms, between 29% and
+35% of it: at the inpatients' severity, the ill outpatients would be covered at
+76.9% to 78.7%, still short of 90%. The rest sits inside the strata. Of the 201
+ill outpatients whose ejection fraction is above 45%, 64.7% to 66.7% are
+covered; the calibration inpatients in the same band are covered at 83.5% to
+84.6%, a figure read on the ECGs that set the threshold and so flattered. Four
+of the six reweighting cells hold fewer than 30 ill outpatients and are not
+judged one by one; their counts are in the results file. Intervals are 95%:
+Wilson for a stratum, bootstrap percentiles for the reweighted figures.
 
 ## The unit of the tracings
 

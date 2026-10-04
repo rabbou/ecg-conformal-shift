@@ -15,6 +15,7 @@ from typing import Any
 
 import pandas as pd
 import pytest
+from test_echonext_severity_results import SEVERITY, severity_figures
 
 from ecs.config import REPO_ROOT, RESULTS_DIR
 from ecs.echonext import LABELS, PROVENANCE_FIELDS
@@ -230,6 +231,11 @@ class TestPiece:
             allowed |= set(arm_figures(result, arm).values())
         # The level asked for, the LVEF threshold of the label, the published mini-model AUROC.
         allowed |= {"90%", "45%", "82.0%"}
+        # The severity section, which tests/test_echonext_severity_results.py holds figure
+        # by figure, and the level of its intervals.
+        severity = json.loads(SEVERITY.read_text())
+        allowed |= set(re.findall(r"\d+(?:\.\d)?%", " ".join(severity_figures(severity).values())))
+        allowed |= {"95%"}
         printed = set(re.findall(r"\d+(?:\.\d)?%", PIECE.read_text()))
         assert printed - allowed == set()
 

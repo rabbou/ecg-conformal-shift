@@ -1,0 +1,1108 @@
+{
+  "distribution": "physionet.org/content/echonext/1.1.1",
+  "alpha": 0.1,
+  "verdict_rule": "Fixed before any coverage by stratum was computed, after counting the patients per cell. Strata: one finding or two and more, crossed with the ejection fraction at 35 or less, 36 to 45, above 45 (six cells, each holding at least 10 ill outpatients). For each of the three strongest models, R is the per-label coverage of the ill outpatients reweighted to the share of the ill calibration inpatients in each cell, O the observed coverage, and the 95% intervals come from 2,000 bootstrap draws that resample the ill of both cohorts, thresholds held fixed. Severity explains none of the drop if the interval of R - O holds 0; all of it if the interval of R reaches 90%; part of it otherwise, the share being (R - O) / (90% - O); both at once is too imprecise to judge. The verdict is the one the three models share; if they differ, each is stated.",
+  "min_stratum_to_judge": 30,
+  "bootstrap_draws": 2000,
+  "cohorts": {
+    "inpatient": {
+      "cohort": "EchoNext validation split, inpatients, composite present",
+      "n_cohort": 1903,
+      "n_ill": 1013
+    },
+    "outpatient": {
+      "cohort": "EchoNext test split, outpatients, composite present",
+      "n_cohort": 1059,
+      "n_ill": 271
+    }
+  },
+  "severity": {
+    "findings_count": {
+      "inpatient": {
+        "n": 1013,
+        "missing": 0,
+        "median": 2.0,
+        "q1": 1.0,
+        "q3": 3.0,
+        "mean": 2.0384995064165845
+      },
+      "outpatient": {
+        "n": 271,
+        "missing": 0,
+        "median": 1.0,
+        "q1": 1.0,
+        "q3": 2.0,
+        "mean": 1.6494464944649447
+      },
+      "test": "Mann-Whitney U, two-sided",
+      "p_value": 7.65485572508786e-06
+    },
+    "lvef_value": {
+      "inpatient": {
+        "n": 1013,
+        "missing": 0,
+        "median": 50.0,
+        "q1": 32.5,
+        "q3": 57.5,
+        "mean": 45.62566633761106
+      },
+      "outpatient": {
+        "n": 271,
+        "missing": 0,
+        "median": 57.5,
+        "q1": 45.0,
+        "q3": 62.5,
+        "mean": 53.2929889298893
+      },
+      "test": "Mann-Whitney U, two-sided",
+      "p_value": 1.6425466681330024e-12
+    },
+    "pasp_value": {
+      "inpatient": {
+        "n": 661,
+        "missing": 352,
+        "median": 43.0,
+        "q1": 33.0,
+        "q3": 53.0,
+        "mean": 45.19803328290469
+      },
+      "outpatient": {
+        "n": 172,
+        "missing": 99,
+        "median": 39.05,
+        "q1": 31.0,
+        "q3": 49.175,
+        "mean": 41.04651162790697
+      },
+      "test": "Mann-Whitney U, two-sided",
+      "p_value": 0.007377290124634032
+    },
+    "tr_max_velocity_value": {
+      "inpatient": {
+        "n": 483,
+        "missing": 530,
+        "median": 2.8,
+        "q1": 2.4,
+        "q3": 3.3,
+        "mean": 2.904968944099379
+      },
+      "outpatient": {
+        "n": 125,
+        "missing": 146,
+        "median": 2.7,
+        "q1": 2.4,
+        "q3": 3.2,
+        "mean": 2.8016000000000005
+      },
+      "test": "Mann-Whitney U, two-sided",
+      "p_value": 0.10920794939438007
+    },
+    "ivs_measurement": {
+      "inpatient": {
+        "n": 1011,
+        "missing": 2,
+        "median": 1.2,
+        "q1": 1.0,
+        "q3": 1.3,
+        "mean": 1.1634025717111771
+      },
+      "outpatient": {
+        "n": 271,
+        "missing": 0,
+        "median": 1.2,
+        "q1": 1.0,
+        "q3": 1.3,
+        "mean": 1.2210332103321033
+      },
+      "test": "Mann-Whitney U, two-sided",
+      "p_value": 0.01146259951752295
+    },
+    "lvpw_measurement": {
+      "inpatient": {
+        "n": 1012,
+        "missing": 1,
+        "median": 1.1,
+        "q1": 0.9,
+        "q3": 1.3,
+        "mean": 1.1044466403162057
+      },
+      "outpatient": {
+        "n": 271,
+        "missing": 0,
+        "median": 1.1,
+        "q1": 0.9,
+        "q3": 1.3,
+        "mean": 1.1121771217712177
+      },
+      "test": "Mann-Whitney U, two-sided",
+      "p_value": 0.3873672366789691
+    },
+    "aortic_stenosis_value": {
+      "inpatient": {
+        "n": 1013,
+        "missing": 0,
+        "median": 0.0,
+        "q1": 0.0,
+        "q3": 0.0,
+        "mean": 0.3810463968410661
+      },
+      "outpatient": {
+        "n": 271,
+        "missing": 0,
+        "median": 0.0,
+        "q1": 0.0,
+        "q3": 0.0,
+        "mean": 0.5608856088560885
+      },
+      "test": "Mann-Whitney U, two-sided",
+      "p_value": 0.056134234470303725,
+      "grades": {
+        "none": 0,
+        "presumed none": 0,
+        "mild": 1,
+        "moderate": 2,
+        "severe": 3
+      },
+      "moderate_from_grade": 2,
+      "share_moderate_or_worse": {
+        "inpatient": 0.12734452122408688,
+        "outpatient": 0.1881918819188192
+      }
+    },
+    "aortic_regurgitation_value": {
+      "inpatient": {
+        "n": 1013,
+        "missing": 0,
+        "median": 0.0,
+        "q1": 0.0,
+        "q3": 0.0,
+        "mean": 0.25567620927936824
+      },
+      "outpatient": {
+        "n": 271,
+        "missing": 0,
+        "median": 0.0,
+        "q1": 0.0,
+        "q3": 1.0,
+        "mean": 0.2952029520295203
+      },
+      "test": "Mann-Whitney U, two-sided",
+      "p_value": 0.11748238310818185,
+      "grades": {
+        "none": 0,
+        "presumed none": 0,
+        "mild": 1,
+        "moderate": 2,
+        "severe": 3
+      },
+      "moderate_from_grade": 2,
+      "share_moderate_or_worse": {
+        "inpatient": 0.0315893385982231,
+        "outpatient": 0.014760147601476014
+      }
+    },
+    "mitral_regurgitation_value": {
+      "inpatient": {
+        "n": 1013,
+        "missing": 0,
+        "median": 1.0,
+        "q1": 0.0,
+        "q3": 1.0,
+        "mean": 0.7127344521224087
+      },
+      "outpatient": {
+        "n": 271,
+        "missing": 0,
+        "median": 0.0,
+        "q1": 0.0,
+        "q3": 1.0,
+        "mean": 0.6088560885608856
+      },
+      "test": "Mann-Whitney U, two-sided",
+      "p_value": 0.052932610894744075,
+      "grades": {
+        "none": 0,
+        "presumed none": 0,
+        "mild": 1,
+        "moderate": 2,
+        "severe": 3
+      },
+      "moderate_from_grade": 2,
+      "share_moderate_or_worse": {
+        "inpatient": 0.1441263573543929,
+        "outpatient": 0.11070110701107011
+      }
+    },
+    "tricuspid_regurgitation_value": {
+      "inpatient": {
+        "n": 1013,
+        "missing": 0,
+        "median": 1.0,
+        "q1": 0.0,
+        "q3": 1.0,
+        "mean": 0.8015794669299111
+      },
+      "outpatient": {
+        "n": 271,
+        "missing": 0,
+        "median": 1.0,
+        "q1": 0.0,
+        "q3": 1.0,
+        "mean": 0.6236162361623616
+      },
+      "test": "Mann-Whitney U, two-sided",
+      "p_value": 0.0017011596410089465,
+      "grades": {
+        "none": 0,
+        "presumed none": 0,
+        "mild": 1,
+        "moderate": 2,
+        "severe": 3
+      },
+      "moderate_from_grade": 2,
+      "share_moderate_or_worse": {
+        "inpatient": 0.1717670286278381,
+        "outpatient": 0.0959409594095941
+      }
+    },
+    "pulmonary_regurgitation_value": {
+      "inpatient": {
+        "n": 1013,
+        "missing": 0,
+        "median": 0.0,
+        "q1": 0.0,
+        "q3": 0.0,
+        "mean": 0.17966436327739388
+      },
+      "outpatient": {
+        "n": 271,
+        "missing": 0,
+        "median": 0.0,
+        "q1": 0.0,
+        "q3": 0.0,
+        "mean": 0.11439114391143912
+      },
+      "test": "Mann-Whitney U, two-sided",
+      "p_value": 0.02558819966130051,
+      "grades": {
+        "none": 0,
+        "presumed none": 0,
+        "mild": 1,
+        "moderate": 2,
+        "severe": 3
+      },
+      "moderate_from_grade": 2,
+      "share_moderate_or_worse": {
+        "inpatient": 0.01085883514313919,
+        "outpatient": 0.0
+      }
+    },
+    "rv_systolic_function_value": {
+      "inpatient": {
+        "n": 1013,
+        "missing": 0,
+        "median": 0.0,
+        "q1": 0.0,
+        "q3": 1.0,
+        "mean": 0.7166831194471865
+      },
+      "outpatient": {
+        "n": 271,
+        "missing": 0,
+        "median": 0.0,
+        "q1": 0.0,
+        "q3": 0.0,
+        "mean": 0.2988929889298893
+      },
+      "test": "Mann-Whitney U, two-sided",
+      "p_value": 8.139988081480849e-13,
+      "grades": {
+        "normal": 0,
+        "mildly_reduced": 1,
+        "moderately_reduced": 2,
+        "severely_reduced": 3
+      },
+      "moderate_from_grade": 2,
+      "share_moderate_or_worse": {
+        "inpatient": 0.21618953603158933,
+        "outpatient": 0.07380073800738007
+      }
+    },
+    "pericardial_effusion_value": {
+      "inpatient": {
+        "n": 976,
+        "missing": 37,
+        "median": 1.0,
+        "q1": 0.0,
+        "q3": 1.0,
+        "mean": 0.7848360655737705
+      },
+      "outpatient": {
+        "n": 262,
+        "missing": 9,
+        "median": 0.0,
+        "q1": 0.0,
+        "q3": 1.0,
+        "mean": 0.42366412213740456
+      },
+      "test": "Mann-Whitney U, two-sided",
+      "p_value": 7.813582667657389e-10,
+      "grades": {
+        "none": 0,
+        "trace": 1,
+        "small": 2,
+        "moderate": 3,
+        "large": 4
+      },
+      "moderate_from_grade": 3,
+      "share_moderate_or_worse": {
+        "inpatient": 0.03381147540983607,
+        "outpatient": 0.007633587786259542
+      }
+    }
+  },
+  "cells": {
+    "1 finding, LVEF 36-45": {
+      "inpatient": 62,
+      "outpatient": 14
+    },
+    "1 finding, LVEF <=35": {
+      "inpatient": 85,
+      "outpatient": 12
+    },
+    "1 finding, LVEF >45": {
+      "inpatient": 332,
+      "outpatient": 139
+    },
+    "2+ finding, LVEF 36-45": {
+      "inpatient": 105,
+      "outpatient": 19
+    },
+    "2+ finding, LVEF <=35": {
+      "inpatient": 215,
+      "outpatient": 25
+    },
+    "2+ finding, LVEF >45": {
+      "inpatient": 214,
+      "outpatient": 62
+    }
+  },
+  "arms": {
+    "resnet": {
+      "coverage_ill_outpatient": 0.7158671586715867,
+      "coverage_ill_calibration_in_sample": 0.9012833168805529,
+      "by_findings": {
+        "outpatient": [
+          {
+            "stratum": "1",
+            "n": 165,
+            "judged": true,
+            "covered": 106,
+            "coverage": 0.6424242424242425,
+            "low": 0.5668170255563183,
+            "high": 0.7115506237655995
+          },
+          {
+            "stratum": "2+",
+            "n": 106,
+            "judged": true,
+            "covered": 88,
+            "coverage": 0.8301886792452831,
+            "low": 0.7474817619368073,
+            "high": 0.889800378627881
+          }
+        ],
+        "inpatient_in_sample": [
+          {
+            "stratum": "1",
+            "n": 479,
+            "judged": true,
+            "covered": 403,
+            "coverage": 0.8413361169102297,
+            "low": 0.8059186199712937,
+            "high": 0.8713223128986266
+          },
+          {
+            "stratum": "2+",
+            "n": 534,
+            "judged": true,
+            "covered": 510,
+            "coverage": 0.9550561797752809,
+            "low": 0.9339975357713567,
+            "high": 0.9696144711305191
+          }
+        ]
+      },
+      "by_lvef": {
+        "outpatient": [
+          {
+            "stratum": "<=35",
+            "n": 37,
+            "judged": true,
+            "covered": 32,
+            "coverage": 0.8648648648648649,
+            "low": 0.7202258821599021,
+            "high": 0.9408670557426799
+          },
+          {
+            "stratum": "36-45",
+            "n": 33,
+            "judged": true,
+            "covered": 32,
+            "coverage": 0.9696969696969697,
+            "low": 0.846812746178811,
+            "high": 0.9946305894631283
+          },
+          {
+            "stratum": ">45",
+            "n": 201,
+            "judged": true,
+            "covered": 130,
+            "coverage": 0.6467661691542289,
+            "low": 0.5785008034543174,
+            "high": 0.7095268269856955
+          }
+        ],
+        "inpatient_in_sample": [
+          {
+            "stratum": "<=35",
+            "n": 300,
+            "judged": true,
+            "covered": 296,
+            "coverage": 0.9866666666666667,
+            "low": 0.9662244697474675,
+            "high": 0.9948030382606411
+          },
+          {
+            "stratum": "36-45",
+            "n": 167,
+            "judged": true,
+            "covered": 161,
+            "coverage": 0.9640718562874252,
+            "low": 0.9238422456604652,
+            "high": 0.9834316740891872
+          },
+          {
+            "stratum": ">45",
+            "n": 546,
+            "judged": true,
+            "covered": 456,
+            "coverage": 0.8351648351648352,
+            "low": 0.8017221770451621,
+            "high": 0.8639242454436054
+          }
+        ]
+      },
+      "by_cell": {
+        "outpatient": [
+          {
+            "stratum": "1 finding, LVEF 36-45",
+            "n": 14,
+            "judged": false,
+            "covered": 13,
+            "coverage": 0.9285714285714286,
+            "low": 0.6853129557584889,
+            "high": 0.9872777847521093
+          },
+          {
+            "stratum": "1 finding, LVEF <=35",
+            "n": 12,
+            "judged": false,
+            "covered": 10,
+            "coverage": 0.8333333333333334,
+            "low": 0.5519691377470267,
+            "high": 0.9530348578161462
+          },
+          {
+            "stratum": "1 finding, LVEF >45",
+            "n": 139,
+            "judged": true,
+            "covered": 83,
+            "coverage": 0.5971223021582733,
+            "low": 0.5140340630726542,
+            "high": 0.6749866891859216
+          },
+          {
+            "stratum": "2+ finding, LVEF 36-45",
+            "n": 19,
+            "judged": false,
+            "covered": 19,
+            "coverage": 1.0,
+            "low": 0.8318207759473837,
+            "high": 1.0
+          },
+          {
+            "stratum": "2+ finding, LVEF <=35",
+            "n": 25,
+            "judged": false,
+            "covered": 22,
+            "coverage": 0.88,
+            "low": 0.7004420607907267,
+            "high": 0.9583318284955964
+          },
+          {
+            "stratum": "2+ finding, LVEF >45",
+            "n": 62,
+            "judged": true,
+            "covered": 47,
+            "coverage": 0.7580645161290323,
+            "low": 0.6384749248397259,
+            "high": 0.8475410379466626
+          }
+        ],
+        "inpatient_in_sample": [
+          {
+            "stratum": "1 finding, LVEF 36-45",
+            "n": 62,
+            "judged": true,
+            "covered": 60,
+            "coverage": 0.967741935483871,
+            "low": 0.8897953040501456,
+            "high": 0.9911086285001833
+          },
+          {
+            "stratum": "1 finding, LVEF <=35",
+            "n": 85,
+            "judged": true,
+            "covered": 82,
+            "coverage": 0.9647058823529412,
+            "low": 0.9012995216039354,
+            "high": 0.987924958145358
+          },
+          {
+            "stratum": "1 finding, LVEF >45",
+            "n": 332,
+            "judged": true,
+            "covered": 261,
+            "coverage": 0.786144578313253,
+            "low": 0.7388973029583895,
+            "high": 0.8268458327080176
+          },
+          {
+            "stratum": "2+ finding, LVEF 36-45",
+            "n": 105,
+            "judged": true,
+            "covered": 101,
+            "coverage": 0.9619047619047619,
+            "low": 0.9061169787394538,
+            "high": 0.9850875406688924
+          },
+          {
+            "stratum": "2+ finding, LVEF <=35",
+            "n": 215,
+            "judged": true,
+            "covered": 214,
+            "coverage": 0.9953488372093023,
+            "low": 0.9741288651988538,
+            "high": 0.9991784831794059
+          },
+          {
+            "stratum": "2+ finding, LVEF >45",
+            "n": 214,
+            "judged": true,
+            "covered": 195,
+            "coverage": 0.9112149532710281,
+            "low": 0.8655027526459985,
+            "high": 0.9424242643359529
+          }
+        ]
+      },
+      "reweighted": {
+        "observed": 0.7158671586715867,
+        "reweighted": 0.7730258367945919,
+        "gap": 0.057158678123005235,
+        "share": 0.3104208771810504,
+        "observed_low": 0.6605166051660517,
+        "observed_high": 0.7675276752767528,
+        "reweighted_low": 0.7229587354166813,
+        "reweighted_high": 0.8189988963012005,
+        "gap_low": 0.02785082428320374,
+        "gap_high": 0.08954275666710691,
+        "share_low": 0.16291818117800363,
+        "share_high": 0.4700035004984556
+      },
+      "reweighted_by_findings_only": 0.7414037184977229,
+      "reweighted_by_lvef_only": 0.7645934666900912,
+      "verdict": "part",
+      "drop": 0.18413284132841334
+    },
+    "echonext_mini": {
+      "coverage_ill_outpatient": 0.7269372693726938,
+      "coverage_ill_calibration_in_sample": 0.9012833168805529,
+      "by_findings": {
+        "outpatient": [
+          {
+            "stratum": "1",
+            "n": 165,
+            "judged": true,
+            "covered": 108,
+            "coverage": 0.6545454545454545,
+            "low": 0.5792175682165766,
+            "high": 0.7228409448774193
+          },
+          {
+            "stratum": "2+",
+            "n": 106,
+            "judged": true,
+            "covered": 89,
+            "coverage": 0.839622641509434,
+            "low": 0.7581004033908071,
+            "high": 0.8973897983328721
+          }
+        ],
+        "inpatient_in_sample": [
+          {
+            "stratum": "1",
+            "n": 479,
+            "judged": true,
+            "covered": 405,
+            "coverage": 0.8455114822546973,
+            "low": 0.81040869619187,
+            "high": 0.8751165294348688
+          },
+          {
+            "stratum": "2+",
+            "n": 534,
+            "judged": true,
+            "covered": 508,
+            "coverage": 0.951310861423221,
+            "low": 0.9296154553696628,
+            "high": 0.9665594156729383
+          }
+        ]
+      },
+      "by_lvef": {
+        "outpatient": [
+          {
+            "stratum": "<=35",
+            "n": 37,
+            "judged": true,
+            "covered": 35,
+            "coverage": 0.9459459459459459,
+            "low": 0.822953456491869,
+            "high": 0.9850490231668423
+          },
+          {
+            "stratum": "36-45",
+            "n": 33,
+            "judged": true,
+            "covered": 28,
+            "coverage": 0.8484848484848485,
+            "low": 0.6908012411955788,
+            "high": 0.9334954271839244
+          },
+          {
+            "stratum": ">45",
+            "n": 201,
+            "judged": true,
+            "covered": 134,
+            "coverage": 0.6666666666666666,
+            "low": 0.5989100434500352,
+            "high": 0.7281721809479453
+          }
+        ],
+        "inpatient_in_sample": [
+          {
+            "stratum": "<=35",
+            "n": 300,
+            "judged": true,
+            "covered": 297,
+            "coverage": 0.99,
+            "low": 0.9710165066376601,
+            "high": 0.9965933815622847
+          },
+          {
+            "stratum": "36-45",
+            "n": 167,
+            "judged": true,
+            "covered": 154,
+            "coverage": 0.9221556886227545,
+            "low": 0.8713811132810243,
+            "high": 0.9539454846847886
+          },
+          {
+            "stratum": ">45",
+            "n": 546,
+            "judged": true,
+            "covered": 462,
+            "coverage": 0.8461538461538461,
+            "low": 0.8134809961310057,
+            "high": 0.873989899226246
+          }
+        ]
+      },
+      "by_cell": {
+        "outpatient": [
+          {
+            "stratum": "1 finding, LVEF 36-45",
+            "n": 14,
+            "judged": false,
+            "covered": 10,
+            "coverage": 0.7142857142857143,
+            "low": 0.4535091567010681,
+            "high": 0.8827862135542308
+          },
+          {
+            "stratum": "1 finding, LVEF <=35",
+            "n": 12,
+            "judged": false,
+            "covered": 12,
+            "coverage": 1.0,
+            "low": 0.7575059933447592,
+            "high": 1.0
+          },
+          {
+            "stratum": "1 finding, LVEF >45",
+            "n": 139,
+            "judged": true,
+            "covered": 86,
+            "coverage": 0.6187050359712231,
+            "low": 0.5357973528058863,
+            "high": 0.6952280110657066
+          },
+          {
+            "stratum": "2+ finding, LVEF 36-45",
+            "n": 19,
+            "judged": false,
+            "covered": 18,
+            "coverage": 0.9473684210526315,
+            "low": 0.753612688331012,
+            "high": 0.9906480059376995
+          },
+          {
+            "stratum": "2+ finding, LVEF <=35",
+            "n": 25,
+            "judged": false,
+            "covered": 23,
+            "coverage": 0.92,
+            "low": 0.7503389104960468,
+            "high": 0.9777795987151524
+          },
+          {
+            "stratum": "2+ finding, LVEF >45",
+            "n": 62,
+            "judged": true,
+            "covered": 48,
+            "coverage": 0.7741935483870968,
+            "low": 0.6559437908464204,
+            "high": 0.8604481696141172
+          }
+        ],
+        "inpatient_in_sample": [
+          {
+            "stratum": "1 finding, LVEF 36-45",
+            "n": 62,
+            "judged": true,
+            "covered": 54,
+            "coverage": 0.8709677419354839,
+            "low": 0.7655067270982637,
+            "high": 0.9331412194071697
+          },
+          {
+            "stratum": "1 finding, LVEF <=35",
+            "n": 85,
+            "judged": true,
+            "covered": 84,
+            "coverage": 0.9882352941176471,
+            "low": 0.9363282911750611,
+            "high": 0.997920212865336
+          },
+          {
+            "stratum": "1 finding, LVEF >45",
+            "n": 332,
+            "judged": true,
+            "covered": 267,
+            "coverage": 0.8042168674698795,
+            "low": 0.7581566937336611,
+            "high": 0.8433175873432558
+          },
+          {
+            "stratum": "2+ finding, LVEF 36-45",
+            "n": 105,
+            "judged": true,
+            "covered": 100,
+            "coverage": 0.9523809523809523,
+            "low": 0.893338334167072,
+            "high": 0.9794908343256379
+          },
+          {
+            "stratum": "2+ finding, LVEF <=35",
+            "n": 215,
+            "judged": true,
+            "covered": 213,
+            "coverage": 0.9906976744186047,
+            "low": 0.9667230633139425,
+            "high": 0.9974452489293104
+          },
+          {
+            "stratum": "2+ finding, LVEF >45",
+            "n": 214,
+            "judged": true,
+            "covered": 195,
+            "coverage": 0.9112149532710281,
+            "low": 0.8655027526459985,
+            "high": 0.9424242643359529
+          }
+        ]
+      },
+      "reweighted": {
+        "observed": 0.7269372693726938,
+        "reweighted": 0.7874105526096005,
+        "gap": 0.060473283236906705,
+        "share": 0.349429845569333,
+        "observed_low": 0.6752767527675276,
+        "observed_high": 0.7785977859778598,
+        "reweighted_low": 0.7401664309561004,
+        "reweighted_high": 0.8308628927526626,
+        "gap_low": 0.03282951854261563,
+        "gap_high": 0.09022945709737723,
+        "share_low": 0.21004073043065286,
+        "share_high": 0.5063936857020563
+      },
+      "reweighted_by_findings_only": 0.7521083546824389,
+      "reweighted_by_lvef_only": 0.7793492137026194,
+      "verdict": "part",
+      "drop": 0.17306273062730626
+    },
+    "ecgfounder": {
+      "coverage_ill_outpatient": 0.7158671586715867,
+      "coverage_ill_calibration_in_sample": 0.9012833168805529,
+      "by_findings": {
+        "outpatient": [
+          {
+            "stratum": "1",
+            "n": 165,
+            "judged": true,
+            "covered": 110,
+            "coverage": 0.6666666666666666,
+            "low": 0.5916682977289911,
+            "high": 0.7340810791370829
+          },
+          {
+            "stratum": "2+",
+            "n": 106,
+            "judged": true,
+            "covered": 84,
+            "coverage": 0.7924528301886793,
+            "low": 0.7056963512516006,
+            "high": 0.8587535446771233
+          }
+        ],
+        "inpatient_in_sample": [
+          {
+            "stratum": "1",
+            "n": 479,
+            "judged": true,
+            "covered": 400,
+            "coverage": 0.8350730688935282,
+            "low": 0.7991981060717487,
+            "high": 0.8656163876629436
+          },
+          {
+            "stratum": "2+",
+            "n": 534,
+            "judged": true,
+            "covered": 513,
+            "coverage": 0.9606741573033708,
+            "low": 0.9406309540469023,
+            "high": 0.9741367566438855
+          }
+        ]
+      },
+      "by_lvef": {
+        "outpatient": [
+          {
+            "stratum": "<=35",
+            "n": 37,
+            "judged": true,
+            "covered": 33,
+            "coverage": 0.8918918918918919,
+            "low": 0.7529146845587398,
+            "high": 0.9571481005958853
+          },
+          {
+            "stratum": "36-45",
+            "n": 33,
+            "judged": true,
+            "covered": 30,
+            "coverage": 0.9090909090909091,
+            "low": 0.7642739435353026,
+            "high": 0.9685960584754184
+          },
+          {
+            "stratum": ">45",
+            "n": 201,
+            "judged": true,
+            "covered": 131,
+            "coverage": 0.6517412935323383,
+            "low": 0.5835915337789244,
+            "high": 0.7141997451505804
+          }
+        ],
+        "inpatient_in_sample": [
+          {
+            "stratum": "<=35",
+            "n": 300,
+            "judged": true,
+            "covered": 296,
+            "coverage": 0.9866666666666667,
+            "low": 0.9662244697474675,
+            "high": 0.9948030382606411
+          },
+          {
+            "stratum": "36-45",
+            "n": 167,
+            "judged": true,
+            "covered": 157,
+            "coverage": 0.9401197604790419,
+            "low": 0.8932944484006284,
+            "high": 0.967152430329687
+          },
+          {
+            "stratum": ">45",
+            "n": 546,
+            "judged": true,
+            "covered": 460,
+            "coverage": 0.8424908424908425,
+            "low": 0.8095557341222755,
+            "high": 0.8706403369454813
+          }
+        ]
+      },
+      "by_cell": {
+        "outpatient": [
+          {
+            "stratum": "1 finding, LVEF 36-45",
+            "n": 14,
+            "judged": false,
+            "covered": 11,
+            "coverage": 0.7857142857142857,
+            "low": 0.524107694133997,
+            "high": 0.9242861328730683
+          },
+          {
+            "stratum": "1 finding, LVEF <=35",
+            "n": 12,
+            "judged": false,
+            "covered": 11,
+            "coverage": 0.9166666666666666,
+            "low": 0.646120088858883,
+            "high": 0.9851349055950829
+          },
+          {
+            "stratum": "1 finding, LVEF >45",
+            "n": 139,
+            "judged": true,
+            "covered": 88,
+            "coverage": 0.6330935251798561,
+            "low": 0.5503958265388406,
+            "high": 0.70863261174143
+          },
+          {
+            "stratum": "2+ finding, LVEF 36-45",
+            "n": 19,
+            "judged": false,
+            "covered": 19,
+            "coverage": 1.0,
+            "low": 0.8318207759473837,
+            "high": 1.0
+          },
+          {
+            "stratum": "2+ finding, LVEF <=35",
+            "n": 25,
+            "judged": false,
+            "covered": 22,
+            "coverage": 0.88,
+            "low": 0.7004420607907267,
+            "high": 0.9583318284955964
+          },
+          {
+            "stratum": "2+ finding, LVEF >45",
+            "n": 62,
+            "judged": true,
+            "covered": 43,
+            "coverage": 0.6935483870967742,
+            "low": 0.5703278379461328,
+            "high": 0.7941841341436585
+          }
+        ],
+        "inpatient_in_sample": [
+          {
+            "stratum": "1 finding, LVEF 36-45",
+            "n": 62,
+            "judged": true,
+            "covered": 55,
+            "coverage": 0.8870967741935484,
+            "low": 0.7848025794735822,
+            "high": 0.9442213647060003
+          },
+          {
+            "stratum": "1 finding, LVEF <=35",
+            "n": 85,
+            "judged": true,
+            "covered": 81,
+            "coverage": 0.9529411764705882,
+            "low": 0.8851627284368122,
+            "high": 0.9815497391669292
+          },
+          {
+            "stratum": "1 finding, LVEF >45",
+            "n": 332,
+            "judged": true,
+            "covered": 264,
+            "coverage": 0.7951807228915663,
+            "low": 0.7485107231572827,
+            "high": 0.8350979852143792
+          },
+          {
+            "stratum": "2+ finding, LVEF 36-45",
+            "n": 105,
+            "judged": true,
+            "covered": 102,
+            "coverage": 0.9714285714285714,
+            "low": 0.9193437093626844,
+            "high": 0.9902361609612977
+          },
+          {
+            "stratum": "2+ finding, LVEF <=35",
+            "n": 215,
+            "judged": true,
+            "covered": 215,
+            "coverage": 1.0,
+            "low": 0.9824463845132672,
+            "high": 1.0
+          },
+          {
+            "stratum": "2+ finding, LVEF >45",
+            "n": 214,
+            "judged": true,
+            "covered": 196,
+            "coverage": 0.9158878504672897,
+            "low": 0.8709737416354516,
+            "high": 0.94613426417584
+          }
+        ]
+      },
+      "reweighted": {
+        "observed": 0.7158671586715867,
+        "reweighted": 0.7694347063962235,
+        "gap": 0.05356754772463679,
+        "share": 0.2909179445566446,
+        "observed_low": 0.6605166051660517,
+        "observed_high": 0.7675276752767528,
+        "reweighted_low": 0.7168049576282184,
+        "reweighted_high": 0.8171262987610732,
+        "gap_low": 0.02472899411161565,
+        "gap_high": 0.0841484315447171,
+        "share_low": 0.14576283049119726,
+        "share_high": 0.44528046505683677
+      },
+      "reweighted_by_findings_only": 0.7329744764601067,
+      "reweighted_by_lvef_only": 0.765287754841467,
+      "verdict": "part",
+      "drop": 0.18413284132841334
+    }
+  },
+  "verdict": "part",
+  "commit": "57e2527a0c41f6ddb2be7d498bddf8d474cfb17c"
+}

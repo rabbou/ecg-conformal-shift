@@ -15,8 +15,8 @@ abstract: >-
   it for a network trained on EchoNext, 72.7% for the published
   EchoNext mini-model and 71.6% for ECGFounder, while the AUROC
   moved from 0.815 to 0.805. Set again on 100
-  outpatients with known diagnoses, the threshold caught 92.2% of the ill
-  on average and flagged 71 of 100 healthy outpatients. An infarction
+  outpatients with known diagnoses, the threshold caught 91.6% of the ill
+  on average and flagged 70 of 100 healthy outpatients. An infarction
   model carried from PTB-XL to hospitals in Chongqing and Shandong is reported
   beside it, with a rotation of five public corpora on five rhythm and
   conduction diagnoses.

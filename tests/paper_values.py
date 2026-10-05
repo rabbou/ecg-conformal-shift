@@ -177,6 +177,20 @@ def echonext() -> dict[str, str]:
         out[f"lad200_hflag_{s}"] = per100(1 - rows[200]["specificity"]["mean"])
         out[f"lad100_missed_{s}"] = per100(1 - rows[100]["sensitivity"]["mean"])
         out[f"lad100_below_{s}"] = pct(rows[100]["share_of_draws_below_level"])
+        out[f"lad200_below_{s}"] = pct(rows[200]["share_of_draws_below_level"])
+        out[f"lad200_ill_{s}"] = f"{round(rows[200]['ill_in_sample']['mean'])}"
+        for rung in (100, 200):
+            out[f"lad{rung}_p10_{s}"] = pct(rows[rung]["sensitivity"]["p10"])
+            out[f"lad{rung}_p90_{s}"] = pct(rows[rung]["sensitivity"]["p90"])
+    out["lad_draws"] = count(clinical["ladder"]["resnet"][0]["draws"])
+    for rung in (100, 200):
+        shares = sorted(
+            r["share_of_draws_below_level"]
+            for arm in STRONGEST
+            for r in clinical["ladder"][arm]
+            if r["labels"] == rung
+        )
+        out[f"lad{rung}_below_range"] = f"{pct(shares[0])} to {pct(shares[-1])}"
     rows = {r["labels"]: r for r in clinical["ladder"]["resnet"]}
     out["lad100_ill_min"] = f"{round(rows[100]['ill_in_sample']['min'])}"
     out["lad100_ill_max"] = f"{round(rows[100]['ill_in_sample']['max'])}"

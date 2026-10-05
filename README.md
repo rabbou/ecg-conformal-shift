@@ -2,7 +2,7 @@
 
 The study: [REPORT.md](REPORT.md) · Methods in statistical terms, the infarction study and the five-corpus rotation: [SUPPLEMENT.md](SUPPLEMENT.md) · The PPV recomputed for a new site: [PPV.md](PPV.md) ([français](PPV.fr.md)) · Ruben Abbou · 2026
 
-At Columbia, a threshold set to catch 90% of inpatients with moderate or worse structural heart disease caught 71.6% of outpatients with it. Two other models gave the same answer: the published EchoNext mini-model caught 72.7% and the ECGFounder foundation model 71.6%. The AUROC hardly moved, from 0.815 to 0.805. The model separated ill from healthy outpatients almost as well as inpatients, and the threshold landed at another point of the same trade-off: per 100 healthy outpatients it flagged 29, against 58 per 100 healthy inpatients. Milder disease among outpatients explains about a quarter of the fall. Set again on 100 outpatients with known diagnoses, about 26 of them ill, the threshold caught 92.2% of the ill on average and flagged 71 of 100 healthy outpatients. A clinic adopting such a model has to measure sensitivity on its own patients, and decide what it will pay for it.
+At Columbia, a threshold set to catch 90% of inpatients with moderate or worse structural heart disease caught 71.6% of outpatients with it. Two other models gave the same answer: the published EchoNext mini-model caught 72.7% and the ECGFounder foundation model 71.6%. The AUROC hardly moved, from 0.815 to 0.805. The model separated ill from healthy outpatients almost as well as inpatients, and the threshold landed at another point of the same trade-off: per 100 healthy outpatients it flagged 29, against 58 per 100 healthy inpatients. Milder disease among outpatients explains about a quarter of the fall. Set again on 100 outpatients with known diagnoses, about 26 of them ill, the threshold caught 91.6% of the ill on average and flagged 70 of 100 healthy outpatients. A clinic adopting such a model has to measure sensitivity on its own patients, and decide what it will pay for it.
 
 ![Ill patients caught against healthy patients flagged, inpatients and outpatients](results/figures/fig_curve.png)
 
@@ -14,7 +14,7 @@ The sensitivity and specificity published with a model belong to the patients it
 
 A second threshold, set on the healthy inpatients, sends patients whose scores sit between the two to a human reader. It misses the same patients the first threshold misses. Among outpatients it sent 36 ill and 27 healthy in 100 to a reader, and left 2 healthy in 100 flagged with no reader.
 
-Setting the threshold again on the clinic's own patients restores the sensitivity at a price in echocardiograms. How precise the new threshold is depends on how many ill patients the sample holds, not on how many ECGs: with 100 outpatients, about 26 ill, about one repetition in four still caught fewer than 90% of the ill.
+Setting the threshold again on 100 of the clinic's own outpatients, about 26 of them ill, brought sensitivity back to 91.6% on average, at a price in echocardiograms, and still fell short of 90% in 29.9% to 33.1% of the repetitions for the three models. With 200 outpatients the share was 36.4% to 37.0%: more labels narrow the spread around 90% without lowering the share that falls short.
 
 This is a retrospective measurement study on public, de-identified data. It is not a medical device and has no regulatory status, it involved no contact with patients, and nothing here is meant to guide the care of any patient. The ethics approvals and the author's competing interests are in [REPORT.md](REPORT.md).
 
@@ -26,9 +26,9 @@ Four models score every ECG: a residual network trained on EchoNext for this stu
 
 | Model | AUROC, outpatients | Ill outpatients caught | Healthy outpatients flagged, per 100 | Ill caught, threshold set again on 100 outpatients | Healthy flagged per 100, threshold set again |
 |---|---|---|---|---|---|
-| Residual network, trained on EchoNext | 0.805 | 71.6% | 29 | 92.2% | 71 |
-| EchoNext mini-model, published weights | 0.795 | 72.7% | 29 | 92.3% | 72 |
-| ECGFounder, frozen, logistic regressions | 0.791 | 71.6% | 29 | 92.6% | 71 |
+| Residual network, trained on EchoNext | 0.805 | 71.6% | 29 | 91.6% | 70 |
+| EchoNext mini-model, published weights | 0.795 | 72.7% | 29 | 91.9% | 72 |
+| ECGFounder, frozen, logistic regressions | 0.791 | 71.6% | 29 | 91.8% | 70 |
 | Random initialisation, frozen, logistic regressions | 0.758 | 78.6% | 43 | | |
 
 An infarction model gives a second case. A residual network trained on PTB-XL, a German research corpus, had its threshold set to catch 90% of infarctions there and caught 83.7% at a hospital in Chongqing and 97.3% at one in Shandong. Between hospitals the model's own separation moved with the threshold: its AUROC went from 0.932 at PTB-XL to 0.793 at Chongqing, where an infarction is an acute event in the discharge diagnosis rather than a pattern on the tracing. [SUPPLEMENT.md](SUPPLEMENT.md) gives the infarction study in full and a rotation of five corpora through the calibration role on five diagnoses: sinus rhythm, atrial fibrillation, left and right bundle-branch block, and first-degree atrioventricular block.

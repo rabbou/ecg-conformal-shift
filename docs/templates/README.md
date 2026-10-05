@@ -14,7 +14,7 @@ The sensitivity and specificity published with a model belong to the patients it
 
 A second threshold, set on the healthy inpatients, sends patients whose scores sit between the two to a human reader. It misses the same patients the first threshold misses. Among outpatients it sent {{pl_def_resnet_out}} ill and {{pl_hdef_resnet_out}} healthy in 100 to a reader, and left {{pl_hflag_resnet_out}} healthy in 100 flagged with no reader.
 
-Setting the threshold again on the clinic's own patients restores the sensitivity at a price in echocardiograms. How precise the new threshold is depends on how many ill patients the sample holds, not on how many ECGs: with 100 outpatients, about {{lad100_ill_resnet}} ill, about one repetition in four still caught fewer than 90% of the ill.
+Setting the threshold again on 100 of the clinic's own outpatients, about {{lad100_ill_resnet}} of them ill, brought sensitivity back to {{lad100_sens_resnet}} on average, at a price in echocardiograms, and still fell short of 90% in {{lad100_below_range}} of the repetitions for the three models. With 200 outpatients the share was {{lad200_below_range}}: more labels narrow the spread around 90% without lowering the share that falls short.
 
 This is a retrospective measurement study on public, de-identified data. It is not a medical device and has no regulatory status, it involved no contact with patients, and nothing here is meant to guide the care of any patient. The ethics approvals and the author's competing interests are in [REPORT.md](REPORT.md).
 

@@ -35,6 +35,7 @@ __all__ = [
     "rerandomised_ladder",
     "standardised_coverage",
     "subgroup_tests",
+    "two_halves",
 ]
 
 Array = NDArray[np.float64]
@@ -130,6 +131,13 @@ def _summary(values: Sequence[float]) -> dict[str, float]:
     }
 
 
+def two_halves(order: IntArray) -> tuple[IntArray, IntArray]:
+    """A shuffled cohort cut into the half labelled samples are drawn from and the
+    half every figure is read on; no patient is in both."""
+    middle = len(order) // 2
+    return order[:middle], order[middle:]
+
+
 def rerandomised_ladder(
     p_cal: Array,
     y_cal: IntArray,
@@ -137,9 +145,10 @@ def rerandomised_ladder(
     y_tgt: IntArray,
     rungs: Sequence[int],
     draws: int,
-    level: float = 0.90,
+    *,
+    alpha: float,
+    level: float,
     seed: int = 0,
-    alpha: float = 0.10,
 ) -> list[dict[str, Any]]:
     """Refit the thresholds on n labelled target patients, read on the others.
 
@@ -167,7 +176,7 @@ def rerandomised_ladder(
             )
         }
         for order in halves:
-            pool, held = order[: len(order) // 2], order[len(order) // 2 :]
+            pool, held = two_halves(order)
             if rung:
                 drawn = rng.choice(pool, size=rung, replace=False)
                 fit_p, fit_y = p_tgt[drawn], y_tgt[drawn]

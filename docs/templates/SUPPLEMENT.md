@@ -121,9 +121,9 @@ Table S6. Sensitivity of the inpatient threshold among ill outpatients by sex an
 
 ### S1.9 Refitting on labelled outpatients
 
-In each of 200 draws the {{out_n}} outpatients were shuffled and cut into two halves; the labelled sample was drawn from the first half, both thresholds were refitted on it, and every figure was read on the second. Rung zero spends the inpatient thresholds on the same halves.
+In each of {{lad_draws}} draws the {{out_n}} outpatients were shuffled and cut into two halves; the labelled sample was drawn from the first half, both thresholds were refitted on it, and every figure was read on the second. Rung zero spends the inpatient thresholds on the same halves.
 
-Table S7. From `results/echonext_clinical.json`, field `ladder`. Means over 200 draws, with the 10th to 90th percentile of the draws in brackets.
+Table S7. From `results/echonext_clinical.json`, field `ladder`. Means over {{lad_draws}} draws, with the 10th to 90th percentile of the draws in brackets.
 
 | Model | Labelled outpatients | Ill among them | Sensitivity | Draws below 90% | Specificity | Sent to a reader |
 |---|---|---|---|---|---|---|

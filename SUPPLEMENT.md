@@ -168,29 +168,29 @@ Table S6. Sensitivity of the inpatient threshold among ill outpatients by sex an
 
 ### S1.9 Refitting on labelled outpatients
 
-In each of 200 draws the 1,059 outpatients were shuffled and cut into two halves; the labelled sample was drawn from the first half, both thresholds were refitted on it, and every figure was read on the second. Rung zero spends the inpatient thresholds on the same halves.
+In each of 2,000 draws the 1,059 outpatients were shuffled and cut into two halves; the labelled sample was drawn from the first half, both thresholds were refitted on it, and every figure was read on the second. Rung zero spends the inpatient thresholds on the same halves.
 
-Table S7. From `results/echonext_clinical.json`, field `ladder`. Means over 200 draws, with the 10th to 90th percentile of the draws in brackets.
+Table S7. From `results/echonext_clinical.json`, field `ladder`. Means over 2,000 draws, with the 10th to 90th percentile of the draws in brackets.
 
 | Model | Labelled outpatients | Ill among them | Sensitivity | Draws below 90% | Specificity | Sent to a reader |
 |---|---|---|---|---|---|---|
-| Network trained here | 0 | none | 71.3% (68.2% to 75.0%) | 100.0% | 71.1% (69.1% to 73.5%) | 29.3% |
-| Network trained here | 25 | 6.2 (3 to 9) | 98.4% (93.1% to 100.0%) | 6.5% | 5.5% (0.0% to 28.6%) | 76.3% |
-| Network trained here | 50 | 12.7 (9 to 17) | 92.8% (82.3% to 100.0%) | 28.0% | 25.0% (3.3% to 56.7%) | 59.6% |
-| Network trained here | 100 | 25.5 (20 to 31) | 92.2% (85.1% to 98.0%) | 26.5% | 28.8% (12.2% to 49.9%) | 54.7% |
-| Network trained here | 200 | 51.2 (44 to 59) | 91.0% (85.3% to 96.4%) | 39.0% | 34.1% (17.5% to 49.0%) | 50.3% |
-| EchoNext mini-model | 0 | none | 72.6% (69.3% to 76.3%) | 100.0% | 71.0% (68.5% to 73.1%) | 32.4% |
-| EchoNext mini-model | 25 | 6.2 (3 to 9) | 98.4% (94.7% to 100.0%) | 6.0% | 5.2% (0.0% to 23.2%) | 79.0% |
-| EchoNext mini-model | 50 | 12.7 (9 to 17) | 92.6% (80.7% to 100.0%) | 28.0% | 24.3% (0.5% to 56.9%) | 62.0% |
-| EchoNext mini-model | 100 | 25.5 (20 to 31) | 92.3% (85.3% to 97.9%) | 33.0% | 27.8% (11.1% to 47.7%) | 56.9% |
-| EchoNext mini-model | 200 | 51.2 (44 to 59) | 91.1% (85.2% to 96.2%) | 34.0% | 31.6% (18.9% to 47.4%) | 53.5% |
-| ECGFounder | 0 | none | 71.5% (67.9% to 75.0%) | 100.0% | 71.5% (69.4% to 73.7%) | 32.1% |
-| ECGFounder | 25 | 6.2 (3 to 9) | 98.2% (94.7% to 100.0%) | 7.5% | 5.8% (0.0% to 25.6%) | 77.8% |
-| ECGFounder | 50 | 12.7 (9 to 17) | 93.3% (81.7% to 100.0%) | 23.5% | 23.5% (0.3% to 58.2%) | 62.7% |
-| ECGFounder | 100 | 25.5 (20 to 31) | 92.6% (85.5% to 98.5%) | 27.0% | 28.7% (11.5% to 46.8%) | 56.9% |
-| ECGFounder | 200 | 51.2 (44 to 59) | 91.4% (84.3% to 97.1%) | 31.0% | 33.0% (19.1% to 46.6%) | 53.3% |
+| Network trained here | 0 | none | 71.5% (68.0% to 75.0%) | 100.0% | 71.1% (69.2% to 73.2%) | 29.3% |
+| Network trained here | 25 | 6.5 (4 to 9) | 98.3% (94.3% to 100.0%) | 6.5% | 5.5% (0.0% to 19.2%) | 77.6% |
+| Network trained here | 50 | 12.8 (9 to 17) | 93.1% (82.7% to 100.0%) | 25.6% | 24.4% (3.7% to 55.1%) | 59.8% |
+| Network trained here | 100 | 25.6 (20 to 31) | 91.6% (83.8% to 98.0%) | 33.1% | 30.4% (12.9% to 51.2%) | 53.7% |
+| Network trained here | 200 | 51.1 (44 to 58) | 90.9% (84.5% to 96.4%) | 37.0% | 33.7% (17.0% to 49.1%) | 50.7% |
+| EchoNext mini-model | 0 | none | 72.7% (69.2% to 76.3%) | 100.0% | 71.1% (68.9% to 73.3%) | 32.3% |
+| EchoNext mini-model | 25 | 6.5 (4 to 9) | 98.3% (93.6% to 100.0%) | 7.1% | 5.6% (0.0% to 24.7%) | 78.7% |
+| EchoNext mini-model | 50 | 12.8 (9 to 17) | 93.1% (83.3% to 100.0%) | 25.4% | 23.4% (0.8% to 52.8%) | 62.0% |
+| EchoNext mini-model | 100 | 25.6 (20 to 31) | 91.9% (84.2% to 98.4%) | 31.1% | 28.4% (11.6% to 50.4%) | 56.7% |
+| EchoNext mini-model | 200 | 51.1 (44 to 58) | 91.0% (84.7% to 96.3%) | 36.4% | 31.6% (18.3% to 47.2%) | 53.4% |
+| ECGFounder | 0 | none | 71.6% (68.1% to 75.2%) | 100.0% | 71.4% (69.4% to 73.5%) | 32.1% |
+| ECGFounder | 25 | 6.5 (4 to 9) | 98.3% (93.6% to 100.0%) | 6.9% | 5.8% (0.0% to 23.3%) | 79.3% |
+| ECGFounder | 50 | 12.8 (9 to 17) | 92.9% (82.5% to 100.0%) | 26.2% | 25.0% (0.5% to 54.2%) | 61.2% |
+| ECGFounder | 100 | 25.6 (20 to 31) | 91.8% (83.9% to 98.4%) | 29.9% | 29.9% (12.5% to 48.8%) | 56.2% |
+| ECGFounder | 200 | 51.1 (44 to 58) | 91.0% (84.8% to 96.4%) | 36.4% | 33.7% (19.4% to 46.6%) | 52.6% |
 
-`results/echonext_transfer.json`, field `ladder`, holds the same refit with the outpatients cut once, by a fixed seed, and the labelled samples drawn from the same pool every time. On that one evaluation half, refitting on 100 outpatients covered 93.4%, 97.6% and 95.3% of the ill for the three models. Re-drawing the halves in every draw gives 92.2%, 92.3% and 92.6%: the fixed half was one of the more favourable ones, and the spread of the re-drawn draws contains the earlier means.
+`results/echonext_transfer.json`, field `ladder`, holds the same refit with the outpatients cut once, by a fixed seed, and the labelled samples drawn from the same pool every time. On that one evaluation half, refitting on 100 outpatients covered 93.4%, 97.6% and 95.3% of the ill for the three models. Re-drawing the halves in every draw gives 91.6%, 91.9% and 91.8%: the fixed half was one of the more favourable ones, and the spread of the re-drawn draws contains the earlier means.
 
 ### S1.10 How the published weights were run
 

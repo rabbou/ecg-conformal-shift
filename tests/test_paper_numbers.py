@@ -294,17 +294,27 @@ class TestClaims:
         assert "about a quarter" in README.read_text()
         assert "about a quarter of the fall" in REPORT.read_text()
 
-    def test_the_refit_reaches_ninety_on_average_and_one_repetition_in_four_falls_short(
+    def test_the_refit_reaches_ninety_on_average_and_one_repetition_in_three_falls_short(
         self,
     ) -> None:
+        """'About one repetition in three', for each of the three models, on enough draws
+        that the Monte Carlo error of the share is near one point; and 200 labels do not
+        lower the share."""
         ladder = v.read("echonext_clinical.json")["ladder"]
         for arm in v.STRONGEST:
-            (at100,) = [r for r in ladder[arm] if r["labels"] == 100]
-            assert at100["sensitivity"]["mean"] >= 0.9, arm
-            assert at100["specificity"]["mean"] < 0.4, arm
-        (resnet,) = [r for r in ladder["resnet"] if r["labels"] == 100]
-        assert 0.2 <= resnet["share_of_draws_below_level"] <= 0.33
-        assert "about one repetition in four" in REPORT.read_text()
+            rows = {r["labels"]: r for r in ladder[arm]}
+            assert rows[100]["draws"] >= 2000
+            assert rows[100]["sensitivity"]["mean"] >= 0.9, arm
+            assert rows[100]["specificity"]["mean"] < 0.4, arm
+            assert 0.27 <= rows[100]["share_of_draws_below_level"] <= 0.39, arm
+            share100 = rows[100]["share_of_draws_below_level"]
+            assert rows[200]["share_of_draws_below_level"] >= share100 - 0.02, arm
+            assert rows[200]["sensitivity"]["p90"] - rows[200]["sensitivity"]["p10"] < (
+                rows[100]["sensitivity"]["p90"] - rows[100]["sensitivity"]["p10"]
+            )
+        assert "about one repetition in three" in REPORT.read_text()
+        for target in (REPORT, README):
+            assert "one repetition in four" not in target.read_text()
 
     def test_the_fixed_half_was_favourable_and_inside_the_redrawn_spread(self) -> None:
         transfer = v.read("echonext_transfer.json")

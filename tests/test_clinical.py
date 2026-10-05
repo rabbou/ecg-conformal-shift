@@ -20,6 +20,7 @@ from ecs.clinical import (
     rerandomised_ladder,
     standardised_coverage,
     subgroup_tests,
+    two_halves,
 )
 
 # Columns: healthy admitted, ill admitted.
@@ -107,7 +108,7 @@ class TestLadder:
     def test_separable_scores_are_caught_and_cleared_by_the_source_threshold(self) -> None:
         y = np.array([1] * 40 + [0] * 60)
         p = np.where(y == 1, 0.9, 0.1).astype(float)
-        (row,) = rerandomised_ladder(p, y, p, y, rungs=(0,), draws=5)
+        (row,) = rerandomised_ladder(p, y, p, y, rungs=(0,), draws=5, alpha=0.10, level=0.90)
         assert row["sensitivity"]["mean"] == 1.0
         assert row["specificity"]["mean"] == 1.0
 
@@ -117,7 +118,9 @@ class TestLadder:
         the refitted threshold flags every patient, ill and healthy."""
         y = np.array([1] * 8 + [0] * 92)
         p = np.where(y == 1, 0.9, 0.1).astype(float)
-        (row,) = rerandomised_ladder(p, y, p, y, rungs=(10,), draws=20, seed=1)
+        (row,) = rerandomised_ladder(
+            p, y, p, y, rungs=(10,), draws=20, seed=1, alpha=0.10, level=0.90
+        )
         assert row["specificity"]["max"] == 0.0
 
     def test_each_draw_counts_the_ill_its_sample_held(self) -> None:
@@ -125,16 +128,30 @@ class TestLadder:
         rng = np.random.default_rng(0)
         y = np.array([1] * 40 + [0] * 60)
         p = np.clip(y * 0.3 + rng.uniform(0, 0.7, size=100), 0, 1)
-        (row,) = rerandomised_ladder(p, y, p, y, rungs=(20,), draws=400, seed=3)
+        (row,) = rerandomised_ladder(
+            p, y, p, y, rungs=(20,), draws=400, seed=3, alpha=0.10, level=0.90
+        )
         assert row["ill_in_sample"]["mean"] == pytest.approx(8.0, abs=0.5)
         assert row["ill_in_sample"]["min"] >= 0 and row["ill_in_sample"]["max"] <= 20
+
+    def test_the_sample_is_never_drawn_from_the_half_it_is_read_on(self) -> None:
+        """The refit is read on patients its threshold never saw: the two halves of
+        every cut are disjoint and together hold the whole cohort."""
+        for n in (1, 2, 7, 1059):
+            order = np.random.default_rng(n).permutation(n)
+            pool, held = two_halves(order)
+            assert not set(pool.tolist()) & set(held.tolist())
+            assert sorted(pool.tolist() + held.tolist()) == list(range(n))
+            assert len(held) - len(pool) in (0, 1)
 
     def test_the_halves_are_redrawn_so_rung_zero_varies(self) -> None:
         """A fixed half would give one sensitivity at rung zero; redrawn halves give a spread."""
         rng = np.random.default_rng(1)
         y = np.array([1] * 50 + [0] * 50)
         p = np.clip(y * 0.2 + rng.uniform(0, 0.8, size=100), 0, 1)
-        (row,) = rerandomised_ladder(p, y, p, y, rungs=(0,), draws=50, seed=2)
+        (row,) = rerandomised_ladder(
+            p, y, p, y, rungs=(0,), draws=50, seed=2, alpha=0.10, level=0.90
+        )
         assert row["sensitivity"]["max"] > row["sensitivity"]["min"]
 
 

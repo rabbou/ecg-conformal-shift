@@ -29,7 +29,7 @@ exactly as ``scripts/echonext_transfer.py`` fits them:
 
 Reads the stored scores under ``$ECS_ECHONEXT_DERIVED/scores`` and refuses to
 run without them.  Writes ``results/echonext_clinical.json``: counts and
-aggregates only.  About two minutes on an Apple M5.
+aggregates only.  The run's wall time is that file's ``seconds`` field.
 
 Usage: uv run python scripts/echonext_clinical.py
 """
@@ -74,7 +74,8 @@ FINDINGS = LABELS[:-1]
 SCORES_DIR = DERIVED_DIR / "scores"
 SCREENING_PREVALENCES = (0.10, 0.05)
 LADDER_RUNGS = (0, 25, 50, 100, 200)
-LADDER_DRAWS = 200
+# 2,000 draws put the Monte Carlo error of a share of draws near one point.
+LADDER_DRAWS = 2000
 # EchoNext records these finer measurements only for an ECG taken within a year
 # before the echocardiogram; an ECG with all of them blank was taken earlier.
 MEASUREMENTS = (
@@ -276,7 +277,14 @@ def measure(meta: pd.DataFrame) -> dict[str, Any]:
 
     result["ladder"] = {
         arm: rerandomised_ladder(
-            probs[arm][cal], y[cal], probs[arm][out_rows], y[out_rows], LADDER_RUNGS, LADDER_DRAWS
+            probs[arm][cal],
+            y[cal],
+            probs[arm][out_rows],
+            y[out_rows],
+            LADDER_RUNGS,
+            LADDER_DRAWS,
+            alpha=ALPHA,
+            level=1 - ALPHA,
         )
         for arm in ARMS
     }

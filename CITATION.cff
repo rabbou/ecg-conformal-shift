@@ -10,15 +10,19 @@ version: 1.2.0
 date-released: 2026-10-05
 license: MIT
 abstract: >-
-  Measures what a decision threshold set for 90% on one population delivers
-  within each label once it is carried unchanged to another. Infarction
-  thresholds fitted on PTB-XL are carried to hospitals in Shandong and
-  Chongqing, and five corpora take the calibrating role in turn on five other
-  diagnoses. Structural heart disease thresholds fitted on Columbia inpatients
-  in EchoNext are carried to its outpatients, for four models. A single tuned
-  threshold, pooled conformal calibration and per-label conformal calibration
-  are compared, with what each defers, what the AUROC and the deferral rate
-  show without labels, and how many local labels repair the transfer.
+  Measures how many of the ill an ECG cut-off set to catch 90% at one place
+  catches once it is used unchanged on other patients. Myocardial infarction
+  cut-offs set on PTB-XL are carried to hospitals in Shandong and Chongqing;
+  five collections take turns setting cut-offs for sinus rhythm, atrial
+  fibrillation, left and right bundle-branch block and first-degree
+  atrioventricular block; and structural heart disease cut-offs set on
+  Columbia inpatients in EchoNext are carried to its outpatients, for four
+  models. A single cut-off answering yes or no is compared with conformal
+  prediction, which refers patients in a grey zone to a doctor, its edges set
+  for all patients together or for the ill and the healthy separately. The
+  study reports how many patients each option refers, what the AUROC and the
+  share referred show without known diagnoses, and how many local ECGs with
+  known diagnoses restore the share caught.
 keywords:
   - conformal prediction
   - electrocardiography

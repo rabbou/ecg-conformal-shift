@@ -227,7 +227,7 @@ def subgroup_figures() -> dict[str, str]:
     age_mi = diff["perlabel:age:75+-0-49:mi"]
     sex_pooled, sex_pooled_ci = flipped("pooled:sex:female-male:mi")
     sex_per, sex_per_ci = flipped("perlabel:sex:female-male:mi")
-    # The claims of section 3.4 and of the subgroup limitation.
+    # The claims of Appendix G and of the subgroup limitation.
     assert age_all_ci[0] > 0 and age_non_ci[0] > 0
     assert age_mi["ci95"][0] < 0 < age_mi["ci95"][1]
     assert abs(sex_pooled_ci[0]) < 0.01, "the pooled sex gap's interval sits at zero's edge"

@@ -56,7 +56,7 @@ def echonext_values() -> dict[str, str]:
         )
         inside, outside = f.arm_auroc(arm, "inpatient"), f.arm_auroc(arm, "outpatient")
         assert inside["low"] < outside["high"] and outside["low"] < inside["high"], (
-            f"section 3.7 says the two AUROC intervals overlap for every arm: {arm}"
+            f"section 3.4 says the two AUROC intervals overlap for every arm: {arm}"
         )
         for rung, r in f.ladder(arm).items():
             stem = f"el.{arm}.{rung}"
@@ -81,10 +81,10 @@ def echonext_values() -> dict[str, str]:
     zero_rung, hundred = f.ladder("resnet")[0], f.ladder("resnet")[100]
     recognised = hundred["recognised_pos_mean"] - zero_rung["recognised_pos_mean"]
     referred = hundred["referred_pos_mean"] - zero_rung["referred_pos_mean"]
-    assert recognised > referred, "section 3.7: the labels buy back recognition first"
+    assert recognised > referred, "section 3.6: the labels buy back recognition first"
     out["d.el.recognised_gain"] = f"{100 * recognised:.1f}"
     out["d.el.referred_gain"] = f"{100 * referred:.1f}"
-    # Section 3.7 quotes one figure for the ResNet and ECGFounder, and section 2.2
+    # Section 3.3 quotes one figure for the ResNet and ECGFounder, and section 2.2
     # puts the mini-model within a tenth of a point of its published 82.0%.
     pos = {a: out[f"e.{a}.outpatient.perlabel.pos"] for a in ("resnet", "ecgfounder")}
     assert pos["resnet"] == pos["ecgfounder"], pos
@@ -190,7 +190,7 @@ def rotation_values() -> dict[str, str]:
         "rot.cells.holdout_n": str(sum(r["role"] not in ("home", "away") for r in grid)),
         "rot.discussion.chow": f"correction is worth a median of {100 * median:.1f} points",
         "rot.limitations.mondrian_pairs": f"{word(starving['mondrian'])} source-diagnosis pairs "
-        "of section 3.6",
+        "of section 3.2",
         "rot.limitations.weighted_pairs": f"reweights, {word(starving['weighted'])} do",
     }
     return out

@@ -494,6 +494,7 @@ def extra_figures() -> dict[str, str]:
         "healthy_before": pct(steps[0]["coverage_neg_mean"]),
         "healthy_after": pct(steps[100]["coverage_neg_mean"]),
         "acs_auroc": auroc(read("auxiliary.json")["discrimination"]["by_corpus"]["acs"]["auroc"]),
+        "sph_auroc": auroc(read("auxiliary.json")["discrimination"]["by_corpus"]["sph"]["auroc"]),
         "strongest_about": strongest_about(),
     }
 

@@ -1,7 +1,7 @@
 """Hold every rotation number the prose prints to the file it was read from.
 
-Section 2.4 and section 3.6 of ``REPORT.md``, and the sentences the rotation adds
-to the abstract and the discussion, quote roughly fifty figures.  Each one is
+Section 2.5, the results of section 3, appendices D to G of ``REPORT.md``, and
+the sentences the rotation adds to the discussion, quote roughly fifty figures.  Each one is
 recomputed here from a file under ``results/`` and asserted to appear in the
 prose, so that regenerating a table and forgetting to reread the paragraph
 fails the suite rather than shipping.
@@ -96,12 +96,17 @@ def report() -> str:
 
 @pytest.fixture(scope="module")
 def rotation_section(report: str) -> str:
-    """Section 2.4 and section 3.6, which is where every figure below is printed."""
-    method = report.index("### 2.4 The source rotation")
+    """Section 2.5, the results and appendices D to G, where every figure below is printed.
+
+    The rotation is read beside the infarction transfer it widens, so its figures
+    sit in every results section rather than in one of their own.
+    """
+    method = report.index("### 2.5 Five corpora in the calibration role")
     method_end = report.index("## 3. Results")
-    results = report.index("### 3.6 Five corpora in the calibration role")
+    results = report.index("## 3. Results")
     results_end = report.index("## 4. Discussion")
-    return report[method:method_end] + report[results:results_end]
+    appendix = report.index("## Appendix D.")
+    return report[method:method_end] + report[results:results_end] + report[appendix:]
 
 
 def _cases(name: str) -> Iterator[tuple[str, str]]:
@@ -511,53 +516,31 @@ GROUPS = [
 def test_the_rotation_section_prints_what_the_results_files_hold(
     group: str, rotation_section: str
 ) -> None:
-    """Every figure in sections 2.4 and 3.6, rebuilt from results/ and searched for."""
+    """Every rotation figure of the methods, results and appendices, rebuilt and searched for."""
     for what, expected in _cases(group):
         assert expected.lower() in rotation_section.lower(), (
             f"{group}/{what}: {expected!r} not in the section"
         )
 
 
-def test_the_abstract_carries_the_rotation_figures_it_claims(report: str) -> None:
-    """The abstract quotes five of the section's numbers and must quote them alike."""
+def test_the_abstract_carries_the_ladder_figures_it_claims(report: str) -> None:
+    """The abstract quotes the Chongqing ladder's 100 rung under per-label calibration.
+
+    It quotes no other rotation figure; the section test pins the rest where the
+    results print them.
+    """
     abstract = report[report.index("## Abstract") : report.index("## 1. Introduction")]
-    home_none = [r for r in _grid("none") if r["role"] == "home"]
-    home_mondrian = [r for r in _grid("mondrian") if r["role"] == "home"]
-    away_mondrian = [r for r in _grid("mondrian") if r["role"] == "away"]
     scale = {
         (r["family"], r["n_target_records"]): r["coverage_by_class"]["1"]["mean"]
         for r in _read("target_scale.json")["rows"]
-        if r["alpha"] == 0.10 and r["score"] == "lac" and r["correction"] == "none"
+        if r["alpha"] == 0.10 and r["score"] == "lac" and r["correction"] == "mondrian"
     }
-    for what, expected in (
-        ("marginal at home", f"cover {_mean_pct(home_none, 'coverage_mean')} of all cases"),
-        (
-            "diagnosis at home",
-            f"and {_mean_pct(home_none, 'coverage_diagnosis_mean')} of the cases",
-        ),
-        # The abstract leads with the reading that excludes the pairs covering
-        # by abstention, and carries the inclusive pair after it.
-        (
-            "repaired at home",
-            f"at home, at {_mean_pct(_finite(home_mondrian), 'coverage_diagnosis_mean')}",
-        ),
-        (
-            "not on transfer",
-            f"on transfer, at {_mean_pct(_finite(away_mondrian), 'coverage_diagnosis_mean')}",
-        ),
-        (
-            "inclusive pair",
-            f"to {_mean_pct(home_mondrian, 'coverage_diagnosis_mean')} and "
-            f"{_mean_pct(away_mondrian, 'coverage_diagnosis_mean')}",
-        ),
-        ("ladder foot", f"from {_pct(scale[('recalibrated', 0)])}"),
-        ("ladder at 100", f"to {_pct(scale[('recalibrated', 100)])}"),
-    ):
-        assert expected in abstract, f"{what}: {expected!r} not in the abstract"
+    expected = f"rose to {_pct(scale[('recalibrated', 100)])}"
+    assert expected in abstract, f"ladder at 100: {expected!r} not in the abstract"
 
 
 def test_the_discussion_and_limitations_quote_the_same_files(report: str) -> None:
-    """The rotation reaches past section 3.6, and those sentences went unpinned.
+    """The rotation reaches past the results, and those sentences went unpinned.
 
     The discussion qualifies its Chow reading with a rotation figure and the
     limitations count the pairs that cover by abstaining under two schemes.
@@ -581,7 +564,7 @@ def test_the_discussion_and_limitations_quote_the_same_files(report: str) -> Non
             "correction is worth a median of "
             f"{100 * chow['by_correction']['mondrian']['median']:.1f} points",
         ),
-        ("mondrian pairs", f"{_word(counts['mondrian'])} source-diagnosis pairs of section 3.6"),
+        ("mondrian pairs", f"{_word(counts['mondrian'])} source-diagnosis pairs of section 3.2"),
         ("weighted pairs", f"reweights, {_word(counts['weighted'])} do"),
     ):
         assert expected in tail, f"{what}: {expected!r} not in the discussion or limitations"

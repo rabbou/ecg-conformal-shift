@@ -1,5 +1,5 @@
 cff-version: 1.2.0
-title: Per-label conformal calibration of ECG classifiers across hospitals and care settings
+title: A 90% ECG threshold does not hold at another hospital or in another care setting
 message: If you use this repository, please cite it as below.
 type: software
 authors:
@@ -10,15 +10,15 @@ version: 1.2.0
 date-released: 2026-10-05
 license: MIT
 abstract: >-
-  Measures what three ways of turning the same frozen ECG classifier scores
-  into a clinical output deliver per label, and what happens to each when its
-  calibration threshold is carried unchanged to hospitals of different
-  myocardial infarction prevalence. PTB-XL as source, SPH (Shandong) and
-  ACS-ECG (Chongqing) as targets. The design is then repeated with each of
-  five corpus sources in the calibration role in turn, on five diagnoses.
-  The same question is then asked of structural heart disease on EchoNext,
-  with thresholds fitted on Columbia inpatients and carried unchanged to
-  outpatients, for four models.
+  Measures what a decision threshold set for 90% on one population delivers
+  within each label once it is carried unchanged to another. Infarction
+  thresholds fitted on PTB-XL are carried to hospitals in Shandong and
+  Chongqing, and five corpora take the calibrating role in turn on five other
+  diagnoses. Structural heart disease thresholds fitted on Columbia inpatients
+  in EchoNext are carried to its outpatients, for four models. A single tuned
+  threshold, pooled conformal calibration and per-label conformal calibration
+  are compared, with what each defers, what the AUROC and the deferral rate
+  show without labels, and how many local labels repair the transfer.
 keywords:
   - conformal prediction
   - electrocardiography

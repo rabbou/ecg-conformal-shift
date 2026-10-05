@@ -119,7 +119,7 @@ SECTION = re.compile(
 
 def prose(text: str) -> str:
     """The text a number is read from: no reference list, link, code or citation mark."""
-    for first, last in (("## References", "## Data and code"), ("## Licence and citation", None)):
+    for first, last in (("## References", "## Declarations"), ("## Licence and citation", None)):
         if first in text:
             start = text.index(first)
             text = text[:start] + (text[text.index(last) :] if last else "")

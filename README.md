@@ -1,8 +1,8 @@
-# Per-label conformal calibration of ECG classifiers across hospitals and care settings
+# A 90% ECG threshold does not hold at another hospital or in another care setting
 
 Infarction across hospitals, and structural heart disease from inpatients to outpatients: [REPORT.md](REPORT.md) · Ruben Abbou · 2026
 
-An ECG classifier's decision threshold is set on one population and used on others. Conformal calibration sets it so that 90% of tracings receive a set of possible diagnoses holding the right one. On PTB-XL, a German research corpus, the target holds over all tracings (90.0%) and fails within infarction (73.5%). Carried unchanged to a hospital in Chongqing, the threshold covers 73.7% of infarctions among held-out tracings; recalibrating on 100 tracings labelled there brings it to 88.9%. At Columbia, thresholds fitted on 1,903 inpatients cover about 72% of outpatients with structural heart disease for each of the three strongest models, which points at the outpatients' ECGs rather than at one model, though all three were fitted to the same EchoNext training split. Refitting them on 100 labelled outpatient ECGs brings that to between 93.4% and 97.6%, averaged over 200 draws. A site adopting such a tool has to measure coverage within each diagnosis and care setting, on its own patients.
+An ECG classifier's decision threshold is set on one population and used on others, and a threshold set for 90% does not deliver 90% after the move, while the AUROC a receiving site is shown can stay where it was. Conformal calibration sets the threshold so that 90% of tracings receive a set of possible diagnoses holding the right one. On PTB-XL, a German research corpus, the target holds over all tracings (90.0%) and fails within infarction (73.5%). Carried unchanged to a hospital in Chongqing, the threshold covers 73.7% of infarctions among held-out tracings; recalibrating on 100 tracings labelled there brings it to 88.9%. At Columbia, thresholds fitted on 1,903 inpatients cover about 72% of outpatients with structural heart disease for each of the three strongest models, while the trained network's AUROC moves only from 0.815 among inpatients to 0.805 among outpatients. That points at the outpatients' ECGs rather than at one model, though all three were fitted to the same EchoNext training split. Refitting them on 100 labelled outpatient ECGs brings that to between 93.4% and 97.6%, averaged over 200 draws. A site adopting such a tool has to measure coverage within each diagnosis and care setting, on its own patients.
 
 ![Coverage by site and calibration scheme](results/figures/fig3_coverage.png)
 
@@ -16,7 +16,7 @@ When the model cannot rule a diagnosis out, the tracing receives a set holding b
 
 What happens at a third site cannot be predicted from these two. Infarction coverage rose at Shandong, to 93.6%, and fell at Chongqing. A site can reuse the measurement code, and what the measurement needs is cases of the rarer diagnosis: 865 infarctions pin coverage within that diagnosis to two points, about 5,800 tracings at Chongqing's prevalence and 86,000 at Shandong's.
 
-This is a retrospective measurement study on public, de-identified data. It is not a medical device and has no regulatory status, it involved no contact with patients, and nothing here is meant to guide the care of any patient. The ethics approvals and the author's competing interests open [REPORT.md](REPORT.md).
+This is a retrospective measurement study on public, de-identified data. It is not a medical device and has no regulatory status, it involved no contact with patients, and nothing here is meant to guide the care of any patient. The ethics approvals and the author's competing interests are in the declarations of [REPORT.md](REPORT.md).
 
 ## Design
 
@@ -50,7 +50,7 @@ Four models score every ECG: a residual network trained on EchoNext for this stu
 
 Among outpatients with structural heart disease, the three models with the highest AUROC (the trained network, the mini-model and ECGFounder) each cover between 71.6% and 72.7%, against the 90% asked for. When a network trained here, a network trained by the EchoNext authors and a foundation model pre-trained elsewhere lose the same coverage, that points at the outpatients' ECGs rather than at one model, though all three were fitted to the same EchoNext training split. Milder disease among outpatients explains about a third of that loss: reweighted to the inpatients' severity, coverage of the ill reaches 76.9% to 78.7%, still short of 90%. The randomly initialised floor model covers 78.6% of outpatients with the disease because it sends 44.2% of all outpatients to a human reader. Refitting the per-label thresholds on 100 labelled outpatient ECGs, drawn 200 times from one half of the outpatients, covers between 93.4% and 97.6% of the other half's patients with the disease for the trained network, the mini-model and ECGFounder, on average over the draws.
 
-EchoNext is under PhysioNet's restricted licence, so no tracing and no per-record score is in this repository. The per-label results, the commands and how the published weights were run are in [REPORT.md](REPORT.md), sections 2.2, 3.7 and 3.8.
+EchoNext is under PhysioNet's restricted licence, so no tracing and no per-record score is in this repository. The per-label results are in [REPORT.md](REPORT.md), sections 3.3 to 3.6, and how the published weights were run is in its Appendix C.
 
 ## Reproduce
 

@@ -10,6 +10,9 @@ probability itself can be read as a risk, and what acting on it is worth.
                          the outcome (1 when the spread is right); the
                          intercept is calibration-in-the-large, fitted with
                          logit(p) as a fixed offset (0 when the level is right).
+``recalibration_coefficients``  intercept and slope of that same logistic
+                         model fitted jointly, the pair that maps logit(p) to
+                         a recalibrated logit.
 ``brier``                mean squared error of the probability.
 ``net_benefit``          Vickers & Elkin (2006): true positives per patient
                          minus false positives per patient weighted by the odds
@@ -39,6 +42,8 @@ __all__ = [
     "net_benefit",
     "net_benefit_treat_all",
     "ppv_at_prevalence",
+    "recalibrated",
+    "recalibration_coefficients",
     "sensitivity_specificity",
     "slope_intercept",
 ]
@@ -96,7 +101,7 @@ def _logistic_fit(design: Array, y: Array, offset: Array) -> Array:
     beta = np.zeros(design.shape[1])
     current = _log_likelihood(design, y, offset, beta)
     for _ in range(NEWTON_STEPS):
-        mu = 1.0 / (1.0 + np.exp(-(design @ beta + offset)))
+        mu = 0.5 * (1.0 + np.tanh((design @ beta + offset) / 2.0))
         gradient = design.T @ (y - mu)
         if np.max(np.abs(gradient)) < NEWTON_TOL * len(y):
             return beta
@@ -129,6 +134,23 @@ def slope_intercept(y: Outcomes, p: Array) -> tuple[float, float]:
     z = _logit(p)
     slope = _logistic_fit(np.column_stack([np.ones_like(z), z]), y, np.zeros_like(z))[1]
     return float(slope), calibration_in_the_large(y, p)
+
+
+def recalibration_coefficients(y: Outcomes, p: Array) -> tuple[float, float]:
+    """Intercept and slope of the joint logistic fit of the outcome on logit(p)."""
+    y, p = _check(y, p)
+    if y.min() == y.max():
+        raise ValueError("recalibration needs both outcomes present")
+    z = _logit(p)
+    a, b = _logistic_fit(np.column_stack([np.ones_like(z), z]), y, np.zeros_like(z))
+    return float(a), float(b)
+
+
+def recalibrated(p: Array, intercept: float, slope: float) -> Array:
+    """The probability expit(intercept + slope * logit(p))."""
+    eta = intercept + slope * _logit(np.asarray(p, dtype=float))
+    out: Array = 0.5 * (1.0 + np.tanh(eta / 2.0))  # expit, without overflow for large |eta|
+    return out
 
 
 def calibration_curve(y: Outcomes, p: Array, n_bins: int = 10) -> list[dict[str, float]]:

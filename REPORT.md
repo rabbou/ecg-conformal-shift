@@ -75,7 +75,7 @@ The second and third options are the two forms of conformal prediction described
 
 The single cut-off and the per-diagnosis option catch exactly the same ill patients. Both are placed at the score that 90% of the ill calibration patients exceed: the single cut-off there, and the per-diagnosis option's lower cut-off there too. What the per-diagnosis option adds is its upper cut-off, which turns some healthy patients the single cut-off would have flagged into referrals.
 
-A fourth option, run for infarction and for the five collections, starts from pooled calibration and adjusts for the share of ill patients at the target hospital, which it has to guess from the model's scores there, since the target's diagnoses are unknown. Appendix H reports it.
+A fourth option, run for infarction and for the five collections, starts from pooled calibration and tries to match the target hospital's share of ill patients. Since the target's diagnoses are unknown, it guesses that share from the model's scores there (higher scores overall suggest more ill patients), counts the ill calibration patients more or less often to match it, and then places the cut-offs. Appendix H reports it.
 
 Every patient ends in one of three places: the right answer alone, a referral, or the wrong answer alone. An ill patient is recognised, referred or missed; a healthy patient is cleared, referred or falsely flagged. Each share is a share of all the ill, or of all the healthy. A referred patient therefore stays in the count as neither right nor wrong, which lets an option that refers be compared with one that does not. The share of the ill caught is the recognised and the referred together, and nothing below counts a referred patient as recognised.
 
@@ -136,7 +136,7 @@ At Shandong, the pooled option caught 93.6% of infarctions, above the 90% asked 
 
 ![Figure 3](results/figures/fig3_coverage.png)
 
-Figure 3. Share of patients given no wrong answer at each hospital (rows: PTB-XL 2,198 tracings, Shandong 25,770, Chongqing 17,955) under each option (columns: pooled; "class-conditional", the per-diagnosis option; "label-shift weighted", the fourth option). Within each panel, the bars are grouped by the share asked for (horizontal axis), rising from left to right. Grey: all patients. Blue: patients without infarction. Red: patients with infarction. Dashed line: the share asked for. Each bar is an average over the 200 random splits of PTB-XL described in section 2.4; its thin line shows how much the result varies between splits.
+Figure 3. Share of patients given no wrong answer at each hospital (rows: PTB-XL 2,198 tracings, Shandong 25,770, Chongqing 17,955) under each option (columns: pooled; "class-conditional", the per-diagnosis option; "label-shift weighted", the fourth option). Each panel repeats the measurement for several requested shares, rising from left to right along the horizontal axis; the text quotes the bars at 90%. Grey: all patients. Blue: patients without infarction. Red: patients with infarction. Dashed line: the share asked for. Each bar is an average over the 200 random splits of PTB-XL described in section 2.4; its thin line shows how much the result varies between splits.
 
 In the terms a clinician uses, the single cut-off set for 90% sensitivity caught 84.0% of infarctions at Chongqing and 97.4% at Shandong. The per-diagnosis option catches the same infarctions; of its 84.0% at Chongqing, 74.6% were called ill and 9.5% referred. The single cut-off's specificity fell from 80.3% at PTB-XL to 57.2% at Chongqing. On patients without infarction at Chongqing, the per-diagnosis option did worse than the pooled one: it flagged 30.6% of them as infarction and referred 12.2%, where the pooled option flagged 22.1% and referred 6.1%. The fourth option misjudged the share of infarction at both hospitals and caught no more than the per-diagnosis option (Appendix H).
 
@@ -144,7 +144,7 @@ Across the five collections, moved cut-offs lost or gained, and which collection
 
 ![Figure 4](results/figures/fig7_rotation.png)
 
-Figure 4. Share of the ill caught for each diagnosis, asked for 90%, under each option, every move drawn. Columns are the five diagnoses, panels the three options ("class-conditional" is the per-diagnosis option, "label-shift weighted" the fourth). Filled dots are moved cut-offs, coloured by the collection that set them; the hollow marker is that collection reading its own ECGs kept aside for testing. Bars are the average over moves, with the spread across collections. A ringed marker is a move whose cut-off for the ill could not be placed, so the result does not measure the option answering (Appendix E).
+Figure 4. Share of the ill caught for each diagnosis, asked for 90%, under each option, every move drawn. Columns are the five diagnoses, panels the three options ("class-conditional" is the per-diagnosis option, "label-shift weighted" the fourth). Filled dots are moved cut-offs, coloured by the collection that set them; the hollow marker is that collection reading its own ECGs kept aside for testing. Bars are the average over moves, with the spread across collections. A ringed marker is a move whose cut-off for the ill could not be placed, so every patient was flagged or referred, and its high share caught is not a real result (Appendix E).
 
 ### 3.3 Carried to the outpatients of the same hospital
 
@@ -203,13 +203,13 @@ Table 4. The per-diagnosis option under recording faults, PTB-XL test part. Shar
 
 The share referred did not follow the damage either. Swapping the arm electrodes took the share of all patients given no wrong answer from 90.1% to 42.2%, and the share referred moved by only 1.8 points, from 10.5% to 12.3%. Inverting the polarity made the model worse than a coin toss (AUROC 0.374) and took the share given no wrong answer to 25.2%, yet the share referred *fell*, to 0.2%. Baseline wander was the one fault the referrals showed, because it pushed many scores into the grey zone (Appendix I). A rising share of infarctions caught is no reassurance either. Swapping the electrodes and inverting the polarity raised most scores, so nearly every patient was flagged: infarctions caught rose to 98.5% and 100.0%, while most patients without infarction were flagged too. At Columbia, with no fault, the share referred moved in the reassuring direction: for the trained network it fell from 42.3% among test inpatients to 29.4% among outpatients, while the share of the ill caught fell from 90.4% to 71.6%.
 
-### 3.5 Why the coverage fell
+### 3.5 Why fewer of the ill were caught
 
 The ill patients scored differently at the target, and the two moves point at different reasons: at Chongqing what counts as an infarction changed along with everything else, while at Columbia part of the loss is milder disease.
 
 The per-diagnosis cut-off for the ill is placed using the ill alone, so a change in how common the disease is cannot by itself lower the share caught; where that share still fell, the ill patients themselves scored lower. At Chongqing, an infarction is a discharge diagnosis of acute infarction rather than an ECG finding, and the scores of both ill and healthy patients differ from PTB-XL's, those of the healthy more. The definition, the population, the recording machines and the years all differ between PTB-XL and Chongqing, and this design measures their combined effect without separating them.
 
-At Columbia the definition is the same. Severity explains about a third of the lost coverage. The ill outpatients are ill more mildly than the ill inpatients who set the cut-offs: they carry fewer of the eleven findings, keep a higher ejection fraction, and have less right ventricular dysfunction, tricuspid regurgitation and pericardial effusion, with aortic stenosis the exception (Table F1). With the inpatient cut-offs, outpatients with two findings or more are caught more often than those with one, and those with an ejection fraction of 45% or less more often than those above it (Table 5).
+At Columbia the definition is the same. Severity explains about a third of the drop in the share caught. The ill outpatients are ill more mildly than the ill inpatients who set the cut-offs: they carry fewer of the eleven findings, keep a higher ejection fraction, and have less right ventricular dysfunction, tricuspid regurgitation and pericardial effusion, with aortic stenosis the exception (Table F1). With the inpatient cut-offs, outpatients with two findings or more are caught more often than those with one, and those with an ejection fraction of 45% or less more often than those above it (Table 5).
 
 Table 5. Ill outpatients caught, by severity, and after weighting them to the inpatients' mix of severity; 95% confidence intervals in brackets.
 
@@ -223,11 +223,11 @@ Weighted to the inpatients' severity, the ill outpatients would be caught at 76.
 
 In neither move did a different model repair the loss. At Columbia three models built in different ways fell alike, and for infarction five other networks, each trained beforehand on other ECGs, did no better at Chongqing (Appendix E).
 
-### 3.6 What repaired it: the receiving site's own labels
+### 3.6 What repaired it: the target's own ECGs with known diagnoses
 
 In both moves, a hundred ECGs with known diagnoses from the target did what no option and no model did: reset on them, the cut-offs caught close to 90% of the ill again.
 
-At Chongqing, PTB-XL's pooled cut-offs caught 73.7% of infarctions among the 8,984 tracings kept aside for checking. Reset on 100 Chongqing tracings, they caught 88.9%; on 500 and 2,000, 88.8% and 88.6% (Figure 6). Adding the same Chongqing tracings to PTB-XL's calibration patients, instead of using them alone, helped far less: 74.8% with 100, 84.2% with 2,000. What repairs the cut-off is being set on the target's own patients, not the number of patients it is set on. Under the per-diagnosis option, the same reset raised the infarctions caught from 84.8% to 93.8%, and a hundred Chongqing tracings hold about 14.9 infarctions.
+At Chongqing, PTB-XL's pooled cut-offs caught 73.7% of infarctions among the 8,984 tracings kept aside for checking. Reset on 100 Chongqing tracings, they caught 88.9%; on 500 and 2,000, 88.8% and 88.6% (Figure 6). Adding the same Chongqing tracings to PTB-XL's calibration patients, instead of using them alone, helped far less: 74.8% with 100, 84.2% with 2,000. What repairs the cut-off is being set on the target's own patients, not the number of patients it is set on. Under the per-diagnosis option, the same reset raised the infarctions caught on those tracings from 84.8% (84.0% over the whole cohort, as in section 3.2) to 93.8%, and a hundred Chongqing tracings hold about 14.9 infarctions.
 
 ![Figure 6](results/figures/fig8_target_scale.png)
 
@@ -278,7 +278,7 @@ The variation quoted with the infarction figures understates the uncertainty. It
 
 No difference by sex or age is established for the per-diagnosis option. Appendix G gives the share caught by sex and age at PTB-XL. The only difference there clearly beyond chance is that patients without infarction aged 75 and over were falsely flagged more often than younger ones. Within infarction the groups are small, 253 women and 232 patients aged 75 and over, too few to settle a difference. Sex and age are the two groups PTB-XL records; the target hospitals publish nothing that would allow the same breakdown. At Columbia the share of ill outpatients caught is 61.1% for women and 80.7% for men, a single look not adjusted for the number of comparisons made, which could be chance.
 
-One target, 90%, was used throughout, with one of the standard formulas for placing conformal cut-offs. Appendix H gives what changes with another target or formula. The choice of 90% is conventional and not weighed against any particular clinical cost.
+One target, 90%, was used throughout. Conformal prediction can place its cut-offs by more than one formula; the one used here is the most common, and Appendix H gives what an 80% target, or another formula, changes. The choice of 90% is conventional and not weighed against any particular clinical cost.
 
 The share caught is not the positive predictive value, the chance that a flagged patient has the disease, which depends directly on how common the disease is. For infarction under the per-diagnosis option it is 9.2% at Shandong, 29.9% at Chongqing and 72.4% at PTB-XL.
 

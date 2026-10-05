@@ -1,16 +1,21 @@
-"""The one-page transfer report, rendered from ``results/echonext_transfer.json`` alone.
+"""The one-page transfer report, rendered from the committed result files.
 
-Every figure on the page is read from the result file at render time, so the
-page cannot say a number the file does not hold, and re-rendering it is how a
-test holds the committed page to the file.  Cells that later tasks fill are
-printed empty, with the task that fills them.
+``results/echonext_transfer.json`` gives the coverage, calibration and ladder;
+``results/echonext_ppv_gap.json`` and ``results/repairs.json``, when present,
+give the recomputed-against-observed PPV and the three repairs.  Every figure
+on the page is read from those files at render time, so the page cannot say a
+number the files do not hold, and re-rendering it is how a test holds the
+committed page to them.  Cells that later tasks fill are printed empty, with
+the task that fills them.
 """
 
 from __future__ import annotations
 
+import json
+from pathlib import Path
 from typing import Any
 
-__all__ = ["CONTEXT_NAMES", "LABEL_NAMES", "pct", "render"]
+__all__ = ["CONTEXT_NAMES", "LABEL_NAMES", "load_companions", "pct", "render"]
 
 LABEL_NAMES = {
     "lvef_lte_45_flag": "LVEF ≤45%",
@@ -201,7 +206,100 @@ def _ladder_section(arm: dict[str, Any], target: str) -> list[str]:
     return lines
 
 
-def render(result: dict[str, Any], arm_name: str, target: str = "outpatient") -> str:
+def _points(x: float) -> str:
+    return f"{100 * x:+.1f}"
+
+
+def _gap_section(rows: list[dict[str, Any]]) -> list[str]:
+    lines = [
+        "## Positive predictive value recomputed by Bayes' rule against observed",
+        "",
+        "At the plain threshold, the recipe carries the source's sensitivity and specificity "
+        "to the target's true prevalence. The gap is recomputed minus observed, in percentage "
+        "points, with the 2.5th and 97.5th centiles of 2,000 redraws of both tables; the "
+        "observed PPV carries its 95% Wilson interval. If only the prevalence had changed, the "
+        "mean likelihood ratio among the healthy would stay at its source value, close to 1.",
+        "",
+        "| Label | Prevalence, target | Flagged | PPV recomputed | PPV observed "
+        "| Gap, points | Mean likelihood ratio of the healthy, source / target |",
+        "|---|---|---|---|---|---|---|",
+    ]
+    for row in rows:
+        if not row["defined"]:
+            lines.append(
+                f"| {LABEL_NAMES[row['label']]} | {pct(row['prevalence_target'])} "
+                f"| {row['n_flagged']} | n/a | n/a | n/a | n/a |"
+            )
+            continue
+        lines.append(
+            f"| {LABEL_NAMES[row['label']]} | {pct(row['prevalence_target'])} "
+            f"| {row['n_flagged']} | {pct(row['ppv_recomputed'])} "
+            f"| {pct(row['ppv_observed'])}"
+            f"{_interval(row['ppv_observed_low'], row['ppv_observed_high'])} "
+            f"| {_points(row['gap'])} [{_points(row['gap_low'])}, {_points(row['gap_high'])}] "
+            f"| {num(row['likelihood_ratio_healthy_source'])} "
+            f"/ {num(row['likelihood_ratio_healthy_target'])} |"
+        )
+    return lines
+
+
+def _repairs_section(cells: list[dict[str, Any]], target: str) -> list[str]:
+    lines = [
+        "## Three repairs judged on net benefit",
+        "",
+        f"Read on one half of the {CONTEXT_NAMES[target]}, cut by patient. Net benefit is in "
+        "true positives per 100 patients. The prevalence correction uses no target label; the "
+        "recalibration fits an intercept and a slope on 100 labelled ECGs from the other half, "
+        "averaged over 200 draws (10th to 90th centile in brackets); the per-label sets use no "
+        "target label and send their abstentions to a human, whose decision is not modelled, "
+        "so they show two values, abstentions cleared and abstentions referred.",
+        "",
+        "| Label | Threshold | As delivered | Prevalence corrected | Recalibrated on 100 "
+        "| Per-label sets, cleared / referred | Treat all |",
+        "|---|---|---|---|---|---|---|",
+    ]
+    for cell in cells:
+        for row in cell["net_benefit"]:
+            lines.append(
+                f"| {LABEL_NAMES[cell['label']]} | {pct(row['threshold'], 0)} "
+                f"| {num(100 * row['as_delivered'], 1)} | {num(100 * row['prior'], 1)} "
+                f"| {num(100 * row['recalibrated'], 1)} "
+                f"[{num(100 * row['recalibrated_p10'], 1)}, "
+                f"{num(100 * row['recalibrated_p90'], 1)}] "
+                f"| {num(100 * row['abstention_cleared'], 1)} "
+                f"/ {num(100 * row['abstention_referred'], 1)} "
+                f"| {num(100 * row['treat_all'], 1)} |"
+            )
+    lines += [
+        "",
+        "| Label | Prevalence, evaluation half | Estimated without labels "
+        "| Sent to a human by the per-label sets |",
+        "|---|---|---|---|",
+    ]
+    for cell in cells:
+        lines.append(
+            f"| {LABEL_NAMES[cell['label']]} | {pct(cell['prevalence_eval'])} "
+            f"| {pct(cell['prevalence_estimated'])} | {pct(cell['abstained'])} |"
+        )
+    return lines
+
+
+def load_companions(results: Path) -> tuple[dict[str, Any] | None, dict[str, Any] | None]:
+    """The PPV gap and the repairs files beside ``echonext_transfer.json``, when present."""
+    gap, repairs = results / "echonext_ppv_gap.json", results / "repairs.json"
+    return (
+        json.loads(gap.read_text()) if gap.exists() else None,
+        json.loads(repairs.read_text()) if repairs.exists() else None,
+    )
+
+
+def render(
+    result: dict[str, Any],
+    arm_name: str,
+    target: str = "outpatient",
+    gap: dict[str, Any] | None = None,
+    repairs: dict[str, Any] | None = None,
+) -> str:
     """The markdown page for one arm, from the Columbia inpatients to one target context."""
     arm = result["arms"][arm_name]
     source, tgt = result["source"], result["targets"][target]
@@ -240,6 +338,19 @@ def render(result: dict[str, Any], arm_name: str, target: str = "outpatient") ->
         _ladder_section(arm, target),
     ):
         lines += [*section, ""]
+    if gap is not None:
+        rows = [r for r in gap["rows"] if r["model"] == arm_name and r["target"] == target]
+        lines += [*_gap_section(rows), ""]
+    if repairs is not None:
+        cells = [
+            c
+            for c in repairs["cells"]
+            if c["family"] == "echonext"
+            and c["model"] == arm_name
+            and c["target"] == target
+            and c["label"] in (COMPOSITE, LVEF)
+        ]
+        lines += [*_repairs_section(cells, target), ""]
     lines += ["## Cells filled by other tasks", ""]
     for cell, filler in result["empty_cells"].items():
         lines.append(f"- {cell}: empty, filled by {filler}.")

@@ -1,6 +1,6 @@
 # Threshold generalisation to new sites and care settings for ECG-AI diagnostic support
 
-Infarction across hospitals: [REPORT.md](REPORT.md) · Structural heart disease, inpatients to outpatients: [ECHONEXT.md](ECHONEXT.md) · Ruben Abbou · 2026
+Infarction across hospitals: [REPORT.md](REPORT.md) · Structural heart disease, inpatients to outpatients: [ECHONEXT.md](ECHONEXT.md) · The PPV recomputed for a new site: [PPV.md](PPV.md) ([français](PPV.fr.md)) · Ruben Abbou · 2026
 
 An ECG classifier's decision threshold is set on one population and used on others. Conformal calibration sets it so that 90% of tracings receive a set of possible diagnoses holding the right one. On PTB-XL, a German research corpus, the target holds over all tracings (89.9%) and fails within infarction (73.2%). Carried unchanged to a hospital in Chongqing, the threshold covers 72.5% of infarctions; recalibrating on 100 tracings labelled there brings it to 88.9% on the held-out tracings. At Columbia, thresholds fitted on 1,903 inpatients cover about 72% of outpatients with structural heart disease for each of the three strongest models, so the cause is the outpatients' ECGs rather than one model. Refitting them on 100 labelled outpatient ECGs brings that to between 93.4% and 97.6%, averaged over 200 draws. A site adopting such a tool has to measure coverage within each diagnosis and care setting, on its own patients.
 
@@ -52,6 +52,10 @@ Among outpatients with structural heart disease, the three models with the highe
 
 EchoNext is under PhysioNet's restricted licence, so no tracing and no per-record score is in this repository. The per-label results, the commands and how the published weights were run are in [ECHONEXT.md](ECHONEXT.md), and each model's one-page report is in [reports/transfer/](reports/transfer/).
 
+## The positive predictive value a buyer recomputes
+
+A positive predictive value recomputed by Bayes' rule from a source's sensitivity and specificity, at a target's true prevalence, misses the observed one by a median of 5.3 percentage points over 174 transfers between populations, in either direction, against 0.3 points on 72 controls. The transfers are the EchoNext pairs above, the infarction pairs and the five-corpus rotation. Recalibrating on 100 labelled local ECGs is the one repair of three that raises net benefit on average. [PPV.md](PPV.md) gives the measurement and the repairs.
+
 ## Reproduce
 
 Every number and figure the report prints is redrawn from the scores committed here, so no raw tracing is needed. `outcomes.py` and `subgroups.py` need PTB-XL's `ptbxl_database.csv` (6.6 MB from PhysioNet), which holds each record's patient, sex and age; point `ECS_PTBXL_DIR` at the directory holding it.
@@ -64,7 +68,11 @@ uv run python scripts/figures.py --lang fr  # the report's five figures in Frenc
 export ECS_PTBXL_DIR=/path/to/ptbxl      # the directory with ptbxl_database.csv
 uv run python scripts/outcomes.py        # rebuilds results/outcomes.json, 3 s
 uv run python scripts/subgroups.py       # rebuilds results/subgroups.json, 23 s
+uv run python scripts/ppv_gap.py         # rebuilds results/ppv_gap.json, 2 s
+uv run python scripts/ppv_figures.py     # the two PPV figures, from the committed results
 ```
+
+`scripts/repairs.py` (52 s on an Apple M5) needs the patient tables of PTB-XL, Shandong and Chongqing beside the corpora, and EchoNext's stored scores for its EchoNext rows.
 
 Timings are wall clock on a six-core i7-8700, CPU only; the full suite on a cold clone took 28 minutes. Re-scoring from the raw tracings, the corpus downloads and the rotation chain are in [docs/data.md](docs/data.md).
 
@@ -83,6 +91,8 @@ Timings are wall clock on a six-core i7-8700, CPU only; the full suite on a cold
 | `src/ecs/echonext.py` | EchoNext's files, one provenance row per tracing, and its inpatient, emergency and outpatient cohorts |
 | `src/ecs/transfer.py` | thresholds fitted on a source cohort and spent unchanged on a target, and refitted on 25 to 400 target labels |
 | `src/ecs/calibration.py` | calibration curve, slope and intercept, Brier score, net benefit and positive predictive value of a probability at one site |
+| `src/ecs/ppv_gap.py` | the PPV recomputed by Bayes' rule against the PPV observed, with Wilson and bootstrap intervals and a likelihood-ratio check of label shift |
+| `src/ecs/repairs.py` | label-free prevalence correction, recalibration on local labels and per-label abstention, judged on net benefit |
 | `src/ecs/transfer_report.py` | the one-page transfer report, rendered from `results/echonext_transfer.json` alone |
 | `src/ecs/embedding_store.py` | encoder vectors filed by encoder, version and tracing digest, outside the repository |
 | `src/ecs/echonext_mini.py` | the published EchoNext mini-model, rebuilt to run its own checkpoint |

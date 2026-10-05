@@ -608,8 +608,11 @@ def test_the_figure_reads_the_abstention_field_in_both_role_loops() -> None:
     assert len(reads) >= 2, f"only {len(reads)} role loop(s) consult the field"
 
 
+DRAWING_SCRIPTS = ("figures.py", "ppv_figures.py")
+
+
 def drawn_names() -> set[str]:
-    """The figure file names ``scripts/figures.py`` actually writes.
+    """The figure file names ``scripts/figures.py`` and ``scripts/ppv_figures.py`` write.
 
     Parsed rather than searched for as a substring: ``"fig7_rotation.png" in
     script`` also passes on a file the script only mentions in a comment, and it
@@ -619,7 +622,7 @@ def drawn_names() -> set[str]:
     """
     from figure_text import SUFFIX
 
-    script = (ROOT / "scripts/figures.py").read_text()
+    script = "".join((ROOT / f"scripts/{name}").read_text() for name in DRAWING_SCRIPTS)
     names = set()
     for stem, suffixed in re.findall(r'out / f?"([A-Za-z0-9_.-]+?)(\{suffix\})?\.png"', script):
         names |= {f"{stem}{s}.png" for s in SUFFIX.values()} if suffixed else {f"{stem}.png"}
@@ -645,7 +648,7 @@ def test_no_committed_figure_is_one_no_script_draws() -> None:
     """A renumbering left fig5_rotation.png behind, byte-identical to fig7.
 
     Nothing referenced it and nothing failed, so it would have shipped. Every
-    file in the figure directory has to be a name ``scripts/figures.py`` writes.
+    file in the figure directory has to be a name a drawing script writes.
     The glob is case-blind, since a ``.PNG`` would slip a case-sensitive one.
     """
     names = drawn_names()

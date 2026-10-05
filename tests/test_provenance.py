@@ -38,6 +38,7 @@ REGENERABLE = (
     "auxiliary.json",
     "outcomes.json",
     "perturbations.json",
+    "ppv_gap.json",
     "shift.json",
     "subgroups.json",
 )
@@ -104,6 +105,14 @@ NOT_REGENERABLE = {
         "needs EchoNext and the two arms' per-record scores, neither of which may be committed"
     ),
     "echonext_coverage.csv": "the coverage grid echonext_transfer.json carries, same run",
+    "echonext_ppv_gap.json": (
+        "needs the four EchoNext arms' per-record scores, which may not be committed"
+    ),
+    "ppv_gap.csv": "every row of ppv_gap.json and echonext_ppv_gap.json, same run",
+    "repairs.json": (
+        "needs the EchoNext arms' per-record scores and the patient tables of PTB-XL, "
+        "Shandong and Chongqing on disk"
+    ),
     "echonext_severity.json": (
         "needs EchoNext's metadata and the stored per-record scores, neither of which may be "
         "committed; tests/test_echonext_data.py rebuilds it where they are"
@@ -118,7 +127,9 @@ NOT_REGENERABLE = {
 # Each is named here so a NEW family cannot appear without a decision.
 FAMILIES = {
     "results/embeddings/": "one cached representation per encoder arm and corpus",
-    "results/figures/": "redrawn from the committed tables by scripts/figures.py",
+    "results/figures/": (
+        "redrawn from the committed tables by scripts/figures.py and scripts/ppv_figures.py"
+    ),
     "scores/": "the frozen score arrays a rotation source wrote for one corpus",
 }
 

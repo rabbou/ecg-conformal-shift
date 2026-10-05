@@ -9,7 +9,10 @@ Writes ``results/echonext_transfer.json``, ``results/echonext_coverage.csv``
 and ``reports/transfer/<arm>_inpatient_to_<context>.md``.  The per-record scores
 stay outside the repository: they are derived from restricted data.
 
-Usage: PYTORCH_ENABLE_MPS_FALLBACK=1 .venv/bin/python scripts/echonext_transfer.py
+``--pages`` re-renders the pages alone from the committed result files, which
+needs neither EchoNext nor its scores.
+
+Usage: PYTORCH_ENABLE_MPS_FALLBACK=1 .venv/bin/python scripts/echonext_transfer.py [--pages]
 """
 
 from __future__ import annotations
@@ -48,7 +51,7 @@ from ecs.transfer import (
     ppv_row,
     subgroup_rows,
 )
-from ecs.transfer_report import CONTEXT_NAMES, render
+from ecs.transfer_report import CONTEXT_NAMES, load_companions, render
 
 LVEF = "lvef_lte_45_flag"
 TARGETS = ("inpatient", "emergency", "outpatient")
@@ -69,7 +72,6 @@ EMPTY_CELLS = {
     "The same pair at a second hospital, Columbia to Beth Israel (MIMIC-IV-Echo)": (
         "T-065, ambitious version, after PhysioNet credentialing"
     ),
-    "Gap between observed and recomputed PPV across sites": "T-067",
 }
 
 Probs = NDArray[np.float32]
@@ -222,13 +224,22 @@ def main() -> None:
     result["commit"] = git_commit()
     (RESULTS_DIR / "echonext_transfer.json").write_text(json.dumps(result, indent=2) + "\n")
     coverage_table(result).to_csv(RESULTS_DIR / "echonext_coverage.csv", index=False)
+    write_pages(result)
+
+
+def write_pages(result: dict[str, Any]) -> None:
+    """Every transfer page, from the result and the PPV and repairs files beside it."""
+    gap, repairs = load_companions(RESULTS_DIR)
     REPORTS_DIR.mkdir(parents=True, exist_ok=True)
     for arm in ARMS:
         for target in REPORTED_TARGETS:
             page: Path = REPORTS_DIR / f"{arm}_inpatient_to_{target}.md"
-            page.write_text(render(result, arm, target))
+            page.write_text(render(result, arm, target, gap, repairs))
             print(page.relative_to(REPO_ROOT))
 
 
 if __name__ == "__main__":
-    main()
+    if sys.argv[1:] == ["--pages"]:
+        write_pages(json.loads((RESULTS_DIR / "echonext_transfer.json").read_text()))
+    else:
+        main()

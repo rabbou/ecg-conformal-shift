@@ -113,8 +113,44 @@ The target is cut once by patient into a pool and an evaluation half. Rung 0 spe
 | LVEF ≤45% | 200 | 92.9% [93.8%, 93.8%] | 88.7% | 3.0% | 0.32 |
 | LVEF ≤45% | 400 | 93.7% [93.8%, 93.8%] | 88.5% | 0.0% | 0.28 |
 
+## Positive predictive value recomputed by Bayes' rule against observed
+
+At the plain threshold, the recipe carries the source's sensitivity and specificity to the target's true prevalence. The gap is recomputed minus observed, in percentage points, with the 2.5th and 97.5th centiles of 2,000 redraws of both tables; the observed PPV carries its 95% Wilson interval. If only the prevalence had changed, the mean likelihood ratio among the healthy would stay at its source value, close to 1.
+
+| Label | Prevalence, target | Flagged | PPV recomputed | PPV observed | Gap, points | Mean likelihood ratio of the healthy, source / target |
+|---|---|---|---|---|---|---|
+| LVEF ≤45% | 6.6% | 369 | 10.8% | 16.3% [12.8%, 20.4%] | -5.4 [-7.6, -3.3] | 1.15 / 0.53 |
+| LV wall ≥1.3 cm | 13.8% | 615 | 16.4% | 20.5% [17.5%, 23.9%] | -4.1 [-5.7, -2.4] | 1.02 / 0.77 |
+| Aortic stenosis, moderate+ | 4.8% | 686 | 6.9% | 7.0% [5.3%, 9.2%] | -0.1 [-0.8, +0.6] | 1.01 / 0.92 |
+| Aortic regurgitation, moderate+ | 0.4% | 902 | 0.4% | 0.4% [0.2%, 1.1%] | -0.0 [-0.1, -0.0] | 0.99 / 0.80 |
+| Mitral regurgitation, moderate+ | 2.8% | 524 | 4.2% | 4.6% [3.1%, 6.7%] | -0.4 [-1.3, +0.5] | 1.03 / 0.68 |
+| Tricuspid regurgitation, moderate+ | 2.5% | 512 | 3.3% | 3.9% [2.5%, 6.0%] | -0.7 [-1.5, +0.3] | 1.02 / 0.66 |
+| Pulmonary regurgitation, moderate+ | 0.0% | 925 | n/a | n/a | n/a | n/a |
+| RV dysfunction, moderate+ | 1.9% | 342 | 3.0% | 4.4% [2.7%, 7.1%] | -1.4 [-2.7, -0.2] | 1.11 / 0.50 |
+| Pericardial effusion, moderate+ | 0.2% | 884 | 0.2% | 0.2% [0.1%, 0.8%] | -0.0 [-0.1, +0.0] | 1.00 / 0.81 |
+| PASP ≥45 mmHg | 5.9% | 711 | 6.5% | 7.2% [5.5%, 9.3%] | -0.7 [-1.6, +0.2] | 1.00 / 0.72 |
+| TR velocity ≥3.2 m/s | 3.3% | 464 | 4.5% | 5.6% [3.9%, 8.1%] | -1.1 [-2.3, +0.1] | 1.01 / 0.71 |
+| Composite (any of the above) | 25.6% | 549 | 31.3% | 38.8% [34.8%, 42.9%] | -7.5 [-10.1, -4.8] | 2.62 / 0.57 |
+
+## Three repairs judged on net benefit
+
+Read on one half of the outpatients, cut by patient. Net benefit is in true positives per 100 patients. The prevalence correction uses no target label; the recalibration fits an intercept and a slope on 100 labelled ECGs from the other half, averaged over 200 draws (10th to 90th centile in brackets); the per-label sets use no target label and send their abstentions to a human, whose decision is not modelled, so they show two values, abstentions cleared and abstentions referred.
+
+| Label | Threshold | As delivered | Prevalence corrected | Recalibrated on 100 | Per-label sets, cleared / referred | Treat all |
+|---|---|---|---|---|---|---|
+| LVEF ≤45% | 5% | 2.5 | 0.0 | 3.4 [3.0, 3.8] | 3.1 / 3.9 | 1.5 |
+| LVEF ≤45% | 10% | 1.0 | 0.0 | 2.4 [2.1, 2.8] | 2.9 / 2.1 | -4.0 |
+| LVEF ≤45% | 20% | 0.1 | 0.0 | 2.0 [1.2, 2.5] | 2.5 / -2.0 | -17.0 |
+| Composite (any of the above) | 5% | 22.9 | 0.0 | 22.4 [22.0, 22.9] | 5.8 / 18.0 | 22.9 |
+| Composite (any of the above) | 10% | 18.8 | 0.0 | 17.7 [16.5, 18.7] | 5.7 / 16.2 | 18.7 |
+| Composite (any of the above) | 20% | 10.3 | 0.0 | 12.5 [11.4, 13.2] | 5.4 / 12.0 | 8.5 |
+
+| Label | Prevalence, evaluation half | Estimated without labels | Sent to a human by the per-label sets |
+|---|---|---|---|
+| LVEF ≤45% | 6.4% | 0.0% | 29.6% |
+| Composite (any of the above) | 26.8% | 0.0% | 42.6% |
+
 ## Cells filled by other tasks
 
 - Distance without labels between source and target ECGs: empty, filled by T-068.
 - The same pair at a second hospital, Columbia to Beth Israel (MIMIC-IV-Echo): empty, filled by T-065, ambitious version, after PhysioNet credentialing.
-- Gap between observed and recomputed PPV across sites: empty, filled by T-067.

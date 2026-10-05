@@ -25579,8 +25579,7 @@
   },
   "empty_cells": {
     "Distance without labels between source and target ECGs": "T-068",
-    "The same pair at a second hospital, Columbia to Beth Israel (MIMIC-IV-Echo)": "T-065, ambitious version, after PhysioNet credentialing",
-    "Gap between observed and recomputed PPV across sites": "T-067"
+    "The same pair at a second hospital, Columbia to Beth Israel (MIMIC-IV-Echo)": "T-065, ambitious version, after PhysioNet credentialing"
   },
   "commit": "755c37d16b7add98918bbc27f10a41e67b47dbc7"
 }

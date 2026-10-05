@@ -20,7 +20,7 @@ from test_echonext_severity_results import SEVERITY, severity_figures
 from ecs.config import REPO_ROOT, RESULTS_DIR
 from ecs.echonext import LABELS, PROVENANCE_FIELDS
 from ecs.transfer import METHODS
-from ecs.transfer_report import pct, render
+from ecs.transfer_report import load_companions, pct, render
 
 TRANSFER = RESULTS_DIR / "echonext_transfer.json"
 PROVENANCE = RESULTS_DIR / "echonext_provenance.json"
@@ -55,15 +55,24 @@ class TestPages:
     def test_each_page_is_what_the_renderer_makes_of_the_json(self, result: dict[str, Any]) -> None:
         for arm in result["arms"]:
             page = REPO_ROOT / f"reports/transfer/{arm}_inpatient_to_outpatient.md"
-            assert page.read_text() == render(result, arm, "outpatient"), (
+            gap, repairs = load_companions(RESULTS_DIR)
+            assert page.read_text() == render(result, arm, "outpatient", gap, repairs), (
                 f"{page.name} differs from its result file; rerun scripts/echonext_transfer.py"
             )
 
     def test_the_pages_name_the_cells_other_tasks_fill(self, result: dict[str, Any]) -> None:
         for arm in result["arms"]:
             page = (REPO_ROOT / f"reports/transfer/{arm}_inpatient_to_outpatient.md").read_text()
-            for filler in ("T-068", "T-067", "T-065, ambitious version"):
+            for filler in ("T-068", "T-065, ambitious version"):
                 assert filler in page
+
+    def test_the_pages_carry_the_ppv_gap_and_the_repairs(self, result: dict[str, Any]) -> None:
+        """T-067 fills the cell T-065 left empty: each page says what Bayes' rule misses."""
+        for arm in result["arms"]:
+            page = (REPO_ROOT / f"reports/transfer/{arm}_inpatient_to_outpatient.md").read_text()
+            assert "## Positive predictive value recomputed by Bayes' rule against observed" in page
+            assert "## Three repairs judged on net benefit" in page
+            assert "T-067" not in page
 
 
 class TestCoverageGrid:

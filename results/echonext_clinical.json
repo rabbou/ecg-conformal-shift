@@ -3247,7 +3247,389 @@
         "p": 0.0014215137265124287,
         "p_holm": 0.004264541179537286
       }
-    ]
+    ],
+    "healthy_and_auroc": {
+      "resnet": {
+        "sex": {
+          "female": {
+            "healthy": 473,
+            "specificity": 0.7885835095137421,
+            "specificity_low": 0.7495366556937804,
+            "specificity_high": 0.822980676744496,
+            "auroc": {
+              "auroc": 0.7726937145541797,
+              "low": 0.7189225678122221,
+              "high": 0.8264467837983838
+            }
+          },
+          "male": {
+            "healthy": 315,
+            "specificity": 0.5936507936507937,
+            "specificity_low": 0.5385998466652386,
+            "specificity_high": 0.6464450976723786,
+            "auroc": {
+              "auroc": 0.8273234811165845,
+              "low": 0.784342798492296,
+              "high": 0.8705594967572394
+            }
+          }
+        },
+        "age": {
+          "18-49": {
+            "healthy": 203,
+            "specificity": 0.8029556650246306,
+            "specificity_low": 0.7428307421587431,
+            "specificity_high": 0.8518276048732499,
+            "auroc": {
+              "auroc": 0.7945812807881774,
+              "low": 0.7096536587989428,
+              "high": 0.8777679237231962
+            }
+          },
+          "50-64": {
+            "healthy": 266,
+            "specificity": 0.7518796992481203,
+            "specificity_low": 0.6966347262958297,
+            "specificity_high": 0.7999531612201547,
+            "auroc": {
+              "auroc": 0.7440884820747521,
+              "low": 0.6687203899888015,
+              "high": 0.8092023781115071
+            }
+          },
+          "65-79": {
+            "healthy": 272,
+            "specificity": 0.6433823529411765,
+            "specificity_low": 0.5848235182545897,
+            "specificity_high": 0.6979476080781729,
+            "auroc": {
+              "auroc": 0.8031045751633988,
+              "low": 0.7511350789653383,
+              "high": 0.8544809305054105
+            }
+          },
+          "80+": {
+            "healthy": 47,
+            "specificity": 0.46808510638297873,
+            "specificity_low": 0.3333168707656074,
+            "specificity_high": 0.607676167798052,
+            "auroc": {
+              "auroc": 0.7972920696324952,
+              "low": 0.7036557059961315,
+              "high": 0.8812103312521146
+            }
+          }
+        }
+      },
+      "echonext_mini": {
+        "sex": {
+          "female": {
+            "healthy": 473,
+            "specificity": 0.7484143763213531,
+            "specificity_low": 0.70741466220316,
+            "specificity_high": 0.7854116129726457,
+            "auroc": {
+              "auroc": 0.7646900902714857,
+              "low": 0.7133301237436018,
+              "high": 0.8172951079399022
+            }
+          },
+          "male": {
+            "healthy": 315,
+            "specificity": 0.653968253968254,
+            "specificity_low": 0.5998650687918463,
+            "specificity_high": 0.7043613651191514,
+            "auroc": {
+              "auroc": 0.8133771209633278,
+              "low": 0.7669526059103862,
+              "high": 0.8602176957655311
+            }
+          }
+        },
+        "age": {
+          "18-49": {
+            "healthy": 203,
+            "specificity": 0.8226600985221675,
+            "specificity_low": 0.7642712206771003,
+            "specificity_high": 0.8690640920155102,
+            "auroc": {
+              "auroc": 0.7505747126436781,
+              "low": 0.6454197936210132,
+              "high": 0.8478471230438105
+            }
+          },
+          "50-64": {
+            "healthy": 266,
+            "specificity": 0.7744360902255639,
+            "specificity_low": 0.720508484801963,
+            "specificity_high": 0.8205499598050052,
+            "auroc": {
+              "auroc": 0.7431622534597363,
+              "low": 0.6674516637911682,
+              "high": 0.8093652428171878
+            }
+          },
+          "65-79": {
+            "healthy": 272,
+            "specificity": 0.625,
+            "specificity_low": 0.5661014129514635,
+            "specificity_high": 0.6804170048770987,
+            "auroc": {
+              "auroc": 0.7788461538461539,
+              "low": 0.7235362663795859,
+              "high": 0.8286008420976377
+            }
+          },
+          "80+": {
+            "healthy": 47,
+            "specificity": 0.3617021276595745,
+            "specificity_low": 0.23966213245714152,
+            "specificity_high": 0.5046410346520489,
+            "auroc": {
+              "auroc": 0.7671179883945842,
+              "low": 0.6806349715099715,
+              "high": 0.8609602967697324
+            }
+          }
+        }
+      },
+      "ecgfounder": {
+        "sex": {
+          "female": {
+            "healthy": 473,
+            "specificity": 0.7547568710359408,
+            "specificity_low": 0.7140344135375386,
+            "specificity_high": 0.7913746601533941,
+            "auroc": {
+              "auroc": 0.7573576294506527,
+              "low": 0.7087911054210705,
+              "high": 0.8113936842056801
+            }
+          },
+          "male": {
+            "healthy": 315,
+            "specificity": 0.6507936507936508,
+            "specificity_low": 0.5966186234953907,
+            "specificity_high": 0.7013351004380606,
+            "auroc": {
+              "auroc": 0.8126108374384235,
+              "low": 0.7621563115531126,
+              "high": 0.855181732728519
+            }
+          }
+        },
+        "age": {
+          "18-49": {
+            "healthy": 203,
+            "specificity": 0.8078817733990148,
+            "specificity_low": 0.7481708983249877,
+            "specificity_high": 0.8561566901221596,
+            "auroc": {
+              "auroc": 0.7753694581280788,
+              "low": 0.6777403977619318,
+              "high": 0.868419400208796
+            }
+          },
+          "50-64": {
+            "healthy": 266,
+            "specificity": 0.7631578947368421,
+            "specificity_low": 0.7085474554889062,
+            "specificity_high": 0.8102757105725702,
+            "auroc": {
+              "auroc": 0.7258908139915005,
+              "low": 0.6453722954357576,
+              "high": 0.7988673004342299
+            }
+          },
+          "65-79": {
+            "healthy": 272,
+            "specificity": 0.6286764705882353,
+            "specificity_low": 0.5698388283261332,
+            "specificity_high": 0.683930131203269,
+            "auroc": {
+              "auroc": 0.799993715434892,
+              "low": 0.752634385286419,
+              "high": 0.8450010795809365
+            }
+          },
+          "80+": {
+            "healthy": 47,
+            "specificity": 0.5106382978723404,
+            "specificity_low": 0.3724245374822684,
+            "specificity_high": 0.6472444496631784,
+            "auroc": {
+              "auroc": 0.7152804642166345,
+              "low": 0.620908950617284,
+              "high": 0.8183112593052109
+            }
+          }
+        }
+      }
+    },
+    "race_ethnicity": {
+      "resnet": {
+        "inpatient": {
+          "asian": {
+            "n": 31,
+            "caught": 27
+          },
+          "black": {
+            "n": 181,
+            "caught": 166
+          },
+          "hispanic": {
+            "n": 257,
+            "caught": 232
+          },
+          "other": {
+            "n": 119,
+            "caught": 106
+          },
+          "unknown": {
+            "n": 200,
+            "caught": 180
+          },
+          "white": {
+            "n": 368,
+            "caught": 334
+          }
+        },
+        "outpatient": {
+          "asian": {
+            "n": 11,
+            "caught": 9
+          },
+          "black": {
+            "n": 39,
+            "caught": 28
+          },
+          "hispanic": {
+            "n": 58,
+            "caught": 41
+          },
+          "other": {
+            "n": 22,
+            "caught": 16
+          },
+          "unknown": {
+            "n": 32,
+            "caught": 23
+          },
+          "white": {
+            "n": 109,
+            "caught": 77
+          }
+        }
+      },
+      "echonext_mini": {
+        "inpatient": {
+          "asian": {
+            "n": 31,
+            "caught": 25
+          },
+          "black": {
+            "n": 181,
+            "caught": 164
+          },
+          "hispanic": {
+            "n": 257,
+            "caught": 233
+          },
+          "other": {
+            "n": 119,
+            "caught": 110
+          },
+          "unknown": {
+            "n": 200,
+            "caught": 187
+          },
+          "white": {
+            "n": 368,
+            "caught": 330
+          }
+        },
+        "outpatient": {
+          "asian": {
+            "n": 11,
+            "caught": 8
+          },
+          "black": {
+            "n": 39,
+            "caught": 29
+          },
+          "hispanic": {
+            "n": 58,
+            "caught": 39
+          },
+          "other": {
+            "n": 22,
+            "caught": 16
+          },
+          "unknown": {
+            "n": 32,
+            "caught": 25
+          },
+          "white": {
+            "n": 109,
+            "caught": 80
+          }
+        }
+      },
+      "ecgfounder": {
+        "inpatient": {
+          "asian": {
+            "n": 31,
+            "caught": 27
+          },
+          "black": {
+            "n": 181,
+            "caught": 163
+          },
+          "hispanic": {
+            "n": 257,
+            "caught": 234
+          },
+          "other": {
+            "n": 119,
+            "caught": 105
+          },
+          "unknown": {
+            "n": 200,
+            "caught": 181
+          },
+          "white": {
+            "n": 368,
+            "caught": 325
+          }
+        },
+        "outpatient": {
+          "asian": {
+            "n": 11,
+            "caught": 9
+          },
+          "black": {
+            "n": 39,
+            "caught": 29
+          },
+          "hispanic": {
+            "n": 58,
+            "caught": 42
+          },
+          "other": {
+            "n": 22,
+            "caught": 15
+          },
+          "unknown": {
+            "n": 32,
+            "caught": 24
+          },
+          "white": {
+            "n": 109,
+            "caught": 75
+          }
+        }
+      }
+    }
   },
   "histogram": {
     "arm": "resnet",
@@ -8506,5 +8888,5 @@
       ]
     }
   },
-  "seconds": 163.6
+  "seconds": 45.6
 }

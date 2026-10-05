@@ -138,6 +138,18 @@ Table S6. Sensitivity of the inpatient threshold among ill outpatients by sex an
 |---|---|---|---|---|---|
 {{rows:subgroup_tests}}
 
+Table S6b. Among outpatients, by sex and age band: the healthy, the specificity of the inpatient threshold with a 95% Wilson interval, and the AUROC with a 95% bootstrap interval, from `results/echonext_clinical.json`, field `subgroups.healthy_and_auroc`.
+
+| Model | Group | Healthy outpatients | Specificity | AUROC |
+|---|---|---|---|---|
+{{rows:subgroup_healthy}}
+
+Table S6c. Ill patients caught by the inpatient threshold in each race and ethnicity group EchoNext records, among test inpatients and outpatients, from field `subgroups.race_ethnicity`. Descriptive; no test was run.
+
+| Model | Group | Inpatients | Outpatients |
+|---|---|---|---|
+{{rows:race}}
+
 ### S1.9 Refitting on labelled outpatients
 
 In each of {{lad_draws}} draws the {{out_n}} outpatients were shuffled and cut into two halves; the labelled sample was drawn from the first half, both thresholds were refitted on it, and every figure was read on the second. Rung zero spends the inpatient thresholds on the same halves.

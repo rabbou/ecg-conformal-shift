@@ -226,6 +226,23 @@ def echonext() -> dict[str, str]:
         g = age["groups"][group]
         out[f"sub_{key}"] = pct(g["caught"] / g["n"])
         out[f"sub_{key}_n"] = f"{g['caught']} of {g['n']}"
+    beside = clinical["subgroups"]["healthy_and_auroc"]["resnet"]
+    for key, kind, group in (
+        ("women", "sex", "female"),
+        ("men", "sex", "male"),
+        ("young", "age", "18-49"),
+        ("old", "age", "80+"),
+    ):
+        g = beside[kind][group]
+        out[f"sp_{key}"] = pct(g["specificity"])
+        out[f"au_{key}"] = f"{g['auroc']['auroc']:.3f}"
+        out[f"au_{key}_ci"] = f"{g['auroc']['low']:.3f} to {g['auroc']['high']:.3f}"
+    race = clinical["subgroups"]["race_ethnicity"]["resnet"]
+    big = [g for g, c in race["outpatient"].items() if c["n"] >= 20]
+    for context, c in (("outpatient", "out"), ("inpatient", "in")):
+        shares = [race[context][g]["caught"] / race[context][g]["n"] for g in big]
+        out[f"race_{c}_range"] = f"{pct(min(shares))} to {pct(max(shares))}"
+    out["race_groups"] = count(len(big))
     out["p_sex_resnet"] = p_value(sex["p_holm"])
     out["p_age_resnet"] = p_value(age["p_holm"])
     out["p_max_others"] = p_value(max(t["p_holm"] for t in tests if t["arm"] != "resnet"))
@@ -558,6 +575,36 @@ def rows_subgroup_tests() -> list[str]:
     return out
 
 
+def rows_subgroup_healthy() -> list[str]:
+    out = []
+    beside = read("echonext_clinical.json")["subgroups"]["healthy_and_auroc"]
+    for arm in STRONGEST:
+        for kind, groups in beside[arm].items():
+            for group, g in groups.items():
+                a = g["auroc"]
+                out.append(
+                    f"| {ARM_NAMES[arm]} | {kind} {group} | {g['healthy']:,} | "
+                    f"{pct(g['specificity'])} "
+                    f"({interval(g['specificity_low'], g['specificity_high'])}) | "
+                    f"{a['auroc']:.3f} ({a['low']:.3f} to {a['high']:.3f}) |"
+                )
+    return out
+
+
+def rows_race() -> list[str]:
+    out = []
+    race = read("echonext_clinical.json")["subgroups"]["race_ethnicity"]
+    for arm in STRONGEST:
+        for group in race[arm]["outpatient"]:
+            cells = " | ".join(
+                f"{race[arm][c][group]['caught']} of {race[arm][c][group]['n']}, "
+                f"{pct(race[arm][c][group]['caught'] / race[arm][c][group]['n'])}"
+                for c in ("inpatient", "outpatient")
+            )
+            out.append(f"| {ARM_NAMES[arm]} | {group} | {cells} |")
+    return out
+
+
 def rows_bedside() -> list[str]:
     out = []
     for arm in STRONGEST:
@@ -716,5 +763,7 @@ ROWS = {
     "ladder_validation": rows_ladder_validation,
     "decision": rows_decision,
     "flow": rows_flow,
+    "subgroup_healthy": rows_subgroup_healthy,
+    "race": rows_race,
     "eras": rows_eras,
 }

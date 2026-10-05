@@ -193,6 +193,52 @@ Table S6. Sensitivity of the inpatient threshold among ill outpatients by sex an
 | ECGFounder | sex | female 79 of 126 (62.7%); male 115 of 145 (79.3%) | Fisher's exact | 0.003 | 0.006 |
 | ECGFounder | age | 18-49 16 of 30 (53.3%); 50-64 41 of 69 (59.4%); 65-79 94 of 117 (80.3%); 80+ 43 of 55 (78.2%) | chi-square | 0.001 | 0.004 |
 
+Table S6b. Among outpatients, by sex and age band: the healthy, the specificity of the inpatient threshold with a 95% Wilson interval, and the AUROC with a 95% bootstrap interval, from `results/echonext_clinical.json`, field `subgroups.healthy_and_auroc`.
+
+| Model | Group | Healthy outpatients | Specificity | AUROC |
+|---|---|---|---|---|
+| Network trained here | sex female | 473 | 78.9% (75.0% to 82.3%) | 0.773 (0.719 to 0.826) |
+| Network trained here | sex male | 315 | 59.4% (53.9% to 64.6%) | 0.827 (0.784 to 0.871) |
+| Network trained here | age 18-49 | 203 | 80.3% (74.3% to 85.2%) | 0.795 (0.710 to 0.878) |
+| Network trained here | age 50-64 | 266 | 75.2% (69.7% to 80.0%) | 0.744 (0.669 to 0.809) |
+| Network trained here | age 65-79 | 272 | 64.3% (58.5% to 69.8%) | 0.803 (0.751 to 0.854) |
+| Network trained here | age 80+ | 47 | 46.8% (33.3% to 60.8%) | 0.797 (0.704 to 0.881) |
+| EchoNext mini-model | sex female | 473 | 74.8% (70.7% to 78.5%) | 0.765 (0.713 to 0.817) |
+| EchoNext mini-model | sex male | 315 | 65.4% (60.0% to 70.4%) | 0.813 (0.767 to 0.860) |
+| EchoNext mini-model | age 18-49 | 203 | 82.3% (76.4% to 86.9%) | 0.751 (0.645 to 0.848) |
+| EchoNext mini-model | age 50-64 | 266 | 77.4% (72.1% to 82.1%) | 0.743 (0.667 to 0.809) |
+| EchoNext mini-model | age 65-79 | 272 | 62.5% (56.6% to 68.0%) | 0.779 (0.724 to 0.829) |
+| EchoNext mini-model | age 80+ | 47 | 36.2% (24.0% to 50.5%) | 0.767 (0.681 to 0.861) |
+| ECGFounder | sex female | 473 | 75.5% (71.4% to 79.1%) | 0.757 (0.709 to 0.811) |
+| ECGFounder | sex male | 315 | 65.1% (59.7% to 70.1%) | 0.813 (0.762 to 0.855) |
+| ECGFounder | age 18-49 | 203 | 80.8% (74.8% to 85.6%) | 0.775 (0.678 to 0.868) |
+| ECGFounder | age 50-64 | 266 | 76.3% (70.9% to 81.0%) | 0.726 (0.645 to 0.799) |
+| ECGFounder | age 65-79 | 272 | 62.9% (57.0% to 68.4%) | 0.800 (0.753 to 0.845) |
+| ECGFounder | age 80+ | 47 | 51.1% (37.2% to 64.7%) | 0.715 (0.621 to 0.818) |
+
+Table S6c. Ill patients caught by the inpatient threshold in each race and ethnicity group EchoNext records, among test inpatients and outpatients, from field `subgroups.race_ethnicity`. Descriptive; no test was run.
+
+| Model | Group | Inpatients | Outpatients |
+|---|---|---|---|
+| Network trained here | asian | 27 of 31, 87.1% | 9 of 11, 81.8% |
+| Network trained here | black | 166 of 181, 91.7% | 28 of 39, 71.8% |
+| Network trained here | hispanic | 232 of 257, 90.3% | 41 of 58, 70.7% |
+| Network trained here | other | 106 of 119, 89.1% | 16 of 22, 72.7% |
+| Network trained here | unknown | 180 of 200, 90.0% | 23 of 32, 71.9% |
+| Network trained here | white | 334 of 368, 90.8% | 77 of 109, 70.6% |
+| EchoNext mini-model | asian | 25 of 31, 80.6% | 8 of 11, 72.7% |
+| EchoNext mini-model | black | 164 of 181, 90.6% | 29 of 39, 74.4% |
+| EchoNext mini-model | hispanic | 233 of 257, 90.7% | 39 of 58, 67.2% |
+| EchoNext mini-model | other | 110 of 119, 92.4% | 16 of 22, 72.7% |
+| EchoNext mini-model | unknown | 187 of 200, 93.5% | 25 of 32, 78.1% |
+| EchoNext mini-model | white | 330 of 368, 89.7% | 80 of 109, 73.4% |
+| ECGFounder | asian | 27 of 31, 87.1% | 9 of 11, 81.8% |
+| ECGFounder | black | 163 of 181, 90.1% | 29 of 39, 74.4% |
+| ECGFounder | hispanic | 234 of 257, 91.1% | 42 of 58, 72.4% |
+| ECGFounder | other | 105 of 119, 88.2% | 15 of 22, 68.2% |
+| ECGFounder | unknown | 181 of 200, 90.5% | 24 of 32, 75.0% |
+| ECGFounder | white | 325 of 368, 88.3% | 75 of 109, 68.8% |
+
 ### S1.9 Refitting on labelled outpatients
 
 In each of 2,000 draws the 1,059 outpatients were shuffled and cut into two halves; the labelled sample was drawn from the first half, both thresholds were refitted on it, and every figure was read on the second. Rung zero spends the inpatient thresholds on the same halves.

@@ -19,7 +19,10 @@ exactly as ``scripts/echonext_transfer.py`` fits them:
   case_mix     the outpatients' sensitivity predicted at the inpatients' case
                mix (findings, ejection fraction, age, sex), against the
                inpatients of the test split;
-  subgroups    sex and age among ill outpatients, each test Holm-adjusted;
+  subgroups    sex and age among ill outpatients, each test Holm-adjusted; and
+               within each sex and age band, the specificity among healthy
+               outpatients and the AUROC; and the sensitivity among the ill of
+               each race and ethnicity group, by setting;
   histogram    the trained network's score, binned, by setting and class;
   roc          each arm's specificity at every whole-percent sensitivity, by
                setting, so the curve and the threshold's point on it can be drawn;
@@ -92,7 +95,7 @@ from ecs.echonext import (
     transfer_cohorts,
 )
 from ecs.metrics import wilson_interval
-from ecs.transfer import AGE_BANDS, ALPHA, conformal_sets
+from ecs.transfer import AGE_BANDS, ALPHA, auroc_row, conformal_sets
 
 ARMS = ("resnet", "echonext_mini", "ecgfounder", "random_init")
 STRONGEST = ("resnet", "echonext_mini", "ecgfounder")
@@ -543,9 +546,51 @@ def measure(meta: pd.DataFrame) -> dict[str, Any]:
         tests += [{"arm": arm, **row} for row in subgroup_tests(caught, groups)]
     for row, adjusted in zip(tests, holm([t["p"] for t in tests]), strict=True):
         row["p_holm"] = adjusted
+    out_meta = meta.iloc[out_rows]
+    out_groups = {
+        "sex": out_meta["sex"].astype(str).to_numpy(),
+        "age": age_band(out_meta["age_at_ecg"]),
+    }
+    beside: dict[str, Any] = {}
+    for arm in STRONGEST:
+        p, yo = probs[arm][out_rows], y[out_rows]
+        flagged = conformal_sets(probs[arm][cal], y[cal], p, ALPHA)["plain"][:, 1]
+        beside[arm] = {}
+        for kind, values in out_groups.items():
+            beside[arm][kind] = {}
+            for group in sorted(set(values.tolist())):
+                g = values == group
+                healthy = g & (yo == 0)
+                low, high = wilson_interval(int((~flagged[healthy]).sum()), int(healthy.sum()))
+                beside[arm][kind][group] = {
+                    "healthy": int(healthy.sum()),
+                    "specificity": float((~flagged[healthy]).mean()),
+                    "specificity_low": low,
+                    "specificity_high": high,
+                    "auroc": auroc_row(yo[g], p[g]),
+                }
+    race: dict[str, Any] = {}
+    for arm in STRONGEST:
+        race[arm] = {}
+        for context in ("inpatient", "outpatient"):
+            rows = targets[context]
+            flagged = conformal_sets(probs[arm][cal], y[cal], probs[arm][rows], ALPHA)["plain"][
+                :, 1
+            ]
+            values = meta.iloc[rows]["race_ethnicity"].astype(str).to_numpy()
+            ill = y[rows] == 1
+            race[arm][context] = {
+                group: {
+                    "n": int((ill & (values == group)).sum()),
+                    "caught": int(flagged[ill & (values == group)].sum()),
+                }
+                for group in sorted(set(values.tolist()))
+            }
     result["subgroups"] = {
         "family": "sex and age, three arms, Holm-adjusted together",
         "tests": tests,
+        "healthy_and_auroc": beside,
+        "race_ethnicity": race,
     }
 
     result["histogram"] = {"arm": "resnet", **histogram(probs["resnet"], y, targets)}

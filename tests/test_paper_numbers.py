@@ -92,6 +92,7 @@ CONSTANTS = {
     "1.3": "EchoNext's wall-thickness threshold, in cm",
     "3.2": "EchoNext's tricuspid velocity threshold, in m/s",
     "18": "the lower edge of the youngest age band",
+    "20": "the fewest ill outpatients a race and ethnicity group needs to be read",
     "49": "the upper edge of the youngest age band",
     "80": "the lower edge of the oldest age band",
     "25": "a rung of the ladder",
@@ -490,6 +491,19 @@ class TestClaims:
                     assert loss < 0.05
         assert "A threshold set the same way for each finding on its own" not in REPORT.read_text()
         assert "ill more mildly" not in REPORT.read_text()
+
+    def test_women_and_the_young_are_cleared_more_and_separated_alike(self) -> None:
+        """Section 3.4: higher specificity among healthy women and the young, and AUROC
+        intervals that overlap between the sexes, for each model."""
+        beside = v.read("echonext_clinical.json")["subgroups"]["healthy_and_auroc"]
+        for arm in v.STRONGEST:
+            sex, age = beside[arm]["sex"], beside[arm]["age"]
+            assert sex["female"]["specificity"] > sex["male"]["specificity"], arm
+            assert age["18-49"]["specificity"] > age["80+"]["specificity"], arm
+            assert sex["female"]["auroc"]["high"] > sex["male"]["auroc"]["low"], arm
+        assert "Women and younger outpatients scored lower, ill and healthy alike" in (
+            REPORT.read_text()
+        )
 
     def test_women_and_the_young_are_caught_less_by_each_model(self) -> None:
         for t in v.read("echonext_clinical.json")["subgroups"]["tests"]:

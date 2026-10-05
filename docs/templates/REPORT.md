@@ -142,7 +142,7 @@ Table 2. The PTB-XL threshold at three hospitals, from `results/infarction_sites
 | Others flagged, per 100 | {{mi_flagged_ptbxl}} | {{mi_flagged_acs}} | {{mi_flagged_sph}} |
 | AUROC | {{mi_auroc_ptbxl}} | {{mi_auroc_acs}} | {{mi_auroc_sph}} |
 
-At Chongqing the threshold caught fewer infarctions and flagged more other patients at once, and the AUROC fell from {{mi_auroc_ptbxl}} to {{mi_auroc_acs}}. There the definition of infarction, the population, the recording equipment and the era all differ from PTB-XL, and the design does not say which difference lowered the AUROC. At Shandong, where infarctions are read on the tracing and most are coded as old, the AUROC rose to {{mi_auroc_sph}} and the threshold caught more infarctions than it was set for; even the low end of its range lies above 90%. The same threshold erred in one direction at one hospital and in the other at the next.
+At Chongqing the threshold caught fewer infarctions and flagged more other patients at once, and the AUROC fell from {{mi_auroc_ptbxl}} to {{mi_auroc_acs}}. There the definition of infarction, the population, the recording equipment and the era all differ from PTB-XL, and the design does not say which difference lowered the AUROC. At Shandong, where infarctions are read on the tracing and most are coded as old, the AUROC rose to {{mi_auroc_sph}} and the threshold caught more infarctions than it was set for; even the low end of its range lies above 90%. The same threshold delivered less than it was set for at one hospital and more at the next, for this model; with other encoders the direction at Shandong can differ (supplement S2.10).
 
 ## 4. Discussion
 

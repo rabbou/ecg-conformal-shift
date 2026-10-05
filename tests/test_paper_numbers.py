@@ -540,3 +540,22 @@ def test_every_reference_of_the_report_is_cited_in_its_text() -> None:
         int(n) for group in re.findall(r"\[(\d+(?:,\s*\d+)*)\]", body) for n in group.split(",")
     }
     assert listed == cited
+
+
+def test_at_ninety_four_encoders_over_cover_shandong_and_ecg_fm_under_covers_both() -> None:
+    """S2.10: at the 90% target, the direction at Shandong depends on the encoder."""
+    arms = v.read("arms.json")["coverage"]
+    at90 = {
+        arm: next(
+            r["coverage"]
+            for r in rows
+            if (r["alpha"], r["score"], r["correction"]) == (0.1, "lac", "mondrian")
+        )
+        for arm, rows in arms.items()
+    }
+    over = {arm for arm, c in at90.items() if c["sph"]["mean"] > 0.9 and c["acs"]["mean"] < 0.9}
+    assert len(over) == 4 and "ecgfm" not in over
+    assert at90["ecgfm"]["sph"]["mean"] < 0.9 and at90["ecgfm"]["acs"]["mean"] < 0.9
+    text = SUPPLEMENT.read_text()
+    assert "ECG-FM under-covers at both" in text
+    assert "recommend" not in text

@@ -281,9 +281,11 @@ def infarction() -> dict[str, str]:
     for corpus, s in sites.items():
         out[f"mi_n_{corpus}"] = count(s["n"])
         out[f"mi_pos_{corpus}"] = count(s["n_mi"])
+        out[f"mi_n_read_{corpus}"] = count(s["n_read_per_draw"])
+        out[f"mi_pos_read_{corpus}"] = count(s["n_mi_read_per_draw"])
         out[f"mi_auroc_{corpus}"] = f"{s['auroc']['auroc']:.3f}"
         out[f"mi_sens_{corpus}"] = pct(s["sensitivity"])
-        out[f"mi_sens_{corpus}_ci"] = interval(*s["sensitivity_wilson"])
+        out[f"mi_sens_{corpus}_ci"] = interval(*s["sensitivity_interval"])
         out[f"mi_spec_{corpus}"] = pct(s["specificity"])
         plain = outcomes[corpus]["schemes"]["plain"]
         out[f"mi_caught_{corpus}"] = per100(plain["1"]["correct"]["mean"])

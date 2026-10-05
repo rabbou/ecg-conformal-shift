@@ -124,19 +124,19 @@ In the same clinic of 1,000 outpatients, the new threshold would send 765 for an
 
 ### 3.7 Infarction: across hospitals, the model's separation changes too
 
-The infarction threshold, set to catch 90% of infarctions at PTB-XL, caught 89.6% there (95% confidence interval 86.8% to 91.9%), 83.7% at Chongqing (82.2% to 85.0%) and 97.3% at Shandong (94.5% to 98.7%). Its specificity was 81.0% at PTB-XL, 57.9% at Chongqing and 82.9% at Shandong.
+The infarction threshold, set to catch 90% of infarctions at PTB-XL, caught 89.6% there (84.0% to 95.1%), 83.7% at Chongqing (81.2% to 86.1%) and 97.3% at Shandong (95.4% to 99.3%). Each range spans 95% of what one threshold set this way would catch: at PTB-XL it is the spread of the 200 draws, each read on about 276 infarctions; at Chongqing and Shandong, read whole in every draw, it adds the sampling of the site's own infarctions. Its specificity was 81.0% at PTB-XL, 57.9% at Chongqing and 82.9% at Shandong.
 
-Table 2. The PTB-XL threshold at three hospitals, from `results/infarction_sites.json` and `results/outcomes.json`.
+Table 2. The PTB-XL threshold at three hospitals, from `results/infarction_sites.json` and `results/outcomes.json`. Each draw sets the threshold on one half of PTB-XL's held-out fold and reads the other half, so the PTB-XL column counts the whole fold and, in brackets, the tracings and infarctions one draw reads on average; Chongqing and Shandong are read whole.
 
 | | PTB-XL, Germany | Chongqing, China | Shandong, China |
 |---|---|---|---|
-| Tracings | 2,198 | 17,955 | 25,770 |
-| Infarctions | 550 | 2,679 | 260 |
+| Tracings | 2,198 (1,099 per draw) | 17,955 | 25,770 |
+| Infarctions | 550 (276 per draw) | 2,679 | 260 |
 | Infarctions caught, per 100 | 90 | 84 | 97 |
 | Others flagged, per 100 | 19 | 42 | 17 |
 | AUROC | 0.932 | 0.793 | 0.978 |
 
-At Chongqing the threshold caught fewer infarctions and flagged more other patients at once, and the AUROC fell from 0.932 to 0.793: the model separated acute infarctions from other angiography patients worse than it separated PTB-XL's infarct patterns, a different definition of the disease. At Shandong, where most infarctions are old ones read on the tracing as at PTB-XL, the AUROC rose to 0.978 and the threshold caught more infarctions than it was set for; even the low end of its confidence interval lies above 90%. The same threshold erred in one direction at one hospital and in the other at the next.
+At Chongqing the threshold caught fewer infarctions and flagged more other patients at once, and the AUROC fell from 0.932 to 0.793: the model separated acute infarctions from other angiography patients worse than it separated PTB-XL's infarct patterns, a different definition of the disease. At Shandong, where most infarctions are old ones read on the tracing as at PTB-XL, the AUROC rose to 0.978 and the threshold caught more infarctions than it was set for; even the low end of its range lies above 90%. The same threshold erred in one direction at one hospital and in the other at the next.
 
 ## 4. Discussion
 

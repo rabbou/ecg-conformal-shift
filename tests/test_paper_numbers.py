@@ -372,8 +372,18 @@ class TestClaims:
 
     def test_shandong_caught_more_than_promised_and_chongqing_less(self) -> None:
         sites = v.read("infarction_sites.json")["sites"]
-        assert sites["sph"]["sensitivity_wilson"][0] > 0.9
-        assert sites["acs"]["sensitivity_wilson"][1] < 0.9
+        assert sites["sph"]["sensitivity_interval"][0] > 0.9
+        assert sites["acs"]["sensitivity_interval"][1] < 0.9
+
+    def test_the_ptbxl_interval_is_the_spread_of_the_draws_each_read_on_half_the_fold(self) -> None:
+        """Each PTB-XL draw reads about half of fold 10, so its interval is the spread
+        between draws, at least as wide as 1.96 of their standard deviations."""
+        sites = v.read("infarction_sites.json")["sites"]
+        draws = v.read("outcomes.json")["by_corpus"]["ptbxl"]["schemes"]["plain"]["1"]["correct"]
+        low, high = sites["ptbxl"]["sensitivity_interval"]
+        assert high - low >= 2 * 1.95 * draws["sd"]
+        assert sites["ptbxl"]["n_mi_read_per_draw"] < 0.6 * sites["ptbxl"]["n_mi"]
+        assert "{{mi_pos_read_ptbxl}}" in (v.ROOT / "docs/templates/REPORT.md").read_text()
         assert sites["acs"]["auroc"]["high"] < sites["ptbxl"]["auroc"]["low"]
 
 

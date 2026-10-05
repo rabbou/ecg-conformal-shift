@@ -1,6 +1,17 @@
 {
  "written_by": "scripts/mimic_rotation.py",
- "commit": "471b3cf777774a89c530c4ecac275810f7d6e9f5",
+ "provenance": {
+  "commit": "806fc8e47ae127684d68ebbd80b79690aa6bce9d",
+  "producers": {
+   "scripts/mimic_rotation.py": "c12bdff3f8a7a7eaf4819ee61e2d4382ea947aa51ff9adacf296df43c4769610",
+   "src/ecs/conformal.py": "c434998b704a551d55bc2206a1a3ada6d42309947b0b92db11607746dcd068dc",
+   "src/ecs/encoders.py": "f52bdc2e73faa72ec28f9cc70e10e60840dc2e24b633bf44a041d2d777ae2d1e",
+   "src/ecs/metrics.py": "e04509abce93b400ac90cbd102a63a747f0559de4d2c9d20cdc2ee4ce1cf90e6",
+   "src/ecs/rotation.py": "9d8b9e17ea2ff0b720d5c773ba3e64828be845476a6f84329a76a0d5cd9d72da",
+   "src/ecs/small_set.py": "cffa219c823ff009f109ac8557fa7acb2c14c10ea438d1445eedb9c8a360d43f",
+   "src/ecs/transfer.py": "e690339b52941e150a61527ac5e0e56a3cc5dbcd5772f7ba06ec8296b112d624"
+  }
+ },
  "settings": {
   "alpha": 0.1,
   "methods": [

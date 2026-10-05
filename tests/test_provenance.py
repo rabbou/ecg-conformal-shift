@@ -36,6 +36,7 @@ RESULTS = REPO_ROOT / "results"
 REGENERABLE = (
     "abstention.json",
     "auxiliary.json",
+    "mimic_rotation.json",
     "outcomes.json",
     "perturbations.json",
     "ppv_gap.json",
@@ -109,6 +110,22 @@ NOT_REGENERABLE = {
         "needs the four EchoNext arms' per-record scores, which may not be committed"
     ),
     "ppv_gap.csv": "every row of ppv_gap.json and echonext_ppv_gap.json, same run",
+    "mimic_label_map.json": (
+        "needs record_list.csv and machine_measurements.csv of MIMIC-IV-ECG, 253 MB"
+    ),
+    "mimic_rotation.csv": "every row mimic_rotation.json summarises, written by the same run",
+    "mimic_shadow.json": (
+        "needs 16,000 MIMIC-IV-ECG tracings and the six rotation checkpoints, not committed"
+    ),
+    "mimic_shadow.csv": "the grid mimic_shadow.json carries, written by the same run",
+    **{
+        f"rotation_six/{source}/{name}": reason
+        for source in ("chapman_ningbo", "cpsc", "georgia", "mimic", "ptbxl", "sph")
+        for name, reason in (
+            ("config.json", "written by a training run of that source on the six-corpus run"),
+            ("metrics.json", "written by that same training run"),
+        )
+    },
     "repairs.json": (
         "needs the EchoNext arms' per-record scores and the patient tables of PTB-XL, "
         "Shandong and Chongqing on disk"

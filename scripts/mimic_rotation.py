@@ -29,7 +29,6 @@ from __future__ import annotations
 
 import csv
 import json
-import subprocess
 import sys
 from pathlib import Path
 from typing import Any
@@ -39,6 +38,7 @@ from numpy.typing import NDArray
 
 from ecs.config import RESULTS_DIR
 from ecs.encoders import SAW
+from ecs.provenance import provenance_block
 from ecs.rotation import EXTENDED_SOURCES, SOURCES, class_keys, usable_classes
 from ecs.transfer import ALPHA, METHODS, auroc_row, conformal_sets, coverage_row
 
@@ -47,6 +47,17 @@ PUBLISHED = Path(RESULTS_DIR) / "rotation"
 OUT_CSV = Path(RESULTS_DIR) / "mimic_rotation.csv"
 OUT_JSON = Path(RESULTS_DIR) / "mimic_rotation.json"
 HEADLINE = "perlabel"
+
+# The files whose behaviour the table's numbers depend on.
+PRODUCERS = [
+    "scripts/mimic_rotation.py",
+    "src/ecs/conformal.py",
+    "src/ecs/encoders.py",
+    "src/ecs/metrics.py",
+    "src/ecs/rotation.py",
+    "src/ecs/small_set.py",
+    "src/ecs/transfer.py",
+]
 
 NAMES = {
     "ptbxl": "PTB-XL",
@@ -76,12 +87,6 @@ COLUMNS = (
     "abstention",
     "n_cal_pos",
 )
-
-
-def commit() -> str:
-    return subprocess.run(
-        ["git", "rev-parse", "HEAD"], capture_output=True, text=True, check=False
-    ).stdout.strip()
 
 
 def load(path: Path) -> tuple[NDArray[np.int_], NDArray[np.float64]]:
@@ -195,7 +200,7 @@ def main() -> int:
     check = reproduction(rows)
     table: dict[str, Any] = {
         "written_by": "scripts/mimic_rotation.py",
-        "commit": commit(),
+        "provenance": provenance_block(PRODUCERS),
         "settings": {
             "alpha": ALPHA,
             "methods": list(METHODS),

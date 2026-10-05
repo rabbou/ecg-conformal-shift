@@ -322,16 +322,36 @@ class TestClaims:
                 <= redrawn["sensitivity"]["p90"]
             )
 
-    def test_what_a_clinic_sees_without_labels_falls(self) -> None:
-        r = v.read("echonext_clinical.json")["arms"]["resnet"]
-        assert (
-            r["outpatient"]["label_free"]["share_flagged"]
-            < r["inpatient"]["label_free"]["share_flagged"]
-        )
-        assert (
-            r["outpatient"]["label_free"]["share_deferred"]
-            < r["inpatient"]["label_free"]["share_deferred"]
-        )
+    def test_what_a_clinic_sees_without_labels_falls_below_what_prevalence_allows(self) -> None:
+        """Section 3.5: no prevalence takes the share flagged, or the share sent to a reader,
+        below the floor the inpatients' rates set, and the outpatients' shares lie below it."""
+        for arm in v.STRONGEST:
+            measured = v.read("echonext_clinical.json")["arms"][arm]
+            floor, expected = v.label_free_bounds(measured)
+            seen = measured["outpatient"]["label_free"]
+            assert seen["share_flagged"] < floor["flagged"] <= expected["flagged"], arm
+            assert seen["share_deferred"] < floor["deferred"] <= expected["deferred"], arm
+            assert seen["share_flagged"] < measured["inpatient"]["label_free"]["share_flagged"]
+
+    def test_the_label_free_floor_is_the_smaller_rate_at_any_prevalence(self) -> None:
+        arm = {
+            "inpatient": {
+                "sensitivity": 0.9,
+                "specificity": 0.4,
+                "outcomes": {
+                    "perlabel": {
+                        "ill": {"deferred": {"share": 0.37}},
+                        "healthy": {"deferred": {"share": 0.49}},
+                    }
+                },
+            },
+            "outpatient": {"n": 100, "n_ill": 25},
+        }
+        floor, expected = v.label_free_bounds(arm)
+        assert floor == {"flagged": 0.6, "deferred": 0.37}
+        assert expected["flagged"] == pytest.approx(0.25 * 0.9 + 0.75 * 0.6)
+        assert "same fall" not in REPORT.read_text()
+        assert "Nothing visible without diagnoses" not in REPORT.read_text()
 
     def test_the_findings_that_kept_and_lost_their_sensitivity(self) -> None:
         def drop(label: str) -> float:

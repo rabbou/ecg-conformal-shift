@@ -111,6 +111,20 @@ def echonext() -> dict[str, str]:
             f"{transfer['arms'][arm]['auroc_test_all_contexts'][COMPOSITE]['auroc']:.3f}"
         )
     out["lf_flag_in"], out["lf_flag_out"] = out["lf_flag_resnet_in"], out["lf_flag_resnet_out"]
+    for arm in STRONGEST:
+        floor, expected = label_free_bounds(clinical["arms"][arm])
+        out[f"lf_floor_{SHORT[arm]}"] = pct(floor["flagged"])
+        out[f"lf_expect_{SHORT[arm]}"] = pct(expected["flagged"])
+        out[f"def_floor_{SHORT[arm]}"] = pct(floor["deferred"])
+        out[f"def_expect_{SHORT[arm]}"] = pct(expected["deferred"])
+    (prior,) = [
+        c
+        for c in read("repairs.json")["cells"]
+        if (c["family"], c["model"], c["target"], c["label"])
+        == ("echonext", "resnet", "outpatient", COMPOSITE)
+    ]
+    out["prior_prev_estimated"] = pct(prior["prevalence_estimated"])
+    out["prior_prev_eval"] = pct(prior["prevalence_eval"], 0)
     caught = sorted({out[f"caught_{SHORT[a]}_out"] for a in STRONGEST}, key=int)
     out["caught_range"] = caught[0] if len(caught) == 1 else f"{caught[0]} to {caught[-1]}"
     for label, key in (
@@ -234,6 +248,30 @@ def echonext() -> dict[str, str]:
 
 
 ARMS_WITH_LADDER = STRONGEST
+
+
+def label_free_bounds(arm: dict[str, Any]) -> tuple[dict[str, float], dict[str, float]]:
+    """What fewer ill patients alone could do to the shares a clinic sees without diagnoses.
+
+    With the inpatients' rates held, the share flagged is ``p * sens + (1 - p) * (1 - spec)``
+    at prevalence ``p``: a weighted mean of the two rates, so it never falls below the
+    smaller one whatever ``p`` is.  The same holds for the share sent to a reader, with
+    the ill and healthy inpatients' deferral rates.  Returns that floor, and the shares
+    expected at the outpatients' own prevalence.
+    """
+    inside, outside = arm["inpatient"], arm["outpatient"]
+    perlabel = inside["outcomes"]["perlabel"]
+    rates = {
+        "flagged": (inside["sensitivity"], 1 - inside["specificity"]),
+        "deferred": (
+            perlabel["ill"]["deferred"]["share"],
+            perlabel["healthy"]["deferred"]["share"],
+        ),
+    }
+    p = outside["n_ill"] / outside["n"]
+    floor = {k: min(ill, healthy) for k, (ill, healthy) in rates.items()}
+    expected = {k: p * ill + (1 - p) * healthy for k, (ill, healthy) in rates.items()}
+    return floor, expected
 
 
 def infarction() -> dict[str, str]:

@@ -1,0 +1,103 @@
+{
+  "epoch_kept": 6,
+  "val_macro_auroc": 0.9868,
+  "history": [
+    {
+      "epoch": 0,
+      "train_loss": 0.08316,
+      "val_auroc": {
+        "AF": 0.756,
+        "LBBB": 0.9349,
+        "RBBB": 0.8081,
+        "IAVB": 0.6875
+      },
+      "val_macro_auroc": 0.7966,
+      "seconds": 29.3
+    },
+    {
+      "epoch": 1,
+      "train_loss": 0.04728,
+      "val_auroc": {
+        "AF": 0.9378,
+        "LBBB": 0.9967,
+        "RBBB": 0.9633,
+        "IAVB": 0.6892
+      },
+      "val_macro_auroc": 0.8967,
+      "seconds": 29.5
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.03619,
+      "val_auroc": {
+        "AF": 0.9931,
+        "LBBB": 1.0,
+        "RBBB": 0.9749,
+        "IAVB": 0.932
+      },
+      "val_macro_auroc": 0.975,
+      "seconds": 29.0
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.02958,
+      "val_auroc": {
+        "AF": 0.9906,
+        "LBBB": 0.9933,
+        "RBBB": 0.9764,
+        "IAVB": 0.9551
+      },
+      "val_macro_auroc": 0.9789,
+      "seconds": 28.7
+    },
+    {
+      "epoch": 4,
+      "train_loss": 0.02119,
+      "val_auroc": {
+        "AF": 0.9926,
+        "LBBB": 1.0,
+        "RBBB": 0.9927,
+        "IAVB": 0.8972
+      },
+      "val_macro_auroc": 0.9706,
+      "seconds": 28.8
+    },
+    {
+      "epoch": 5,
+      "train_loss": 0.02041,
+      "val_auroc": {
+        "AF": 0.99,
+        "LBBB": 1.0,
+        "RBBB": 0.9778,
+        "IAVB": 0.9383
+      },
+      "val_macro_auroc": 0.9765,
+      "seconds": 29.0
+    },
+    {
+      "epoch": 6,
+      "train_loss": 0.01804,
+      "val_auroc": {
+        "AF": 0.9917,
+        "LBBB": 1.0,
+        "RBBB": 0.9829,
+        "IAVB": 0.9727
+      },
+      "val_macro_auroc": 0.9868,
+      "seconds": 29.4
+    },
+    {
+      "epoch": 7,
+      "train_loss": 0.01637,
+      "val_auroc": {
+        "AF": 0.9975,
+        "LBBB": 1.0,
+        "RBBB": 0.9868,
+        "IAVB": 0.9543
+      },
+      "val_macro_auroc": 0.9846,
+      "seconds": 29.9
+    }
+  ],
+  "seconds": 245.6
+}

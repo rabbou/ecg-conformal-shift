@@ -1,0 +1,7742 @@
+{
+ "written_by": "scripts/mimic_label_table.py",
+ "commit": "471b3cf777774a89c530c4ecac275810f7d6e9f5",
+ "release": "MIMIC-IV-ECG v1.0 (PhysioNet, ODbL 1.0), doi:10.13026/4nqg-sb35",
+ "label_source": "machine statements report_0..report_17, written by the cart's own interpretation software; no cardiologist label",
+ "files": {
+  "record_list.csv": {
+   "sha256": "b6f113023e955406e924a9ce10c1108f3bf8080e14cfe2f3ba3a2e858ebb621b",
+   "matches_release_sha256sums": true
+  },
+  "machine_measurements.csv": {
+   "sha256": "56f6b1413221bce95bd6f48b28ca1acf27ae0b073d6f2c1d12f3af7500eabbb6",
+   "matches_release_sha256sums": true
+  }
+ },
+ "n_records": 800035,
+ "n_patients": 161352,
+ "n_distinct_statements": 3127,
+ "n_distinct_statements_touching_a_class": 992,
+ "classes": {
+  "NSR": {
+   "positive_statuses": [
+    "definite"
+   ],
+   "n_records": 461068,
+   "n_patients": 131111,
+   "prevalence": 0.57631,
+   "strict_n_records": 461068,
+   "records_carrying_status": {
+    "definite": 461068,
+    "borderline": 0,
+    "age_undetermined": 0,
+    "hedged": 30,
+    "excluded": 188211
+   },
+   "records_hedged_and_not_positive": 30,
+   "measured_intervals_ms": {
+    "interval": "qrs",
+    "by_status": {
+     "definite": {
+      "n_measured": 461066,
+      "median": 92.0,
+      "q10": 78.0,
+      "q90": 124.0,
+      "share_above_120": 0.1107,
+      "share_at_least_120": 0.117
+     },
+     "hedged": {
+      "n_measured": 30,
+      "median": 102.0,
+      "q10": 81.6,
+      "q90": 128.60000000000002,
+      "share_above_120": 0.2,
+      "share_at_least_120": 0.2
+     },
+     "excluded": {
+      "n_measured": 188208,
+      "median": 92.0,
+      "q10": 78.0,
+      "q90": 124.0,
+      "share_above_120": 0.1118,
+      "share_at_least_120": 0.1194
+     }
+    },
+    "no_statement_for_this_class": {
+     "n_measured": 149392,
+     "median": 104.0,
+     "q10": 82.0,
+     "q90": 158.0,
+     "share_above_120": 0.3439,
+     "share_at_least_120": 0.3565
+    }
+   }
+  },
+  "AF": {
+   "positive_statuses": [
+    "definite"
+   ],
+   "n_records": 78069,
+   "n_patients": 21063,
+   "prevalence": 0.09758,
+   "strict_n_records": 78069,
+   "records_carrying_status": {
+    "definite": 78069,
+    "borderline": 0,
+    "age_undetermined": 0,
+    "hedged": 3026,
+    "excluded": 324
+   },
+   "records_hedged_and_not_positive": 3026,
+   "measured_intervals_ms": {
+    "interval": "qrs",
+    "by_status": {
+     "definite": {
+      "n_measured": 78069,
+      "median": 98.0,
+      "q10": 80.0,
+      "q90": 144.0,
+      "share_above_120": 0.2349,
+      "share_at_least_120": 0.2474
+     },
+     "hedged": {
+      "n_measured": 3026,
+      "median": 104.0,
+      "q10": 82.0,
+      "q90": 150.0,
+      "share_above_120": 0.311,
+      "share_at_least_120": 0.3255
+     },
+     "excluded": {
+      "n_measured": 324,
+      "median": 148.0,
+      "q10": 101.0,
+      "q90": 185.7,
+      "share_above_120": 0.8025,
+      "share_at_least_120": 0.8086
+     }
+    },
+    "no_statement_for_this_class": {
+     "n_measured": 717277,
+     "median": 92.0,
+     "q10": 78.0,
+     "q90": 134.0,
+     "share_above_120": 0.1449,
+     "share_at_least_120": 0.1521
+    }
+   }
+  },
+  "LBBB": {
+   "positive_statuses": [
+    "definite"
+   ],
+   "n_records": 23451,
+   "n_patients": 5156,
+   "prevalence": 0.02931,
+   "strict_n_records": 23451,
+   "records_carrying_status": {
+    "definite": 23451,
+    "borderline": 0,
+    "age_undetermined": 0,
+    "hedged": 0,
+    "excluded": 6242
+   },
+   "records_hedged_and_not_positive": 0,
+   "measured_intervals_ms": {
+    "interval": "qrs",
+    "by_status": {
+     "definite": {
+      "n_measured": 23451,
+      "median": 144.0,
+      "q10": 126.0,
+      "q90": 168.0,
+      "share_above_120": 0.9579,
+      "share_at_least_120": 0.9716
+     },
+     "excluded": {
+      "n_measured": 6242,
+      "median": 120.0,
+      "q10": 108.0,
+      "q90": 142.0,
+      "share_above_120": 0.491,
+      "share_at_least_120": 0.5541
+     }
+    },
+    "no_statement_for_this_class": {
+     "n_measured": 769003,
+     "median": 92.0,
+     "q10": 78.0,
+     "q90": 130.0,
+     "share_above_120": 0.1273,
+     "share_at_least_120": 0.1345
+    }
+   }
+  },
+  "RBBB": {
+   "positive_statuses": [
+    "definite"
+   ],
+   "n_records": 57360,
+   "n_patients": 12077,
+   "prevalence": 0.0717,
+   "strict_n_records": 57360,
+   "records_carrying_status": {
+    "definite": 57360,
+    "borderline": 0,
+    "age_undetermined": 0,
+    "hedged": 0,
+    "excluded": 8564
+   },
+   "records_hedged_and_not_positive": 0,
+   "measured_intervals_ms": {
+    "interval": "qrs",
+    "by_status": {
+     "definite": {
+      "n_measured": 57360,
+      "median": 140.0,
+      "q10": 122.0,
+      "q90": 162.0,
+      "share_above_120": 0.9077,
+      "share_at_least_120": 0.9325
+     },
+     "excluded": {
+      "n_measured": 8562,
+      "median": 104.0,
+      "q10": 94.0,
+      "q90": 124.0,
+      "share_above_120": 0.1141,
+      "share_at_least_120": 0.1265
+     }
+    },
+    "no_statement_for_this_class": {
+     "n_measured": 732774,
+     "median": 92.0,
+     "q10": 78.0,
+     "q90": 120.0,
+     "share_above_120": 0.0961,
+     "share_at_least_120": 0.1025
+    }
+   }
+  },
+  "IAVB": {
+   "positive_statuses": [
+    "borderline",
+    "definite"
+   ],
+   "n_records": 66689,
+   "n_patients": 21637,
+   "prevalence": 0.08336,
+   "strict_n_records": 34719,
+   "records_carrying_status": {
+    "definite": 34719,
+    "borderline": 31970,
+    "age_undetermined": 0,
+    "hedged": 0,
+    "excluded": 0
+   },
+   "records_hedged_and_not_positive": 0,
+   "measured_intervals_ms": {
+    "interval": "pr",
+    "by_status": {
+     "definite": {
+      "n_measured": 34717,
+      "median": 236.0,
+      "q10": 220.0,
+      "q90": 282.0,
+      "share_above_200": 0.9525,
+      "share_at_least_200": 0.9537
+     },
+     "borderline": {
+      "n_measured": 31970,
+      "median": 208.0,
+      "q10": 202.0,
+      "q90": 216.0,
+      "share_above_200": 0.9753,
+      "share_at_least_200": 0.9758
+     }
+    },
+    "no_statement_for_this_class": {
+     "n_measured": 609865,
+     "median": 156.0,
+     "q10": 126.0,
+     "q90": 188.0,
+     "share_above_200": 0.0141,
+     "share_at_least_200": 0.0234
+    }
+   }
+  },
+  "MI_OLD": {
+   "positive_statuses": [
+    "age_undetermined",
+    "definite"
+   ],
+   "n_records": 70388,
+   "n_patients": 21392,
+   "prevalence": 0.08798,
+   "strict_n_records": 10222,
+   "records_carrying_status": {
+    "definite": 10222,
+    "borderline": 0,
+    "age_undetermined": 60430,
+    "hedged": 114776,
+    "excluded": 14643
+   },
+   "records_hedged_and_not_positive": 99035,
+   "measured_intervals_ms": {
+    "interval": "qrs",
+    "by_status": {
+     "definite": {
+      "n_measured": 10222,
+      "median": 97.0,
+      "q10": 82.0,
+      "q90": 131.0,
+      "share_above_120": 0.1407,
+      "share_at_least_120": 0.1481
+     },
+     "age_undetermined": {
+      "n_measured": 60430,
+      "median": 104.0,
+      "q10": 82.0,
+      "q90": 154.0,
+      "share_above_120": 0.3221,
+      "share_at_least_120": 0.338
+     },
+     "hedged": {
+      "n_measured": 114775,
+      "median": 96.0,
+      "q10": 78.0,
+      "q90": 142.0,
+      "share_above_120": 0.2024,
+      "share_at_least_120": 0.2142
+     },
+     "excluded": {
+      "n_measured": 14642,
+      "median": 104.0,
+      "q10": 81.0,
+      "q90": 158.0,
+      "share_above_120": 0.3482,
+      "share_at_least_120": 0.3622
+     }
+    },
+    "no_statement_for_this_class": {
+     "n_measured": 619049,
+     "median": 92.0,
+     "q10": 78.0,
+     "q90": 131.0,
+     "share_above_120": 0.1311,
+     "share_at_least_120": 0.1375
+    }
+   }
+  }
+ },
+ "ambiguities": [
+  {
+   "key": "nsr-rate-variants",
+   "what": "The carts write 'Sinus bradycardia', 'Sinus tachycardia' and 'Sinus arrhythmia' as rhythm statements of their own, without 'sinus rhythm'.",
+   "decision": "Not NSR.",
+   "why": "The rotation's NSR is SNOMED 426783006 'sinus rhythm'; bradycardia, tachycardia and arrhythmia of the sinus node are the separate SNOMED classes SB, STach and SA in the same Challenge table, and the four Challenge corpora label them apart.",
+   "evidence": "mappings/dx_mapping_scored.csv rows NSR, SB, STach, SA",
+   "n_records": 186513
+  },
+  {
+   "key": "nsr-sinus-or-ectopic",
+   "what": "'Sinus or ectopic atrial rhythm' and its rate variants.",
+   "decision": "Not NSR.",
+   "why": "The cart does not decide between a sinus and an atrial focus.",
+   "evidence": "machine_measurements.csv statements",
+   "n_records": 1698
+  },
+  {
+   "key": "nsr-hedged",
+   "what": "'consider sinus rhythm with 2:1 S-A block' and other hedged sinus statements.",
+   "decision": "Not NSR.",
+   "why": "A hedged rhythm is not a stated rhythm.",
+   "evidence": "machine_measurements.csv statements",
+   "n_records": 30
+  },
+  {
+   "key": "af-or-flutter",
+   "what": "'Atrial flutter/fibrillation', 'Afib/flutter', 'A-flutter/fibrillation'.",
+   "decision": "Not AF.",
+   "why": "The cart cannot tell flutter from fibrillation, and flutter is the separate Challenge class AFL.",
+   "evidence": "machine_measurements.csv statements; dx_mapping_scored.csv rows AF, AFL",
+   "n_records": 324
+  },
+  {
+   "key": "af-hedged",
+   "what": "'Probable atrial fibrillation', 'Possible atrial fibrillation'.",
+   "decision": "Not AF.",
+   "why": "The positive label stays what the cart asserts. The count is given so a reader can rebuild the class with the hedged tracings in.",
+   "evidence": "machine_measurements.csv statements",
+   "n_records": 3026
+  },
+  {
+   "key": "bbb-incomplete",
+   "what": "'Incomplete RBBB', 'Incomplete left bundle branch block', 'ILBBB'.",
+   "decision": "Not LBBB or RBBB.",
+   "why": "The rotation's classes are the complete or unqualified blocks; the incomplete forms are separate Challenge classes (IRBBB) and stay out on the other five corpora too.",
+   "evidence": "src/ecs/small_set.py, SMALL_SET RBBB description",
+   "n_records": 12963,
+   "measured_intervals_ms": {
+    "interval": "qrs",
+    "n_measured": 12962,
+    "median": 110.0,
+    "q10": 96.0,
+    "q90": 128.0,
+    "share_above_120": 0.1822,
+    "share_at_least_120": 0.2137
+   }
+  },
+  {
+   "key": "bbb-type-conduction-defect",
+   "what": "'Conduction defect of LBBB type', 'IVCD, consider atypical RBBB' and the upper-case 'I.V. conduction defect of ... bundle branch block type'.",
+   "decision": "Not LBBB or RBBB.",
+   "why": "The cart measures a wide QRS (120 ms or more on 96% of these tracings, median 140 ms) and declines to call it a bundle-branch block; the Challenge class for that is IVCD (nonspecific intraventricular conduction disorder), not the block.",
+   "evidence": "results/mimic_label_map.json, measured_intervals_ms",
+   "n_records": 1843,
+   "measured_intervals_ms": {
+    "interval": "qrs",
+    "n_measured": 1842,
+    "median": 140.0,
+    "q10": 121.0,
+    "q90": 170.0,
+    "share_above_120": 0.9121,
+    "share_at_least_120": 0.962
+   }
+  },
+  {
+   "key": "iavb-borderline",
+   "what": "'Sinus rhythm with borderline 1st degree A-V block' and 'Borderline prolonged PR interval', the cart's own grade below 'first degree'.",
+   "decision": "IAVB.",
+   "why": "First-degree block is a PR interval above 200 ms with every beat conducted. The cart's own PR measurement on these tracings has a median of 208 ms and is above 200 ms on 97.5% of them, so they meet the definition the rotation's IAVB class states. The class roughly doubles with them; the strict count is given beside it.",
+   "evidence": "results/mimic_label_map.json, measured_intervals_ms and strict_counts",
+   "n_records": 31970,
+   "measured_intervals_ms": {
+    "interval": "pr",
+    "n_measured": 31970,
+    "median": 208.0,
+    "q10": 202.0,
+    "q90": 216.0,
+    "share_above_200": 0.9753,
+    "share_at_least_200": 0.9758
+   }
+  },
+  {
+   "key": "mi-age-undetermined",
+   "what": "'Inferior infarct - age undetermined' and the like: the cart's commonest infarct statement, with no age.",
+   "decision": "MI_OLD.",
+   "why": "The cart's infarct statements are old, undated or acute, and the acute ones are excluded; an undated infarct pattern on a resting ECG is the Q-wave pattern that ICD-10 I25.2 (old myocardial infarction) describes. The count with old statements only is given beside it.",
+   "evidence": "machine_measurements.csv statements; results/mimic_label_map.json",
+   "n_records": 60430
+  },
+  {
+   "key": "mi-acute",
+   "what": "'CONSIDER ACUTE ST ELEVATION MI', 'INFERIOR INFARCT - POSSIBLY ACUTE'.",
+   "decision": "Not MI_OLD.",
+   "why": "Acute injury is a different finding from an old infarct.",
+   "evidence": "machine_measurements.csv statements",
+   "n_records": 14643
+  },
+  {
+   "key": "mi-hedged",
+   "what": "'Possible anterior infarct - age undetermined', 'Cannot rule out septal infarct'.",
+   "decision": "Not MI_OLD.",
+   "why": "The positive label stays what the cart asserts; 'possible' infarct statements outnumber the definite ones and are counted apart.",
+   "evidence": "machine_measurements.csv statements",
+   "n_records": 114776
+  }
+ ],
+ "quality_statements": {
+  "data_quality_warning": 7079,
+  "unsuitable_for_analysis": 19088,
+  "lead_reversal_suspected": 2833,
+  "paced_no_further_analysis": 14232
+ },
+ "rules": [
+  {
+   "class": "NSR",
+   "status": "hedged",
+   "pattern": "(?:possibl[ey]|probabl[ey]|consider|cannot rule out|questionable|suggests?|\\?)\\s+(?:normal\\s+)?sinus rhythm",
+   "ambiguity": "nsr-hedged"
+  },
+  {
+   "class": "NSR",
+   "status": "excluded",
+   "pattern": "sinus or ectopic",
+   "ambiguity": "nsr-sinus-or-ectopic"
+  },
+  {
+   "class": "NSR",
+   "status": "definite",
+   "pattern": "\\b(?:normal\\s+)?sinus rhythm\\b",
+   "ambiguity": null
+  },
+  {
+   "class": "NSR",
+   "status": "excluded",
+   "pattern": "sinus (?:bradycardia|tachycardia|arrhythmia)",
+   "ambiguity": "nsr-rate-variants"
+  },
+  {
+   "class": "AF",
+   "status": "excluded",
+   "pattern": "flutter\\s*/\\s*fib|fib\\w*\\s*/\\s*flutter",
+   "ambiguity": "af-or-flutter"
+  },
+  {
+   "class": "AF",
+   "status": "hedged",
+   "pattern": "(?:possibl[ey]|probabl[ey]|consider|cannot rule out|questionable|suggests?|\\?)\\s+(?:atrial fibrillation|afib|a-fib)",
+   "ambiguity": "af-hedged"
+  },
+  {
+   "class": "AF",
+   "status": "definite",
+   "pattern": "atrial fibrillation|\\bafib\\b|\\ba-fib\\b",
+   "ambiguity": null
+  },
+  {
+   "class": "LBBB",
+   "status": "excluded",
+   "pattern": "incomplete\\s+(?:lbbb|left bundle)|\\bilbbb\\b",
+   "ambiguity": "bbb-incomplete"
+  },
+  {
+   "class": "LBBB",
+   "status": "excluded",
+   "pattern": "(?:lbbb|left bundle branch block)\\s+type|atypical\\s+lbbb",
+   "ambiguity": "bbb-type-conduction-defect"
+  },
+  {
+   "class": "LBBB",
+   "status": "definite",
+   "pattern": "\\blbbb\\b|left bundle branch block",
+   "ambiguity": null
+  },
+  {
+   "class": "RBBB",
+   "status": "excluded",
+   "pattern": "incomplete\\s+(?:rbbb|right bundle)|\\birbbb\\b",
+   "ambiguity": "bbb-incomplete"
+  },
+  {
+   "class": "RBBB",
+   "status": "excluded",
+   "pattern": "(?:rbbb|right bundle branch block)\\s+type|atypical\\s+rbbb",
+   "ambiguity": "bbb-type-conduction-defect"
+  },
+  {
+   "class": "RBBB",
+   "status": "definite",
+   "pattern": "\\brbbb\\b|right bundle branch block",
+   "ambiguity": null
+  },
+  {
+   "class": "IAVB",
+   "status": "borderline",
+   "pattern": "borderline\\s+(?:(?:1st|first) degree a-?v block|prolonged pr)",
+   "ambiguity": "iavb-borderline"
+  },
+  {
+   "class": "IAVB",
+   "status": "definite",
+   "pattern": "(?:1st|first) degree a-?v block|prolonged pr\\b",
+   "ambiguity": null
+  },
+  {
+   "class": "MI_OLD",
+   "status": "excluded",
+   "pattern": "infarct.*(?:acute|recent)|(?:acute|recent).*(?:infarct|\\bmi\\b)|\\bstemi\\b",
+   "ambiguity": "mi-acute"
+  },
+  {
+   "class": "MI_OLD",
+   "status": "hedged",
+   "pattern": "(?:possibl[ey]|probabl[ey]|consider|cannot rule out|questionable|suggests?|\\?).*infarct|infarct.*(?:possibl[ey]|probabl[ey]|consider|cannot rule out|questionable|suggests?|\\?)|may be due.*infarct",
+   "ambiguity": "mi-hedged"
+  },
+  {
+   "class": "MI_OLD",
+   "status": "definite",
+   "pattern": "infarct\\w*.*\\bold\\b|\\bold\\b.*infarct",
+   "ambiguity": null
+  },
+  {
+   "class": "MI_OLD",
+   "status": "age_undetermined",
+   "pattern": "infarct\\w*.*age (?:undetermined|indeterminate)",
+   "ambiguity": "mi-age-undetermined"
+  }
+ ],
+ "statements": [
+  {
+   "statement": "sinus rhythm",
+   "n_records": 391608,
+   "status": {
+    "NSR": "definite"
+   }
+  },
+  {
+   "statement": "sinus bradycardia",
+   "n_records": 72682,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus tachycardia",
+   "n_records": 56809,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "atrial fibrillation",
+   "n_records": 42439,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "inferior infarct - age undetermined",
+   "n_records": 41581,
+   "status": {
+    "MI_OLD": "age_undetermined"
+   }
+  },
+  {
+   "statement": "possible anterior infarct - age undetermined",
+   "n_records": 34341,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "right bundle branch block",
+   "n_records": 33837,
+   "status": {
+    "RBBB": "definite"
+   }
+  },
+  {
+   "statement": "possible inferior infarct - age undetermined",
+   "n_records": 30680,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "left bundle branch block",
+   "n_records": 23451,
+   "status": {
+    "LBBB": "definite"
+   }
+  },
+  {
+   "statement": "rbbb with left anterior fascicular block",
+   "n_records": 21027,
+   "status": {
+    "RBBB": "definite"
+   }
+  },
+  {
+   "statement": "sinus rhythm with borderline 1st degree a-v block",
+   "n_records": 15852,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "atrial fibrillation with rapid ventricular response",
+   "n_records": 15358,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "sinus rhythm with 1st degree a-v block",
+   "n_records": 15267,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "sinus arrhythmia",
+   "n_records": 14060,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "possible anteroseptal infarct - age undetermined",
+   "n_records": 14035,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "possible septal infarct - age undetermined",
+   "n_records": 11870,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus rhythm with pac(s)",
+   "n_records": 10788,
+   "status": {
+    "NSR": "definite"
+   }
+  },
+  {
+   "statement": "*** consider acute st elevation mi ***",
+   "n_records": 8723,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "anteroseptal infarct - age undetermined",
+   "n_records": 7500,
+   "status": {
+    "MI_OLD": "age_undetermined"
+   }
+  },
+  {
+   "statement": "sinus rhythm with pvc(s)",
+   "n_records": 6633,
+   "status": {
+    "NSR": "definite"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with 1st degree a-v block",
+   "n_records": 6487,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "atrial fibrillation with slow ventricular response",
+   "n_records": 6267,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "qrs changes v3/v4 may be due to lvh but cannot rule out anterior infarct",
+   "n_records": 6257,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with borderline 1st degree a-v block",
+   "n_records": 6041,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "incomplete rbbb",
+   "n_records": 6006,
+   "status": {
+    "RBBB": "excluded"
+   }
+  },
+  {
+   "statement": "prolonged pr interval",
+   "n_records": 5623,
+   "status": {
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "inferior infarct, old",
+   "n_records": 5513,
+   "status": {
+    "MI_OLD": "definite"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with sinus arrhythmia",
+   "n_records": 4867,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "extensive infarct - age undetermined",
+   "n_records": 4838,
+   "status": {
+    "MI_OLD": "age_undetermined"
+   }
+  },
+  {
+   "statement": "incomplete lbbb",
+   "n_records": 4675,
+   "status": {
+    "LBBB": "excluded"
+   }
+  },
+  {
+   "statement": "sinus rhythm with pacs",
+   "n_records": 4142,
+   "status": {
+    "NSR": "definite"
+   }
+  },
+  {
+   "statement": "possible lateral infarct - age undetermined",
+   "n_records": 3995,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "lateral infarct - age undetermined",
+   "n_records": 3604,
+   "status": {
+    "MI_OLD": "age_undetermined"
+   }
+  },
+  {
+   "statement": "sinus rhythm with pvcs",
+   "n_records": 2905,
+   "status": {
+    "NSR": "definite"
+   }
+  },
+  {
+   "statement": "inferior st elevation, consider acute infarct",
+   "n_records": 2748,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with pac(s)",
+   "n_records": 2358,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with pac(s)",
+   "n_records": 2312,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "lateral st elevation, consider acute infarct",
+   "n_records": 2283,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "anterior infarct - age undetermined",
+   "n_records": 2249,
+   "status": {
+    "MI_OLD": "age_undetermined"
+   }
+  },
+  {
+   "statement": "borderline prolonged pr interval",
+   "n_records": 2125,
+   "status": {
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "atrial fibrillation with pvc(s)",
+   "n_records": 2102,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "anterior infarct, old",
+   "n_records": 2003,
+   "status": {
+    "MI_OLD": "definite"
+   }
+  },
+  {
+   "statement": "probable sinus tachycardia",
+   "n_records": 1802,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "rbbb and lafb",
+   "n_records": 1759,
+   "status": {
+    "RBBB": "definite"
+   }
+  },
+  {
+   "statement": "sinus rhythm with frequent pvcs",
+   "n_records": 1759,
+   "status": {
+    "NSR": "definite"
+   }
+  },
+  {
+   "statement": "atrial fibrillation with pvc(s) or aberrant ventricular conduction",
+   "n_records": 1724,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "anteroseptal st elevation, consider acute infarct",
+   "n_records": 1699,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "- borderline first degree a-v block",
+   "n_records": 1527,
+   "status": {
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "possible extensive infarct - age undetermined",
+   "n_records": 1511,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "- first degree a-v block",
+   "n_records": 1476,
+   "status": {
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "cannot rule out septal infarct - age undetermined",
+   "n_records": 1375,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "poor r wave progression - cannot rule out anteroseptal infarct",
+   "n_records": 1359,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with sinus arrhythmia",
+   "n_records": 1279,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "anteroseptal infarct, old",
+   "n_records": 1259,
+   "status": {
+    "MI_OLD": "definite"
+   }
+  },
+  {
+   "statement": "probable anteroseptal infarct, old",
+   "n_records": 1231,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with pacs",
+   "n_records": 1225,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "atrial fibrillation with uncontrolled ventricular response",
+   "n_records": 1197,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "cannot rule out anteroseptal infarct - age undetermined",
+   "n_records": 1175,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus or ectopic atrial rhythm",
+   "n_records": 1162,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "old inferior infarct",
+   "n_records": 1144,
+   "status": {
+    "MI_OLD": "definite"
+   }
+  },
+  {
+   "statement": "incomplete right bundle branch block",
+   "n_records": 1106,
+   "status": {
+    "RBBB": "excluded"
+   }
+  },
+  {
+   "statement": "sinus rhythm with pvc(s) with pac(s)",
+   "n_records": 1057,
+   "status": {
+    "NSR": "definite"
+   }
+  },
+  {
+   "statement": "anterolateral infarct - age undetermined",
+   "n_records": 1053,
+   "status": {
+    "MI_OLD": "age_undetermined"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with pvc(s)",
+   "n_records": 1043,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "anteroseptal infarct, age indeterminate",
+   "n_records": 1034,
+   "status": {
+    "MI_OLD": "age_undetermined"
+   }
+  },
+  {
+   "statement": "atrial fibrillation with rapid ventricular response with pvc(s)",
+   "n_records": 1013,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "consider anterior infarct",
+   "n_records": 995,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with borderline 1st degree a-v block",
+   "n_records": 983,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "sinus arrhythmia with pvc(s)",
+   "n_records": 924,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with pvc(s)",
+   "n_records": 907,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "atrial fibrillation with pvcs",
+   "n_records": 878,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "cannot rule out anterior infarct - age undetermined",
+   "n_records": 863,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus rhythm with pac(s) with 1st degree a-v block",
+   "n_records": 856,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "incomplete left bundle branch block",
+   "n_records": 852,
+   "status": {
+    "LBBB": "excluded"
+   }
+  },
+  {
+   "statement": "inferior infarct, age indeterminate",
+   "n_records": 851,
+   "status": {
+    "MI_OLD": "age_undetermined"
+   }
+  },
+  {
+   "statement": "marked precordial st depression, consider acute infarct",
+   "n_records": 846,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus rhythm with bigeminal pvcs",
+   "n_records": 832,
+   "status": {
+    "NSR": "definite"
+   }
+  },
+  {
+   "statement": "sinus rhythm with pac(s) with borderline 1st degree a-v block",
+   "n_records": 830,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "atrial fibrillation with rapid ventricular response with pvc(s) or aberrant ventricular conduction",
+   "n_records": 814,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "sinus rhythm with aberrantly conducted supraventricular complexes",
+   "n_records": 797,
+   "status": {
+    "NSR": "definite"
+   }
+  },
+  {
+   "statement": "sinus arrhythmia with borderline 1st degree a-v block",
+   "n_records": 791,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "anterolateral st elevation, consider acute infarct",
+   "n_records": 777,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus arrhythmia with 1st degree a-v block",
+   "n_records": 759,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with pacs",
+   "n_records": 703,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus rhythm with pvc(s) with 1st degree a-v block",
+   "n_records": 692,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "atrial fibrillation with pvcs or aberrant ventricular conduction",
+   "n_records": 671,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "anteroseptal st depression is probably reciprocal to inferior infarct",
+   "n_records": 661,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "possible old anterior infarct",
+   "n_records": 646,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "possible old inferior infarct",
+   "n_records": 627,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "poor r wave progression - cannot rule out septal infarct",
+   "n_records": 622,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "probable old inferior infarct",
+   "n_records": 598,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus rhythm with pvc(s) with borderline 1st degree a-v block",
+   "n_records": 593,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "marked sinus bradycardia",
+   "n_records": 592,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "ivcd, consider atypical rbbb",
+   "n_records": 592,
+   "status": {
+    "RBBB": "excluded"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with pvcs",
+   "n_records": 562,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "inferior infarction - age undetermined",
+   "n_records": 555,
+   "status": {
+    "MI_OLD": "age_undetermined"
+   }
+  },
+  {
+   "statement": "probable old septal infarct",
+   "n_records": 552,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "possible anterior infarction - age undetermined",
+   "n_records": 544,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus rhythm with frequent multifocal pvcs",
+   "n_records": 517,
+   "status": {
+    "NSR": "definite"
+   }
+  },
+  {
+   "statement": "sinus rhythm with bigeminal pacs",
+   "n_records": 510,
+   "status": {
+    "NSR": "definite"
+   }
+  },
+  {
+   "statement": "probable anterior infarct, age indeterminate",
+   "n_records": 496,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "atrial fibrillation with rapid ventricular response with pvcs",
+   "n_records": 494,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "irregular sinus bradycardia",
+   "n_records": 493,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "inferior infarct, acute",
+   "n_records": 493,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus rhythm with pvcs with pacs",
+   "n_records": 486,
+   "status": {
+    "NSR": "definite"
+   }
+  },
+  {
+   "statement": "tall r v1/v2 probably reflect the infarct",
+   "n_records": 477,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with sinus arrhythmia with 1st degree a-v block",
+   "n_records": 465,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "probable atrial fibrillation",
+   "n_records": 461,
+   "status": {
+    "AF": "hedged"
+   }
+  },
+  {
+   "statement": "inferior and lateral st elevation, consider acute infarct",
+   "n_records": 456,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with sinus arrhythmia with borderline 1st degree a-v block",
+   "n_records": 451,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "atrial fibrillation with rapid ventricular response with pvcs or aberrant ventricular conduction",
+   "n_records": 444,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "sinus rhythm with multifocal pvcs",
+   "n_records": 441,
+   "status": {
+    "NSR": "definite"
+   }
+  },
+  {
+   "statement": "rbbb and lpfb",
+   "n_records": 430,
+   "status": {
+    "RBBB": "definite"
+   }
+  },
+  {
+   "statement": "conduction defect of rbbb type",
+   "n_records": 426,
+   "status": {
+    "RBBB": "excluded"
+   }
+  },
+  {
+   "statement": "probable atrial fibrillation with pvc(s) or aberrant ventricular conduction",
+   "n_records": 409,
+   "status": {
+    "AF": "hedged"
+   }
+  },
+  {
+   "statement": "*** anteroseptal infarct - possibly acute ***",
+   "n_records": 407,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with pvc(s) with pac(s)",
+   "n_records": 403,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "*** anterior infarct - possibly acute ***",
+   "n_records": 402,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with pac(s) with 1st degree a-v block",
+   "n_records": 385,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "septal st elevation, consider acute infarct",
+   "n_records": 385,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus arrhythmia with pvcs",
+   "n_records": 379,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "atrial fibrillation with slow ventricular response with pvc(s)",
+   "n_records": 375,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "*** inferior infarct - possibly acute ***",
+   "n_records": 369,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus or ectopic atrial tachycardia",
+   "n_records": 363,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "atrial fibrillation with multifocal pvcs or aberrant ventricular conduction",
+   "n_records": 362,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "first degree a-v block",
+   "n_records": 353,
+   "status": {
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "possible inferior infarction - age undetermined",
+   "n_records": 347,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "anterolateral infarct, age indeterminate",
+   "n_records": 345,
+   "status": {
+    "MI_OLD": "age_undetermined"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with frequent pvcs",
+   "n_records": 345,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "probable atrial fibrillation with pvc(s)",
+   "n_records": 339,
+   "status": {
+    "AF": "hedged"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with pvcs",
+   "n_records": 339,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "conduction defect of lbbb type",
+   "n_records": 338,
+   "status": {
+    "LBBB": "excluded"
+   }
+  },
+  {
+   "statement": "atrial fibrillation with rapid v-rate",
+   "n_records": 336,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "possible anterior infarct",
+   "n_records": 329,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "afib/flut and v-paced complexes",
+   "n_records": 327,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "borderline first degree a-v block",
+   "n_records": 312,
+   "status": {
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "qrs changes v3/v4 - probably due to lvh but consider anterior infarct",
+   "n_records": 310,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "probable old anteroseptal infarct",
+   "n_records": 310,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "atrial fibrillation with frequent multifocal pvcs or aberrant ventricular conduction",
+   "n_records": 308,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "probable inferior infarct - age undetermined",
+   "n_records": 305,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus rhythm with pacs with 1st degree a-v block",
+   "n_records": 305,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "atrial fibrillation with frequent pvcs or aberrant ventricular conduction",
+   "n_records": 304,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "sinus rhythm with pvcs with 1st degree a-v block",
+   "n_records": 302,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "incomplete rbbb and lafb",
+   "n_records": 301,
+   "status": {
+    "RBBB": "excluded"
+   }
+  },
+  {
+   "statement": "extensive st-t changes suggest myocardial infarct",
+   "n_records": 300,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "anterior infarct, acute",
+   "n_records": 293,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "right bundle branch block with left anterior fascicular block",
+   "n_records": 280,
+   "status": {
+    "RBBB": "definite"
+   }
+  },
+  {
+   "statement": "lateral infarct, acute",
+   "n_records": 277,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "*** lateral infarct - possibly acute ***",
+   "n_records": 275,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus rhythm with pacs with borderline 1st degree a-v block",
+   "n_records": 264,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "sinus rhythm with frequent pacs",
+   "n_records": 263,
+   "status": {
+    "NSR": "definite"
+   }
+  },
+  {
+   "statement": "ivcd, consider atypical lbbb",
+   "n_records": 261,
+   "status": {
+    "LBBB": "excluded"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with pac(s) with borderline 1st degree a-v block",
+   "n_records": 256,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "probable anteroseptal infarct, recent",
+   "n_records": 251,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus rhythm with pvcs with borderline 1st degree a-v block",
+   "n_records": 244,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "sinus rhythm with interpolated pvc(s)",
+   "n_records": 241,
+   "status": {
+    "NSR": "definite"
+   }
+  },
+  {
+   "statement": "old anteroseptal infarct",
+   "n_records": 238,
+   "status": {
+    "MI_OLD": "definite"
+   }
+  },
+  {
+   "statement": "sinus rhythm with 2nd degree a-v block, mobitz i (wenckebach)",
+   "n_records": 236,
+   "status": {
+    "NSR": "definite"
+   }
+  },
+  {
+   "statement": "afib/flutter and ventricular-paced rhythm",
+   "n_records": 235,
+   "status": {
+    "AF": "excluded"
+   }
+  },
+  {
+   "statement": "atrial fibrillation with paroxysmal idioventricular rhythm or aberrant ventricular conduction",
+   "n_records": 229,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with irregular rate",
+   "n_records": 228,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "consider old anteroseptal infarct",
+   "n_records": 226,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with pvcs with pacs",
+   "n_records": 226,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "*** extensive infarct with some acute changes ***",
+   "n_records": 219,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "extensive st elevation, consider acute infarct",
+   "n_records": 217,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "atrial fibrillation with slow ventricular response with pvc(s) or aberrant ventricular conduction",
+   "n_records": 212,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "atrial fibrillation with rapid ventricular response with frequent multifocal pvcs or aberrant ventricular conduction",
+   "n_records": 211,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "probable anteroseptal infarct - age undetermined",
+   "n_records": 206,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "atrial fibrillation with rapid ventricular response with multifocal pvcs or aberrant ventricular conduction",
+   "n_records": 205,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with sinus arrhythmia with pvc(s)",
+   "n_records": 198,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "posterior infarct, old",
+   "n_records": 194,
+   "status": {
+    "MI_OLD": "definite"
+   }
+  },
+  {
+   "statement": "possible anterolateral infarct - age undetermined",
+   "n_records": 192,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "probable atrial fibrillation with rapid ventricular response",
+   "n_records": 188,
+   "status": {
+    "AF": "hedged"
+   }
+  },
+  {
+   "statement": "possible anteroseptal infarction - age undetermined",
+   "n_records": 187,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus rhythm with bigeminal pacs with 1st degree a-v block",
+   "n_records": 178,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "sinus or ectopic atrial bradycardia",
+   "n_records": 173,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "atrial fibrillation with rapid ventricular response with non-sustained ventricular tachycardia",
+   "n_records": 172,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "consider inferior infarct",
+   "n_records": 170,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "anterior infarct, age indeterminate",
+   "n_records": 165,
+   "status": {
+    "MI_OLD": "age_undetermined"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with interpolated pvc(s)",
+   "n_records": 164,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with pac(s) with borderline 1st degree a-v block",
+   "n_records": 164,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "*** anterolateral infarct - possibly acute ***",
+   "n_records": 163,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "probable inferior infarct, age indeterminate",
+   "n_records": 162,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "possible acute anterior infarct",
+   "n_records": 161,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "qrs changes may be due to lvh but cannot rule out anteroseptal infarct",
+   "n_records": 161,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "probable atrial fibrillation with pvcs or aberrant ventricular conduction",
+   "n_records": 160,
+   "status": {
+    "AF": "hedged"
+   }
+  },
+  {
+   "statement": "irregular sinus tachycardia",
+   "n_records": 160,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus arrhythmia with frequent pvcs",
+   "n_records": 159,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with sinus arrhythmia with pvc(s)",
+   "n_records": 156,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "qrs changes in v2 may be due to lvh but cannot rule out septal infarct",
+   "n_records": 156,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "probable inferior infarct, old",
+   "n_records": 155,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with pvc(s) with 1st degree a-v block",
+   "n_records": 154,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "consider old septal infarct",
+   "n_records": 151,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus rhythm with occasional pacs",
+   "n_records": 148,
+   "status": {
+    "NSR": "definite"
+   }
+  },
+  {
+   "statement": "atrial fibrillation with slow ventricular response with pvcs",
+   "n_records": 148,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "ant/septal and lateral st-t changes suggest myocardial infarct",
+   "n_records": 146,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with frequent pacs",
+   "n_records": 145,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus rhythm with bigeminal pvcs with 1st degree a-v block",
+   "n_records": 145,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "atrial fibrillation with intermittent conduction defect",
+   "n_records": 144,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with frequent multifocal pvcs",
+   "n_records": 143,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "probable septal infarct - age undetermined",
+   "n_records": 141,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with aberrantly conducted supraventricular complexes",
+   "n_records": 141,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "consider anteroseptal infarct - age undetermined",
+   "n_records": 140,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus rhythm with interpolated pvcs",
+   "n_records": 138,
+   "status": {
+    "NSR": "definite"
+   }
+  },
+  {
+   "statement": "probable lateral infarct, age indeterminate",
+   "n_records": 126,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "probable atrial fibrillation with pvcs",
+   "n_records": 125,
+   "status": {
+    "AF": "hedged"
+   }
+  },
+  {
+   "statement": "atrial fibrillation with rapid ventricular response with frequent pvcs or aberrant ventricular conduction",
+   "n_records": 125,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "sinus rhythm with frequent pvcs with borderline 1st degree a-v block",
+   "n_records": 122,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "possible acute inferior infarct",
+   "n_records": 120,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus rhythm with frequent pvcs with 1st degree a-v block",
+   "n_records": 118,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "atrial fibrillation with paroxysmal idioventricular rhythm",
+   "n_records": 118,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with aberrantly conducted supraventricular complexes",
+   "n_records": 116,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "i.v. conduction defect of left bundle branch block type",
+   "n_records": 116,
+   "status": {
+    "LBBB": "excluded"
+   }
+  },
+  {
+   "statement": "probable atrial fibrillation with rapid ventricular response with pvc(s) or aberrant ventricular conduction",
+   "n_records": 116,
+   "status": {
+    "AF": "hedged"
+   }
+  },
+  {
+   "statement": "probable atrial fibrillation with rapid ventricular response with pvc(s)",
+   "n_records": 115,
+   "status": {
+    "AF": "hedged"
+   }
+  },
+  {
+   "statement": "probable anterolateral infarct, old",
+   "n_records": 113,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with frequent pvcs",
+   "n_records": 112,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "probable atrial fibrillation with frequent pvcs or aberrant ventricular conduction",
+   "n_records": 112,
+   "status": {
+    "AF": "hedged"
+   }
+  },
+  {
+   "statement": "probable anterior infarct, old",
+   "n_records": 111,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "slow sinus arrhythmia",
+   "n_records": 110,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "i.v. conduction defect of right bundle branch block type",
+   "n_records": 110,
+   "status": {
+    "RBBB": "excluded"
+   }
+  },
+  {
+   "statement": "sinus arrhythmia with aberrantly conducted supraventricular complexes",
+   "n_records": 108,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "anterolateral infarct, acute",
+   "n_records": 107,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "posterior infarct, acute",
+   "n_records": 107,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "*** septal infarct - possibly acute ***",
+   "n_records": 106,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "extensive t wave changes suggest myocardial infarct",
+   "n_records": 105,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "old lateral infarct",
+   "n_records": 104,
+   "status": {
+    "MI_OLD": "definite"
+   }
+  },
+  {
+   "statement": "anterior st elevation, consider acute infarct",
+   "n_records": 103,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "atrial fibrillation with multifocal pvcs",
+   "n_records": 103,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "consider septal infarct",
+   "n_records": 102,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with pvc(s) with borderline 1st degree a-v block",
+   "n_records": 102,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with pvc(s) with pac(s)",
+   "n_records": 101,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus arrhythmia with pvc(s) with borderline 1st degree a-v block",
+   "n_records": 101,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "anteroseptal infarction - age undetermined",
+   "n_records": 99,
+   "status": {
+    "MI_OLD": "age_undetermined"
+   }
+  },
+  {
+   "statement": "probable posterior infarct, acute",
+   "n_records": 99,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "inferior and ant/septal st elevation, consider acute infarct",
+   "n_records": 98,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "extensive infarction - age undetermined",
+   "n_records": 96,
+   "status": {
+    "MI_OLD": "age_undetermined"
+   }
+  },
+  {
+   "statement": "probable atrial fibrillation with complete a-v block",
+   "n_records": 95,
+   "status": {
+    "AF": "hedged"
+   }
+  },
+  {
+   "statement": "possible septal infarction - age undetermined",
+   "n_records": 95,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "lateral infarct, age indeterminate",
+   "n_records": 94,
+   "status": {
+    "MI_OLD": "age_undetermined"
+   }
+  },
+  {
+   "statement": "atrial fibrillation with rapid ventricular response with paroxysmal idioventricular rhythm or aberrant ventricular conduction",
+   "n_records": 93,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with pacs with 1st degree a-v block",
+   "n_records": 93,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "probable inferior infarct, acute",
+   "n_records": 90,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "inferior infarct - probably acute",
+   "n_records": 88,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "probable atrial fibrillation with multifocal pvcs or aberrant ventricular conduction",
+   "n_records": 87,
+   "status": {
+    "AF": "hedged"
+   }
+  },
+  {
+   "statement": "ant/septal and lateral t wave changes suggest myocardial infarct",
+   "n_records": 87,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus rhythm with pvc(s) with pac(s) with 1st degree a-v block",
+   "n_records": 87,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with multifocal pvcs",
+   "n_records": 87,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus rhythm with aberrantly conducted supraventricular complexes with pvc(s)",
+   "n_records": 87,
+   "status": {
+    "NSR": "definite"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with 1st degree a-v block",
+   "n_records": 86,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "anterolateral infarct, old",
+   "n_records": 86,
+   "status": {
+    "MI_OLD": "definite"
+   }
+  },
+  {
+   "statement": "atrial fibrillation with slow ventricular response with pvcs or aberrant ventricular conduction",
+   "n_records": 85,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "probable atrial fibrillation with slow ventricular response",
+   "n_records": 84,
+   "status": {
+    "AF": "hedged"
+   }
+  },
+  {
+   "statement": "probable extensive infarct - age undetermined",
+   "n_records": 84,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "probable lateral infarct - age undetermined",
+   "n_records": 83,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "probable atrial fibrillation with frequent multifocal pvcs or aberrant ventricular conduction",
+   "n_records": 82,
+   "status": {
+    "AF": "hedged"
+   }
+  },
+  {
+   "statement": "probable lateral infarct, old",
+   "n_records": 82,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "changes are probably due to lvh but consider anterior infarct",
+   "n_records": 81,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus arrhythmia with multifocal pvcs",
+   "n_records": 81,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus arrhythmia with pvc(s) with 1st degree a-v block",
+   "n_records": 81,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "probable atrial fibrillation with rapid ventricular response with pvcs or aberrant ventricular conduction",
+   "n_records": 80,
+   "status": {
+    "AF": "hedged"
+   }
+  },
+  {
+   "statement": "sinus rhythm with pvc(s) with pac(s) with borderline 1st degree a-v block",
+   "n_records": 79,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "anterior q waves, possibly due to ilbbb",
+   "n_records": 75,
+   "status": {
+    "LBBB": "excluded"
+   }
+  },
+  {
+   "statement": "atrial fibrillation with rapid ventricular response with multifocal pvcs",
+   "n_records": 75,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "old inferior infarction",
+   "n_records": 74,
+   "status": {
+    "MI_OLD": "definite"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with sinus arrhythmia with borderline 1st degree a-v block",
+   "n_records": 74,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "sinus arrhythmia with frequent multifocal pvcs",
+   "n_records": 74,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with sinus arrhythmia with pvcs",
+   "n_records": 74,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus arrhythmia with interpolated pvc(s)",
+   "n_records": 72,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "probable atrial fibrillation with rapid ventricular response with pvcs",
+   "n_records": 72,
+   "status": {
+    "AF": "hedged"
+   }
+  },
+  {
+   "statement": "probable atrial fibrillation with uncontrolled ventricular response",
+   "n_records": 72,
+   "status": {
+    "AF": "hedged"
+   }
+  },
+  {
+   "statement": "anterior infarct, possibly acute",
+   "n_records": 72,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus rhythm with bigeminal pacs with borderline 1st degree a-v block",
+   "n_records": 71,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "atrial fibrillation with frequent pvcs",
+   "n_records": 69,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with pacs with borderline 1st degree a-v block",
+   "n_records": 69,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "atrial flutter/fibrillation",
+   "n_records": 67,
+   "status": {
+    "AF": "excluded"
+   }
+  },
+  {
+   "statement": "sinus rhythm with intermittent conduction defect",
+   "n_records": 67,
+   "status": {
+    "NSR": "definite"
+   }
+  },
+  {
+   "statement": "sinus rhythm with multifocal pvcs with pac(s)",
+   "n_records": 66,
+   "status": {
+    "NSR": "definite"
+   }
+  },
+  {
+   "statement": "inferior/lateral st-t changes suggest myocardial infarct",
+   "n_records": 66,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "possible acute anteroseptal infarct",
+   "n_records": 64,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus rhythm with multifocal pvcs with 1st degree a-v block",
+   "n_records": 63,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "probable inferior infarct, recent",
+   "n_records": 62,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "atrial fibrillation with uncontrolled ventricular response with pvc(s)",
+   "n_records": 62,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with sinus arrhythmia with pac(s)",
+   "n_records": 62,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus rhythm with bigeminal pvcs with borderline 1st degree a-v block",
+   "n_records": 62,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "sinus rhythm with aberrantly conducted supraventricular complexes with borderline 1st degree a-v block",
+   "n_records": 61,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "anterior st elevation, consider recent infarction",
+   "n_records": 61,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "inferior and septal st elevation, consider acute infarct",
+   "n_records": 61,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "probable old anterior infarct",
+   "n_records": 61,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus rhythm with 2nd degree (mobitz ii) sa block",
+   "n_records": 60,
+   "status": {
+    "NSR": "definite"
+   }
+  },
+  {
+   "statement": "lateral st elevation - probable extension of infarct",
+   "n_records": 60,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "atrial fibrillation with frequent multifocal pvcs",
+   "n_records": 60,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "lateral st elevation, consider recent infarction",
+   "n_records": 58,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "probable old lateral infarct",
+   "n_records": 58,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with pacs with borderline 1st degree a-v block",
+   "n_records": 58,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "probable anterolateral infarct, acute",
+   "n_records": 57,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "inferior st-t changes suggest myocardial infarct",
+   "n_records": 56,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "possible old inferior infarction",
+   "n_records": 55,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "abnormal q suggests anterior infarct",
+   "n_records": 55,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with interpolated pvcs",
+   "n_records": 55,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "inferolateral infarct, acute",
+   "n_records": 55,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "probable acute inferior infarct",
+   "n_records": 54,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "anteroseptal t wave changes suggest myocardial infarct",
+   "n_records": 54,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "marked st depression in v lead, consider recent infarction",
+   "n_records": 53,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus rhythm with aberrantly conducted supraventricular complexes with 1st degree a-v block",
+   "n_records": 51,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "probable old septal infarction",
+   "n_records": 51,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus rhythm with frequent pvcs with pac(s)",
+   "n_records": 50,
+   "status": {
+    "NSR": "definite"
+   }
+  },
+  {
+   "statement": "probable atrial fibrillation with rapid ventricular response with frequent pvcs or aberrant ventricular conduction",
+   "n_records": 49,
+   "status": {
+    "AF": "hedged"
+   }
+  },
+  {
+   "statement": "probable old inferior infarction",
+   "n_records": 49,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "acute inferior infarct",
+   "n_records": 48,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "fast sinus arrhythmia",
+   "n_records": 48,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "probable anterolateral infarct, age indeterm",
+   "n_records": 48,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "consider anterolateral infarct",
+   "n_records": 48,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus rhythm with 2:1 a-v block",
+   "n_records": 48,
+   "status": {
+    "NSR": "definite"
+   }
+  },
+  {
+   "statement": "sinus arrhythmia with pvcs with borderline 1st degree a-v block",
+   "n_records": 47,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "inferior infarct, recent",
+   "n_records": 47,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with pvc(s) with borderline 1st degree a-v block",
+   "n_records": 47,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with pvcs with 1st degree a-v block",
+   "n_records": 47,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "probable atrial fibrillation with rapid ventricular response with frequent multifocal pvcs or aberrant ventricular conduction",
+   "n_records": 47,
+   "status": {
+    "AF": "hedged"
+   }
+  },
+  {
+   "statement": "sinus rhythm with multifocal pvcs with borderline 1st degree a-v block",
+   "n_records": 47,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "atrial fibrillation with uncontrolled ventricular response with pvc(s) or aberrant ventricular conduction",
+   "n_records": 47,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "lateral infarct, old",
+   "n_records": 47,
+   "status": {
+    "MI_OLD": "definite"
+   }
+  },
+  {
+   "statement": "possible old anterior infarction",
+   "n_records": 46,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with sinus arrhythmia with interpolated pvc(s)",
+   "n_records": 46,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus rhythm with frequent multifocal pvcs with 1st degree a-v block",
+   "n_records": 46,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "sinus arrhythmia with pvcs with 1st degree a-v block",
+   "n_records": 45,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "possible lateral infarction - age undetermined",
+   "n_records": 44,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "atrial fibrillation with fusion complexes",
+   "n_records": 44,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "probable anterior infarct - age undetermined",
+   "n_records": 44,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "atrial fibrillation with rapid ventricular response with frequent pvcs",
+   "n_records": 44,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "lateral st elevation - probable lateral extension of infarct",
+   "n_records": 44,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "probable atrial fibrillation with slow ventricular response with complete a-v block",
+   "n_records": 44,
+   "status": {
+    "AF": "hedged"
+   }
+  },
+  {
+   "statement": "sinus rhythm with frequent multifocal pvcs with borderline 1st degree a-v block",
+   "n_records": 44,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "inferoposterior infarct, acute",
+   "n_records": 44,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with sinus arrhythmia with pvcs",
+   "n_records": 43,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus rhythm with aberrantly conducted supraventricular complexes with pvcs",
+   "n_records": 43,
+   "status": {
+    "NSR": "definite"
+   }
+  },
+  {
+   "statement": "consider anterior myocardial infarction",
+   "n_records": 42,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "inferoposterior infarct, recent",
+   "n_records": 42,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with pvcs with pacs",
+   "n_records": 40,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "probable atrial fibrillation with rapid ventricular response with multifocal pvcs or aberrant ventricular conduction",
+   "n_records": 40,
+   "status": {
+    "AF": "hedged"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with sinus arrhythmia with pac(s) with 1st degree a-v block",
+   "n_records": 40,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with pvcs with borderline 1st degree a-v block",
+   "n_records": 39,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "possible acute lateral infarct",
+   "n_records": 38,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "consider anteroseptal infarct",
+   "n_records": 38,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "possible recent anterior infarct",
+   "n_records": 37,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with multifocal pvcs",
+   "n_records": 37,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "anteroseptal st-t changes suggest myocardial infarct",
+   "n_records": 36,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "lateral infarction - age undetermined",
+   "n_records": 36,
+   "status": {
+    "MI_OLD": "age_undetermined"
+   }
+  },
+  {
+   "statement": "inferior st elevation, consider recent infarction",
+   "n_records": 35,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "consider acute lateral infarction",
+   "n_records": 35,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus arrhythmia with interpolated pvcs",
+   "n_records": 35,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "anteroseptal infarct, acute",
+   "n_records": 34,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus rhythm with paroxysmal idioventricular rhythm",
+   "n_records": 34,
+   "status": {
+    "NSR": "definite"
+   }
+  },
+  {
+   "statement": "sinus rhythm with pvcs with pacs with borderline 1st degree a-v block",
+   "n_records": 33,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "possible extensive infarct with acute anterolateral changes",
+   "n_records": 33,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "extensive st-t changes suggest myocardial infarction",
+   "n_records": 33,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with sinus arrhythmia with multifocal pvcs",
+   "n_records": 32,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with frequent multifocal pvcs",
+   "n_records": 32,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "extensive st-t changes may be due to myocardial infarct or cva",
+   "n_records": 32,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with sinus arrhythmia with frequent multifocal pvcs",
+   "n_records": 31,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with aberrantly conducted supraventricular complexes with pvc(s) with pac(s)",
+   "n_records": 31,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "atrial fibrillation with uncontrolled ventricular response with non-sustained ventricular tachycardia",
+   "n_records": 31,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with sinus arrhythmia with pvc(s) with 1st degree a-v block",
+   "n_records": 31,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with interpolated pvc(s) with 1st degree a-v block",
+   "n_records": 31,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "atrial fibrillation with fusion complexes or aberrant ventricular conduction",
+   "n_records": 31,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "sinus rhythm with frequent multifocal pvcs with pac(s)",
+   "n_records": 30,
+   "status": {
+    "NSR": "definite"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with sinus arrhythmia with frequent pvcs",
+   "n_records": 30,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "inferolateral infarct, old",
+   "n_records": 30,
+   "status": {
+    "MI_OLD": "definite"
+   }
+  },
+  {
+   "statement": "sinus rhythm with multifocal interpolated pvcs",
+   "n_records": 30,
+   "status": {
+    "NSR": "definite"
+   }
+  },
+  {
+   "statement": "consider septal infarct - age undetermined",
+   "n_records": 29,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "atrial fibrillation with slow ventricular response with multifocal pvcs or aberrant ventricular conduction",
+   "n_records": 29,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "anteroseptal infarct - probably acute",
+   "n_records": 29,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus rhythm with interpolated pvc(s) with borderline 1st degree a-v block",
+   "n_records": 29,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "changes v3-v4 are probably due to left ventricular hypertrophy but consider anterior infarction",
+   "n_records": 29,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with multifocal pvcs with pac(s)",
+   "n_records": 28,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "consider acute inferior infarction",
+   "n_records": 28,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "atrial fibrillation with uncontrolled ventricular response with pvcs",
+   "n_records": 28,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "probable atrial fibrillation with slow ventricular response with pvc(s)",
+   "n_records": 28,
+   "status": {
+    "AF": "hedged"
+   }
+  },
+  {
+   "statement": "sinus rhythm with pvcs with pacs with 1st degree a-v block",
+   "n_records": 28,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with sinus arrhythmia with aberrantly conducted supraventricular complexes",
+   "n_records": 28,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with aberrantly conducted supraventricular complexes with pvc(s)",
+   "n_records": 27,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus bradycardia - consider sinus rhythm with 2:1 s-a block",
+   "n_records": 27,
+   "status": {
+    "NSR": "hedged"
+   }
+  },
+  {
+   "statement": "sinus rhythm with interpolated pvc(s) with 1st degree a-v block",
+   "n_records": 27,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "probable atrial fibrillation with slow ventricular response with pvc(s) or aberrant ventricular conduction",
+   "n_records": 27,
+   "status": {
+    "AF": "hedged"
+   }
+  },
+  {
+   "statement": "probable atrial fibrillation with frequent pvcs",
+   "n_records": 27,
+   "status": {
+    "AF": "hedged"
+   }
+  },
+  {
+   "statement": "probable old anteroseptal infarction",
+   "n_records": 27,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "rbbb with rad - possible left posterior fascicular block",
+   "n_records": 26,
+   "status": {
+    "RBBB": "definite"
+   }
+  },
+  {
+   "statement": "probable anterolateral infarct, recent",
+   "n_records": 26,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "extensive anterior infarct, acute",
+   "n_records": 26,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "atrial fibrillation with slow ventricular response with frequent pvcs or aberrant ventricular conduction",
+   "n_records": 26,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with pvc(s) with pac(s) with borderline 1st degree a-v block",
+   "n_records": 26,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "sinus arrhythmia with multifocal pvcs with 1st degree a-v block",
+   "n_records": 25,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "atrial fibrillation with slow ventricular response with paroxysmal idioventricular rhythm or aberrant ventricular conduction",
+   "n_records": 25,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with non-sustained ventricular tachycardia",
+   "n_records": 25,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus rhythm with aberrantly conducted supraventricular complexes with pac(s)",
+   "n_records": 25,
+   "status": {
+    "NSR": "definite"
+   }
+  },
+  {
+   "statement": "atrial fibrillation with rapid ventricular response with intermittent conduction defect",
+   "n_records": 25,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "strongly suggests myocardial infarction",
+   "n_records": 24,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus rhythm with aberrantly conducted supraventricular complexes with pvc(s) with pac(s)",
+   "n_records": 24,
+   "status": {
+    "NSR": "definite"
+   }
+  },
+  {
+   "statement": "marked ant/septal stj depression is probably reciprocal to inferior infarct",
+   "n_records": 24,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with multifocal pvcs with pacs",
+   "n_records": 24,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "atrial fibrillation with rapid ventricular response with frequent multifocal pvcs",
+   "n_records": 24,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "anterior infarction - age undetermined",
+   "n_records": 24,
+   "status": {
+    "MI_OLD": "age_undetermined"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with pvcs with borderline 1st degree a-v block",
+   "n_records": 24,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "possible acute anterolateral infarct",
+   "n_records": 24,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "possible old anteroseptal infarction",
+   "n_records": 24,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with sinus arrhythmia with pac(s)",
+   "n_records": 24,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with frequent pvcs with pac(s)",
+   "n_records": 24,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "atrial fibrillation with uncontrolled ventricular response with pvcs or aberrant ventricular conduction",
+   "n_records": 23,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with sinus arrhythmia with pvc(s) with borderline 1st degree a-v block",
+   "n_records": 23,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "irbbb and lpfb",
+   "n_records": 23,
+   "status": {
+    "RBBB": "excluded"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with sinus arrhythmia with 2nd degree (mobitz ii) sa block",
+   "n_records": 23,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "lad, consider lafb or inferior infarct",
+   "n_records": 23,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus rhythm with aberrantly conducted supraventricular complexes with multifocal pvcs",
+   "n_records": 23,
+   "status": {
+    "NSR": "definite"
+   }
+  },
+  {
+   "statement": "sinus rhythm with pvcs with occasional pacs",
+   "n_records": 23,
+   "status": {
+    "NSR": "definite"
+   }
+  },
+  {
+   "statement": "probable inferior infarction - age undetermined",
+   "n_records": 23,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "septal st elevation, consider recent infarction",
+   "n_records": 23,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "*** extensive infarct - possibly acute ***",
+   "n_records": 22,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "extensive anterior infarct, old",
+   "n_records": 22,
+   "status": {
+    "MI_OLD": "definite"
+   }
+  },
+  {
+   "statement": "probable atrial fibrillation with multifocal pvcs",
+   "n_records": 22,
+   "status": {
+    "AF": "hedged"
+   }
+  },
+  {
+   "statement": "a-flutter/fibrillation w/ complete av block",
+   "n_records": 22,
+   "status": {
+    "AF": "excluded"
+   }
+  },
+  {
+   "statement": "atrial fibrillation with slow ventricular response with multifocal pvcs",
+   "n_records": 22,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with interpolated pvc(s) with borderline 1st degree a-v block",
+   "n_records": 22,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "atrial fibrillation with non-sustained ventricular tachycardia",
+   "n_records": 21,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "probable anteroseptal infarct, acute",
+   "n_records": 21,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with sinus arrhythmia with pacs",
+   "n_records": 21,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "anterolateral st elevation, consider recent infarction",
+   "n_records": 20,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with sinus arrhythmia with pacs",
+   "n_records": 20,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus rhythm with multifocal pvcs with pacs",
+   "n_records": 20,
+   "status": {
+    "NSR": "definite"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with sinus arrhythmia with 2nd degree (mobitz ii) sa block",
+   "n_records": 20,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "probable atrial fibrillation with rapid ventricular response with non-sustained ventricular tachycardia",
+   "n_records": 20,
+   "status": {
+    "AF": "hedged"
+   }
+  },
+  {
+   "statement": "possible acute septal infarct",
+   "n_records": 20,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "probable posterior infarct, recent",
+   "n_records": 20,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "atrial fibrillation with slow ventricular response with paroxysmal idioventricular rhythm",
+   "n_records": 19,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "probable acute anteroseptal infarct",
+   "n_records": 19,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus rhythm with interpolated pvcs with 1st degree a-v block",
+   "n_records": 19,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "sinus rhythm with fusion complexes",
+   "n_records": 19,
+   "status": {
+    "NSR": "definite"
+   }
+  },
+  {
+   "statement": "possible extensive infarction - age undetermined",
+   "n_records": 19,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus rhythm with aberrantly conducted supraventricular complexes with frequent multifocal pvcs",
+   "n_records": 19,
+   "status": {
+    "NSR": "definite"
+   }
+  },
+  {
+   "statement": "anteroseptal infarct, possibly acute",
+   "n_records": 19,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus rhythm with aberrantly conducted supraventricular complexes with interpolated pvc(s)",
+   "n_records": 19,
+   "status": {
+    "NSR": "definite"
+   }
+  },
+  {
+   "statement": "inferior infarct - possibly acute",
+   "n_records": 19,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus rhythm with aberrantly conducted supraventricular complexes with pvcs with pacs",
+   "n_records": 18,
+   "status": {
+    "NSR": "definite"
+   }
+  },
+  {
+   "statement": "lateral infarct, recent",
+   "n_records": 18,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus rhythm with frequent multifocal pvcs with pacs",
+   "n_records": 18,
+   "status": {
+    "NSR": "definite"
+   }
+  },
+  {
+   "statement": "anteroseptal t wave changes suggest myocardial infarction",
+   "n_records": 18,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "qrs changes in v2 probably due to lvh but consider septal infarct",
+   "n_records": 18,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "inferoposterior infarct, old",
+   "n_records": 18,
+   "status": {
+    "MI_OLD": "definite"
+   }
+  },
+  {
+   "statement": "inferior and ant/septal t wave changes suggest myocardial infarct",
+   "n_records": 17,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "consider acute anteroseptal infarct",
+   "n_records": 17,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus rhythm with non-sustained ventricular tachycardia",
+   "n_records": 17,
+   "status": {
+    "NSR": "definite"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with sinus arrhythmia with aberrantly conducted supraventricular complexes",
+   "n_records": 17,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "atrial fibrillation with slow ventricular response with frequent multifocal pvcs or aberrant ventricular conduction",
+   "n_records": 17,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "consider acute anteroseptal infarction",
+   "n_records": 17,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "ant/septal and lateral st-t changes may be due to myocardial infarct or cva",
+   "n_records": 17,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "atrial fibrillation with rapid ventricular response with paroxysmal idioventricular rhythm",
+   "n_records": 16,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with frequent pvcs with 1st degree a-v block",
+   "n_records": 16,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "probable anterolateral infarct - age undetermined",
+   "n_records": 16,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with frequent pvcs with pacs",
+   "n_records": 16,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with aberrantly conducted supraventricular complexes with 1st degree a-v block",
+   "n_records": 16,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "possible extensive infarct with acute lateral changes",
+   "n_records": 16,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with frequent multifocal pvcs with pac(s)",
+   "n_records": 16,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "extensive infarct with acute anterolateral changes",
+   "n_records": 16,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with pvc(s) with pac(s) with borderline 1st degree a-v block",
+   "n_records": 16,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with occasional pacs",
+   "n_records": 15,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus arrhythmia with aberrantly conducted supraventricular complexes with pvc(s)",
+   "n_records": 15,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "atrial fibrillation with slow ventricular response with frequent pvcs",
+   "n_records": 15,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "*** extensive infarct *** with possible acute anterolateral changes",
+   "n_records": 15,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus rhythm with aberrantly conducted supraventricular complexes with pacs",
+   "n_records": 15,
+   "status": {
+    "NSR": "definite"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with aberrantly conducted supraventricular complexes with borderline 1st degree a-v block",
+   "n_records": 15,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "sinus rhythm with occasional pacs with 1st degree a-v block",
+   "n_records": 15,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "anterolateral st-t changes suggest myocardial infarct",
+   "n_records": 15,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus arrhythmia with frequent pvcs with 1st degree a-v block",
+   "n_records": 15,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "probable anteroseptal infarction - age undetermined",
+   "n_records": 15,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus rhythm with 2nd degree (mobitz ii) sa block with 1st degree a-v block",
+   "n_records": 15,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "sinus rhythm with frequent pacs with borderline 1st degree a-v block",
+   "n_records": 15,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with sinus arrhythmia with multifocal pvcs",
+   "n_records": 15,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with frequent pacs",
+   "n_records": 15,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus rhythm with occasional pacs with borderline 1st degree a-v block",
+   "n_records": 15,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "sinus rhythm with frequent pacs with 1st degree a-v block",
+   "n_records": 14,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "lateral st-t changes may be due to myocardial infarct or cva",
+   "n_records": 14,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "probable old extensive infarction",
+   "n_records": 14,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "inferolateral infarct, age indeterminate",
+   "n_records": 14,
+   "status": {
+    "MI_OLD": "age_undetermined"
+   }
+  },
+  {
+   "statement": "old anteroseptal infarction",
+   "n_records": 14,
+   "status": {
+    "MI_OLD": "definite"
+   }
+  },
+  {
+   "statement": "recent inferior infarct",
+   "n_records": 14,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "anterolateral t wave changes suggest myocardial infarct",
+   "n_records": 14,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with sinus arrhythmia with pacs with 1st degree a-v block",
+   "n_records": 14,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with pvcs with pacs with borderline 1st degree a-v block",
+   "n_records": 14,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "anterior infarct, recent",
+   "n_records": 14,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "inferior and lateral st elevation, consider recent infarction",
+   "n_records": 14,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with sinus arrhythmia with 2nd degree (mobitz ii) sa block with 1st degree a-v block",
+   "n_records": 14,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "possible old lateral infarct",
+   "n_records": 13,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with sinus arrhythmia with non-sustained ventricular tachycardia",
+   "n_records": 13,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "old anterior infarct",
+   "n_records": 13,
+   "status": {
+    "MI_OLD": "definite"
+   }
+  },
+  {
+   "statement": "inferoposterior infarct, age indeterminate",
+   "n_records": 13,
+   "status": {
+    "MI_OLD": "age_undetermined"
+   }
+  },
+  {
+   "statement": "sinus rhythm with frequent pvcs with pacs",
+   "n_records": 13,
+   "status": {
+    "NSR": "definite"
+   }
+  },
+  {
+   "statement": "inferior and anterior st-t changes suggest myocardial infarct",
+   "n_records": 13,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "anterolateral infarct, recent",
+   "n_records": 13,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with sinus arrhythmia with frequent pvcs",
+   "n_records": 13,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with pvc(s) with pac(s) with 1st degree a-v block",
+   "n_records": 13,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "probable atrial fibrillation with frequent multifocal pvcs",
+   "n_records": 12,
+   "status": {
+    "AF": "hedged"
+   }
+  },
+  {
+   "statement": "probable poor r wave progression but consider anteroseptal infarct",
+   "n_records": 12,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "consider anterolateral infarct - age undetermined",
+   "n_records": 12,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "changes are probably due to lvh but consider anteroseptal infarct",
+   "n_records": 12,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "inferior and ant/septal st-t changes suggest myocardial infarct",
+   "n_records": 12,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with frequent multifocal pvcs with pacs",
+   "n_records": 12,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with occasional pacs",
+   "n_records": 12,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "anterior t wave changes suggest myocardial infarct",
+   "n_records": 12,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with frequent pvcs with borderline 1st degree a-v block",
+   "n_records": 12,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "inferior/lateral st-t changes may be due to myocardial infarct or cva",
+   "n_records": 12,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus arrhythmia with frequent pvcs with borderline 1st degree a-v block",
+   "n_records": 12,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "anterolateral infarction - age undetermined",
+   "n_records": 12,
+   "status": {
+    "MI_OLD": "age_undetermined"
+   }
+  },
+  {
+   "statement": "extensive infarct with acute inferior changes",
+   "n_records": 11,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "old extensive infarction",
+   "n_records": 11,
+   "status": {
+    "MI_OLD": "definite"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with multifocal interpolated pvcs",
+   "n_records": 11,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with interpolated pvcs with borderline 1st degree a-v block",
+   "n_records": 11,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with sinus arrhythmia with interpolated pvcs",
+   "n_records": 11,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "probable atrial fibrillation with uncontrolled ventricular response with pvc(s)",
+   "n_records": 11,
+   "status": {
+    "AF": "hedged"
+   }
+  },
+  {
+   "statement": "inferior and lateral st elevation - probable extension of infarct",
+   "n_records": 11,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "probable acute septal infarct",
+   "n_records": 11,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "consider anteroseptal infarct - although changes v2-v4 may be due to lvh also present",
+   "n_records": 11,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "probable atrial fibrillation with slow ventricular response with pvcs",
+   "n_records": 11,
+   "status": {
+    "AF": "hedged"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with sinus arrhythmia with pvc(s) with borderline 1st degree a-v block",
+   "n_records": 11,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with interpolated pvc(s)",
+   "n_records": 11,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with intermittent conduction defect",
+   "n_records": 11,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with multifocal pvcs with 1st degree a-v block",
+   "n_records": 10,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "recent anteroseptal infarct",
+   "n_records": 10,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "consider acute infarction",
+   "n_records": 10,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus arrhythmia with frequent multifocal pvcs with borderline 1st degree a-v block",
+   "n_records": 10,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with aberrantly conducted supraventricular complexes with pvcs with pacs",
+   "n_records": 10,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus arrhythmia with aberrantly conducted supraventricular complexes with pvcs",
+   "n_records": 10,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with sinus arrhythmia with pvcs with 1st degree a-v block",
+   "n_records": 10,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "lateral infarct - probably acute",
+   "n_records": 10,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "anterior t wave changes suggest myocardial infarction",
+   "n_records": 10,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "anterolateral st-t changes suggest myocardial infarction",
+   "n_records": 10,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "anteroseptal st elevation, consider recent infarction",
+   "n_records": 9,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "atrial fibrillation with slow ventricular response with intermittent conduction defect",
+   "n_records": 9,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with frequent pvcs with borderline 1st degree a-v block",
+   "n_records": 9,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "changes in v2 are probably related to poor r wave progression but septal infarction cannot be excluded",
+   "n_records": 9,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "consider acute anterolateral infarction",
+   "n_records": 9,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "probable atrial fibrillation with slow ventricular response with pvcs or aberrant ventricular conduction",
+   "n_records": 9,
+   "status": {
+    "AF": "hedged"
+   }
+  },
+  {
+   "statement": "possible extensive infarct with acute inferior changes",
+   "n_records": 9,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus arrhythmia with multifocal pvcs with borderline 1st degree a-v block",
+   "n_records": 9,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "possible acute inferior infarction",
+   "n_records": 9,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with frequent multifocal pvcs with 1st degree a-v block",
+   "n_records": 9,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "sinus rhythm with interpolated pvc(s) with pac(s)",
+   "n_records": 9,
+   "status": {
+    "NSR": "definite"
+   }
+  },
+  {
+   "statement": "sinus rhythm with interpolated pvcs with borderline 1st degree a-v block",
+   "n_records": 9,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with aberrantly conducted supraventricular complexes with pvcs",
+   "n_records": 9,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "*** extensive infarct *** with possible acute inferior and lateral changes",
+   "n_records": 9,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "probable atrial fibrillation with uncontrolled ventricular response with pvcs",
+   "n_records": 9,
+   "status": {
+    "AF": "hedged"
+   }
+  },
+  {
+   "statement": "sinus arrhythmia with frequent multifocal pvcs with 1st degree a-v block",
+   "n_records": 9,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "atrial fibrillation with slow ventricular response with frequent multifocal pvcs",
+   "n_records": 9,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "sinus rhythm with paroxysmal idioventricular rhythm with 1st degree a-v block",
+   "n_records": 9,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "extensive st-t changes may be due to myocardial infarction or cva",
+   "n_records": 9,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with aberrantly conducted supraventricular complexes with interpolated pvc(s)",
+   "n_records": 9,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "inferior and anterior st elevation, consider acute infarct",
+   "n_records": 8,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "extensive t wave changes suggest myocardial infarction",
+   "n_records": 8,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "ant/septal+lateral st-t changes suggest myocardial infarction",
+   "n_records": 8,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus rhythm with aberrantly conducted supraventricular complexes with pvc(s) with borderline 1st degree a-v block",
+   "n_records": 8,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "old lateral infarction",
+   "n_records": 8,
+   "status": {
+    "MI_OLD": "definite"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with sinus arrhythmia with pac(s) with borderline 1st degree a-v block",
+   "n_records": 8,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with paroxysmal idioventricular rhythm",
+   "n_records": 8,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with pvc(s) with 1st degree a-v block",
+   "n_records": 8,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "recent lateral infarct",
+   "n_records": 8,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "acute anteroseptal infarct",
+   "n_records": 8,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "probable atrial fibrillation with fusion complexes or aberrant ventricular conduction",
+   "n_records": 8,
+   "status": {
+    "AF": "hedged"
+   }
+  },
+  {
+   "statement": "probable atrial fibrillation with paroxysmal idioventricular rhythm",
+   "n_records": 7,
+   "status": {
+    "AF": "hedged"
+   }
+  },
+  {
+   "statement": "consider septal infarct though changes in v2 may be due to lvh",
+   "n_records": 7,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with frequent pacs with borderline 1st degree a-v block",
+   "n_records": 7,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "sinus rhythm with aberrantly conducted supraventricular complexes with interpolated pvcs",
+   "n_records": 7,
+   "status": {
+    "NSR": "definite"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with pvcs with pacs with 1st degree a-v block",
+   "n_records": 7,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "probable sinus tachycardia with pvc(s)",
+   "n_records": 7,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus rhythm with multifocal pvcs with pac(s) with borderline 1st degree a-v block",
+   "n_records": 7,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "inferior t wave changes suggest myocardial infarct",
+   "n_records": 7,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with intermittent conduction defect",
+   "n_records": 7,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "probable anterior infarct, acute",
+   "n_records": 7,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with sinus arrhythmia with pvcs with borderline 1st degree a-v block",
+   "n_records": 7,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "consider anterior infarction though changes may be due to lvh",
+   "n_records": 7,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "probable recent anteroseptal infarct",
+   "n_records": 7,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with interpolated pvcs with 1st degree a-v block",
+   "n_records": 7,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "probable sinus tachycardia. ? atrial tachycardia or flutter + 2:1 a-v block",
+   "n_records": 7,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "acute anterolateral infarct",
+   "n_records": 7,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "consider posterior infarct",
+   "n_records": 7,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "probable sinus tachycardia.consider flutter and/or 2:1 a-v block",
+   "n_records": 7,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "possible acute anterior infarction",
+   "n_records": 7,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with aberrantly conducted supraventricular complexes with interpolated pvcs",
+   "n_records": 7,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with sinus arrhythmia with pacs with borderline 1st degree a-v block",
+   "n_records": 6,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "probably reciprocal to inferior infarct",
+   "n_records": 6,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "ant/septal+lateral t wave changes suggest myocardial infarction",
+   "n_records": 6,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus rhythm with 3:1 a-v block",
+   "n_records": 6,
+   "status": {
+    "NSR": "definite"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with sinus arrhythmia with interpolated pvc(s) with 1st degree a-v block",
+   "n_records": 6,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "sinus rhythm with frequent multifocal pvcs with pac(s) with borderline 1st degree a-v block",
+   "n_records": 6,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with aberrantly conducted supraventricular complexes with pvc(s)",
+   "n_records": 6,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with sinus arrhythmia with interpolated pvc(s) with borderline 1st degree a-v block",
+   "n_records": 6,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with sinus arrhythmia with 2nd degree (mobitz ii) sa block with borderline 1st degree a-v block",
+   "n_records": 6,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "probable extensive infarct with acute lateral changes",
+   "n_records": 6,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "inferior + anterior st elevation, consider recent infarction",
+   "n_records": 6,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus rhythm with undetermined irregularity",
+   "n_records": 6,
+   "status": {
+    "NSR": "definite"
+   }
+  },
+  {
+   "statement": "sinus rhythm with multifocal pvcs with pac(s) with 1st degree a-v block",
+   "n_records": 6,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "possible anterolateral infarction - age undetermined",
+   "n_records": 6,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus arrhythmia with aberrantly conducted supraventricular complexes with borderline 1st degree a-v block",
+   "n_records": 6,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "lateral t wave changes may be due to myocardial infarct or cva",
+   "n_records": 6,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "probable old anterior infarction",
+   "n_records": 6,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus arrhythmia with multifocal interpolated pvcs",
+   "n_records": 6,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with pvcs with pacs with borderline 1st degree a-v block",
+   "n_records": 6,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with sinus arrhythmia with frequent multifocal pvcs",
+   "n_records": 6,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "probable old lateral infarction",
+   "n_records": 6,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "probable atrial fibrillation with rapid ventricular response with frequent pvcs",
+   "n_records": 6,
+   "status": {
+    "AF": "hedged"
+   }
+  },
+  {
+   "statement": "probable atrial fibrillation with uncontrolled ventricular response with pvc(s) or aberrant ventricular conduction",
+   "n_records": 6,
+   "status": {
+    "AF": "hedged"
+   }
+  },
+  {
+   "statement": "probable extensive infarct with acute anterolateral changes",
+   "n_records": 6,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus arrhythmia with non-sustained ventricular tachycardia",
+   "n_records": 6,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "acute lateral infarct",
+   "n_records": 6,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "possible acute extensive infarct",
+   "n_records": 6,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "probable septal infarction - age undetermined",
+   "n_records": 6,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "*** extensive infarct *** with possible acute inferior changes",
+   "n_records": 5,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "anteroseptal infarct - possibly acute",
+   "n_records": 5,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "inferior/lateral t wave changes may be due to myocardial infarct or cva",
+   "n_records": 5,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with pac(s) with 1st degree a-v block",
+   "n_records": 5,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "atrial fibrillation with uncontrolled ventricular response with multifocal pvcs or aberrant ventricular conduction",
+   "n_records": 5,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "probable extensive infarct with acute inferior changes",
+   "n_records": 5,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with interpolated pvcs",
+   "n_records": 5,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with aberrantly conducted supraventricular complexes with frequent multifocal pvcs",
+   "n_records": 5,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus rhythm with multifocal pvcs with pacs with borderline 1st degree a-v block",
+   "n_records": 5,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "inferior and anterior t wave changes suggest myocardial infarct",
+   "n_records": 5,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "probable extensive infarct with acute inferior + lateral changes",
+   "n_records": 5,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "probable atrial fibrillation with fusion complexes",
+   "n_records": 5,
+   "status": {
+    "AF": "hedged"
+   }
+  },
+  {
+   "statement": "anterolateral infarction - possibly acute",
+   "n_records": 5,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with occasional pacs with 1st degree a-v block",
+   "n_records": 5,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "*** extensive infarct *** with possible acute inferior and anteroseptal changes",
+   "n_records": 5,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus bradycardia. consider 2:1 sino-atrial block",
+   "n_records": 5,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "lateral infarction - possibly acute",
+   "n_records": 5,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with multifocal pvcs with borderline 1st degree a-v block",
+   "n_records": 5,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "anteroseptal infarction - possibly acute",
+   "n_records": 5,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with sinus arrhythmia with undetermined irregularity with 1st degree a-v block",
+   "n_records": 5,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "sinus arrhythmia with paroxysmal idioventricular rhythm",
+   "n_records": 5,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "qrs changes probably due to lvh but consider anteroseptal infarct",
+   "n_records": 5,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "probable extensive infarction - age undetermined",
+   "n_records": 5,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "abnormal q suggests inferior infarct",
+   "n_records": 5,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "recent anterolateral infarct",
+   "n_records": 5,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "probable atrial fibrillation with intermittent conduction defect",
+   "n_records": 5,
+   "status": {
+    "AF": "hedged"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with aberrantly conducted supraventricular complexes with pvcs",
+   "n_records": 5,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "probable atrial fibrillation with rapid ventricular response with paroxysmal idioventricular rhythm or aberrant ventricular conduction",
+   "n_records": 5,
+   "status": {
+    "AF": "hedged"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with sinus arrhythmia with aberrantly conducted supraventricular complexes with pvc(s)",
+   "n_records": 5,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "atrial fibrillation with rapid ventricular response with fusion complexes",
+   "n_records": 5,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "sinus arrhythmia with interpolated pvc(s) with borderline 1st degree a-v block",
+   "n_records": 5,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "extensive infarct with acute inferior + anteroseptal changes",
+   "n_records": 5,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "anteroseptal st changes suggest myocardial infarct",
+   "n_records": 5,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with aberrantly conducted supraventricular complexes with pac(s)",
+   "n_records": 5,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus rhythm with multifocal interpolated pvcs with 1st degree a-v block",
+   "n_records": 5,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "sinus arrhythmia with aberrantly conducted supraventricular complexes with 1st degree a-v block",
+   "n_records": 5,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "changes v2-v4 are probably related to poor r wave progression but anteroseptal infarction cannot be excluded",
+   "n_records": 5,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "extensive st elevation, consider recent infarction",
+   "n_records": 5,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus rhythm with aberrantly conducted supraventricular complexes with multifocal pvcs with pacs",
+   "n_records": 5,
+   "status": {
+    "NSR": "definite"
+   }
+  },
+  {
+   "statement": "sinus rhythm with aberrantly conducted supraventricular complexes with pvc(s) with 1st degree a-v block",
+   "n_records": 5,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "anteroseptal st-t changes may be due to myocardial infarct or cva",
+   "n_records": 5,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with sinus arrhythmia with pac(s) with borderline 1st degree a-v block",
+   "n_records": 5,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "anterior t wave changes may be due to myocardial infarct or cva",
+   "n_records": 5,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "inferior and lateral st elevation - probable lateral extension of infarct",
+   "n_records": 5,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with frequent multifocal pvcs with borderline 1st degree a-v block",
+   "n_records": 5,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "anterolateral t wave changes suggest myocardial infarction",
+   "n_records": 5,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "inferior st-t changes suggest myocardial infarction",
+   "n_records": 5,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "changes are probably due to lvh but consider septal infarct",
+   "n_records": 5,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "inferior and ant/septal t wave changes may be due to myocardial infarct or cva",
+   "n_records": 4,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "atrial fibrillation with uncontrolled ventricular response with frequent pvcs or aberrant ventricular conduction",
+   "n_records": 4,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "sinus rhythm with paroxysmal idioventricular rhythm with borderline 1st degree a-v block",
+   "n_records": 4,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with sinus arrhythmia with multifocal interpolated pvcs",
+   "n_records": 4,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "probable sinus tachycardia with pvcs",
+   "n_records": 4,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with multifocal pvcs with pac(s)",
+   "n_records": 4,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "extensive infarct with acute inferior + lateral changes",
+   "n_records": 4,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "probable atrial fibrillation with uncontrolled ventricular response with pvcs or aberrant ventricular conduction",
+   "n_records": 4,
+   "status": {
+    "AF": "hedged"
+   }
+  },
+  {
+   "statement": "sinus rhythm with aberrantly conducted supraventricular complexes with multifocal pvcs with pac(s)",
+   "n_records": 4,
+   "status": {
+    "NSR": "definite"
+   }
+  },
+  {
+   "statement": "probable atrial fibrillation with slow ventricular response with multifocal pvcs or aberrant ventricular conduction",
+   "n_records": 4,
+   "status": {
+    "AF": "hedged"
+   }
+  },
+  {
+   "statement": "acute septal infarct",
+   "n_records": 4,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with paroxysmal idioventricular rhythm",
+   "n_records": 4,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "possible old septal infarction",
+   "n_records": 4,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus rhythm with intermittent conduction defect with borderline 1st degree a-v block",
+   "n_records": 4,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "anterior infarction - possibly acute",
+   "n_records": 4,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "atrial fibrillation with uncontrolled ventricular response with multifocal pvcs",
+   "n_records": 4,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "extensive t wave changes may be due to myocardial infarct or cva",
+   "n_records": 4,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "demand atrial pacing with 1st degree a-v block",
+   "n_records": 4,
+   "status": {
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "sinus rhythm with aberrantly conducted supraventricular complexes with pvcs with 1st degree a-v block",
+   "n_records": 4,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "atrial fibrillation with uncontrolled ventricular response with frequent multifocal pvcs or aberrant ventricular conduction",
+   "n_records": 4,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "acute extensive infarction",
+   "n_records": 4,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "atrial fibrillation with slow ventricular response with fusion complexes",
+   "n_records": 4,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with sinus arrhythmia with aberrantly conducted supraventricular complexes with pvcs",
+   "n_records": 4,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "anterior t wave changes may be due to myocardial infarction or cva",
+   "n_records": 4,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus arrhythmia with interpolated pvc(s) with 1st degree a-v block",
+   "n_records": 4,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "consider acute septal infarction",
+   "n_records": 4,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "lateral st-t changes may be due to myocardial infarction or cva",
+   "n_records": 4,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "consider acute septal infarct",
+   "n_records": 4,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "probable atrial fibrillation with non-sustained ventricular tachycardia",
+   "n_records": 4,
+   "status": {
+    "AF": "hedged"
+   }
+  },
+  {
+   "statement": "anterior st-t changes suggest myocardial infarct",
+   "n_records": 4,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "anteroseptal t wave changes may be due to myocardial infarct or cva",
+   "n_records": 4,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus rhythm with interpolated pvcs with pacs",
+   "n_records": 4,
+   "status": {
+    "NSR": "definite"
+   }
+  },
+  {
+   "statement": "probable atrial fibrillation with paroxysmal idioventricular rhythm or aberrant ventricular conduction",
+   "n_records": 4,
+   "status": {
+    "AF": "hedged"
+   }
+  },
+  {
+   "statement": "atrial fibrillation with interpolated pvc(s)",
+   "n_records": 4,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "posterior infarct, recent",
+   "n_records": 4,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "probable acute lateral infarct",
+   "n_records": 4,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus rhythm with aberrantly conducted supraventricular complexes with multifocal pvcs with 1st degree a-v block",
+   "n_records": 4,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "probable lateral infarct, recent",
+   "n_records": 4,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "atrial fibrillation with uncontrolled ventricular response with frequent multifocal pvcs",
+   "n_records": 3,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with sinus arrhythmia with frequent pvcs with 1st degree a-v block",
+   "n_records": 3,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "probable recent septal infarct",
+   "n_records": 3,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "posterior infarct, acute (lcx)",
+   "n_records": 3,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "consider anterior infarction - although changes v3-v4 may be due to left ventricular hypertrophy also present",
+   "n_records": 3,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "demand pacing; interpretation is based on unpaced beats with 1st degree a-v block",
+   "n_records": 3,
+   "status": {
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "possible extensive infarct with acute inferior and lateral changes",
+   "n_records": 3,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus arrhythmia with aberrantly conducted supraventricular complexes with multifocal pvcs",
+   "n_records": 3,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with sinus arrhythmia with 1st degree a-v block",
+   "n_records": 3,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "possible extensive infarct with acute anteroseptal changes",
+   "n_records": 3,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "inferior/lateral st-t changes suggest myocardial infarction",
+   "n_records": 3,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with aberrantly conducted supraventricular complexes with multifocal pvcs with pacs",
+   "n_records": 3,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "probable recent anterior infarct",
+   "n_records": 3,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "extensive infarct with acute anteroseptal changes",
+   "n_records": 3,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with aberrantly conducted supraventricular complexes with borderline 1st degree a-v block",
+   "n_records": 3,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "changes possibly due to infarct or cva",
+   "n_records": 3,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus bradycardia. consider sinus rhythm with 2:1 sino-atrial block",
+   "n_records": 3,
+   "status": {
+    "NSR": "hedged"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with sinus arrhythmia with undetermined irregularity",
+   "n_records": 3,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with sinus arrhythmia with multifocal pvcs with borderline 1st degree a-v block",
+   "n_records": 3,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "ant/septal and lateral t wave changes may be due to myocardial infarct or cva",
+   "n_records": 3,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "probable atrial fibrillation with rapid ventricular response with frequent multifocal pvcs",
+   "n_records": 3,
+   "status": {
+    "AF": "hedged"
+   }
+  },
+  {
+   "statement": "demand pacing with borderline 1st degree a-v block",
+   "n_records": 3,
+   "status": {
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "probable sinus tachycardia with non-sustained ventricular tachycardia",
+   "n_records": 3,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with sinus arrhythmia with 2nd degree a-v block, mobitz ii",
+   "n_records": 3,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "probable recent lateral infarct",
+   "n_records": 3,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus arrhythmia with intermittent conduction defect",
+   "n_records": 3,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "anterolateral st-t changes may be due to myocardial infarct or cva",
+   "n_records": 3,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "consider acute inferior and lateral infarction",
+   "n_records": 3,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "probable anterior infarction - age undetermined",
+   "n_records": 3,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus rhythm with frequent pvcs with pac(s) with borderline 1st degree a-v block",
+   "n_records": 3,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "probable lateral infarction - age undetermined",
+   "n_records": 3,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with multifocal interpolated pvcs with 1st degree a-v block",
+   "n_records": 3,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with sinus arrhythmia with pvcs with borderline 1st degree a-v block",
+   "n_records": 3,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with pvcs with occasional pacs",
+   "n_records": 3,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "possible old lateral infarction",
+   "n_records": 3,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "consider recent infarction",
+   "n_records": 3,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with pvcs with 1st degree a-v block",
+   "n_records": 3,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "extensive infarction - probably acute",
+   "n_records": 3,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus arrhythmia with interpolated pvcs with 1st degree a-v block",
+   "n_records": 3,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "sinus rhythm with fusion complexes with pac(s)",
+   "n_records": 3,
+   "status": {
+    "NSR": "definite"
+   }
+  },
+  {
+   "statement": "sinus rhythm with fusion complexes with 1st degree a-v block",
+   "n_records": 3,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "sinus rhythm with non-sustained ventricular tachycardia with 1st degree a-v block",
+   "n_records": 3,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "sinus rhythm with aberrantly conducted supraventricular complexes with multifocal pvcs with borderline 1st degree a-v block",
+   "n_records": 3,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with frequent pvcs with pac(s) with borderline 1st degree a-v block",
+   "n_records": 3,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "consider recent lateral infarction",
+   "n_records": 3,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "*** extensive infarct *** with possible acute anteroseptal changes",
+   "n_records": 3,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "probable anterior infarct, recent",
+   "n_records": 3,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with sinus arrhythmia with aberrantly conducted supraventricular complexes with 1st degree a-v block",
+   "n_records": 3,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with sinus arrhythmia with interpolated pvcs with borderline 1st degree a-v block",
+   "n_records": 3,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "extensive infarct with acute lateral changes",
+   "n_records": 3,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with aberrantly conducted supraventricular complexes with multifocal pvcs with pac(s)",
+   "n_records": 3,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "anterolateral infarct - possibly acute",
+   "n_records": 3,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "inferior+ant/septal t wave change suggest myocardial infarction",
+   "n_records": 3,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with pvcs with occasional pacs",
+   "n_records": 3,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "atrial fibrillation with uncontrolled ventricular response with frequent pvcs",
+   "n_records": 3,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "sinus rhythm with multifocal interpolated pvcs with borderline 1st degree a-v block",
+   "n_records": 3,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with 2:1 a-v block",
+   "n_records": 3,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with pac(s) with pvc(s)",
+   "n_records": 3,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "inferior/lateral t changes may be due to myocardial infarction or cva",
+   "n_records": 3,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with aberrantly conducted supraventricular complexes with frequent multifocal pvcs with pac(s)",
+   "n_records": 3,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with non-sustained ventricular tachycardia with pac(s)",
+   "n_records": 3,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with sinus arrhythmia with multifocal pvcs with 1st degree a-v block",
+   "n_records": 3,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "inferior/lateral st-t changes may be due to myocardial infarction or cva",
+   "n_records": 3,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "possible posterior extension of infarct",
+   "n_records": 3,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus rhythm with frequent multifocal pvcs with occasional pacs",
+   "n_records": 3,
+   "status": {
+    "NSR": "definite"
+   }
+  },
+  {
+   "statement": "consider inferoposterior infarct",
+   "n_records": 3,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus rhythm with pvcs with occasional pacs with 1st degree a-v block",
+   "n_records": 3,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "sinus rhythm with aberrantly conducted supraventricular complexes with intermittent conduction defect",
+   "n_records": 3,
+   "status": {
+    "NSR": "definite"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with sinus arrhythmia with frequent multifocal pvcs with 1st degree a-v block",
+   "n_records": 3,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "lateral infarct, acute (lad)",
+   "n_records": 3,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus rhythm with aberrantly conducted supraventricular complexes with frequent multifocal pvcs with 1st degree a-v block",
+   "n_records": 3,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "probable atrial fibrillation with rapid ventricular response with multifocal pvcs",
+   "n_records": 2,
+   "status": {
+    "AF": "hedged"
+   }
+  },
+  {
+   "statement": "sinus rhythm with frequent pvcs with pac(s) with 1st degree a-v block",
+   "n_records": 2,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "sinus arrhythmia with fusion complexes",
+   "n_records": 2,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "probable sinus tachycardia with aberrantly conducted supraventricular complexes",
+   "n_records": 2,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus rhythm with 2nd degree (mobitz ii) sa block with pvcs",
+   "n_records": 2,
+   "status": {
+    "NSR": "definite"
+   }
+  },
+  {
+   "statement": "demand pacing; interpretation is based on unpaced beats with borderline 1st degree a-v block",
+   "n_records": 2,
+   "status": {
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "anteroseptal st changes may be due to myocardial infarct or cva",
+   "n_records": 2,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with sinus arrhythmia with intermittent conduction defect",
+   "n_records": 2,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with aberrantly conducted supraventricular complexes with interpolated pvc(s) with borderline 1st degree a-v block",
+   "n_records": 2,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "sinus rhythm with frequent multifocal pvcs with pacs with borderline 1st degree a-v block",
+   "n_records": 2,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with sinus arrhythmia with aberrantly conducted supraventricular complexes with multifocal pvcs",
+   "n_records": 2,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus rhythm with multifocal pvcs with pacs with 1st degree a-v block",
+   "n_records": 2,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "sinus rhythm with aberrantly conducted supraventricular complexes with frequent multifocal pvcs with pac(s)",
+   "n_records": 2,
+   "status": {
+    "NSR": "definite"
+   }
+  },
+  {
+   "statement": "sinus rhythm with intermittent conduction defect with 1st degree a-v block",
+   "n_records": 2,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with sinus arrhythmia with intermittent conduction defect with borderline 1st degree a-v block",
+   "n_records": 2,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with frequent pacs with 1st degree a-v block",
+   "n_records": 2,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with multifocal pvcs with pac(s) with borderline 1st degree a-v block",
+   "n_records": 2,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with interpolated pvc(s) with pac(s)",
+   "n_records": 2,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus rhythm with non-sustained ventricular tachycardia with pac(s)",
+   "n_records": 2,
+   "status": {
+    "NSR": "definite"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with pvcs with pacs with 1st degree a-v block",
+   "n_records": 2,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "anteroseptal st-t changes suggest myocardial infarction",
+   "n_records": 2,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus rhythm with aberrantly conducted supraventricular complexes with pvcs with borderline 1st degree a-v block",
+   "n_records": 2,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with fusion complexes with borderline 1st degree a-v block",
+   "n_records": 2,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "changes in v2 are probably due to left ventricular hypertrophy but consider septal infarction",
+   "n_records": 2,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus rhythm with aberrantly conducted supraventricular complexes with interpolated pvcs with borderline 1st degree a-v block",
+   "n_records": 2,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "sinus rhythm with aberrantly conducted supraventricular complexes with interpolated pvc(s) with borderline 1st degree a-v block",
+   "n_records": 2,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "anterolateral st elevation - probable extension of infarct",
+   "n_records": 2,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with frequent pacs with borderline 1st degree a-v block",
+   "n_records": 2,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "probable extensive infarction with acute changes in the inferior + lateral leads",
+   "n_records": 2,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus rhythm with pacs with pvcs with 1st degree a-v block",
+   "n_records": 2,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "inferior and ant/septal st-t changes may be due to myocardial infarct or cva",
+   "n_records": 2,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "consider septal infarct though changes in v2 may be related to left ventricular hypertrophy which is also present",
+   "n_records": 2,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "lateral infarct - possibly acute",
+   "n_records": 2,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus rhythm with aberrantly conducted supraventricular complexes with frequent multifocal pvcs with borderline 1st degree a-v block",
+   "n_records": 2,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "probable atrial fibrillation with rapid ventricular response with fusion complexes",
+   "n_records": 2,
+   "status": {
+    "AF": "hedged"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with aberrantly conducted supraventricular complexes with interpolated pvc(s) with 1st degree a-v block",
+   "n_records": 2,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with interpolated pvc(s) with pac(s)",
+   "n_records": 2,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus rhythm with non-sustained ventricular tachycardia with borderline 1st degree a-v block",
+   "n_records": 2,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with multifocal pvcs with pac(s) with borderline 1st degree a-v block",
+   "n_records": 2,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "probable acute septal infarction",
+   "n_records": 2,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "probable poor r wave progression but consider septal infarct",
+   "n_records": 2,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with non-sustained ventricular tachycardia with borderline 1st degree a-v block",
+   "n_records": 2,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with sinus arrhythmia with aberrantly conducted supraventricular complexes with borderline 1st degree a-v block",
+   "n_records": 2,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with frequent pvcs with pac(s)",
+   "n_records": 2,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus rhythm with pvcs with occasional pacs with borderline 1st degree a-v block",
+   "n_records": 2,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with interpolated pvc(s) with pac(s) with 1st degree a-v block",
+   "n_records": 2,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with aberrantly conducted supraventricular complexes with multifocal pvcs",
+   "n_records": 2,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with non-sustained ventricular tachycardia with pacs",
+   "n_records": 2,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "anteroseptal st changes suggest myocardial infarction",
+   "n_records": 2,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with fusion complexes",
+   "n_records": 2,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with interpolated pvcs with pacs",
+   "n_records": 2,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "consider recent septal infarction",
+   "n_records": 2,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "inferior infarction, probably acute",
+   "n_records": 2,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "acute inferior infarction",
+   "n_records": 2,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "atrial fibrillation with uncontrolled ventricular response with fusion complexes",
+   "n_records": 2,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "atrial fibrillation with interpolated pvcs",
+   "n_records": 2,
+   "status": {
+    "AF": "definite"
+   }
+  },
+  {
+   "statement": "sinus rhythm with frequent multifocal pvcs with pacs with 1st degree a-v block",
+   "n_records": 2,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "sinus rhythm with interpolated pvc(s) with pac(s) with borderline 1st degree a-v block",
+   "n_records": 2,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "possible extensive infarct with acute inferior and anteroseptal changes",
+   "n_records": 2,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "demand pacing with 1st degree a-v block",
+   "n_records": 2,
+   "status": {
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "*** extensive infarct *** with possible acute lateral changes",
+   "n_records": 2,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with frequent multifocal pvcs with borderline 1st degree a-v block",
+   "n_records": 2,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with occasional pacs with borderline 1st degree a-v block",
+   "n_records": 2,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with aberrantly conducted supraventricular complexes with pvc(s) with pac(s)",
+   "n_records": 2,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus rhythm with frequent multifocal pvcs with pac(s) with 1st degree a-v block",
+   "n_records": 2,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "consider recent inferior and lateral infarction",
+   "n_records": 2,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus rhythm with interpolated pvcs with pacs with borderline 1st degree a-v block",
+   "n_records": 2,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with multifocal pvcs with borderline 1st degree a-v block",
+   "n_records": 2,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with multifocal pvcs with pacs",
+   "n_records": 2,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus rhythm with 2nd degree (mobitz ii) sa block with borderline 1st degree a-v block",
+   "n_records": 2,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "sinus rhythm with undetermined irregularity with 1st degree a-v block",
+   "n_records": 2,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "sinus rhythm with frequent pvcs with pacs with 1st degree a-v block",
+   "n_records": 2,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "sinus rhythm with pac(s) with pvc(s)",
+   "n_records": 2,
+   "status": {
+    "NSR": "definite"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with sinus arrhythmia with occasional pacs",
+   "n_records": 2,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "old anterolateral infarct",
+   "n_records": 2,
+   "status": {
+    "MI_OLD": "definite"
+   }
+  },
+  {
+   "statement": "probable extensive infarct with acute anteroseptal changes",
+   "n_records": 1,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with aberrantly conducted supraventricular complexes with pacs",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with sinus arrhythmia with paroxysmal idioventricular rhythm or aberrant ventricular conduction",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus arrhythmia with varying 2nd degree a-v block with pvc(s)",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with sinus arrhythmia with aberrantly conducted supraventricular complexes with borderline 1st degree a-v block",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with paroxysmal idioventricular rhythm with pacs with borderline 1st degree a-v block",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with non-sustained ventricular tachycardia",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "inferior + septal st elevation, consider recent infarction",
+   "n_records": 1,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus rhythm with fusion complexes with borderline 1st degree a-v block",
+   "n_records": 1,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "consider recent anterolateral infarction",
+   "n_records": 1,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with fusion complexes with pac(s)",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus rhythm with fusion complexes with pacs",
+   "n_records": 1,
+   "status": {
+    "NSR": "definite"
+   }
+  },
+  {
+   "statement": "acute anterolateral infarction",
+   "n_records": 1,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "consider recent inferior infarction",
+   "n_records": 1,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus arrhythmia with fusion complexes with 1st degree a-v block",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "extensive infarction with acute changes in the anterolateral leads",
+   "n_records": 1,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "probable atrial fibrillation with uncontrolled ventricular response with frequent pvcs or aberrant ventricular conduction",
+   "n_records": 1,
+   "status": {
+    "AF": "hedged"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with sinus arrhythmia with aberrantly conducted supraventricular complexes with pvc(s)",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with sinus arrhythmia with 2nd degree a-v block, mobitz ii",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus rhythm with aberrantly conducted supraventricular complexes with pacs with 1st degree a-v block",
+   "n_records": 1,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "anterolateral infarct - probably acute",
+   "n_records": 1,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "recent anterior infarct",
+   "n_records": 1,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "probable atrial fibrillation with slow ventricular response with frequent pvcs",
+   "n_records": 1,
+   "status": {
+    "AF": "hedged"
+   }
+  },
+  {
+   "statement": "sinus rhythm with aberrantly conducted supraventricular complexes with interpolated pvcs with 1st degree a-v block",
+   "n_records": 1,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "possible posterior infarct - age undetermined",
+   "n_records": 1,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with aberrantly conducted supraventricular complexes with pac(s) with 1st degree a-v block",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "inferior+ant/septal st-t changes suggest myocardial infarction",
+   "n_records": 1,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with frequent multifocal pvcs with 1st degree a-v block",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "extensive infarction with acute changes in the lateral leads",
+   "n_records": 1,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "anteroseptal st changes may be due to myocardial infarction or cva",
+   "n_records": 1,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with multifocal pvcs with pac(s) with 1st degree a-v block",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with pvcs with occasional pacs with 1st degree a-v block",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with sinus arrhythmia with pacs with borderline 1st degree a-v block",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "marked sinus bradycardia with pvc(s)",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "septal infarction - possibly acute",
+   "n_records": 1,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with non-sustained ventricular tachycardia with 1st degree a-v block",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "probable atrial fibrillation with uncontrolled ventricular response with frequent multifocal pvcs or aberrant ventricular conduction",
+   "n_records": 1,
+   "status": {
+    "AF": "hedged"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with multifocal interpolated pvcs",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "anteroseptal t wave changes may be due to myocardial infarction or cva",
+   "n_records": 1,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with sinus arrhythmia with pvc(s) with 1st degree a-v block",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with multifocal pvcs with pacs with borderline 1st degree a-v block",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with sinus arrhythmia with aberrantly conducted supraventricular complexes with interpolated pvcs",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus arrhythmia with multifocal interpolated pvcs with 1st degree a-v block",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "probable atrial fibrillation with slow ventricular response with frequent multifocal pvcs or aberrant ventricular conduction",
+   "n_records": 1,
+   "status": {
+    "AF": "hedged"
+   }
+  },
+  {
+   "statement": "possible recent inferior infarct",
+   "n_records": 1,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "rbbb with left posterior fascicular block",
+   "n_records": 1,
+   "status": {
+    "RBBB": "definite"
+   }
+  },
+  {
+   "statement": "consider anteroseptal infarct - although changes v2-v4 may be due to left ventricular hypertrophy also present",
+   "n_records": 1,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with sinus arrhythmia with 2nd degree (mobitz ii) sa block with borderline 1st degree a-v block",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "extensive st elevation, consider recent extensive infarction",
+   "n_records": 1,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "inferior/lateral t wave changes suggest myocardial infarct",
+   "n_records": 1,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus rhythm with pac(s) with pvc(s) with 1st degree a-v block",
+   "n_records": 1,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "sinus rhythm with interpolated pvcs with occasional pacs with 1st degree a-v block",
+   "n_records": 1,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "recent lateral infarction",
+   "n_records": 1,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with aberrantly conducted supraventricular complexes with non-sustained ventricular tachycardia with pac(s)",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "extensive t wave changes may be due to myocardial infarction or cva",
+   "n_records": 1,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with pacs with 1st degree a-v block",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with intermittent conduction defect with 1st degree a-v block",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with sinus arrhythmia with fusion complexes",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with sinus arrhythmia with aberrantly conducted supraventricular complexes with interpolated pvc(s)",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus arrhythmia with fusion complexes with borderline 1st degree a-v block",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "anterior st-t changes suggest myocardial infarction",
+   "n_records": 1,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with aberrantly conducted supraventricular complexes with interpolated pvc(s)",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with aberrantly conducted supraventricular complexes with non-sustained ventricular tachycardia",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with sinus arrhythmia with aberrantly conducted supraventricular complexes with interpolated pvcs",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with frequent multifocal pvcs with occasional pacs",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with frequent pvcs with 1st degree a-v block",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with fusion complexes",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "consider recent anterior infarction",
+   "n_records": 1,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus arrhythmia with interpolated pvcs with borderline 1st degree a-v block",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "consider recent anteroseptal infarct",
+   "n_records": 1,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with aberrantly conducted supraventricular complexes with frequent multifocal pvcs with pacs",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with paroxysmal idioventricular rhythm with borderline 1st degree a-v block",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with sinus arrhythmia with frequent pvcs with borderline 1st degree a-v block",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "recent inferior infarction",
+   "n_records": 1,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "probable acute anterolateral infarct",
+   "n_records": 1,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "probable acute anterior infarct",
+   "n_records": 1,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus rhythm with aberrantly conducted supraventricular complexes with interpolated pvc(s) with 1st degree a-v block",
+   "n_records": 1,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with aberrantly conducted supraventricular complexes with pvcs with 1st degree a-v block",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with sinus arrhythmia with undetermined irregularity",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with fusion complexes with 1st degree a-v block",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "changes possibly due to myocardial infarction or cerebrovascular accident",
+   "n_records": 1,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with aberrantly conducted supraventricular complexes with frequent multifocal pvcs",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus rhythm with multifocal pvcs with occasional pacs",
+   "n_records": 1,
+   "status": {
+    "NSR": "definite"
+   }
+  },
+  {
+   "statement": "extensive infarction with some acute changes",
+   "n_records": 1,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "probable extensive infarct with acute inferior + anteroseptal changes",
+   "n_records": 1,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus arrhythmia are borderline abnormal for age/sex",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus rhythm with interpolated pvcs with occasional pacs with borderline 1st degree a-v block",
+   "n_records": 1,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "inferior + anterior st-t change may be due to myocardial infarction or cva",
+   "n_records": 1,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "probable lateral extension of infarction",
+   "n_records": 1,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "anterolateral infarct, possibly acute",
+   "n_records": 1,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with pacs with pvcs",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "probable atrial fibrillation with slow ventricular response with paroxysmal idioventricular rhythm",
+   "n_records": 1,
+   "status": {
+    "AF": "hedged"
+   }
+  },
+  {
+   "statement": "consider acute extensive infarction",
+   "n_records": 1,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus rhythm with aberrantly conducted supraventricular complexes with multifocal interpolated pvcs",
+   "n_records": 1,
+   "status": {
+    "NSR": "definite"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with intermittent conduction defect with pac(s)",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "consider acute inferior and anteroseptal infarction",
+   "n_records": 1,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with fusion complexes with 1st degree a-v block",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "probable atrial fibrillation with slow ventricular response with frequent pvcs or aberrant ventricular conduction",
+   "n_records": 1,
+   "status": {
+    "AF": "hedged"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with sinus arrhythmia with pacs with 1st degree a-v block",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with intermittent conduction defect with borderline 1st degree a-v block",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "sinus rhythm with pacs with pvcs with borderline 1st degree a-v block",
+   "n_records": 1,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "sinus arrhythmia with aberrantly conducted supraventricular complexes with interpolated pvcs",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with pvc(s) with pac(s) with 1st degree a-v block",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with sinus arrhythmia with frequent pvcs with 1st degree a-v block",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "sinus rhythm with aberrantly conducted supraventricular complexes with frequent multifocal pvcs with pacs",
+   "n_records": 1,
+   "status": {
+    "NSR": "definite"
+   }
+  },
+  {
+   "statement": "probable inferolateral infarct, age indeterm",
+   "n_records": 1,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "demand atrial pacing with borderline 1st degree a-v block",
+   "n_records": 1,
+   "status": {
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "anterolateral t wave changes may be due to myocardial infarct or cva",
+   "n_records": 1,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus rhythm with 2:1 a-v block with multifocal pvcs",
+   "n_records": 1,
+   "status": {
+    "NSR": "definite"
+   }
+  },
+  {
+   "statement": "inferior + septal st-t changes suggest myocardial infarction",
+   "n_records": 1,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with intermittent conduction defect with borderline 1st degree a-v block",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "consider recent inferior and anteroseptal infarction",
+   "n_records": 1,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with aberrantly conducted supraventricular complexes with frequent multifocal pvcs with 1st degree a-v block",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with sinus arrhythmia with aberrantly conducted supraventricular complexes with pvc(s) with borderline 1st degree a-v block",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with aberrantly conducted supraventricular complexes with pvcs with borderline 1st degree a-v block",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with occasional pacs with borderline 1st degree a-v block",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with sinus arrhythmia with multifocal pvcs with borderline 1st degree a-v block",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with sinus arrhythmia with aberrantly conducted supraventricular complexes with frequent multifocal pvcs",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus rhythm with aberrantly conducted supraventricular complexes with pac(s) with 1st degree a-v block",
+   "n_records": 1,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with aberrantly conducted supraventricular complexes with interpolated pvcs",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus rhythm with occasional pacs with pvcs with 1st degree a-v block",
+   "n_records": 1,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with aberrantly conducted supraventricular complexes with multifocal interpolated pvcs",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "probable atrial fibrillation with rapid ventricular response with intermittent conduction defect",
+   "n_records": 1,
+   "status": {
+    "AF": "hedged"
+   }
+  },
+  {
+   "statement": "probable atrial fibrillation with rapid ventricular response with paroxysmal idioventricular rhythm",
+   "n_records": 1,
+   "status": {
+    "AF": "hedged"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with multifocal pvcs with 1st degree a-v block",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with interpolated pvcs with pacs with 1st degree a-v block",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "sinus rhythm with varying 2nd degree a-v block",
+   "n_records": 1,
+   "status": {
+    "NSR": "definite"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with aberrantly conducted supraventricular complexes with multifocal interpolated pvcs",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "lateral infarction, probably acute",
+   "n_records": 1,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with sinus arrhythmia with interpolated pvc(s) or aberrant ventricular conduction",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with aberrantly conducted supraventricular complexes with non-sustained ventricular tachycardia with pacs",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with aberrantly conducted supraventricular complexes with multifocal pvcs",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with sinus arrhythmia with undetermined irregularity with borderline 1st degree a-v block",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "extensive infarction with acute changes in the inferior leads",
+   "n_records": 1,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with sinus arrhythmia with aberrantly conducted supraventricular complexes with non-sustained ventricular tachycardia",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded"
+   }
+  },
+  {
+   "statement": "sinus rhythm with 2nd degree a-v block, mobitz ii",
+   "n_records": 1,
+   "status": {
+    "NSR": "definite"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with sinus arrhythmia with occasional pacs with 1st degree a-v block",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "sinus rhythm with aberrantly conducted supraventricular complexes with interpolated pvcs with pacs",
+   "n_records": 1,
+   "status": {
+    "NSR": "definite"
+   }
+  },
+  {
+   "statement": "anteroseptal infarction, probably acute",
+   "n_records": 1,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "inferior and septal st-t changes suggest myocardial infarct",
+   "n_records": 1,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "probable recent inferior infarct",
+   "n_records": 1,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with sinus arrhythmia with multifocal interpolated pvcs with 1st degree a-v block",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "inferior+ant/septal t wave change may be due to myocardial infarction or cva",
+   "n_records": 1,
+   "status": {
+    "MI_OLD": "hedged"
+   }
+  },
+  {
+   "statement": "sinus bradycardia with sinus arrhythmia with interpolated pvcs with 1st degree a-v block",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "definite"
+   }
+  },
+  {
+   "statement": "inferior+ant/septal st elevation consider recent infarction",
+   "n_records": 1,
+   "status": {
+    "MI_OLD": "excluded"
+   }
+  },
+  {
+   "statement": "sinus tachycardia with frequent multifocal pvcs with pacs with borderline 1st degree a-v block",
+   "n_records": 1,
+   "status": {
+    "NSR": "excluded",
+    "IAVB": "borderline"
+   }
+  },
+  {
+   "statement": "sinus rhythm with frequent pvcs with occasional pacs with borderline 1st degree a-v block",
+   "n_records": 1,
+   "status": {
+    "NSR": "definite",
+    "IAVB": "borderline"
+   }
+  }
+ ],
+ "seconds": 83.7
+}

@@ -38,9 +38,17 @@ from .challenge import (
     scan_source,
     sph_small_set_labels,
 )
-from .config import PTBXL_DIR, RESULTS_DIR, SAMPLING_RATE_HZ, SPH_DIR, WINDOW_SAMPLES
+from .config import (
+    MIMIC_ECG_DIR,
+    PTBXL_DIR,
+    RESULTS_DIR,
+    SAMPLING_RATE_HZ,
+    SPH_DIR,
+    WINDOW_SAMPLES,
+)
 from .duplicates import grouping_key
 from .ingest import Record, assemble_corpus, read_or_error, read_sph, read_wfdb
+from .mimic import ROTATION_DEVIATIONS, rotation_frame
 from .small_set import SMALL_SET, refusals
 from .splits import patient_split
 
@@ -52,6 +60,7 @@ __all__ = [
     "TRAIN_CAP",
     "VAL_CAP",
     "CorpusIndex",
+    "EXTENDED_SOURCES",
     "AGE_BANDS",
     "age_band",
     "class_keys",
@@ -63,6 +72,11 @@ __all__ = [
 ]
 
 SOURCES: tuple[str, ...] = ("ptbxl", "sph", "chapman_ningbo", "georgia", "cpsc")
+
+# The rotation with MIMIC-IV-ECG as a sixth corpus.  It is kept apart from
+# SOURCES so the published five-corpus rotation and everything that reads it
+# stay as they were; the six-corpus run writes under its own results directory.
+EXTENDED_SOURCES: tuple[str, ...] = (*SOURCES, "mimic")
 
 # Shares of patients, drawn once per corpus with a fixed seed.  The eval side is
 # the larger one: a coverage figure needs test records far more than a model
@@ -252,6 +266,10 @@ def corpus_index(corpus: str, widen_duplicates: bool = True) -> CorpusIndex:
             "diagnoses are AHA codes bridged to SNOMED by Leinonen et al.'s table",
             "records run from ten to sixty seconds; the first ten are kept",
         ]
+    elif corpus == "mimic":
+        mimic, labels = rotation_frame(MIMIC_ECG_DIR)
+        frame = mimic[["patient", "path", "age", "sex"]].copy()
+        deviations = list(ROTATION_DEVIATIONS)
     else:
         table = scan_source(corpus)
         # Georgia ships 52 records of five seconds and CPSC 22 that fall short of

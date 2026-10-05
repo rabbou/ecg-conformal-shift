@@ -1,0 +1,487 @@
+{
+ "written_by": "scripts/mimic_shadow.py",
+ "commit": "471b3cf777774a89c530c4ecac275810f7d6e9f5",
+ "eras": "estimated",
+ "era_definition": "terciles of each tracing's estimated place in time, from the cart chronology",
+ "settings": {
+  "alpha": 0.1,
+  "methods": [
+   "plain",
+   "pooled",
+   "perlabel"
+  ],
+  "schemes": {
+   "patient_split": {
+    "fit_on": "patient_cal",
+    "spent_on": "patient_test"
+   },
+   "same_era": {
+    "fit_on": "early_cal",
+    "spent_on": "early_test"
+   },
+   "shadow": {
+    "fit_on": "early_cal",
+    "spent_on": "late_test"
+   }
+  },
+  "sizes": {
+   "early_cal": 2000,
+   "early_test": 4000,
+   "late_test": 8000
+  },
+  "interval": "Wilson score interval, 95%",
+  "headline": {
+   "model": "mimic",
+   "method": "perlabel"
+  }
+ },
+ "cart_chronology": {
+  "n_carts": 156,
+  "n_patients_used": 93053,
+  "residual_sd_years": 1.491,
+  "span_of_cart_positions_years": 7.6,
+  "tercile_cuts_years": [
+   -0.594,
+   0.504
+  ]
+ },
+ "check_against_demo_patients": {
+  "available": true,
+  "path": "/Users/ruben/data/mimic-iv-demo/patients.csv",
+  "n_patients": 92,
+  "n_tracings": 644,
+  "n_tracings_clock_outside_2008_2019": 15,
+  "real_year": "middle of the anchor-group bounds; the group spans three years, so the reference itself is uncertain by about 1.5 years",
+  "spearman_estimate_vs_real_year": 0.709,
+  "real_year_by_estimated_era": {
+   "early": {
+    "n_tracings": 136,
+    "mean": 2012.53,
+    "sd": 1.69
+   },
+   "late": {
+    "n_tracings": 228,
+    "mean": 2016.41,
+    "sd": 1.52
+   },
+   "middle": {
+    "n_tracings": 280,
+    "mean": 2014.08,
+    "sd": 1.57
+   }
+  }
+ },
+ "cohorts": {
+  "early_cal": {
+   "n_requested": 2000,
+   "n_read": 1985,
+   "prevalence": {
+    "NSR": 0.6599,
+    "AF": 0.0499,
+    "LBBB": 0.0141,
+    "RBBB": 0.0398,
+    "IAVB": 0.0589
+   },
+   "bandwidth_share": {
+    "0.005-150 Hz": 0.8736,
+    "0.05-150 Hz": 0.1229,
+    "0.0005-150 Hz": 0.0035
+   },
+   "estimated_years_mean": -1.934
+  },
+  "early_test": {
+   "n_requested": 4000,
+   "n_read": 3959,
+   "prevalence": {
+    "NSR": 0.657,
+    "AF": 0.0455,
+    "LBBB": 0.0162,
+    "RBBB": 0.0389,
+    "IAVB": 0.0571
+   },
+   "bandwidth_share": {
+    "0.005-150 Hz": 0.8613,
+    "0.05-150 Hz": 0.1344,
+    "0.0005-150 Hz": 0.0043
+   },
+   "estimated_years_mean": -2.025
+  },
+  "late_test": {
+   "n_requested": 8000,
+   "n_read": 7953,
+   "prevalence": {
+    "NSR": 0.6682,
+    "AF": 0.0582,
+    "LBBB": 0.0192,
+    "RBBB": 0.0464,
+    "IAVB": 0.0653
+   },
+   "bandwidth_share": {
+    "0.0005-150 Hz": 0.5442,
+    "0.005-150 Hz": 0.4338,
+    "0.05-150 Hz": 0.022
+   },
+   "estimated_years_mean": 2.522
+  },
+  "patient_cal": {
+   "n_requested": 2000,
+   "n_read": 1980,
+   "prevalence": {
+    "NSR": 0.6399,
+    "AF": 0.0621,
+    "LBBB": 0.0157,
+    "RBBB": 0.0465,
+    "IAVB": 0.0611
+   },
+   "bandwidth_share": {
+    "0.005-150 Hz": 0.747,
+    "0.0005-150 Hz": 0.1934,
+    "0.05-150 Hz": 0.0596
+   },
+   "estimated_years_mean": 0.129
+  },
+  "patient_test": {
+   "n_requested": 8000,
+   "n_read": 7926,
+   "prevalence": {
+    "NSR": 0.6448,
+    "AF": 0.0574,
+    "LBBB": 0.0183,
+    "RBBB": 0.0481,
+    "IAVB": 0.0622
+   },
+   "bandwidth_share": {
+    "0.005-150 Hz": 0.7521,
+    "0.0005-150 Hz": 0.1929,
+    "0.05-150 Hz": 0.055
+   },
+   "estimated_years_mean": 0.127
+  }
+ },
+ "headline_rows": [
+  {
+   "model": "mimic",
+   "scheme": "patient_split",
+   "fit_on": "patient_cal",
+   "spent_on": "patient_test",
+   "label": "NSR",
+   "method": "perlabel",
+   "n": 7926,
+   "n_pos": 5111,
+   "n_cal_pos": 1267,
+   "prevalence": 0.64484,
+   "auroc": 0.9529,
+   "coverage_pos": 0.8896,
+   "coverage_pos_low": 0.8808,
+   "coverage_pos_high": 0.8979,
+   "coverage_neg": 0.8746,
+   "coverage_neg_low": 0.8619,
+   "coverage_neg_high": 0.8863,
+   "abstention": 0.0284
+  },
+  {
+   "model": "mimic",
+   "scheme": "patient_split",
+   "fit_on": "patient_cal",
+   "spent_on": "patient_test",
+   "label": "AF",
+   "method": "perlabel",
+   "n": 7926,
+   "n_pos": 455,
+   "n_cal_pos": 123,
+   "prevalence": 0.05741,
+   "auroc": 0.9689,
+   "coverage_pos": 0.9275,
+   "coverage_pos_low": 0.8999,
+   "coverage_pos_high": 0.9479,
+   "coverage_neg": 0.8842,
+   "coverage_neg_low": 0.8768,
+   "coverage_neg_high": 0.8913,
+   "abstention": 0.0392
+  },
+  {
+   "model": "mimic",
+   "scheme": "patient_split",
+   "fit_on": "patient_cal",
+   "spent_on": "patient_test",
+   "label": "LBBB",
+   "method": "perlabel",
+   "n": 7926,
+   "n_pos": 145,
+   "n_cal_pos": 31,
+   "prevalence": 0.01829,
+   "auroc": 0.9964,
+   "coverage_pos": 0.931,
+   "coverage_pos_low": 0.8777,
+   "coverage_pos_high": 0.9621,
+   "coverage_neg": 0.9098,
+   "coverage_neg_low": 0.9032,
+   "coverage_neg_high": 0.9159,
+   "abstention": 0.0763
+  },
+  {
+   "model": "mimic",
+   "scheme": "patient_split",
+   "fit_on": "patient_cal",
+   "spent_on": "patient_test",
+   "label": "RBBB",
+   "method": "perlabel",
+   "n": 7926,
+   "n_pos": 381,
+   "n_cal_pos": 92,
+   "prevalence": 0.04807,
+   "auroc": 0.9873,
+   "coverage_pos": 0.8609,
+   "coverage_pos_low": 0.8225,
+   "coverage_pos_high": 0.8921,
+   "coverage_neg": 0.8998,
+   "coverage_neg_low": 0.8928,
+   "coverage_neg_high": 0.9064,
+   "abstention": 0.0905
+  },
+  {
+   "model": "mimic",
+   "scheme": "patient_split",
+   "fit_on": "patient_cal",
+   "spent_on": "patient_test",
+   "label": "IAVB",
+   "method": "perlabel",
+   "n": 7926,
+   "n_pos": 493,
+   "n_cal_pos": 121,
+   "prevalence": 0.0622,
+   "auroc": 0.9667,
+   "coverage_pos": 0.8398,
+   "coverage_pos_low": 0.8048,
+   "coverage_pos_high": 0.8695,
+   "coverage_neg": 0.9,
+   "coverage_neg_low": 0.893,
+   "coverage_neg_high": 0.9067,
+   "abstention": 0.0462
+  },
+  {
+   "model": "mimic",
+   "scheme": "same_era",
+   "fit_on": "early_cal",
+   "spent_on": "early_test",
+   "label": "NSR",
+   "method": "perlabel",
+   "n": 3959,
+   "n_pos": 2601,
+   "n_cal_pos": 1310,
+   "prevalence": 0.65698,
+   "auroc": 0.9502,
+   "coverage_pos": 0.9047,
+   "coverage_pos_low": 0.8928,
+   "coverage_pos_high": 0.9153,
+   "coverage_neg": 0.891,
+   "coverage_neg_low": 0.8733,
+   "coverage_neg_high": 0.9065,
+   "abstention": 0.0
+  },
+  {
+   "model": "mimic",
+   "scheme": "same_era",
+   "fit_on": "early_cal",
+   "spent_on": "early_test",
+   "label": "AF",
+   "method": "perlabel",
+   "n": 3959,
+   "n_pos": 180,
+   "n_cal_pos": 99,
+   "prevalence": 0.04547,
+   "auroc": 0.9819,
+   "coverage_pos": 0.9444,
+   "coverage_pos_low": 0.9008,
+   "coverage_pos_high": 0.9695,
+   "coverage_neg": 0.9066,
+   "coverage_neg_low": 0.8969,
+   "coverage_neg_high": 0.9155,
+   "abstention": 0.0301
+  },
+  {
+   "model": "mimic",
+   "scheme": "same_era",
+   "fit_on": "early_cal",
+   "spent_on": "early_test",
+   "label": "LBBB",
+   "method": "perlabel",
+   "n": 3959,
+   "n_pos": 64,
+   "n_cal_pos": 28,
+   "prevalence": 0.01617,
+   "auroc": 0.9979,
+   "coverage_pos": 0.8281,
+   "coverage_pos_low": 0.7179,
+   "coverage_pos_high": 0.9012,
+   "coverage_neg": 0.894,
+   "coverage_neg_low": 0.8839,
+   "coverage_neg_high": 0.9033,
+   "abstention": 0.1026
+  },
+  {
+   "model": "mimic",
+   "scheme": "same_era",
+   "fit_on": "early_cal",
+   "spent_on": "early_test",
+   "label": "RBBB",
+   "method": "perlabel",
+   "n": 3959,
+   "n_pos": 154,
+   "n_cal_pos": 79,
+   "prevalence": 0.0389,
+   "auroc": 0.9931,
+   "coverage_pos": 0.9156,
+   "coverage_pos_low": 0.8609,
+   "coverage_pos_high": 0.95,
+   "coverage_neg": 0.9049,
+   "coverage_neg_low": 0.8951,
+   "coverage_neg_high": 0.9138,
+   "abstention": 0.0803
+  },
+  {
+   "model": "mimic",
+   "scheme": "same_era",
+   "fit_on": "early_cal",
+   "spent_on": "early_test",
+   "label": "IAVB",
+   "method": "perlabel",
+   "n": 3959,
+   "n_pos": 226,
+   "n_cal_pos": 117,
+   "prevalence": 0.05709,
+   "auroc": 0.9718,
+   "coverage_pos": 0.9248,
+   "coverage_pos_low": 0.8829,
+   "coverage_pos_high": 0.9525,
+   "coverage_neg": 0.8987,
+   "coverage_neg_low": 0.8887,
+   "coverage_neg_high": 0.908,
+   "abstention": 0.0318
+  },
+  {
+   "model": "mimic",
+   "scheme": "shadow",
+   "fit_on": "early_cal",
+   "spent_on": "late_test",
+   "label": "NSR",
+   "method": "perlabel",
+   "n": 7953,
+   "n_pos": 5314,
+   "n_cal_pos": 1310,
+   "prevalence": 0.66818,
+   "auroc": 0.954,
+   "coverage_pos": 0.8867,
+   "coverage_pos_low": 0.8779,
+   "coverage_pos_high": 0.895,
+   "coverage_neg": 0.9015,
+   "coverage_neg_low": 0.8895,
+   "coverage_neg_high": 0.9123,
+   "abstention": 0.0009
+  },
+  {
+   "model": "mimic",
+   "scheme": "shadow",
+   "fit_on": "early_cal",
+   "spent_on": "late_test",
+   "label": "AF",
+   "method": "perlabel",
+   "n": 7953,
+   "n_pos": 463,
+   "n_cal_pos": 99,
+   "prevalence": 0.05822,
+   "auroc": 0.9711,
+   "coverage_pos": 0.9309,
+   "coverage_pos_low": 0.9041,
+   "coverage_pos_high": 0.9506,
+   "coverage_neg": 0.8562,
+   "coverage_neg_low": 0.8481,
+   "coverage_neg_high": 0.864,
+   "abstention": 0.051
+  },
+  {
+   "model": "mimic",
+   "scheme": "shadow",
+   "fit_on": "early_cal",
+   "spent_on": "late_test",
+   "label": "LBBB",
+   "method": "perlabel",
+   "n": 7953,
+   "n_pos": 153,
+   "n_cal_pos": 28,
+   "prevalence": 0.01924,
+   "auroc": 0.987,
+   "coverage_pos": 0.817,
+   "coverage_pos_low": 0.7482,
+   "coverage_pos_high": 0.8702,
+   "coverage_neg": 0.7612,
+   "coverage_neg_low": 0.7516,
+   "coverage_neg_high": 0.7705,
+   "abstention": 0.2291
+  },
+  {
+   "model": "mimic",
+   "scheme": "shadow",
+   "fit_on": "early_cal",
+   "spent_on": "late_test",
+   "label": "RBBB",
+   "method": "perlabel",
+   "n": 7953,
+   "n_pos": 369,
+   "n_cal_pos": 79,
+   "prevalence": 0.0464,
+   "auroc": 0.9913,
+   "coverage_pos": 0.9621,
+   "coverage_pos_low": 0.9373,
+   "coverage_pos_high": 0.9773,
+   "coverage_neg": 0.844,
+   "coverage_neg_low": 0.8357,
+   "coverage_neg_high": 0.852,
+   "abstention": 0.1235
+  },
+  {
+   "model": "mimic",
+   "scheme": "shadow",
+   "fit_on": "early_cal",
+   "spent_on": "late_test",
+   "label": "IAVB",
+   "method": "perlabel",
+   "n": 7953,
+   "n_pos": 519,
+   "n_cal_pos": 117,
+   "prevalence": 0.06526,
+   "auroc": 0.9627,
+   "coverage_pos": 0.8593,
+   "coverage_pos_low": 0.8268,
+   "coverage_pos_high": 0.8866,
+   "coverage_neg": 0.8963,
+   "coverage_neg_low": 0.8892,
+   "coverage_neg_high": 0.903,
+   "abstention": 0.0334
+  }
+ ],
+ "grid": {
+  "file": "results/mimic_shadow.csv",
+  "columns": [
+   "model",
+   "scheme",
+   "fit_on",
+   "spent_on",
+   "label",
+   "method",
+   "n",
+   "n_pos",
+   "n_cal_pos",
+   "prevalence",
+   "auroc",
+   "coverage_pos",
+   "coverage_pos_low",
+   "coverage_pos_high",
+   "coverage_neg",
+   "coverage_neg_low",
+   "coverage_neg_high",
+   "abstention"
+  ]
+ },
+ "seconds": 519
+}

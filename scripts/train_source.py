@@ -45,7 +45,7 @@ from ecs.encoders import machine_info
 from ecs.models import ResNet1d
 from ecs.rotation import (
     CAL_CAP,
-    SOURCES,
+    EXTENDED_SOURCES,
     TEST_CAP,
     TRAIN_CAP,
     VAL_CAP,
@@ -75,6 +75,11 @@ class Settings:
     weight_decay: float = 1e-2
     patience: int = 3
     seed: int = 0
+    # Where the network runs.  Torch 2.2's CPU kernels for conv1d backward are
+    # about fifty times slower on Apple silicon than its "mps" backend, and the
+    # two backends round differently, so the device is part of what moves the
+    # number.
+    device: str = "cpu"
 
 
 def read_part(
@@ -124,11 +129,12 @@ def probabilities(
 ) -> NDArray[np.float64]:
     """Per-class probability for every row, in the same order."""
     model.eval()
+    device = next(model.parameters()).device
     out = []
     with torch.no_grad():
         for i in range(0, len(x), batch):
-            block = torch.from_numpy((x[i : i + batch] - centre) / scale)
-            out.append(torch.sigmoid(model(block)))
+            block = torch.from_numpy((x[i : i + batch] - centre) / scale).to(device)
+            out.append(torch.sigmoid(model(block)).cpu())
     if not out:
         return np.empty((0, len(class_keys())), dtype=np.float64)
     return torch.cat(out).numpy().astype(np.float64)
@@ -149,7 +155,7 @@ def per_class_auroc(
     return out
 
 
-def train(source: str, settings: Settings, results: Path) -> dict[str, Any]:
+def train(source: str, settings: Settings, rotation_dir: Path) -> dict[str, Any]:
     started = time.time()
     torch.manual_seed(settings.seed)
 
@@ -160,17 +166,18 @@ def train(source: str, settings: Settings, results: Path) -> dict[str, Any]:
     x_val, y_val, ids_val = read_part(index, "val", scratch / "val.npy")
     centre, scale = standardisation(x_train)
 
-    model = ResNet1d(n_classes=len(class_keys()))
+    device = torch.device(settings.device)
+    model = ResNet1d(n_classes=len(class_keys())).to(device)
     optimiser = torch.optim.AdamW(
         model.parameters(), lr=settings.learning_rate, weight_decay=settings.weight_decay
     )
     # Only the classes this corpus can carry contribute to the loss: a refused
     # class has no labels here, and training the head on all-zero targets would
     # teach the model that the diagnosis never happens.
-    mask = torch.tensor([1.0 if key in keys else 0.0 for key in class_keys()])
+    mask = torch.tensor([1.0 if key in keys else 0.0 for key in class_keys()]).to(device)
     loss_fn = nn.BCEWithLogitsLoss(reduction="none")
 
-    directory = results / "rotation" / source
+    directory = rotation_dir / source
     directory.mkdir(parents=True, exist_ok=True)
     log = (directory / "train.log").open("w")
     best = -1.0
@@ -187,8 +194,8 @@ def train(source: str, settings: Settings, results: Path) -> dict[str, Any]:
         total = 0.0
         for start in range(0, len(order), settings.batch_size):
             rows = order[start : start + settings.batch_size]
-            batch = torch.from_numpy((x_train[rows] - centre) / scale)
-            target = torch.from_numpy(y_train[rows]).float()
+            batch = torch.from_numpy((x_train[rows] - centre) / scale).to(device)
+            target = torch.from_numpy(y_train[rows]).float().to(device)
             optimiser.zero_grad()
             loss = (loss_fn(model(batch), target) * mask).sum() / (mask.sum() * len(rows))
             loss.backward()
@@ -255,13 +262,20 @@ def train(source: str, settings: Settings, results: Path) -> dict[str, Any]:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--source", required=True, choices=list(SOURCES))
+    parser.add_argument("--source", required=True, choices=list(EXTENDED_SOURCES))
+    parser.add_argument(
+        "--rotation-dir",
+        type=Path,
+        default=Path(RESULTS_DIR) / "rotation",
+        help="where <source>/ is written (default results/rotation)",
+    )
     parser.add_argument("--epochs", type=int, default=Settings.epochs)
     parser.add_argument("--threads", type=int, default=0, help="torch intra-op threads")
+    parser.add_argument("--device", default=Settings.device, help="cpu or mps")
     args = parser.parse_args()
     if args.threads:
         torch.set_num_threads(args.threads)
-    train(args.source, Settings(epochs=args.epochs), Path(RESULTS_DIR))
+    train(args.source, Settings(epochs=args.epochs, device=args.device), args.rotation_dir)
     return 0
 
 

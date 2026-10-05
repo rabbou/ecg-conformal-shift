@@ -1,0 +1,57 @@
+{
+  "epochs": 8,
+  "learning_rate": 0.001,
+  "batch_size": 64,
+  "weight_decay": 0.01,
+  "patience": 3,
+  "seed": 0,
+  "device": "mps",
+  "source": "mimic",
+  "classes": [
+    "NSR",
+    "AF",
+    "LBBB",
+    "RBBB",
+    "IAVB"
+  ],
+  "usable_classes": [
+    "NSR",
+    "AF",
+    "LBBB",
+    "RBBB",
+    "IAVB"
+  ],
+  "caps": {
+    "train": 3500,
+    "val": 600,
+    "cal": 2000,
+    "test": 8000
+  },
+  "split_sizes": {
+    "train": 3500,
+    "val": 600,
+    "cal": 2000,
+    "test": 8000,
+    "unused": 147252
+  },
+  "n_train": 3462,
+  "n_validation": 594,
+  "standardisation": {
+    "centre_mv": 0.00851166807115078,
+    "scale_mv": 0.1889648288488388
+  },
+  "deviations": [
+    "labels are the cart's machine statements mapped by src/ecs/mimic.py, not a cardiologist's reading; results/mimic_label_map.json names every join",
+    "one ECG per patient, drawn with a fixed seed from the patient's 1 to 260 tracings",
+    "age and sex are in the credentialed MIMIC-IV patients table, not in the open release, so every MIMIC record is in the 'unknown' age band and sex",
+    "lead order I, II, III, aVR, aVF, aVL, V1-V6 in the release, reordered by header name",
+    "200 ADC units per mV: 5 microvolt resolution against PTB-XL's 1"
+  ],
+  "machine": {
+    "cpu": "Apple M5",
+    "platform": "macOS-27.0.1-arm64-arm-64bit",
+    "python": "3.11.15",
+    "torch": "2.2.2",
+    "torch_threads": 4
+  }
+}

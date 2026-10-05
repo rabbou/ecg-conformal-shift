@@ -21,6 +21,18 @@ CHALLENGE2021_DIR = Path(
     os.environ.get("ECS_CHALLENGE2021_DIR", Path.home() / "data/challenge2021")
 )
 
+# MIMIC-IV-ECG v1.0 (ODbL): the metadata tables at the top, the waveforms under
+# files/ in the release's own layout.  Only the records the rotation and the
+# shadow run read are extracted from the release zip; see scripts/mimic_extract.py.
+MIMIC_ECG_DIR = Path(os.environ.get("ECS_MIMIC_ECG_DIR", Path.home() / "data/mimic-iv-ecg"))
+
+# The MIMIC-IV patients table (hosp/patients.csv), which holds each patient's
+# anchor_year_group, the only key from shifted to real calendar years.  The full
+# table is credentialed; the open demo (100 patients, ODbL) has the same schema.
+MIMIC_PATIENTS_CSV = Path(
+    os.environ.get("ECS_MIMIC_PATIENTS_CSV", Path.home() / "data/mimic-iv-demo/patients.csv")
+)
+
 # The published code tables the label mapping joins on, copied into the
 # repository so the table can be rebuilt without a network.  Provenance,
 # licence and digest of each are in mappings/NOTICE.md.

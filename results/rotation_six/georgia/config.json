@@ -1,0 +1,55 @@
+{
+  "epochs": 8,
+  "learning_rate": 0.001,
+  "batch_size": 64,
+  "weight_decay": 0.01,
+  "patience": 3,
+  "seed": 0,
+  "device": "mps",
+  "source": "georgia",
+  "classes": [
+    "NSR",
+    "AF",
+    "LBBB",
+    "RBBB",
+    "IAVB"
+  ],
+  "usable_classes": [
+    "NSR",
+    "AF",
+    "LBBB",
+    "RBBB",
+    "IAVB"
+  ],
+  "caps": {
+    "train": 3500,
+    "val": 600,
+    "cal": 2000,
+    "test": 8000
+  },
+  "split_sizes": {
+    "train": 3492,
+    "val": 600,
+    "cal": 2000,
+    "test": 4123,
+    "unused": 77
+  },
+  "n_train": 3489,
+  "n_validation": 600,
+  "standardisation": {
+    "centre_mv": -0.00231633591465652,
+    "scale_mv": 0.19954797625541687
+  },
+  "deviations": [
+    "the Challenge bundle ships no patient identifier, so each record is its own patient for splitting",
+    "52 records shorter than ten seconds, dropped before the split",
+    "89 groups of identical tracings, 180 records, split as one unit: the corpus repeats a tracing under more than one record identifier"
+  ],
+  "machine": {
+    "cpu": "Apple M5",
+    "platform": "macOS-27.0.1-arm64-arm-64bit",
+    "python": "3.11.15",
+    "torch": "2.2.2",
+    "torch_threads": 4
+  }
+}

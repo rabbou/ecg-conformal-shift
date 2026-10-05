@@ -14,6 +14,7 @@ import pytest
 from ecs.clinical import (
     empirical_refit,
     external_ladder,
+    half_means,
     holm,
     net_benefit,
     outcome_shares,
@@ -200,6 +201,16 @@ class TestEmpiricalRefit:
         (margin,) = rerandomised_ladder(p, y, p, y, (100,), 300, alpha=0.10, level=0.90)
         assert plain["sensitivity"]["mean"] < margin["sensitivity"]["mean"]
         assert plain["specificity"]["mean"] > margin["specificity"]["mean"]
+
+
+class TestHalfMeans:
+    def test_one_mean_per_cut_sorted(self) -> None:
+        rng = np.random.default_rng(0)
+        y = (rng.uniform(size=400) < 0.3).astype(int)
+        p = np.clip(0.3 * y + rng.uniform(0, 0.7, size=400), 0, 1)
+        means = half_means(p, y, 60, halves=12, draws=5, alpha=0.10)
+        assert len(means) == 12 and means == sorted(means)
+        assert 0.6 < np.mean(means) <= 1.0
 
 
 class TestCaseMix:

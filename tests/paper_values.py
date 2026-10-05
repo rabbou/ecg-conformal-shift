@@ -252,6 +252,12 @@ def echonext() -> dict[str, str]:
         fixed = transfer["arms"][arm]["ladder"]["outpatient"][COMPOSITE]
         (at100,) = [r for r in fixed if r["labels"] == 100]
         out[f"fixed_lad100_{SHORT[arm]}"] = pct(at100["coverage_pos_mean"])
+        means = clinical["half_means"][arm]["means"]
+        below = sum(m < at100["coverage_pos_mean"] for m in means) / len(means)
+        out[f"fixed_rank_{SHORT[arm]}"] = pct(below)
+        out[f"half_low_{SHORT[arm]}"] = pct(means[round(0.025 * (len(means) - 1))])
+        out[f"half_high_{SHORT[arm]}"] = pct(means[round(0.975 * (len(means) - 1))])
+    out["half_cuts"] = count(clinical["half_means"]["resnet"]["halves"])
 
     for context, c in CONTEXT.items():
         u = clinical["unmeasured"][context]

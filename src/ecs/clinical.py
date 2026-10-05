@@ -29,6 +29,7 @@ from .transfer import conformal_sets
 __all__ = [
     "empirical_refit",
     "external_ladder",
+    "half_means",
     "holm",
     "net_benefit",
     "outcome_shares",
@@ -250,6 +251,37 @@ def empirical_refit(
         "specificity": _summary(spec),
         "share_of_draws_below_level": float(np.mean(np.array(sens) < level)),
     }
+
+
+def half_means(
+    p_tgt: Array,
+    y_tgt: IntArray,
+    rung: int,
+    halves: int,
+    draws: int,
+    *,
+    alpha: float,
+    seed: int = 0,
+) -> list[float]:
+    """For each of ``halves`` random cuts of the target, the mean sensitivity over
+    ``draws`` refits on ``rung`` patients of the labelled half, read on the other.
+
+    One cut fixed for every draw gives one of these means; their spread across cuts
+    is the yardstick that mean belongs on, not the spread of single draws.
+    """
+    y_tgt = np.asarray(y_tgt, dtype=int)
+    rng = np.random.default_rng(seed)
+    means = []
+    for _ in range(halves):
+        pool, held = two_halves(rng.permutation(len(y_tgt)))
+        ill = y_tgt[held] == 1
+        caught = []
+        for _ in range(draws):
+            drawn = rng.choice(pool, size=rung, replace=False)
+            flagged = conformal_sets(p_tgt[drawn], y_tgt[drawn], p_tgt[held], alpha)["plain"][:, 1]
+            caught.append(float(flagged[ill].mean()))
+        means.append(float(np.mean(caught)))
+    return sorted(means)
 
 
 def external_ladder(

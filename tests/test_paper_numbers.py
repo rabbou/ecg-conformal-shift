@@ -317,21 +317,32 @@ class TestClaims:
         for target in (REPORT, README):
             assert "one repetition in four" not in target.read_text()
 
-    def test_the_fixed_half_was_favourable_and_inside_the_redrawn_spread(self) -> None:
+    def test_the_fixed_half_sits_high_among_the_means_of_random_halves(self) -> None:
+        """S1.9: the fixed half's mean, set among the means of other halves, is above
+        most of them for each model and above almost all for the mini-model."""
         transfer = v.read("echonext_transfer.json")
-        ladder = v.read("echonext_clinical.json")["ladder"]
+        clinical = v.read("echonext_clinical.json")
+        rank = {}
         for arm in v.STRONGEST:
             (fixed,) = [
                 r
                 for r in transfer["arms"][arm]["ladder"]["outpatient"][v.COMPOSITE]
                 if r["labels"] == 100
             ]
-            (redrawn,) = [r for r in ladder[arm] if r["labels"] == 100]
-            assert (
-                redrawn["sensitivity"]["mean"]
-                < fixed["coverage_pos_mean"]
-                <= redrawn["sensitivity"]["p90"]
-            )
+            means = clinical["half_means"][arm]["means"]
+            rank[arm] = sum(m < fixed["coverage_pos_mean"] for m in means) / len(means)
+        assert min(rank.values()) > 0.6 and rank["echonext_mini"] > 0.99
+        assert "one of the more favourable ones" not in SUPPLEMENT.read_text()
+
+    def test_the_one_page_reports_say_their_ladder_is_superseded(self) -> None:
+        """README links each model's page; the page says its ladder reads one fixed half,
+        points to the report, and gives the specificity beside the healthy covered."""
+        pages = sorted((v.ROOT / "reports/transfer").glob("*_inpatient_to_outpatient.md"))
+        assert len(pages) == 4
+        for page in pages:
+            text = page.read_text()
+            assert "those figures supersede this ladder's" in text, page.name
+            assert "of those without it unflagged" in text, page.name
 
     def test_more_healthy_outpatients_than_inpatients_carry_no_measurement(self) -> None:
         """Section 2.1 and the limitations: the healthy without a measurement are a larger

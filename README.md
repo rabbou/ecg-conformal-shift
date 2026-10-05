@@ -33,7 +33,7 @@ Four models score every ECG: a residual network trained on EchoNext for this stu
 
 An infarction model gives a second case. A residual network trained on PTB-XL, a German research corpus, had its threshold set to catch 90% of infarctions there and caught 83.7% at a hospital in Chongqing and 97.3% at one in Shandong. Between hospitals the model's own separation moved with the threshold: its AUROC went from 0.932 at PTB-XL to 0.793 at Chongqing, where an infarction is an acute event in the discharge diagnosis rather than a pattern on the tracing. [SUPPLEMENT.md](SUPPLEMENT.md) gives the infarction study in full and a rotation of five corpora through the calibration role on five diagnoses: sinus rhythm, atrial fibrillation, left and right bundle-branch block, and first-degree atrioventricular block.
 
-EchoNext is under PhysioNet's restricted licence, so no tracing and no per-record score is in this repository. Each EchoNext model's one-page report is in [reports/transfer/](reports/transfer/).
+EchoNext is under PhysioNet's restricted licence, so no tracing and no per-record score is in this repository. Each EchoNext model's one-page report is in [reports/transfer/](reports/transfer/); its refitting ladder reads one fixed half of the outpatients and counts a healthy patient sent to a human as covered, and the report's section 3.6 supersedes it.
 
 ## The positive predictive value a buyer recomputes
 

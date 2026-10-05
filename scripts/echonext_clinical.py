@@ -35,6 +35,9 @@ exactly as ``scripts/echonext_transfer.py`` fits them:
   refit_without_margin
                the refit on 100 outpatients with the sample's own 10th
                percentile and no finite-sample margin;
+  half_means   the mean sensitivity of the refit on 100 over the draws of one
+               cut into halves, for 400 random cuts: the spread a refit read
+               on one fixed half belongs in;
   decision     net benefit per outpatient at decision thresholds of 5%, 10%
                and 20%, for each way of setting the threshold and for an
                echocardiogram for every outpatient or none;
@@ -63,6 +66,7 @@ from sklearn.metrics import roc_auc_score
 from ecs.clinical import (
     empirical_refit,
     external_ladder,
+    half_means,
     holm,
     net_benefit,
     outcome_shares,
@@ -458,6 +462,15 @@ def measure(meta: pd.DataFrame) -> dict[str, Any]:
         for arm in ARMS
     }
     result["decision"] = {arm: decision(result, arm) for arm in ARMS}
+    result["half_means"] = {
+        arm: {
+            "labels": 100,
+            "halves": 400,
+            "draws_per_half": 100,
+            "means": half_means(probs[arm][out_rows], y[out_rows], 100, 400, 100, alpha=ALPHA),
+        }
+        for arm in STRONGEST
+    }
     return result
 
 

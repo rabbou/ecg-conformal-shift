@@ -62,8 +62,9 @@ CONSTANTS = {
     "100": "outcomes are counted per 100 patients; the rung of the ladder the text reads",
     "1,000": "the clinic of 1,000 outpatients the counts are scaled to",
     "100,000": "EchoNext's ECGs",
-    "10%": "a screening prevalence",
-    "5%": "a screening prevalence",
+    "10%": "a screening prevalence, and a decision threshold of net benefit",
+    "5%": "a screening prevalence, and a decision threshold of net benefit",
+    "20%": "a decision threshold of net benefit",
     "80%": "the middle 80% of the repetitions a band of Figure 3 spans",
     "45%": "EchoNext's ejection-fraction threshold",
     "45": "EchoNext's pulmonary pressure threshold, in mmHg",
@@ -355,6 +356,31 @@ class TestClaims:
         text = REPORT.read_text() + README.read_text() + CITATION.read_text()
         assert "restore" not in text.lower()
         assert "short of 90% for all three" in REPORT.read_text()
+
+    def test_net_benefit_orders_the_options_as_the_discussion_says(self) -> None:
+        """At 5% an echocardiogram for everyone nets the most, at 20% the inpatient
+        threshold does, and at 10% the refit beats the inpatient threshold."""
+        for arm in v.STRONGEST:
+            o = v.read("echonext_clinical.json")["decision"][arm]["options"]
+            nb = {k: x["net_benefit"] for k, x in o.items()}
+            assert max(nb, key=lambda k: nb[k]["0.05"]) == "echo_for_all", arm
+            assert max(nb, key=lambda k: nb[k]["0.20"]) == "inpatient_threshold", arm
+            assert nb["refit_100"]["0.10"] > nb["inpatient_threshold"]["0.10"], arm
+        assert "which this study does not measure" not in REPORT.read_text()
+        assert "Table S7d" in REPORT.read_text()
+
+    def test_the_recalibration_lowered_net_benefit_for_echonext_outpatients(self) -> None:
+        for cell in v.read("repairs.json")["cells"]:
+            if (cell["family"], cell["target"], cell["label"]) != (
+                "echonext",
+                "outpatient",
+                v.COMPOSITE,
+            ) or cell["model"] not in v.STRONGEST:
+                continue
+            for row in cell["net_benefit"]:
+                if row["threshold"] in (0.05, 0.1):
+                    assert row["recalibrated"] < row["as_delivered"], cell["model"]
+        assert "it lowered net benefit at decision thresholds of 5% and 10%" in README.read_text()
 
     def test_set_on_every_validation_patient_the_fall_shrinks_and_remains(self) -> None:
         variants = v.read("echonext_clinical.json")["calibration_variants"]

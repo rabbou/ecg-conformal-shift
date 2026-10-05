@@ -228,6 +228,32 @@ Table S7c. Thresholds refitted on outpatients drawn from the validation split's 
 | ECGFounder | 100 | 28.1 (23 to 34) | 89.5% (84.1% to 92.3%) | 38.4% | 39.5% (30.3% to 52.7%) |
 | ECGFounder | 200 | 56.0 (49 to 63) | 88.8% (84.1% to 91.1%) | 48.0% | 42.1% (37.1% to 50.8%) |
 
+Table S7d. Net benefit among the test outpatients, per 1,000, from `results/echonext_clinical.json`, field `decision`: the ill found, less the healthy flagged weighted by t/(1-t) at a decision threshold t of 5%, 10% and 20% (Vickers and Elkin, Med Decis Making 2006;26:565-574). Sensitivities are those of Table S1, the means of Table S7 and Table S7b; the 90% point with every diagnosis known is read on the outpatients' own curve.
+
+| Model | Threshold | Sensitivity | Flagged per 1,000 | Net benefit, 5% | 10% | 20% |
+|---|---|---|---|---|---|---|
+| Network trained here | Inpatient threshold | 71.6% | 398 | 172 | 159 | 129 |
+| Network trained here | Set again on 100 outpatients | 91.6% | 752 | 207 | 177 | 105 |
+| Network trained here | Set again on 200 outpatients | 90.9% | 726 | 207 | 178 | 109 |
+| Network trained here | Set on the validation outpatients | 86.3% | 604 | 201 | 178 | 125 |
+| Network trained here | 90% with every diagnosis known | 90.0% | 668 | 207 | 182 | 121 |
+| Network trained here | Echocardiogram for every outpatient | 100.0% | 1,000 | 217 | 173 | 70 |
+| Network trained here | Echocardiogram for none | 0.0% | 0 | 0 | 0 | 0 |
+| EchoNext mini-model | Inpatient threshold | 72.7% | 401 | 175 | 162 | 132 |
+| EchoNext mini-model | Set again on 100 outpatients | 91.9% | 768 | 207 | 176 | 102 |
+| EchoNext mini-model | Set again on 200 outpatients | 91.0% | 742 | 206 | 176 | 106 |
+| EchoNext mini-model | Set on the validation outpatients | 87.8% | 671 | 201 | 175 | 113 |
+| EchoNext mini-model | 90% with every diagnosis known | 90.0% | 713 | 205 | 177 | 110 |
+| EchoNext mini-model | Echocardiogram for every outpatient | 100.0% | 1,000 | 217 | 173 | 70 |
+| EchoNext mini-model | Echocardiogram for none | 0.0% | 0 | 0 | 0 | 0 |
+| ECGFounder | Inpatient threshold | 71.6% | 397 | 172 | 159 | 130 |
+| ECGFounder | Set again on 100 outpatients | 91.8% | 756 | 208 | 177 | 105 |
+| ECGFounder | Set again on 200 outpatients | 91.0% | 727 | 207 | 178 | 109 |
+| ECGFounder | Set on the validation outpatients | 89.7% | 654 | 207 | 182 | 123 |
+| ECGFounder | 90% with every diagnosis known | 90.0% | 664 | 207 | 182 | 122 |
+| ECGFounder | Echocardiogram for every outpatient | 100.0% | 1,000 | 217 | 173 | 70 |
+| ECGFounder | Echocardiogram for none | 0.0% | 0 | 0 | 0 | 0 |
+
 ### S1.10 How the published weights were run
 
 The mini-model's weights come from the authors' IntroECG repository (commit

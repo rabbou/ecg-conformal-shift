@@ -32,6 +32,12 @@ exactly as ``scripts/echonext_transfer.py`` fits them:
                validation split's outpatients, read on every test outpatient;
   flow         ECGs and patients by split and setting, and which this study
                uses;
+  refit_without_margin
+               the refit on 100 outpatients with the sample's own 10th
+               percentile and no finite-sample margin;
+  decision     net benefit per outpatient at decision thresholds of 5%, 10%
+               and 20%, for each way of setting the threshold and for an
+               echocardiogram for every outpatient or none;
   unmeasured   the healthy ECGs that carry no echocardiographic measurement,
                by setting, and the specificity, prevalence and AUROC once
                they are set aside.
@@ -55,8 +61,10 @@ from numpy.typing import NDArray
 from sklearn.metrics import roc_auc_score
 
 from ecs.clinical import (
+    empirical_refit,
     external_ladder,
     holm,
+    net_benefit,
     outcome_shares,
     paired_difference,
     per_thousand,
@@ -83,6 +91,7 @@ CONTEXTS = ("inpatient", "emergency", "outpatient")
 FINDINGS = LABELS[:-1]
 SCORES_DIR = DERIVED_DIR / "scores"
 SCREENING_PREVALENCES = (0.10, 0.05)
+DECISION_THRESHOLDS = (0.05, 0.10, 0.20)
 LADDER_RUNGS = (0, 25, 50, 100, 200)
 # 2,000 draws put the Monte Carlo error of a share of draws near one point.
 LADDER_DRAWS = 2000
@@ -266,6 +275,39 @@ def calibration_variants(
     return out
 
 
+def decision(result: dict[str, Any], arm: str) -> dict[str, Any]:
+    """Net benefit among the test outpatients of each way of setting the threshold,
+    from the sensitivities and specificities measured elsewhere in ``result``."""
+    measured = result["arms"][arm]["outpatient"]
+    prevalence = measured["n_ill"] / measured["n"]
+    ladder = {r["labels"]: r for r in result["ladder"][arm]}
+    held = result["calibration_variants"]["outpatients"]["arms"][arm]["outpatient"]
+    roc_at90 = result["roc"][arm]["outpatient"][SENSITIVITY_GRID.tolist().index(0.9)]
+    options = {
+        "inpatient_threshold": (measured["sensitivity"], measured["specificity"]),
+        "refit_100": (ladder[100]["sensitivity"]["mean"], ladder[100]["specificity"]["mean"]),
+        "refit_200": (ladder[200]["sensitivity"]["mean"], ladder[200]["specificity"]["mean"]),
+        "validation_outpatients": (held["sensitivity"]["share"], held["specificity"]["share"]),
+        "every_diagnosis_known_90": (0.9, roc_at90),
+        "echo_for_all": (1.0, 0.0),
+        "echo_for_none": (0.0, 1.0),
+    }
+    return {
+        "prevalence": prevalence,
+        "options": {
+            name: {
+                "sensitivity": sens,
+                "specificity": spec,
+                "flagged_per_thousand": 1000 * (sens * prevalence + (1 - spec) * (1 - prevalence)),
+                "net_benefit": {
+                    f"{t:.2f}": net_benefit(sens, spec, prevalence, t) for t in DECISION_THRESHOLDS
+                },
+            }
+            for name, (sens, spec) in options.items()
+        },
+    }
+
+
 def flow(meta: pd.DataFrame) -> dict[str, Any]:
     """Every ECG of the distribution by split and setting, the patients behind them,
     and the cells this study reads."""
@@ -411,6 +453,11 @@ def measure(meta: pd.DataFrame) -> dict[str, Any]:
         for arm in ARMS
     }
     result["flow"] = flow(meta)
+    result["refit_without_margin"] = {
+        arm: empirical_refit(probs[arm][out_rows], y[out_rows], 100, LADDER_DRAWS, level=1 - ALPHA)
+        for arm in ARMS
+    }
+    result["decision"] = {arm: decision(result, arm) for arm in ARMS}
     return result
 
 

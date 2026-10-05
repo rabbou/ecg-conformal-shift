@@ -145,6 +145,12 @@ Table S7c. Thresholds refitted on outpatients drawn from the validation split's 
 |---|---|---|---|---|---|
 {{rows:ladder_validation}}
 
+Table S7d. Net benefit among the test outpatients, per 1,000, from `results/echonext_clinical.json`, field `decision`: the ill found, less the healthy flagged weighted by t/(1-t) at a decision threshold t of 5%, 10% and 20% (Vickers and Elkin, Med Decis Making 2006;26:565-574). Sensitivities are those of Table S1, the means of Table S7 and Table S7b; the 90% point with every diagnosis known is read on the outpatients' own curve.
+
+| Model | Threshold | Sensitivity | Flagged per 1,000 | Net benefit, 5% | 10% | 20% |
+|---|---|---|---|---|---|---|
+{{rows:decision}}
+
 ### S1.10 How the published weights were run
 
 The mini-model's weights come from the authors' IntroECG repository (commit

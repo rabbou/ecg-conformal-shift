@@ -27,8 +27,10 @@ from .metrics import wilson_interval
 from .transfer import conformal_sets
 
 __all__ = [
+    "empirical_refit",
     "external_ladder",
     "holm",
+    "net_benefit",
     "outcome_shares",
     "paired_difference",
     "per_thousand",
@@ -97,6 +99,17 @@ def per_thousand(sens: float, spec: float, prevalence: float) -> dict[str, float
         "ill_missed": (1 - sens) * ill,
         "healthy_flagged": (1 - spec) * healthy,
     }
+
+
+def net_benefit(sens: float, spec: float, prevalence: float, threshold: float) -> float:
+    """Net benefit per patient at a decision threshold: the ill found, less the healthy
+    flagged weighted by the odds of the threshold (Vickers and Elkin, 2006).
+
+    A decision threshold t is the chance of disease at which a clinician would
+    order the test; flagging a healthy patient then costs t/(1-t) of an ill
+    patient found.
+    """
+    return sens * prevalence - (1 - spec) * (1 - prevalence) * threshold / (1 - threshold)
 
 
 def paired_difference(
@@ -203,6 +216,40 @@ def rerandomised_ladder(
         row["share_of_draws_below_level"] = float(np.mean(np.array(record["sensitivity"]) < level))
         rows.append(row)
     return rows
+
+
+def empirical_refit(
+    p_tgt: Array,
+    y_tgt: IntArray,
+    rung: int,
+    draws: int,
+    *,
+    level: float,
+    seed: int = 0,
+) -> dict[str, Any]:
+    """The refit with no finite-sample margin: the threshold is the sample's own
+    (1 - level) quantile of the ill scores, read on the other half as in
+    ``rerandomised_ladder``.  Beside the margin the conformal rule adds, it shows
+    what that margin buys and what it costs."""
+    y_tgt = np.asarray(y_tgt, dtype=int)
+    rng = np.random.default_rng(seed)
+    sens, spec = [], []
+    for _ in range(draws):
+        pool, held = two_halves(rng.permutation(len(y_tgt)))
+        drawn = rng.choice(pool, size=rung, replace=False)
+        ill = p_tgt[drawn][y_tgt[drawn] == 1]
+        cut = np.quantile(ill, 1 - level, method="inverted_cdf") if len(ill) else -np.inf
+        flagged = p_tgt[held] >= cut
+        y_eval = y_tgt[held]
+        sens.append(float(flagged[y_eval == 1].mean()))
+        spec.append(float((~flagged)[y_eval == 0].mean()))
+    return {
+        "labels": rung,
+        "draws": draws,
+        "sensitivity": _summary(sens),
+        "specificity": _summary(spec),
+        "share_of_draws_below_level": float(np.mean(np.array(sens) < level)),
+    }
 
 
 def external_ladder(

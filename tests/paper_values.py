@@ -295,6 +295,39 @@ def echonext() -> dict[str, str]:
         out[f"vl{rung}_below_range"] = f"{pct(shares[0])} to {pct(shares[-1])}"
     flags = sorted(1 - outside["arms"][a]["outpatient"]["specificity"]["share"] for a in STRONGEST)
     out["vo_hflag_range"] = f"{per100(flags[0])} to {per100(flags[-1])}"
+    choice = clinical["decision"]["resnet"]
+    options, prevalence = choice["options"], choice["prevalence"]
+    found = {k: 1000 * o["sensitivity"] * prevalence for k, o in options.items()}
+    extra_echo = (
+        options["refit_100"]["flagged_per_thousand"]
+        - options["inpatient_threshold"]["flagged_per_thousand"]
+    )
+    out["echo_per_extra_ill"] = (
+        f"{extra_echo / (found['refit_100'] - found['inpatient_threshold']):.0f}"
+    )
+    option_keys = {
+        "inpatient_threshold": "in",
+        "refit_100": "refit",
+        "validation_outpatients": "vo",
+        "every_diagnosis_known_90": "oracle",
+        "echo_for_all": "all",
+    }
+    for name, key in option_keys.items():
+        for t, value in options[name]["net_benefit"].items():
+            out[f"nb{round(100 * float(t))}_{key}"] = count(1000 * value)
+    plain = clinical["refit_without_margin"]["resnet"]
+    out["plain_sens"] = pct(plain["sensitivity"]["mean"])
+    out["plain_hflag"] = per100(1 - plain["specificity"]["mean"])
+    out["plain_below"] = pct(plain["share_of_draws_below_level"])
+    floor_rows = {r["labels"]: r for r in clinical["ladder"]["random_init"]}
+    out["lad100_sens_floor"] = pct(floor_rows[100]["sensitivity"]["mean"])
+    out["lad100_hflag_floor"] = per100(1 - floor_rows[100]["specificity"]["mean"])
+    gaps = [
+        {r["labels"]: r for r in clinical["ladder"][a]}[100]["specificity"]["mean"]
+        - floor_rows[100]["specificity"]["mean"]
+        for a in STRONGEST
+    ]
+    out["floor_gap"] = f"{per100(min(gaps))} to {per100(max(gaps))}"
     floor_out = outside["arms"]["random_init"]["outpatient"]
     out["vo_sens_floor"] = pct(floor_out["sensitivity"]["share"])
     out["vo_hflag_floor"] = per100(1 - floor_out["specificity"]["share"])
@@ -561,6 +594,29 @@ def rows_ladder_validation() -> list[str]:
     return out
 
 
+OPTION_NAMES = {
+    "inpatient_threshold": "Inpatient threshold",
+    "refit_100": "Set again on 100 outpatients",
+    "refit_200": "Set again on 200 outpatients",
+    "validation_outpatients": "Set on the validation outpatients",
+    "every_diagnosis_known_90": "90% with every diagnosis known",
+    "echo_for_all": "Echocardiogram for every outpatient",
+    "echo_for_none": "Echocardiogram for none",
+}
+
+
+def rows_decision() -> list[str]:
+    out = []
+    for arm in STRONGEST:
+        for name, o in read("echonext_clinical.json")["decision"][arm]["options"].items():
+            nb = " | ".join(count(1000 * o["net_benefit"][t]) for t in ("0.05", "0.10", "0.20"))
+            out.append(
+                f"| {ARM_NAMES[arm]} | {OPTION_NAMES[name]} | {pct(o['sensitivity'])} | "
+                f"{count(o['flagged_per_thousand'])} | {nb} |"
+            )
+    return out
+
+
 def rows_paired() -> list[str]:
     out = []
     for pair, d in read("echonext_clinical.json")["paired"]["outpatient_sensitivity"].items():
@@ -583,4 +639,5 @@ ROWS = {
     "unmeasured": rows_unmeasured,
     "variants": rows_variants,
     "ladder_validation": rows_ladder_validation,
+    "decision": rows_decision,
 }

@@ -37,7 +37,7 @@ EchoNext is under PhysioNet's restricted licence, so no tracing and no per-recor
 
 ## The positive predictive value a buyer recomputes
 
-A positive predictive value recomputed by Bayes' rule from a source's sensitivity and specificity, at a target's true prevalence, misses the observed one by a median of 5.3 percentage points over 174 transfers between populations, in either direction, against 0.3 points on 72 controls. The transfers are the EchoNext pairs above, the infarction pairs and the five-corpus rotation. Recalibrating on 100 labelled local ECGs is the one repair of three that raises net benefit on average. [PPV.md](PPV.md) gives the measurement and the repairs.
+A positive predictive value recomputed by Bayes' rule from a source's sensitivity and specificity, at a target's true prevalence, misses the observed one by a median of 5.3 percentage points over 174 transfers between populations, in either direction, against 0.3 points on 72 controls. The transfers are the EchoNext pairs above, the infarction pairs and the five-corpus rotation. Recalibrating on 100 labelled local ECGs is the one repair of three that raises net benefit on average over those transfers; for EchoNext's outpatients it lowered net benefit at decision thresholds of 5% and 10% for all three models. [PPV.md](PPV.md) gives the measurement and the repairs.
 
 ## Reproduce
 

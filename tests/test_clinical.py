@@ -12,8 +12,10 @@ import pandas as pd
 import pytest
 
 from ecs.clinical import (
+    empirical_refit,
     external_ladder,
     holm,
+    net_benefit,
     outcome_shares,
     paired_difference,
     per_thousand,
@@ -176,6 +178,28 @@ class TestExternalLadder:
         p = np.where(y == 1, 0.9, 0.1).astype(float)
         (row,) = external_ladder(p, y, p, y, (50,), draws=10, alpha=0.10, level=0.90)
         assert row["sensitivity"]["mean"] == 1.0 and row["specificity"]["mean"] == 1.0
+
+
+class TestNetBenefit:
+    def test_flagging_everyone_at_a_threshold_equal_to_the_prevalence_nets_nothing(self) -> None:
+        """At t equal to the prevalence, flagging everyone nets zero: the ill found are
+        exactly paid for by the healthy flagged."""
+        assert net_benefit(1.0, 0.0, 0.25, 0.25) == pytest.approx(0.0)
+        assert net_benefit(0.0, 1.0, 0.25, 0.10) == 0.0
+        assert net_benefit(0.9, 0.5, 0.2, 0.1) == pytest.approx(0.18 - 0.4 / 9)
+
+
+class TestEmpiricalRefit:
+    def test_it_flags_fewer_than_the_rule_with_a_margin(self) -> None:
+        """No margin: the sample's own 10th percentile, so on average a little under
+        90% caught and fewer healthy flagged than the conformal rule's refit."""
+        rng = np.random.default_rng(0)
+        y = (rng.uniform(size=1000) < 0.3).astype(int)
+        p = np.clip(0.25 * y + rng.uniform(0, 0.75, size=1000), 0, 1)
+        plain = empirical_refit(p, y, 100, 300, level=0.90)
+        (margin,) = rerandomised_ladder(p, y, p, y, (100,), 300, alpha=0.10, level=0.90)
+        assert plain["sensitivity"]["mean"] < margin["sensitivity"]["mean"]
+        assert plain["specificity"]["mean"] > margin["specificity"]["mean"]
 
 
 class TestCaseMix:

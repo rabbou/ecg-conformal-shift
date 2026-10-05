@@ -6440,6 +6440,469 @@
       }
     }
   },
+  "by_finding": {
+    "resnet": {
+      "inpatient": {
+        "lvef_lte_45_flag": {
+          "n": 537,
+          "caught": 506,
+          "low": 0.9192251104713749,
+          "high": 0.9590359626270861
+        },
+        "lvwt_gte_13_flag": {
+          "n": 483,
+          "caught": 444,
+          "low": 0.8915205691586184,
+          "high": 0.9403724273438901
+        },
+        "aortic_stenosis_moderate_or_greater_flag": {
+          "n": 141,
+          "caught": 137,
+          "low": 0.9293315734082841,
+          "high": 0.9889138038676157
+        },
+        "aortic_regurgitation_moderate_or_greater_flag": {
+          "n": 33,
+          "caught": 31,
+          "low": 0.8039375519135219,
+          "high": 0.9832191169128082
+        },
+        "mitral_regurgitation_moderate_or_greater_flag": {
+          "n": 173,
+          "caught": 165,
+          "low": 0.9114163003542645,
+          "high": 0.976384564030076
+        },
+        "tricuspid_regurgitation_moderate_or_greater_flag": {
+          "n": 183,
+          "caught": 172,
+          "low": 0.8955852895385042,
+          "high": 0.966107832620784
+        },
+        "pulmonary_regurgitation_moderate_or_greater_flag": {
+          "n": 14,
+          "caught": 14,
+          "low": 0.7846891972623643,
+          "high": 1.0
+        },
+        "rv_systolic_dysfunction_moderate_or_greater_flag": {
+          "n": 246,
+          "caught": 234,
+          "low": 0.9166851103896492,
+          "high": 0.9718783852282844
+        },
+        "pericardial_effusion_moderate_large_flag": {
+          "n": 45,
+          "caught": 41,
+          "low": 0.7926642466571064,
+          "high": 0.9648888832736299
+        },
+        "pasp_gte_45_flag": {
+          "n": 346,
+          "caught": 315,
+          "low": 0.8756331180151555,
+          "high": 0.9361631766760343
+        },
+        "tr_max_gte_32_flag": {
+          "n": 181,
+          "caught": 166,
+          "low": 0.8677798905526314,
+          "high": 0.949136406058498
+        },
+        "without_wall_alone": {
+          "n": 939,
+          "caught": 860
+        }
+      },
+      "outpatient": {
+        "lvef_lte_45_flag": {
+          "n": 70,
+          "caught": 64,
+          "low": 0.8253432750766051,
+          "high": 0.9601233303548878
+        },
+        "lvwt_gte_13_flag": {
+          "n": 146,
+          "caught": 101,
+          "low": 0.612766535228479,
+          "high": 0.7609618069856188
+        },
+        "aortic_stenosis_moderate_or_greater_flag": {
+          "n": 51,
+          "caught": 48,
+          "low": 0.8407537395119957,
+          "high": 0.9797933605775353
+        },
+        "aortic_regurgitation_moderate_or_greater_flag": {
+          "n": 4,
+          "caught": 3,
+          "low": 0.30064184258240184,
+          "high": 0.9544127391902995
+        },
+        "mitral_regurgitation_moderate_or_greater_flag": {
+          "n": 30,
+          "caught": 21,
+          "low": 0.5212421254128503,
+          "high": 0.833352517317562
+        },
+        "tricuspid_regurgitation_moderate_or_greater_flag": {
+          "n": 26,
+          "caught": 18,
+          "low": 0.5001174167780164,
+          "high": 0.8349868440453624
+        },
+        "rv_systolic_dysfunction_moderate_or_greater_flag": {
+          "n": 20,
+          "caught": 17,
+          "low": 0.6395811352592431,
+          "high": 0.9476312541037835
+        },
+        "pericardial_effusion_moderate_large_flag": {
+          "n": 2,
+          "caught": 2,
+          "low": 0.34238022750665303,
+          "high": 1.0
+        },
+        "pasp_gte_45_flag": {
+          "n": 63,
+          "caught": 45,
+          "low": 0.5929728343259288,
+          "high": 0.810968080135992
+        },
+        "tr_max_gte_32_flag": {
+          "n": 35,
+          "caught": 28,
+          "low": 0.6410838693433439,
+          "high": 0.8995755352620137
+        },
+        "without_wall_alone": {
+          "n": 186,
+          "caught": 144
+        }
+      },
+      "missed_outpatients": {
+        "n": 77,
+        "one_finding": {
+          "lvef_lte_45_flag": 3,
+          "lvwt_gte_13_flag": 35,
+          "aortic_regurgitation_moderate_or_greater_flag": 1,
+          "mitral_regurgitation_moderate_or_greater_flag": 7,
+          "tricuspid_regurgitation_moderate_or_greater_flag": 4,
+          "pasp_gte_45_flag": 8,
+          "tr_max_gte_32_flag": 1
+        },
+        "severe": 12
+      }
+    },
+    "echonext_mini": {
+      "inpatient": {
+        "lvef_lte_45_flag": {
+          "n": 537,
+          "caught": 512,
+          "low": 0.932178681453074,
+          "high": 0.9682700398078744
+        },
+        "lvwt_gte_13_flag": {
+          "n": 483,
+          "caught": 439,
+          "low": 0.8799130896816929,
+          "high": 0.931439339005939
+        },
+        "aortic_stenosis_moderate_or_greater_flag": {
+          "n": 141,
+          "caught": 139,
+          "low": 0.949760311092732,
+          "high": 0.9961014685072551
+        },
+        "aortic_regurgitation_moderate_or_greater_flag": {
+          "n": 33,
+          "caught": 32,
+          "low": 0.846812746178811,
+          "high": 0.9946305894631283
+        },
+        "mitral_regurgitation_moderate_or_greater_flag": {
+          "n": 173,
+          "caught": 164,
+          "low": 0.9040991296165678,
+          "high": 0.9723921696163796
+        },
+        "tricuspid_regurgitation_moderate_or_greater_flag": {
+          "n": 183,
+          "caught": 173,
+          "low": 0.902346882672198,
+          "high": 0.9700505018741622
+        },
+        "pulmonary_regurgitation_moderate_or_greater_flag": {
+          "n": 14,
+          "caught": 13,
+          "low": 0.6853129557584889,
+          "high": 0.9872777847521093
+        },
+        "rv_systolic_dysfunction_moderate_or_greater_flag": {
+          "n": 246,
+          "caught": 235,
+          "low": 0.921717636048382,
+          "high": 0.9748509361066503
+        },
+        "pericardial_effusion_moderate_large_flag": {
+          "n": 45,
+          "caught": 41,
+          "low": 0.7926642466571064,
+          "high": 0.9648888832736299
+        },
+        "pasp_gte_45_flag": {
+          "n": 346,
+          "caught": 318,
+          "low": 0.8855275336933098,
+          "high": 0.9434193869420603
+        },
+        "tr_max_gte_32_flag": {
+          "n": 181,
+          "caught": 165,
+          "low": 0.8612402371639487,
+          "high": 0.9448559760483577
+        },
+        "without_wall_alone": {
+          "n": 939,
+          "caught": 867
+        }
+      },
+      "outpatient": {
+        "lvef_lte_45_flag": {
+          "n": 70,
+          "caught": 63,
+          "low": 0.807670851514326,
+          "high": 0.9507106985574605
+        },
+        "lvwt_gte_13_flag": {
+          "n": 146,
+          "caught": 106,
+          "low": 0.6485875403723463,
+          "high": 0.7918780058085545
+        },
+        "aortic_stenosis_moderate_or_greater_flag": {
+          "n": 51,
+          "caught": 47,
+          "low": 0.8150005368740411,
+          "high": 0.9690778032115107
+        },
+        "aortic_regurgitation_moderate_or_greater_flag": {
+          "n": 4,
+          "caught": 3,
+          "low": 0.30064184258240184,
+          "high": 0.9544127391902995
+        },
+        "mitral_regurgitation_moderate_or_greater_flag": {
+          "n": 30,
+          "caught": 22,
+          "low": 0.555520383048111,
+          "high": 0.8581733668040368
+        },
+        "tricuspid_regurgitation_moderate_or_greater_flag": {
+          "n": 26,
+          "caught": 21,
+          "low": 0.6212374288068301,
+          "high": 0.9149293885105758
+        },
+        "rv_systolic_dysfunction_moderate_or_greater_flag": {
+          "n": 20,
+          "caught": 17,
+          "low": 0.6395811352592431,
+          "high": 0.9476312541037835
+        },
+        "pericardial_effusion_moderate_large_flag": {
+          "n": 2,
+          "caught": 1,
+          "low": 0.09453120573423074,
+          "high": 0.9054687942657693
+        },
+        "pasp_gte_45_flag": {
+          "n": 63,
+          "caught": 44,
+          "low": 0.5763962768644041,
+          "high": 0.7976230883781149
+        },
+        "tr_max_gte_32_flag": {
+          "n": 35,
+          "caught": 29,
+          "low": 0.6731771770095504,
+          "high": 0.9189735994629841
+        },
+        "without_wall_alone": {
+          "n": 186,
+          "caught": 144
+        }
+      },
+      "missed_outpatients": {
+        "n": 74,
+        "one_finding": {
+          "lvef_lte_45_flag": 4,
+          "lvwt_gte_13_flag": 32,
+          "aortic_stenosis_moderate_or_greater_flag": 1,
+          "aortic_regurgitation_moderate_or_greater_flag": 1,
+          "mitral_regurgitation_moderate_or_greater_flag": 6,
+          "tricuspid_regurgitation_moderate_or_greater_flag": 2,
+          "pasp_gte_45_flag": 10,
+          "tr_max_gte_32_flag": 1
+        },
+        "severe": 10
+      }
+    },
+    "ecgfounder": {
+      "inpatient": {
+        "lvef_lte_45_flag": {
+          "n": 537,
+          "caught": 510,
+          "low": 0.9278350130398828,
+          "high": 0.9652178255002365
+        },
+        "lvwt_gte_13_flag": {
+          "n": 483,
+          "caught": 436,
+          "low": 0.8729961106412866,
+          "high": 0.9260319773574194
+        },
+        "aortic_stenosis_moderate_or_greater_flag": {
+          "n": 141,
+          "caught": 134,
+          "low": 0.9010743041142573,
+          "high": 0.975746469675512
+        },
+        "aortic_regurgitation_moderate_or_greater_flag": {
+          "n": 33,
+          "caught": 32,
+          "low": 0.846812746178811,
+          "high": 0.9946305894631283
+        },
+        "mitral_regurgitation_moderate_or_greater_flag": {
+          "n": 173,
+          "caught": 164,
+          "low": 0.9040991296165678,
+          "high": 0.9723921696163796
+        },
+        "tricuspid_regurgitation_moderate_or_greater_flag": {
+          "n": 183,
+          "caught": 169,
+          "low": 0.8756956880903591,
+          "high": 0.9538846469077135
+        },
+        "pulmonary_regurgitation_moderate_or_greater_flag": {
+          "n": 14,
+          "caught": 12,
+          "low": 0.6005862050302965,
+          "high": 0.9599060787285351
+        },
+        "rv_systolic_dysfunction_moderate_or_greater_flag": {
+          "n": 246,
+          "caught": 234,
+          "low": 0.9166851103896492,
+          "high": 0.9718783852282844
+        },
+        "pericardial_effusion_moderate_large_flag": {
+          "n": 45,
+          "caught": 38,
+          "low": 0.7121609112760374,
+          "high": 0.9225457651524174
+        },
+        "pasp_gte_45_flag": {
+          "n": 346,
+          "caught": 309,
+          "low": 0.8560782074728303,
+          "high": 0.9214168353299997
+        },
+        "tr_max_gte_32_flag": {
+          "n": 181,
+          "caught": 157,
+          "low": 0.8102845314609839,
+          "high": 0.9092510145607393
+        },
+        "without_wall_alone": {
+          "n": 939,
+          "caught": 851
+        }
+      },
+      "outpatient": {
+        "lvef_lte_45_flag": {
+          "n": 70,
+          "caught": 63,
+          "low": 0.807670851514326,
+          "high": 0.9507106985574605
+        },
+        "lvwt_gte_13_flag": {
+          "n": 146,
+          "caught": 107,
+          "low": 0.6558113171496185,
+          "high": 0.798001669824643
+        },
+        "aortic_stenosis_moderate_or_greater_flag": {
+          "n": 51,
+          "caught": 46,
+          "low": 0.7902176531891913,
+          "high": 0.9573919268923814
+        },
+        "aortic_regurgitation_moderate_or_greater_flag": {
+          "n": 4,
+          "caught": 3,
+          "low": 0.30064184258240184,
+          "high": 0.9544127391902995
+        },
+        "mitral_regurgitation_moderate_or_greater_flag": {
+          "n": 30,
+          "caught": 20,
+          "low": 0.4878005164454384,
+          "high": 0.8076950191632386
+        },
+        "tricuspid_regurgitation_moderate_or_greater_flag": {
+          "n": 26,
+          "caught": 18,
+          "low": 0.5001174167780164,
+          "high": 0.8349868440453624
+        },
+        "rv_systolic_dysfunction_moderate_or_greater_flag": {
+          "n": 20,
+          "caught": 16,
+          "low": 0.5839825677481065,
+          "high": 0.9193423374202019
+        },
+        "pericardial_effusion_moderate_large_flag": {
+          "n": 2,
+          "caught": 1,
+          "low": 0.09453120573423074,
+          "high": 0.9054687942657693
+        },
+        "pasp_gte_45_flag": {
+          "n": 63,
+          "caught": 42,
+          "low": 0.5436724114497559,
+          "high": 0.7705038553539602
+        },
+        "tr_max_gte_32_flag": {
+          "n": 35,
+          "caught": 25,
+          "low": 0.5494506513681738,
+          "high": 0.836734637635653
+        },
+        "without_wall_alone": {
+          "n": 186,
+          "caught": 138
+        }
+      },
+      "missed_outpatients": {
+        "n": 77,
+        "one_finding": {
+          "lvef_lte_45_flag": 4,
+          "lvwt_gte_13_flag": 29,
+          "aortic_stenosis_moderate_or_greater_flag": 1,
+          "aortic_regurgitation_moderate_or_greater_flag": 1,
+          "mitral_regurgitation_moderate_or_greater_flag": 7,
+          "tricuspid_regurgitation_moderate_or_greater_flag": 3,
+          "pasp_gte_45_flag": 9,
+          "tr_max_gte_32_flag": 1
+        },
+        "severe": 13
+      }
+    }
+  },
   "refit_without_margin": {
     "resnet": {
       "labels": 100,
@@ -8043,5 +8506,5 @@
       ]
     }
   },
-  "seconds": 46.5
+  "seconds": 163.6
 }

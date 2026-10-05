@@ -54,7 +54,7 @@ Table S2. Paired differences in outpatient sensitivity between the three models,
 
 ### S1.4 The eleven findings
 
-Table S3. The trained network's inpatient threshold for each finding, fitted on that finding's ill calibration inpatients, from `results/echonext_coverage.csv`. Pulmonary regurgitation has no ill outpatient in the test split.
+Table S3. A threshold set separately for each finding, on that finding's ill calibration inpatients, for the trained network, from `results/echonext_coverage.csv`. This is not the composite threshold the report follows; section 3.1 reads the composite threshold finding by finding (`results/echonext_clinical.json`, field `by_finding`). Pulmonary regurgitation has no ill outpatient in the test split.
 
 | Finding, moderate or worse | Ill inpatients, test split | Sensitivity, inpatients | Ill outpatients | Sensitivity, outpatients |
 |---|---|---|---|---|
@@ -82,7 +82,7 @@ The earlier reading below reweights the outpatients to the severity of the calib
 
 ### S1.7 The severity of the ill by care setting
 
-The ill outpatients are ill more mildly than the ill inpatients who calibrate the thresholds. They carry fewer of the eleven findings, keep a higher ejection fraction, and have less right ventricular dysfunction, tricuspid regurgitation and pericardial effusion. Aortic stenosis is the exception, more frequent among outpatients. The two-sided test is Mann-Whitney's, on ranks; grades read none, mild, moderate, severe (the right ventricle normal to severely reduced, the effusion none, trace, small, moderate, large).
+The ill outpatients are ill differently from the ill inpatients who calibrate the thresholds. They carry fewer of the eleven findings, keep a higher ejection fraction, and have less right ventricular dysfunction, tricuspid regurgitation and pericardial effusion; they have a thicker septum and more aortic stenosis, and the wall-thickness finding is more frequent among them (Table S3). The two-sided test is Mann-Whitney's, on ranks; grades read none, mild, moderate, severe (the right ventricle normal to severely reduced, the effusion none, trace, small, moderate, large).
 
 | Among the ill, median (quartiles) | Inpatients, 1,013 | Outpatients, 271 | p |
 |---|---|---|---|
@@ -111,14 +111,17 @@ from 2,000 bootstrap draws. Severity would explain all of the drop if the
 reweighted coverage could reach 90%, and none of it if it could not differ from
 the observed one.
 
-| Arm | Ill outpatients covered | One finding, 165 | Two or more, 106 | Ejection fraction 35 or less, 37 | 36 to 45, 33 | Above 45, 201 | Reweighted to the inpatients' severity | Share of the drop explained |
+| Arm | Ill outpatients covered | One finding, 165 | Two or more, 106 | Ejection fraction 35 or less, 37 | 36 to 45, 33 | Above 45, 201 | Reweighted to the inpatients' severity | Share of the drop, against the calibration inpatients |
 |---|---|---|---|---|---|---|---|---|
-| Study ResNet, trained | 71.6% | 64.2% (56.7% to 71.2%) | 83.0% (74.7% to 89.0%) | 86.5% (72.0% to 94.1%) | 97.0% (84.7% to 99.5%) | 64.7% (57.9% to 71.0%) | 77.3% (72.3% to 81.9%) | 31% (16% to 47%) |
-| EchoNext mini-model, published | 72.7% | 65.5% (57.9% to 72.3%) | 84.0% (75.8% to 89.7%) | 94.6% (82.3% to 98.5%) | 84.8% (69.1% to 93.3%) | 66.7% (59.9% to 72.8%) | 78.7% (74.0% to 83.1%) | 35% (21% to 51%) |
-| ECGFounder, frozen, probes | 71.6% | 66.7% (59.2% to 73.4%) | 79.2% (70.6% to 85.9%) | 89.2% (75.3% to 95.7%) | 90.9% (76.4% to 96.9%) | 65.2% (58.4% to 71.4%) | 76.9% (71.7% to 81.7%) | 29% (15% to 45%) |
+| Network trained here | 71.6% | 64.2% (56.7% to 71.2%) | 83.0% (74.7% to 89.0%) | 86.5% (72.0% to 94.1%) | 97.0% (84.7% to 99.5%) | 64.7% (57.9% to 71.0%) | 77.3% (72.3% to 81.9%) | 31% (16% to 47%) |
+| EchoNext mini-model | 72.7% | 65.5% (57.9% to 72.3%) | 84.0% (75.8% to 89.7%) | 94.6% (82.3% to 98.5%) | 84.8% (69.1% to 93.3%) | 66.7% (59.9% to 72.8%) | 78.7% (74.0% to 83.1%) | 35% (21% to 51%) |
+| ECGFounder | 71.6% | 66.7% (59.2% to 73.4%) | 79.2% (70.6% to 85.9%) | 89.2% (75.3% to 95.7%) | 90.9% (76.4% to 96.9%) | 65.2% (58.4% to 71.4%) | 76.9% (71.7% to 81.7%) | 29% (15% to 45%) |
 
 Severity explains part of the drop for each of the three arms, between 29% and
-35% of it: at the inpatients' severity, the ill outpatients would be covered at
+35% of it, when the drop is read against the calibration inpatients, whose own
+sensitivity was read on the ECGs that set the threshold. The case-mix model of
+the section before, read against the test inpatients, replaces this share in
+the main text, and the two are not the same quantity. At the inpatients' severity, the ill outpatients would be covered at
 76.9% to 78.7%, still short of 90%. The rest sits inside the strata. Of the 201
 ill outpatients whose ejection fraction is above 45%, 64.7% to 66.7% are
 covered; the calibration inpatients in the same band are covered at 83.5% to

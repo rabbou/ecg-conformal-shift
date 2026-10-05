@@ -204,7 +204,7 @@ def echonext() -> dict[str, str]:
     for arm in STRONGEST:
         mix = clinical["case_mix"][arm]
         s = SHORT[arm]
-        out[f"mix_share_{s}"] = pct(mix["share_explained"]["estimate"], 0)
+        out[f"mix_share_{s}"] = pct(mix["share_explained"]["estimate"])
         out[f"mix_share_{s}_ci"] = (
             f"{pct(mix['share_explained']['low'], 0)} to {pct(mix['share_explained']['high'], 0)}"
         )
@@ -212,8 +212,8 @@ def echonext() -> dict[str, str]:
         observed_in = mix["observed_inpatient"]["estimate"]
         observed_out = mix["observed_outpatient"]["estimate"]
         at_mix = mix["outpatient_at_inpatient_mix"]["estimate"]
-        out[f"mix_gap_pts_{s}"] = f"{100 * (observed_in - observed_out):.0f}"
-        out[f"mix_pts_{s}"] = f"{100 * (at_mix - observed_out):.0f}"
+        out[f"mix_gap_pts_{s}"] = f"{100 * (observed_in - observed_out):.1f}"
+        out[f"mix_pts_{s}"] = f"{100 * (at_mix - observed_out):.1f}"
 
     tests = clinical["subgroups"]["tests"]
     by = {(t["arm"], t["kind"]): t for t in tests}
@@ -268,6 +268,28 @@ def echonext() -> dict[str, str]:
             a = u["arms"][arm]
             out[f"unmeas_flag_{SHORT[arm]}_{c}"] = per100(1 - a["specificity_measured"])
             out[f"unmeas_auroc_{SHORT[arm]}_{c}"] = f"{a['auroc_measured']:.3f}"
+
+    found = clinical["by_finding"]["resnet"]
+    for label, key in (
+        ("lvef_lte_45_flag", "lvef"),
+        ("lvwt_gte_13_flag", "lvwt"),
+        ("aortic_stenosis_moderate_or_greater_flag", "as"),
+        ("mitral_regurgitation_moderate_or_greater_flag", "mr"),
+        ("tricuspid_regurgitation_moderate_or_greater_flag", "tr"),
+        ("pasp_gte_45_flag", "pasp"),
+    ):
+        for context, c in (("inpatient", "in"), ("outpatient", "out")):
+            f = found[context][label]
+            out[f"bf_{key}_{c}"] = pct(f["caught"] / f["n"])
+            out[f"bf_{key}_{c}_n"] = f"{f['caught']} of {f['n']}"
+    for context, c in (("inpatient", "in"), ("outpatient", "out")):
+        w = found[context]["without_wall_alone"]
+        out[f"nowall_{c}"] = pct(w["caught"] / w["n"])
+    missed = found["missed_outpatients"]
+    out["missed_n"] = count(missed["n"])
+    out["missed_wall_alone"] = count(missed["one_finding"]["lvwt_gte_13_flag"])
+    out["missed_one_finding"] = count(sum(missed["one_finding"].values()))
+    out["missed_severe"] = count(missed["severe"])
 
     flow = clinical["flow"]
     out["flow_nosplit"] = count(sum(flow["ecgs"]["no_split"].values()))

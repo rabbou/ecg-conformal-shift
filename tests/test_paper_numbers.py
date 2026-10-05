@@ -445,13 +445,28 @@ class TestClaims:
         assert "Nothing visible without diagnoses" not in REPORT.read_text()
 
     def test_the_findings_that_kept_and_lost_their_sensitivity(self) -> None:
-        def drop(label: str) -> float:
-            inside = float(v.cell("resnet", "inpatient", "plain", label)["coverage_pos"])
-            return inside - float(v.cell("resnet", "outpatient", "plain", label)["coverage_pos"])
-
-        assert abs(drop("lvef_lte_45_flag")) < 0.03
-        assert drop("aortic_stenosis_moderate_or_greater_flag") < 0.03
-        assert drop("lvwt_gte_13_flag") > 0.1
+        """Section 3.1, under the composite threshold: a thick wall loses the most for each
+        model, an ejection fraction of 45% or less and aortic stenosis far less."""
+        for arm in v.STRONGEST:
+            found = v.read("echonext_clinical.json")["by_finding"][arm]
+            share = {
+                (c, label): found[c][label]["caught"] / found[c][label]["n"]
+                for c in ("inpatient", "outpatient")
+                for label in (
+                    "lvef_lte_45_flag",
+                    "aortic_stenosis_moderate_or_greater_flag",
+                    "lvwt_gte_13_flag",
+                )
+            }
+            wall = share["inpatient", "lvwt_gte_13_flag"] - share["outpatient", "lvwt_gte_13_flag"]
+            assert wall > 0.15, arm
+            for label in ("lvef_lte_45_flag", "aortic_stenosis_moderate_or_greater_flag"):
+                loss = share["inpatient", label] - share["outpatient", label]
+                assert loss < wall - 0.1, arm
+                if arm == "resnet":  # the figures section 3.1 prints
+                    assert loss < 0.05
+        assert "A threshold set the same way for each finding on its own" not in REPORT.read_text()
+        assert "ill more mildly" not in REPORT.read_text()
 
     def test_women_and_the_young_are_caught_less_by_each_model(self) -> None:
         for t in v.read("echonext_clinical.json")["subgroups"]["tests"]:

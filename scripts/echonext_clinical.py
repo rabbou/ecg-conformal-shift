@@ -32,6 +32,8 @@ exactly as ``scripts/echonext_transfer.py`` fits them:
                validation split's outpatients, read on every test outpatient;
   flow         ECGs and patients by split and setting, and which this study
                uses;
+  by_finding   the composite threshold's catch among the ill carrying each
+               finding, by setting, and who the missed outpatients are;
   eras         the year each cohort's ECGs were recorded, and the sensitivity
                of the inpatient threshold within each band of years;
   refit_without_margin
@@ -89,6 +91,7 @@ from ecs.echonext import (
     read_metadata,
     transfer_cohorts,
 )
+from ecs.metrics import wilson_interval
 from ecs.transfer import AGE_BANDS, ALPHA, conformal_sets
 
 ARMS = ("resnet", "echonext_mini", "ecgfounder", "random_init")
@@ -315,6 +318,67 @@ def decision(result: dict[str, Any], arm: str) -> dict[str, Any]:
 
 
 ERAS = ((2008, 2015), (2016, 2018), (2019, 2022))
+SEVERE_GRADES = ("severe", "severely_reduced", "large")
+GRADES = MEASUREMENTS[:7]  # the graded findings; the rest are measurements
+WALL = "lvwt_gte_13_flag"
+
+
+def by_finding(
+    meta: pd.DataFrame,
+    probs: dict[str, NDArray[np.float64]],
+    y: NDArray[np.int_],
+    cal: NDArray[np.int_],
+    targets: dict[str, Any],
+) -> dict[str, Any]:
+    """The composite threshold, the one the report follows, read among the ill who
+    carry each finding; and, among the ill outpatients it misses, how many carry one
+    finding only, which, and how many a severe one."""
+    severe = meta[list(GRADES)].isin(SEVERE_GRADES).any(axis=1).to_numpy() | (
+        meta["lvef_value"].to_numpy(dtype=float) <= 35
+    )
+    findings = meta[list(FINDINGS)].to_numpy(dtype=int)
+    out: dict[str, Any] = {}
+    for arm in STRONGEST:
+        p = probs[arm]
+        entry: dict[str, Any] = {}
+        caught_of: dict[str, NDArray[np.bool_]] = {}
+        for context in ("inpatient", "outpatient"):
+            rows = targets[context]
+            flagged = conformal_sets(p[cal], y[cal], p[rows], ALPHA)["plain"][:, 1]
+            caught_of[context] = flagged
+            entry[context] = {}
+            for j, finding in enumerate(FINDINGS):
+                ill = findings[rows, j] == 1
+                if ill.any():
+                    low, high = wilson_interval(int(flagged[ill].sum()), int(ill.sum()))
+                    entry[context][finding] = {
+                        "n": int(ill.sum()),
+                        "caught": int(flagged[ill].sum()),
+                        "low": low,
+                        "high": high,
+                    }
+            alone_wall = (findings[rows].sum(axis=1) == 1) & (
+                findings[rows, FINDINGS.index(WALL)] == 1
+            )
+            other_ill = (y[rows] == 1) & ~alone_wall
+            entry[context]["without_wall_alone"] = {
+                "n": int(other_ill.sum()),
+                "caught": int(flagged[other_ill].sum()),
+            }
+        rows = targets["outpatient"]
+        missed = (y[rows] == 1) & ~caught_of["outpatient"]
+        single = missed & (findings[rows].sum(axis=1) == 1)
+        entry["missed_outpatients"] = {
+            "n": int(missed.sum()),
+            "one_finding": {
+                f: int((single & (findings[rows, j] == 1)).sum())
+                for j, f in enumerate(FINDINGS)
+                if (single & (findings[rows, j] == 1)).any()
+            },
+            "severe": int((missed & severe[rows]).sum()),
+        }
+        out[arm] = entry
+    return out
 
 
 def eras(
@@ -504,6 +568,7 @@ def measure(meta: pd.DataFrame) -> dict[str, Any]:
     }
     result["flow"] = flow(meta)
     result["eras"] = eras(meta, probs, y, cal, targets)
+    result["by_finding"] = by_finding(meta, probs, y, cal, targets)
     result["refit_without_margin"] = {
         arm: empirical_refit(probs[arm][out_rows], y[out_rows], 100, LADDER_DRAWS, level=1 - ALPHA)
         for arm in ARMS

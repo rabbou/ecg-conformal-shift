@@ -1,6 +1,6 @@
 {
  "written_by": "scripts/mimic_shadow.py",
- "commit": "48f1234811a9271b275e6aef96c8628425e9417c",
+ "commit": "471b3cf777774a89c530c4ecac275810f7d6e9f5",
  "eras": "estimated",
  "era_definition": "terciles of each tracing's estimated place in time, from the cart chronology",
  "settings": {
@@ -483,5 +483,5 @@
    "abstention"
   ]
  },
- "seconds": 569
+ "seconds": 519
 }

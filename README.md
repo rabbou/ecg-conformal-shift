@@ -1,6 +1,6 @@
 # Threshold generalisation to new sites and care settings for ECG-AI diagnostic support
 
-Infarction across hospitals: [REPORT.md](REPORT.md) · Structural heart disease, inpatients to outpatients: [ECHONEXT.md](ECHONEXT.md) · The PPV recomputed for a new site: [PPV.md](PPV.md) ([français](PPV.fr.md)) · Ruben Abbou · 2026
+Infarction across hospitals: [REPORT.md](REPORT.md) · Structural heart disease, inpatients to outpatients: [ECHONEXT.md](ECHONEXT.md) · The PPV recomputed for a new site: [PPV.md](PPV.md) ([français](PPV.fr.md)) · A sixth corpus, Beth Israel Deaconess on machine labels: [MIMIC.md](MIMIC.md) · Ruben Abbou · 2026
 
 An ECG classifier's decision threshold is set on one population and used on others. Conformal calibration sets it so that 90% of tracings receive a set of possible diagnoses holding the right one. On PTB-XL, a German research corpus, the target holds over all tracings (89.9%) and fails within infarction (73.2%). Carried unchanged to a hospital in Chongqing, the threshold covers 72.5% of infarctions; recalibrating on 100 tracings labelled there brings it to 88.9% on the held-out tracings. At Columbia, thresholds fitted on 1,903 inpatients cover about 72% of outpatients with structural heart disease for each of the three strongest models, so the cause is the outpatients' ECGs rather than one model. Refitting them on 100 labelled outpatient ECGs brings that to between 93.4% and 97.6%, averaged over 200 draws. A site adopting such a tool has to measure coverage within each diagnosis and care setting, on its own patients.
 
@@ -96,6 +96,7 @@ Timings are wall clock on a six-core i7-8700, CPU only; the full suite on a cold
 | `src/ecs/transfer_report.py` | the one-page transfer report, rendered from `results/echonext_transfer.json` alone |
 | `src/ecs/embedding_store.py` | encoder vectors filed by encoder, version and tracing digest, outside the repository |
 | `src/ecs/echonext_mini.py` | the published EchoNext mini-model, rebuilt to run its own checkpoint |
+| `src/ecs/mimic.py` | MIMIC-IV-ECG: cart statements to the five diagnoses, one ECG per patient, the carts ordered in time |
 | `mappings/` | the three published code tables the label mapping joins on, with provenance and digests |
 
 `pre-commit` runs `ruff`, `mypy --disallow-untyped-defs` and `pytest` on every commit, and the unit tests run again before a push.

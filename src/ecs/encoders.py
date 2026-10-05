@@ -175,8 +175,8 @@ PRETRAINING = {
 SAW: dict[str, tuple[str, ...]] = {
     "random_init": (),
     "ecgfounder": (),
-    "ecgfm": ("ptbxl",),
-    "hubert_ecg": ("ptbxl", "sph"),
+    "ecgfm": ("ptbxl", "mimic"),
+    "hubert_ecg": ("ptbxl", "sph", "mimic"),
     "ecg_jepa": ("chapman_ningbo",),
 }
 

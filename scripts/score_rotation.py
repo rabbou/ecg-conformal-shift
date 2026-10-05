@@ -40,30 +40,31 @@ CHUNK = 500
 class Scorer:
     """One source's trained model with the standardisation it was fitted under."""
 
-    def __init__(self, source: str, results: Path) -> None:
-        directory = results / "rotation" / source
+    def __init__(self, source: str, rotation_dir: Path, device: str = "cpu") -> None:
+        directory = rotation_dir / source
         config = json.loads((directory / "config.json").read_text())
         self.source = source
         self.centre = float(config["standardisation"]["centre_mv"])
         self.scale = float(config["standardisation"]["scale_mv"])
         self.usable = list(config["usable_classes"])
+        self.device = torch.device(device)
         self.model = ResNet1d(n_classes=len(class_keys()))
         self.model.load_state_dict(torch.load(directory / "model.pt", map_location="cpu"))
-        self.model.eval()
+        self.model.to(self.device).eval()
 
     def probabilities(self, x: NDArray[np.float32], batch: int = 64) -> NDArray[np.float64]:
         out = []
         with torch.no_grad():
             for i in range(0, len(x), batch):
                 block = torch.from_numpy((x[i : i + batch] - self.centre) / self.scale)
-                out.append(torch.sigmoid(self.model(block)))
+                out.append(torch.sigmoid(self.model(block.to(self.device))).cpu())
         if not out:
             return np.empty((0, len(class_keys())), dtype=np.float64)
         return torch.cat(out).numpy().astype(np.float64)
 
 
 def score_part(
-    index: CorpusIndex, part: str, scorers: dict[str, Scorer], results: Path
+    index: CorpusIndex, part: str, scorers: dict[str, Scorer], rotation_dir: Path
 ) -> dict[str, int]:
     """Read one part of one corpus in chunks and score it with every model."""
     wanted = index.ids(part)
@@ -82,7 +83,7 @@ def score_part(
         )
     y = index.labels(kept)
     for source in scorers:
-        directory = results / "rotation" / source / "scores"
+        directory = rotation_dir / source / "scores"
         directory.mkdir(parents=True, exist_ok=True)
         stacked = (
             np.concatenate(probabilities[source])
@@ -115,19 +116,26 @@ def main() -> int:
         help="comma-separated corpora to score (default: all five)",
     )
     parser.add_argument("--threads", type=int, default=0)
+    parser.add_argument("--device", default="cpu", help="cpu or mps")
+    parser.add_argument(
+        "--rotation-dir",
+        type=Path,
+        default=Path(RESULTS_DIR) / "rotation",
+        help="where each source's model is read and its scores written",
+    )
     args = parser.parse_args()
     if args.threads:
         torch.set_num_threads(args.threads)
 
-    results = Path(RESULTS_DIR)
+    rotation_dir = args.rotation_dir
     sources = [s for s in args.sources.split(",") if s]
-    scorers = {source: Scorer(source, results) for source in sources}
+    scorers = {source: Scorer(source, rotation_dir, args.device) for source in sources}
     for corpus in [c for c in args.corpora.split(",") if c]:
         index = corpus_index(corpus)
-        done = score_part(index, "test", scorers, results)
+        done = score_part(index, "test", scorers, rotation_dir)
         print(f"{corpus}/test: {done}", flush=True)
         if corpus in scorers:
-            done = score_part(index, "cal", {corpus: scorers[corpus]}, results)
+            done = score_part(index, "cal", {corpus: scorers[corpus]}, rotation_dir)
             print(f"{corpus}/cal: {done}", flush=True)
     return 0
 

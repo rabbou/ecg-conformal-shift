@@ -34,6 +34,13 @@ class TestWhatTheArmDeclares:
             "hubert_ecg",
         }
 
+    def test_the_arms_that_saw_mimic_are_ecg_fm_and_hubert_ecg(self) -> None:
+        """MIMIC as a target is an upper bound for these two, not a transfer."""
+        assert {arm for arm, corpora in SAW.items() if "mimic" in corpora} == {
+            "ecgfm",
+            "hubert_ecg",
+        }
+
     def test_what_each_arm_saw_matches_what_its_sources_say(self) -> None:
         """The structured fact and the sentence beside it cannot drift apart."""
         for arm, corpora in SAW.items():
@@ -44,6 +51,10 @@ class TestWhatTheArmDeclares:
                 assert "Shandong" in described, arm
             if "chapman_ningbo" in corpora:
                 assert "Chapman-Shaoxing" in described, arm
+            if "mimic" in corpora:
+                assert "MIMIC-IV" in described, arm
+            else:
+                assert "MIMIC" not in described, arm
         assert set(SAW) == set(ARMS)
 
     def test_ecg_jepa_names_the_corpus_it_did_see(self) -> None:

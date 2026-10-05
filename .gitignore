@@ -34,6 +34,15 @@ results/baseline/model.pt
 !results/repairs.json
 !results/rotation/
 results/rotation/**/model.pt
+!results/mimic_label_map.json
+!results/mimic_rotation.json
+!results/mimic_rotation.csv
+!results/mimic_shadow.json
+!results/mimic_shadow.csv
+!results/rotation_six/
+results/rotation_six/**/model.pt
+results/rotation_six/**/train.log
+!results/mimic_shadow/
 !results/embeddings/
 results/embeddings/**/*.npz
 !results/figures/

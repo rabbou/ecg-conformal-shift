@@ -14,7 +14,23 @@ A third construction, one threshold pair fitted over all calibration patients to
 
 ### S1.2 Cohorts
 
-EchoNext v1.1.1 holds 100,000 ECGs from Columbia, each paired with a transthoracic echocardiogram, with eleven binary findings and their composite. Its source states the labelling rule: an ECG is positive when it was "performed within 1 year prior to an echocardiogram with SHD", and for a patient whose most recent echocardiogram shows none, "all ECGs prior to the most recent echo were labeled as negative" (PhysioNet, EchoNext 1.1.1, read on 5 October 2026). The finer measurements (grades, ejection fraction, wall thickness, pressures) are recorded only for an ECG within the year, so a healthy ECG with every measurement blank was taken earlier; Table S1b counts them. The thresholds are fitted on the {{cal_n}} inpatient ECGs of the validation split and applied unchanged to the test split: {{out_n}} outpatient ECGs, and the {{em_n}} emergency and {{in_n}} inpatient ECGs beside them. No patient appears in two of the roles (training, calibration, test); `transfer_cohorts` raises if one does. The models were fitted on the {{train_n}} ECGs of the training split.
+EchoNext v1.1.1 holds 100,000 ECGs from Columbia, each paired with a transthoracic echocardiogram, with eleven binary findings and their composite. Its source states the labelling rule: an ECG is positive when it was "performed within 1 year prior to an echocardiogram with SHD", and for a patient whose most recent echocardiogram shows none, "all ECGs prior to the most recent echo were labeled as negative" (PhysioNet, EchoNext 1.1.1, read on 5 October 2026). The finer measurements (grades, ejection fraction, wall thickness, pressures) are recorded only for an ECG within the year, so a healthy ECG with every measurement blank was taken earlier; Table S1b counts them. The thresholds are fitted on the {{cal_n}} inpatient ECGs of the validation split and applied unchanged to the test split: {{out_n}} outpatient ECGs, and the {{em_n}} emergency and {{in_n}} inpatient ECGs beside them. No patient appears in two of the roles (training, calibration, each test setting), and no patient contributes two ECGs to one cohort; `transfer_cohorts` raises if either happens. The models were fitted on the {{train_n}} ECGs of the training split.
+
+Table S0. Every ECG of EchoNext by split and care setting, and its use here, from `results/echonext_clinical.json`, field `flow`.
+
+| Split | ECGs | Patients | Inpatient | Emergency | Outpatient | Procedural | Use |
+|---|---|---|---|---|---|---|---|
+{{rows:flow}}
+
+What a diagnostic-accuracy report states, item by item. The ECGs were recorded between {{year_min}} and {{year_max}} at the two sites, by EchoNext's authors' selection; this study takes the published splits whole, with no exclusion beyond the procedural setting. Every patient was {{age_min}} or older. Validation and test hold each patient's latest ECG. No ECG of the validation or test split lacks a score, an age, a sex or the composite label, so there are no indeterminate or missing results. No sample size was computed in advance: the cohorts are EchoNext's. The study was not registered, and no protocol was published before the analysis.
+
+The outpatients' ECGs are older than the inpatients': median year {{year_out}} against {{year_in}}. Table S1c reads the inpatient threshold's sensitivity within three bands of years.
+
+Table S1c. Ill patients caught by the inpatient threshold within bands of recording years (2008 to 2015, 2016 to 2018, 2019 to 2022), from `results/echonext_clinical.json`, field `eras`.
+
+| Model | Setting | 2008 to 2015 | 2016 to 2018 | 2019 to 2022 |
+|---|---|---|---|---|
+{{rows:eras}}
 
 ### S1.3 Every arm in every setting
 

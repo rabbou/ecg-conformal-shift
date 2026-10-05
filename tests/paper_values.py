@@ -269,6 +269,28 @@ def echonext() -> dict[str, str]:
             out[f"unmeas_flag_{SHORT[arm]}_{c}"] = per100(1 - a["specificity_measured"])
             out[f"unmeas_auroc_{SHORT[arm]}_{c}"] = f"{a['auroc_measured']:.3f}"
 
+    flow = clinical["flow"]
+    out["flow_nosplit"] = count(sum(flow["ecgs"]["no_split"].values()))
+    out["flow_val"] = count(sum(flow["ecgs"]["val"].values()))
+    out["flow_test"] = count(sum(flow["ecgs"]["test"].values()))
+    out["train_patients"] = count(flow["patients"]["train"])
+    for split in ("val", "test"):
+        out[f"flow_{split}_proc"] = count(flow["ecgs"][split]["procedural"])
+        out[f"flow_{split}_em"] = count(flow["ecgs"][split]["emergency"])
+        out[f"flow_{split}_out"] = count(flow["ecgs"][split]["outpatient"])
+    out["age_min"] = f"{min(flow['youngest'][s] for s in ('train', 'val', 'test'))}"
+    years = clinical["eras"]["years"]
+    out["year_min"] = f"{min(y['min'] for y in years.values())}"
+    out["year_max"] = f"{max(y['max'] for y in years.values())}"
+    out["year_out"] = f"{years['outpatient']['median']:.0f}"
+    out["year_in"] = f"{years['inpatient']['median']:.0f}"
+    band_sens = [
+        r["share"] for arm in STRONGEST for r in clinical["eras"]["arms"][arm]["outpatient"]
+    ]
+    out["era_out_range"] = f"{pct(min(band_sens))} to {pct(max(band_sens))}"
+    band_in = [r["share"] for arm in STRONGEST for r in clinical["eras"]["arms"][arm]["inpatient"]]
+    out["era_in_range"] = f"{pct(min(band_in))} to {pct(max(band_in))}"
+
     variants = clinical["calibration_variants"]
     every, outside = variants["every_setting"], variants["outpatients"]
     out["va_n"], out["va_ill"] = count(every["n"]), count(every["n_ill"])
@@ -623,6 +645,31 @@ def rows_decision() -> list[str]:
     return out
 
 
+def rows_flow() -> list[str]:
+    flow = read("echonext_clinical.json")["flow"]
+    out = []
+    for split in ("train", "val", "test", "no_split"):
+        e = flow["ecgs"][split]
+        out.append(
+            f"| {split.replace('_', ' ')} | {sum(e.values()):,} | {flow['patients'][split]:,} | "
+            f"{e['inpatient']:,} | {e['emergency']:,} | {e['outpatient']:,} | "
+            f"{e['procedural']:,} | {flow['used'][split]} |"
+        )
+    return out
+
+
+def rows_eras() -> list[str]:
+    eras = read("echonext_clinical.json")["eras"]
+    out = []
+    for arm in STRONGEST:
+        for context, cname in (("inpatient", "Inpatients"), ("outpatient", "Outpatients")):
+            cells = " | ".join(
+                f"{r['count']} of {r['n']}, {pct(r['share'])}" for r in eras["arms"][arm][context]
+            )
+            out.append(f"| {ARM_NAMES[arm]} | {cname} | {cells} |")
+    return out
+
+
 def rows_paired() -> list[str]:
     out = []
     for pair, d in read("echonext_clinical.json")["paired"]["outpatient_sensitivity"].items():
@@ -646,4 +693,6 @@ ROWS = {
     "variants": rows_variants,
     "ladder_validation": rows_ladder_validation,
     "decision": rows_decision,
+    "flow": rows_flow,
+    "eras": rows_eras,
 }

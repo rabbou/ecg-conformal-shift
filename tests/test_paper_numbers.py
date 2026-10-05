@@ -344,6 +344,19 @@ class TestClaims:
             assert "those figures supersede this ladder's" in text, page.name
             assert "of those without it unflagged" in text, page.name
 
+    def test_the_fall_holds_within_each_band_of_recording_years(self) -> None:
+        """Section 2.1: the outpatients' ECGs are older, and in every band of years the
+        outpatients' sensitivity stays below every inpatient band's, for each model."""
+        eras = v.read("echonext_clinical.json")["eras"]
+        assert eras["years"]["outpatient"]["median"] < eras["years"]["inpatient"]["median"]
+        for arm in v.STRONGEST:
+            outside = max(r["share"] for r in eras["arms"][arm]["outpatient"])
+            inside = min(r["share"] for r in eras["arms"][arm]["inpatient"])
+            assert outside < inside - 0.05, arm
+        text = REPORT.read_text()
+        assert "nothing else separates the cohorts" not in text
+        assert "Each patient contributes one ECG and belongs to one group only" not in text
+
     def test_more_healthy_outpatients_than_inpatients_carry_no_measurement(self) -> None:
         """Section 2.1 and the limitations: the healthy without a measurement are a larger
         share among outpatients, and no ill ECG lacks one."""

@@ -32,6 +32,8 @@ exactly as ``scripts/echonext_transfer.py`` fits them:
                validation split's outpatients, read on every test outpatient;
   flow         ECGs and patients by split and setting, and which this study
                uses;
+  eras         the year each cohort's ECGs were recorded, and the sensitivity
+               of the inpatient threshold within each band of years;
   refit_without_margin
                the refit on 100 outpatients with the sample's own 10th
                percentile and no finite-sample margin;
@@ -312,6 +314,49 @@ def decision(result: dict[str, Any], arm: str) -> dict[str, Any]:
     }
 
 
+ERAS = ((2008, 2015), (2016, 2018), (2019, 2022))
+
+
+def eras(
+    meta: pd.DataFrame,
+    probs: dict[str, NDArray[np.float64]],
+    y: NDArray[np.int_],
+    cal: NDArray[np.int_],
+    targets: dict[str, Any],
+) -> dict[str, Any]:
+    """Recording years by cohort, and the inpatient threshold's sensitivity among the
+    ill of each setting within bands of years: whether the fall from inpatients to
+    outpatients survives inside one era."""
+    year = meta["acquisition_year"].to_numpy(dtype=int)
+    cohorts = {"calibration": cal} | dict(targets)
+    out: dict[str, Any] = {
+        "years": {
+            name: {
+                "median": float(np.median(year[rows])),
+                "min": int(year[rows].min()),
+                "max": int(year[rows].max()),
+                "share_to_2018": float((year[rows] <= 2018).mean()),
+            }
+            for name, rows in cohorts.items()
+        },
+        "bands": [list(b) for b in ERAS],
+        "arms": {},
+    }
+    for arm in STRONGEST:
+        p = probs[arm]
+        out["arms"][arm] = {}
+        for context in ("inpatient", "outpatient"):
+            rows = targets[context]
+            out["arms"][arm][context] = [
+                outcome_shares(
+                    conformal_sets(p[cal], y[cal], p[rows][band], ALPHA)["plain"],
+                    y[rows][band],
+                )["ill"]["right_alone"]
+                for band in ((year[rows] >= low) & (year[rows] <= high) for low, high in ERAS)
+            ]
+    return out
+
+
 def flow(meta: pd.DataFrame) -> dict[str, Any]:
     """Every ECG of the distribution by split and setting, the patients behind them,
     and the cells this study reads."""
@@ -319,6 +364,7 @@ def flow(meta: pd.DataFrame) -> dict[str, Any]:
     return {
         "ecgs": {s: {c: int(n) for c, n in row.items()} for s, row in table.iterrows()},
         "patients": {s: int(n) for s, n in meta.groupby("split")["patient_key"].nunique().items()},
+        "youngest": {s: int(n) for s, n in meta.groupby("split")["age_at_ecg"].min().items()},
         "used": {
             "train": "every setting, to train the network and fit the probes",
             "val": "inpatients set the thresholds; every setting and the outpatients set the "
@@ -457,6 +503,7 @@ def measure(meta: pd.DataFrame) -> dict[str, Any]:
         for arm in ARMS
     }
     result["flow"] = flow(meta)
+    result["eras"] = eras(meta, probs, y, cal, targets)
     result["refit_without_margin"] = {
         arm: empirical_refit(probs[arm][out_rows], y[out_rows], 100, LADDER_DRAWS, level=1 - ALPHA)
         for arm in ARMS

@@ -176,6 +176,19 @@ class TestCohorts:
         with pytest.raises(ValueError, match="1 patients are in both calibration and target"):
             transfer_cohorts(read_metadata(tmp_path))
 
+    def test_a_patient_in_two_target_settings_is_refused(self, tmp_path: Path) -> None:
+        """The report compares inpatients with outpatients of the test split."""
+        records = [*RECORDS[:-1], ("test", "p7", "outpatient")]  # p7 is a test inpatient
+        write_corpus(tmp_path, records)
+        with pytest.raises(ValueError, match="target:inpatient and target:outpatient"):
+            transfer_cohorts(read_metadata(tmp_path))
+
+    def test_a_patient_with_two_ecgs_in_one_cohort_is_refused(self, tmp_path: Path) -> None:
+        records = [*RECORDS[:-1], ("test", "p8", "outpatient")]  # p8 twice
+        write_corpus(tmp_path, records)
+        with pytest.raises(ValueError, match="more than one ECG to target:outpatient"):
+            transfer_cohorts(read_metadata(tmp_path))
+
     def test_a_training_patient_in_a_target_is_refused(self, tmp_path: Path) -> None:
         records = [*RECORDS[:-1], ("test", "p2", "emergency")]
         write_corpus(tmp_path, records)

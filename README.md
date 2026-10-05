@@ -1,4 +1,4 @@
-# Carrying an ECG-AI threshold from inpatients to outpatients: a retrospective measurement of three structural heart disease models at one hospital
+# Carrying an ECG-AI threshold from inpatients to outpatients: a retrospective measurement of three structural heart disease models in one hospital system
 
 The study: [REPORT.md](REPORT.md) · Methods in statistical terms, the infarction study and the five-corpus rotation: [SUPPLEMENT.md](SUPPLEMENT.md) · The PPV recomputed for a new site: [PPV.md](PPV.md) ([français](PPV.fr.md)) · Ruben Abbou · 2026
 

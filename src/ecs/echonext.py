@@ -325,9 +325,13 @@ def transfer_cohorts(
     names = list(roles)
     for i, a in enumerate(names):
         for b in names[i + 1 :]:
-            if a.startswith("target:") and b.startswith("target:"):
-                continue  # two target contexts are read side by side, never pooled
+            # Two target contexts are compared with each other, so they too must hold
+            # different patients.
             shared = set(patients[roles[a]]) & set(patients[roles[b]])
             if shared:
                 raise ValueError(f"{len(shared)} patients are in both {a} and {b}")
+    for name in names[1:]:
+        repeated = pd.Series(patients[roles[name]]).duplicated().sum()
+        if repeated:
+            raise ValueError(f"{repeated} patients contribute more than one ECG to {name}")
     return Cohorts(training=training, calibration=calibration, targets=targets)

@@ -50,6 +50,7 @@ LITERATURE = {
     },
     "Carter 2026: patients, sensitivity and specificity": {"13,960", "84.5%", "83.6%"},
     "Wagner 2020: PTB-XL's recording years": {"1989", "1996"},
+    "de Vries 2023: the local screens the mammography cut-off was reset on": {"16,204"},
 }
 
 # Constants of the design, not results.

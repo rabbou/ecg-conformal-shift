@@ -347,7 +347,7 @@ def rows_ladder() -> list[str]:
             held = (
                 "none"
                 if ill is None
-                else f"{ill['mean']:.1f} ({ill['min']:.0f} to {ill['max']:.0f})"
+                else f"{ill['mean']:.1f} ({ill['p10']:.0f} to {ill['p90']:.0f})"
             )
             sens, spec = row["sensitivity"], row["specificity"]
             out.append(

@@ -354,3 +354,18 @@ class TestClaims:
         assert sites["sph"]["sensitivity_wilson"][0] > 0.9
         assert sites["acs"]["sensitivity_wilson"][1] < 0.9
         assert sites["acs"]["auroc"]["high"] < sites["ptbxl"]["auroc"]["low"]
+
+
+def test_table_s7_brackets_hold_the_percentiles_its_legend_names() -> None:
+    """Table S7's legend promises the 10th to 90th percentile of the draws for every
+    bracket, the count of ill patients in the sample included."""
+    text = SUPPLEMENT.read_text()
+    assert "with the 10th to 90th percentile of the draws in brackets" in text
+    for arm in v.STRONGEST:
+        for row in v.read("echonext_clinical.json")["ladder"][arm]:
+            ill = row.get("ill_in_sample")
+            if ill is None:
+                continue
+            cell = f"| {v.ARM_NAMES[arm]} | {row['labels']} | {ill['mean']:.1f} "
+            cell += f"({ill['p10']:.0f} to {ill['p90']:.0f}) |"
+            assert cell in text, cell

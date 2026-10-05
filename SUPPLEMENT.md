@@ -161,20 +161,20 @@ Table S7. From `results/echonext_clinical.json`, field `ladder`. Means over 200 
 | Model | Labelled outpatients | Ill among them | Sensitivity | Draws below 90% | Specificity | Sent to a reader |
 |---|---|---|---|---|---|---|
 | Network trained here | 0 | none | 71.3% (68.2% to 75.0%) | 100.0% | 71.1% (69.1% to 73.5%) | 29.3% |
-| Network trained here | 25 | 6.2 (1 to 14) | 98.4% (93.1% to 100.0%) | 6.5% | 5.5% (0.0% to 28.6%) | 76.3% |
-| Network trained here | 50 | 12.7 (6 to 22) | 92.8% (82.3% to 100.0%) | 28.0% | 25.0% (3.3% to 56.7%) | 59.6% |
-| Network trained here | 100 | 25.5 (14 to 36) | 92.2% (85.1% to 98.0%) | 26.5% | 28.8% (12.2% to 49.9%) | 54.7% |
-| Network trained here | 200 | 51.2 (37 to 64) | 91.0% (85.3% to 96.4%) | 39.0% | 34.1% (17.5% to 49.0%) | 50.3% |
+| Network trained here | 25 | 6.2 (3 to 9) | 98.4% (93.1% to 100.0%) | 6.5% | 5.5% (0.0% to 28.6%) | 76.3% |
+| Network trained here | 50 | 12.7 (9 to 17) | 92.8% (82.3% to 100.0%) | 28.0% | 25.0% (3.3% to 56.7%) | 59.6% |
+| Network trained here | 100 | 25.5 (20 to 31) | 92.2% (85.1% to 98.0%) | 26.5% | 28.8% (12.2% to 49.9%) | 54.7% |
+| Network trained here | 200 | 51.2 (44 to 59) | 91.0% (85.3% to 96.4%) | 39.0% | 34.1% (17.5% to 49.0%) | 50.3% |
 | EchoNext mini-model | 0 | none | 72.6% (69.3% to 76.3%) | 100.0% | 71.0% (68.5% to 73.1%) | 32.4% |
-| EchoNext mini-model | 25 | 6.2 (1 to 14) | 98.4% (94.7% to 100.0%) | 6.0% | 5.2% (0.0% to 23.2%) | 79.0% |
-| EchoNext mini-model | 50 | 12.7 (6 to 22) | 92.6% (80.7% to 100.0%) | 28.0% | 24.3% (0.5% to 56.9%) | 62.0% |
-| EchoNext mini-model | 100 | 25.5 (14 to 36) | 92.3% (85.3% to 97.9%) | 33.0% | 27.8% (11.1% to 47.7%) | 56.9% |
-| EchoNext mini-model | 200 | 51.2 (37 to 64) | 91.1% (85.2% to 96.2%) | 34.0% | 31.6% (18.9% to 47.4%) | 53.5% |
+| EchoNext mini-model | 25 | 6.2 (3 to 9) | 98.4% (94.7% to 100.0%) | 6.0% | 5.2% (0.0% to 23.2%) | 79.0% |
+| EchoNext mini-model | 50 | 12.7 (9 to 17) | 92.6% (80.7% to 100.0%) | 28.0% | 24.3% (0.5% to 56.9%) | 62.0% |
+| EchoNext mini-model | 100 | 25.5 (20 to 31) | 92.3% (85.3% to 97.9%) | 33.0% | 27.8% (11.1% to 47.7%) | 56.9% |
+| EchoNext mini-model | 200 | 51.2 (44 to 59) | 91.1% (85.2% to 96.2%) | 34.0% | 31.6% (18.9% to 47.4%) | 53.5% |
 | ECGFounder | 0 | none | 71.5% (67.9% to 75.0%) | 100.0% | 71.5% (69.4% to 73.7%) | 32.1% |
-| ECGFounder | 25 | 6.2 (1 to 14) | 98.2% (94.7% to 100.0%) | 7.5% | 5.8% (0.0% to 25.6%) | 77.8% |
-| ECGFounder | 50 | 12.7 (6 to 22) | 93.3% (81.7% to 100.0%) | 23.5% | 23.5% (0.3% to 58.2%) | 62.7% |
-| ECGFounder | 100 | 25.5 (14 to 36) | 92.6% (85.5% to 98.5%) | 27.0% | 28.7% (11.5% to 46.8%) | 56.9% |
-| ECGFounder | 200 | 51.2 (37 to 64) | 91.4% (84.3% to 97.1%) | 31.0% | 33.0% (19.1% to 46.6%) | 53.3% |
+| ECGFounder | 25 | 6.2 (3 to 9) | 98.2% (94.7% to 100.0%) | 7.5% | 5.8% (0.0% to 25.6%) | 77.8% |
+| ECGFounder | 50 | 12.7 (9 to 17) | 93.3% (81.7% to 100.0%) | 23.5% | 23.5% (0.3% to 58.2%) | 62.7% |
+| ECGFounder | 100 | 25.5 (20 to 31) | 92.6% (85.5% to 98.5%) | 27.0% | 28.7% (11.5% to 46.8%) | 56.9% |
+| ECGFounder | 200 | 51.2 (44 to 59) | 91.4% (84.3% to 97.1%) | 31.0% | 33.0% (19.1% to 46.6%) | 53.3% |
 
 `results/echonext_transfer.json`, field `ladder`, holds the same refit with the outpatients cut once, by a fixed seed, and the labelled samples drawn from the same pool every time. On that one evaluation half, refitting on 100 outpatients covered 93.4%, 97.6% and 95.3% of the ill for the three models. Re-drawing the halves in every draw gives 92.2%, 92.3% and 92.6%: the fixed half was one of the more favourable ones, and the spread of the re-drawn draws contains the earlier means.
 

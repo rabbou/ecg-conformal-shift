@@ -93,3 +93,16 @@ def test_the_severity_file_is_what_the_corpus_and_stored_scores_give(meta: pd.Da
     committed = json.loads((RESULTS_DIR / "echonext_severity.json").read_text())
     committed.pop("commit")
     assert json.loads(json.dumps(measure(meta))) == committed
+
+
+def test_the_clinical_file_is_what_the_corpus_and_stored_scores_give(meta: pd.DataFrame) -> None:
+    """The report's outcome counts, ladder and case-mix model come from this file, and the
+    scores behind it cannot be committed: rebuilt here from the metadata and the stored
+    scores, it equals the committed file in every figure but its run time."""
+    from echonext_clinical import ARMS, measure
+
+    for arm in ARMS:
+        require(DERIVED_DIR / f"scores/{arm}.npz")
+    committed = json.loads((RESULTS_DIR / "echonext_clinical.json").read_text())
+    committed.pop("seconds")
+    assert json.loads(json.dumps(measure(meta))) == committed

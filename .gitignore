@@ -32,6 +32,8 @@ results/baseline/model.pt
 !results/ppv_gap.csv
 !results/echonext_ppv_gap.json
 !results/repairs.json
+!results/echonext_clinical.json
+!results/infarction_sites.json
 !results/rotation/
 results/rotation/**/model.pt
 !results/embeddings/

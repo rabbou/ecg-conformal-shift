@@ -36,6 +36,7 @@ RESULTS = REPO_ROOT / "results"
 REGENERABLE = (
     "abstention.json",
     "auxiliary.json",
+    "infarction_sites.json",
     "outcomes.json",
     "perturbations.json",
     "ppv_gap.json",
@@ -112,6 +113,10 @@ NOT_REGENERABLE = {
     "repairs.json": (
         "needs the EchoNext arms' per-record scores and the patient tables of PTB-XL, "
         "Shandong and Chongqing on disk"
+    ),
+    "echonext_clinical.json": (
+        "needs EchoNext's metadata and the four arms' stored per-record scores, neither of "
+        "which may be committed; tests/test_echonext_data.py rebuilds it where they are"
     ),
     "echonext_severity.json": (
         "needs EchoNext's metadata and the stored per-record scores, neither of which may be "

@@ -2,7 +2,7 @@
 
 The study: [REPORT.md](REPORT.md) · Methods in statistical terms, the infarction study and the five-corpus rotation: [SUPPLEMENT.md](SUPPLEMENT.md) · The PPV recomputed for a new site: [PPV.md](PPV.md) ([français](PPV.fr.md)) · Ruben Abbou · 2026
 
-At Columbia, a threshold set to catch 90% of inpatients with moderate or worse structural heart disease caught 71.6% of outpatients with it. Two other models gave the same answer: the published EchoNext mini-model caught 72.7% and the ECGFounder foundation model 71.6%. The AUROC hardly moved, from 0.815 to 0.805. The model separated ill from healthy outpatients almost as well as inpatients, and the threshold landed at another point of the same trade-off: per 100 healthy outpatients it flagged 29, against 58 per 100 healthy inpatients. Milder disease among outpatients explains about a quarter of the fall. Set again on 100 outpatients with known diagnoses, about 26 of them ill, the threshold caught 92.2% of the ill on average and flagged 71 of 100 healthy outpatients. A clinic adopting such a model has to measure sensitivity on its own patients, and decide what it will pay for it.
+At Columbia, a threshold set to catch 90% of inpatients with moderate or worse structural heart disease caught {{sens_resnet_out}} of outpatients with it. Two other models gave the same answer: the published EchoNext mini-model caught {{sens_mini_out}} and the ECGFounder foundation model {{sens_ecgf_out}}. The AUROC hardly moved, from {{auroc_resnet_in}} to {{auroc_resnet_out}}. The model separated ill from healthy outpatients almost as well as inpatients, and the threshold landed at another point of the same trade-off: per 100 healthy outpatients it flagged {{flagged_resnet_out}}, against {{flagged_resnet_in}} per 100 healthy inpatients. Milder disease among outpatients explains about a quarter of the fall. Set again on 100 outpatients with known diagnoses, about {{lad100_ill_resnet}} of them ill, the threshold caught {{lad100_sens_resnet}} of the ill on average and flagged {{lad100_hflag_resnet}} of 100 healthy outpatients. A clinic adopting such a model has to measure sensitivity on its own patients, and decide what it will pay for it.
 
 ![Ill patients caught against healthy patients flagged, inpatients and outpatients](results/figures/fig_curve.png)
 
@@ -10,34 +10,34 @@ Ill patients caught against healthy patients flagged, per 100, for the network t
 
 ## What a clinic should measure
 
-The sensitivity and specificity published with a model belong to the patients its threshold was set on. At Columbia those were inpatients, and on outpatients the same threshold missed 28 ill patients in 100 instead of 10. An AUROC reported by care setting does not show this, because it compares ill with healthy patients inside one setting, and both groups scored lower among outpatients.
+The sensitivity and specificity published with a model belong to the patients its threshold was set on. At Columbia those were inpatients, and on outpatients the same threshold missed {{missed_resnet_out}} ill patients in 100 instead of {{missed_resnet_in}}. An AUROC reported by care setting does not show this, because it compares ill with healthy patients inside one setting, and both groups scored lower among outpatients.
 
-A second threshold, set on the healthy inpatients, sends patients whose scores sit between the two to a human reader. It misses the same patients the first threshold misses. Among outpatients it sent 36 ill and 27 healthy in 100 to a reader, and left 2 healthy in 100 flagged with no reader.
+A second threshold, set on the healthy inpatients, sends patients whose scores sit between the two to a human reader. It misses the same patients the first threshold misses. Among outpatients it sent {{pl_def_resnet_out}} ill and {{pl_hdef_resnet_out}} healthy in 100 to a reader, and left {{pl_hflag_resnet_out}} healthy in 100 flagged with no reader.
 
-Setting the threshold again on the clinic's own patients restores the sensitivity at a price in echocardiograms. How precise the new threshold is depends on how many ill patients the sample holds, not on how many ECGs: with 100 outpatients, about 26 ill, about one repetition in four still caught fewer than 90% of the ill.
+Setting the threshold again on the clinic's own patients restores the sensitivity at a price in echocardiograms. How precise the new threshold is depends on how many ill patients the sample holds, not on how many ECGs: with 100 outpatients, about {{lad100_ill_resnet}} ill, about one repetition in four still caught fewer than 90% of the ill.
 
 This is a retrospective measurement study on public, de-identified data. It is not a medical device and has no regulatory status, it involved no contact with patients, and nothing here is meant to guide the care of any patient. The ethics approvals and the author's competing interests are in [REPORT.md](REPORT.md).
 
 ## Design
 
-EchoNext holds 100,000 ECGs from Columbia, each paired with an echocardiogram. The label studied is moderate or worse structural heart disease on echocardiography, a composite of eleven findings that EchoNext records for each ECG. Thresholds are fitted on the 1,903 inpatient ECGs of EchoNext's validation split and applied unchanged to the 1,059 outpatient ECGs of its test split, one ECG per patient and no patient in both. Structural heart disease is present in 53.2% of the calibration inpatients and in 25.6% of the test outpatients.
+EchoNext holds 100,000 ECGs from Columbia, each paired with an echocardiogram. The label studied is moderate or worse structural heart disease on echocardiography, a composite of eleven findings that EchoNext records for each ECG. Thresholds are fitted on the {{cal_n}} inpatient ECGs of EchoNext's validation split and applied unchanged to the {{out_n}} outpatient ECGs of its test split, one ECG per patient and no patient in both. Structural heart disease is present in {{cal_prev}} of the calibration inpatients and in {{out_prev}} of the test outpatients.
 
 Four models score every ECG: a residual network trained on EchoNext for this study; the published EchoNext mini-model, run on its authors' weights; ECGFounder, a foundation model pre-trained at another hospital and frozen under one logistic regression per label; and the study's residual network frozen at random initialisation under the same regressions, the floor a pre-trained model has to clear.
 
 | Model | AUROC, outpatients | Ill outpatients caught | Healthy outpatients flagged, per 100 | Ill caught, threshold set again on 100 outpatients | Healthy flagged per 100, threshold set again |
 |---|---|---|---|---|---|
-| Residual network, trained on EchoNext | 0.805 | 71.6% | 29 | 92.2% | 71 |
-| EchoNext mini-model, published weights | 0.795 | 72.7% | 29 | 92.3% | 72 |
-| ECGFounder, frozen, logistic regressions | 0.791 | 71.6% | 29 | 92.6% | 71 |
-| Random initialisation, frozen, logistic regressions | 0.758 | 78.6% | 43 | | |
+| Residual network, trained on EchoNext | {{auroc_resnet_out}} | {{sens_resnet_out}} | {{flagged_resnet_out}} | {{lad100_sens_resnet}} | {{lad100_hflag_resnet}} |
+| EchoNext mini-model, published weights | {{auroc_mini_out}} | {{sens_mini_out}} | {{flagged_mini_out}} | {{lad100_sens_mini}} | {{lad100_hflag_mini}} |
+| ECGFounder, frozen, logistic regressions | {{auroc_ecgf_out}} | {{sens_ecgf_out}} | {{flagged_ecgf_out}} | {{lad100_sens_ecgf}} | {{lad100_hflag_ecgf}} |
+| Random initialisation, frozen, logistic regressions | {{auroc_floor_out}} | {{sens_floor_out}} | {{flagged_floor_out}} | | |
 
-An infarction model gives a second case. A residual network trained on PTB-XL, a German research corpus, had its threshold set to catch 90% of infarctions there and caught 83.7% at a hospital in Chongqing and 97.3% at one in Shandong. Between hospitals the model's own separation moved with the threshold: its AUROC went from 0.932 at PTB-XL to 0.793 at Chongqing, where an infarction is an acute event in the discharge diagnosis rather than a pattern on the tracing. [SUPPLEMENT.md](SUPPLEMENT.md) gives the infarction study in full and a rotation of five corpora through the calibration role on five diagnoses: sinus rhythm, atrial fibrillation, left and right bundle-branch block, and first-degree atrioventricular block.
+An infarction model gives a second case. A residual network trained on PTB-XL, a German research corpus, had its threshold set to catch 90% of infarctions there and caught {{mi_sens_acs}} at a hospital in Chongqing and {{mi_sens_sph}} at one in Shandong. Between hospitals the model's own separation moved with the threshold: its AUROC went from {{mi_auroc_ptbxl}} at PTB-XL to {{mi_auroc_acs}} at Chongqing, where an infarction is an acute event in the discharge diagnosis rather than a pattern on the tracing. [SUPPLEMENT.md](SUPPLEMENT.md) gives the infarction study in full and a rotation of five corpora through the calibration role on five diagnoses: sinus rhythm, atrial fibrillation, left and right bundle-branch block, and first-degree atrioventricular block.
 
 EchoNext is under PhysioNet's restricted licence, so no tracing and no per-record score is in this repository. Each EchoNext model's one-page report is in [reports/transfer/](reports/transfer/).
 
 ## The positive predictive value a buyer recomputes
 
-A positive predictive value recomputed by Bayes' rule from a source's sensitivity and specificity, at a target's true prevalence, misses the observed one by a median of 5.3 percentage points over 174 transfers between populations, in either direction, against 0.3 points on 72 controls. The transfers are the EchoNext pairs above, the infarction pairs and the five-corpus rotation. Recalibrating on 100 labelled local ECGs is the one repair of three that raises net benefit on average. [PPV.md](PPV.md) gives the measurement and the repairs.
+A positive predictive value recomputed by Bayes' rule from a source's sensitivity and specificity, at a target's true prevalence, misses the observed one by a median of {{ppv_gap_median}} percentage points over {{ppv_gap_cells}} transfers between populations, in either direction, against {{ppv_control_median}} points on {{ppv_control_cells}} controls. The transfers are the EchoNext pairs above, the infarction pairs and the five-corpus rotation. Recalibrating on 100 labelled local ECGs is the one repair of three that raises net benefit on average. [PPV.md](PPV.md) gives the measurement and the repairs.
 
 ## Reproduce
 

@@ -131,6 +131,20 @@ Table S7. From `results/echonext_clinical.json`, field `ladder`. Means over {{la
 
 `results/echonext_transfer.json`, field `ladder`, holds the same refit with the outpatients cut once, by a fixed seed, and the labelled samples drawn from the same pool every time. On that one evaluation half, refitting on 100 outpatients covered {{fixed_lad100_resnet}}, {{fixed_lad100_mini}} and {{fixed_lad100_ecgf}} of the ill for the three models. Re-drawing the halves in every draw gives {{lad100_sens_resnet}}, {{lad100_sens_mini}} and {{lad100_sens_ecgf}}: the fixed half was one of the more favourable ones, and the spread of the re-drawn draws contains the earlier means.
 
+The redrawn ladder draws its labelled outpatients from the patients it reads. Table S7b sets the same rule on other validation patients and reads it on every test outpatient; Table S7c draws the labelled outpatients from the {{vo_n}} validation outpatients and reads each refit on all {{out_n}} test outpatients. Validation and test hold different patients, which `calibration_variants` checks before it runs.
+
+Table S7b. The 90% rule set on three groups of validation patients, read on the test split, from `results/echonext_clinical.json`, field `calibration_variants`. Sensitivity and specificity among the test outpatients with 95% Wilson intervals, and the sensitivity among the test inpatients.
+
+| Threshold set on | Model | Sensitivity, outpatients | Specificity, outpatients | Sensitivity, inpatients |
+|---|---|---|---|---|
+{{rows:variants}}
+
+Table S7c. Thresholds refitted on outpatients drawn from the validation split's {{vo_n}} outpatients and read on every test outpatient, from `results/echonext_clinical.json`, field `ladder_validation`. Means over {{lad_draws}} draws, with the 10th to 90th percentile of the draws in brackets.
+
+| Model | Labelled outpatients | Ill among them | Sensitivity | Draws below 90% | Specificity |
+|---|---|---|---|---|---|
+{{rows:ladder_validation}}
+
 ### S1.10 How the published weights were run
 
 The mini-model's weights come from the authors' IntroECG repository (commit

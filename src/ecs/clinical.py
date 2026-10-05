@@ -27,6 +27,7 @@ from .metrics import wilson_interval
 from .transfer import conformal_sets
 
 __all__ = [
+    "external_ladder",
     "holm",
     "outcome_shares",
     "paired_difference",
@@ -199,6 +200,44 @@ def rerandomised_ladder(
             if key == "ill_in_sample" and not rung:
                 continue
             row[key] = _summary(values)
+        row["share_of_draws_below_level"] = float(np.mean(np.array(record["sensitivity"]) < level))
+        rows.append(row)
+    return rows
+
+
+def external_ladder(
+    p_pool: Array,
+    y_pool: IntArray,
+    p_eval: Array,
+    y_eval: IntArray,
+    rungs: Sequence[int],
+    draws: int,
+    *,
+    alpha: float,
+    level: float,
+    seed: int = 0,
+) -> list[dict[str, Any]]:
+    """Refit the threshold on n labelled patients drawn from a separate pool, read on
+    every evaluation patient.
+
+    Where ``rerandomised_ladder`` draws the labelled sample from half of the
+    patients it reads, here the pool and the evaluation cohort are different
+    patients: a clinic labelling last year's outpatients and reading this year's.
+    """
+    y_pool = np.asarray(y_pool, dtype=int)
+    y_eval = np.asarray(y_eval, dtype=int)
+    rng = np.random.default_rng(seed)
+    rows = []
+    for rung in rungs:
+        record: dict[str, list[float]] = {"ill_in_sample": [], "sensitivity": [], "specificity": []}
+        for _ in range(draws):
+            drawn = rng.choice(len(y_pool), size=rung, replace=False)
+            flagged = conformal_sets(p_pool[drawn], y_pool[drawn], p_eval, alpha)["plain"][:, 1]
+            record["ill_in_sample"].append(float(y_pool[drawn].sum()))
+            record["sensitivity"].append(float(flagged[y_eval == 1].mean()))
+            record["specificity"].append(float((~flagged)[y_eval == 0].mean()))
+        row: dict[str, Any] = {"labels": rung, "draws": draws}
+        row |= {key: _summary(values) for key, values in record.items()}
         row["share_of_draws_below_level"] = float(np.mean(np.array(record["sensitivity"]) < level))
         rows.append(row)
     return rows

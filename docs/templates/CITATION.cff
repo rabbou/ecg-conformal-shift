@@ -14,9 +14,12 @@ abstract: >-
   worse structural heart disease caught {{sens_resnet_out}} of outpatients with
   it for a network trained on EchoNext, {{sens_mini_out}} for the published
   EchoNext mini-model and {{sens_ecgf_out}} for ECGFounder, while the AUROC
-  moved from {{auroc_resnet_in}} to {{auroc_resnet_out}}. Set again on 100
-  outpatients with known diagnoses, the threshold caught {{lad100_sens_resnet}} of the ill
-  on average and flagged {{lad100_hflag_resnet}} of 100 healthy outpatients. An infarction
+  moved from {{auroc_resnet_in}} to {{auroc_resnet_out}} for the trained network. Set
+  again on 100 outpatients with known diagnoses, the threshold caught
+  {{lad100_sens_resnet}} of the other outpatients' ill on average and flagged
+  {{lad100_hflag_resnet}} of 100 healthy; set on {{vo_n}} separate outpatients, it
+  caught {{vo_sens_resnet}}, {{vo_sens_mini}} and {{vo_sens_ecgf}}, short of 90% for
+  all three models. An infarction
   model carried from PTB-XL to hospitals in Chongqing and Shandong is reported
   beside it, with a rotation of five public corpora on five rhythm and
   conduction diagnoses.

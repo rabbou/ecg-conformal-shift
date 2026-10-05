@@ -263,6 +263,42 @@ def echonext() -> dict[str, str]:
             out[f"unmeas_flag_{SHORT[arm]}_{c}"] = per100(1 - a["specificity_measured"])
             out[f"unmeas_auroc_{SHORT[arm]}_{c}"] = f"{a['auroc_measured']:.3f}"
 
+    variants = clinical["calibration_variants"]
+    every, outside = variants["every_setting"], variants["outpatients"]
+    out["va_n"], out["va_ill"] = count(every["n"]), count(every["n_ill"])
+    out["vo_n"], out["vo_ill"] = count(outside["n"]), count(outside["n_ill"])
+    ecgs = clinical["flow"]["ecgs"]["val"]
+    out["val_in_share"] = pct(ecgs["inpatient"] / sum(ecgs.values()), 0)
+    for arm in STRONGEST:
+        s = SHORT[arm]
+        for context, c in (("inpatient", "in"), ("outpatient", "out")):
+            sens = every["arms"][arm][context]["sensitivity"]
+            out[f"va_sens_{s}_{c}"] = pct(sens["share"])
+            out[f"va_sens_{s}_{c}_ci"] = interval(sens["low"], sens["high"])
+        out[f"va_caught_{s}_out"] = per100(every["arms"][arm]["outpatient"]["sensitivity"]["share"])
+        held = outside["arms"][arm]["outpatient"]
+        out[f"vo_sens_{s}"] = pct(held["sensitivity"]["share"])
+        out[f"vo_sens_{s}_ci"] = interval(held["sensitivity"]["low"], held["sensitivity"]["high"])
+        out[f"vo_hflag_{s}"] = per100(1 - held["specificity"]["share"])
+        drawn = {r["labels"]: r for r in clinical["ladder_validation"][arm]}
+        for rung in (100, 200):
+            out[f"vl{rung}_sens_{s}"] = pct(drawn[rung]["sensitivity"]["mean"])
+            out[f"vl{rung}_below_{s}"] = pct(drawn[rung]["share_of_draws_below_level"])
+        out[f"vl100_hflag_{s}"] = per100(1 - drawn[100]["specificity"]["mean"])
+    for rung in (100, 200):
+        shares = sorted(
+            {r["labels"]: r for r in clinical["ladder_validation"][arm]}[rung][
+                "share_of_draws_below_level"
+            ]
+            for arm in STRONGEST
+        )
+        out[f"vl{rung}_below_range"] = f"{pct(shares[0])} to {pct(shares[-1])}"
+    flags = sorted(1 - outside["arms"][a]["outpatient"]["specificity"]["share"] for a in STRONGEST)
+    out["vo_hflag_range"] = f"{per100(flags[0])} to {per100(flags[-1])}"
+    floor_out = outside["arms"]["random_init"]["outpatient"]
+    out["vo_sens_floor"] = pct(floor_out["sensitivity"]["share"])
+    out["vo_hflag_floor"] = per100(1 - floor_out["specificity"]["share"])
+
     sev = severity["severity"]
     out["sev_findings_in"] = f"{sev['findings_count']['inpatient']['median']:g}"
     out["sev_findings_out"] = f"{sev['findings_count']['outpatient']['median']:g}"
@@ -487,6 +523,44 @@ def rows_unmeasured() -> list[str]:
     return out
 
 
+VARIANT_NAMES = {
+    "inpatients": "Validation inpatients (the report's threshold)",
+    "every_setting": "Every validation patient",
+    "outpatients": "Validation outpatients",
+}
+
+
+def rows_variants() -> list[str]:
+    out = []
+    for name, entry in read("echonext_clinical.json")["calibration_variants"].items():
+        for arm in ARM_NAMES:
+            a = entry["arms"][arm]
+            sens, spec = a["outpatient"]["sensitivity"], a["outpatient"]["specificity"]
+            out.append(
+                f"| {VARIANT_NAMES[name]}, {entry['n']:,} ({entry['n_ill']:,} ill) | "
+                f"{ARM_NAMES[arm]} | "
+                f"{pct(sens['share'])} ({interval(sens['low'], sens['high'])}) | "
+                f"{pct(spec['share'])} ({interval(spec['low'], spec['high'])}) | "
+                f"{pct(a['inpatient']['sensitivity']['share'])} |"
+            )
+    return out
+
+
+def rows_ladder_validation() -> list[str]:
+    out = []
+    for arm in STRONGEST:
+        for row in read("echonext_clinical.json")["ladder_validation"][arm]:
+            ill, sens, spec = row["ill_in_sample"], row["sensitivity"], row["specificity"]
+            out.append(
+                f"| {ARM_NAMES[arm]} | {row['labels']} | "
+                f"{ill['mean']:.1f} ({ill['p10']:.0f} to {ill['p90']:.0f}) | "
+                f"{pct(sens['mean'])} ({pct(sens['p10'])} to {pct(sens['p90'])}) | "
+                f"{pct(row['share_of_draws_below_level'])} | "
+                f"{pct(spec['mean'])} ({pct(spec['p10'])} to {pct(spec['p90'])}) |"
+            )
+    return out
+
+
 def rows_paired() -> list[str]:
     out = []
     for pair, d in read("echonext_clinical.json")["paired"]["outpatient_sensitivity"].items():
@@ -507,4 +581,6 @@ ROWS = {
     "case_mix": rows_case_mix,
     "paired": rows_paired,
     "unmeasured": rows_unmeasured,
+    "variants": rows_variants,
+    "ladder_validation": rows_ladder_validation,
 }

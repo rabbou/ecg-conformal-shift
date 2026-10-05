@@ -14,9 +14,12 @@ abstract: >-
   worse structural heart disease caught 71.6% of outpatients with
   it for a network trained on EchoNext, 72.7% for the published
   EchoNext mini-model and 71.6% for ECGFounder, while the AUROC
-  moved from 0.815 to 0.805. Set again on 100
-  outpatients with known diagnoses, the threshold caught 91.6% of the ill
-  on average and flagged 70 of 100 healthy outpatients. An infarction
+  moved from 0.815 to 0.805 for the trained network. Set
+  again on 100 outpatients with known diagnoses, the threshold caught
+  91.6% of the other outpatients' ill on average and flagged
+  70 of 100 healthy; set on 858 separate outpatients, it
+  caught 86.3%, 87.8% and 89.7%, short of 90% for
+  all three models. An infarction
   model carried from PTB-XL to hospitals in Chongqing and Shandong is reported
   beside it, with a rotation of five public corpora on five rhythm and
   conduction diagnoses.

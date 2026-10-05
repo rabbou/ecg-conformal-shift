@@ -192,6 +192,42 @@ Table S7. From `results/echonext_clinical.json`, field `ladder`. Means over 2,00
 
 `results/echonext_transfer.json`, field `ladder`, holds the same refit with the outpatients cut once, by a fixed seed, and the labelled samples drawn from the same pool every time. On that one evaluation half, refitting on 100 outpatients covered 93.4%, 97.6% and 95.3% of the ill for the three models. Re-drawing the halves in every draw gives 91.6%, 91.9% and 91.8%: the fixed half was one of the more favourable ones, and the spread of the re-drawn draws contains the earlier means.
 
+The redrawn ladder draws its labelled outpatients from the patients it reads. Table S7b sets the same rule on other validation patients and reads it on every test outpatient; Table S7c draws the labelled outpatients from the 858 validation outpatients and reads each refit on all 1,059 test outpatients. Validation and test hold different patients, which `calibration_variants` checks before it runs.
+
+Table S7b. The 90% rule set on three groups of validation patients, read on the test split, from `results/echonext_clinical.json`, field `calibration_variants`. Sensitivity and specificity among the test outpatients with 95% Wilson intervals, and the sensitivity among the test inpatients.
+
+| Threshold set on | Model | Sensitivity, outpatients | Specificity, outpatients | Sensitivity, inpatients |
+|---|---|---|---|---|
+| Validation inpatients (the report's threshold), 1,903 (1,013 ill) | Network trained here | 71.6% (65.9% to 76.6%) | 71.1% (67.8% to 74.1%) | 90.4% |
+| Validation inpatients (the report's threshold), 1,903 (1,013 ill) | EchoNext mini-model | 72.7% (67.1% to 77.7%) | 71.1% (67.8% to 74.1%) | 90.7% |
+| Validation inpatients (the report's threshold), 1,903 (1,013 ill) | ECGFounder | 71.6% (65.9% to 76.6%) | 71.3% (68.1% to 74.4%) | 89.5% |
+| Validation inpatients (the report's threshold), 1,903 (1,013 ill) | Untrained floor | 78.6% (73.3% to 83.1%) | 57.4% (53.9% to 60.8%) | 90.9% |
+| Every validation patient, 4,626 (1,990 ill) | Network trained here | 77.1% (71.8% to 81.7%) | 63.5% (60.0% to 66.7%) | 94.0% |
+| Every validation patient, 4,626 (1,990 ill) | EchoNext mini-model | 76.4% (71.0% to 81.0%) | 66.1% (62.7% to 69.3%) | 92.6% |
+| Every validation patient, 4,626 (1,990 ill) | ECGFounder | 77.9% (72.5% to 82.4%) | 62.8% (59.4% to 66.1%) | 92.8% |
+| Every validation patient, 4,626 (1,990 ill) | Untrained floor | 83.0% (78.1% to 87.0%) | 45.4% (42.0% to 48.9%) | 93.8% |
+| Validation outpatients, 858 (240 ill) | Network trained here | 86.3% (81.7% to 89.9%) | 48.5% (45.0% to 52.0%) | 97.1% |
+| Validation outpatients, 858 (240 ill) | EchoNext mini-model | 87.8% (83.4% to 91.2%) | 40.0% (36.6% to 43.4%) | 97.8% |
+| Validation outpatients, 858 (240 ill) | ECGFounder | 89.7% (85.5% to 92.8%) | 42.9% (39.5% to 46.4%) | 98.2% |
+| Validation outpatients, 858 (240 ill) | Untrained floor | 91.9% (88.0% to 94.6%) | 24.7% (21.9% to 27.9%) | 97.5% |
+
+Table S7c. Thresholds refitted on outpatients drawn from the validation split's 858 outpatients and read on every test outpatient, from `results/echonext_clinical.json`, field `ladder_validation`. Means over 2,000 draws, with the 10th to 90th percentile of the draws in brackets.
+
+| Model | Labelled outpatients | Ill among them | Sensitivity | Draws below 90% | Specificity |
+|---|---|---|---|---|---|
+| Network trained here | 25 | 7.1 (4 to 10) | 97.3% (88.6% to 100.0%) | 10.9% | 9.3% (0.0% to 44.5%) |
+| Network trained here | 50 | 14.0 (10 to 18) | 91.0% (82.3% to 98.5%) | 33.4% | 31.9% (8.5% to 58.0%) |
+| Network trained here | 100 | 28.1 (23 to 34) | 89.0% (83.0% to 95.2%) | 48.5% | 39.4% (16.9% to 57.1%) |
+| Network trained here | 200 | 56.0 (49 to 63) | 87.8% (83.4% to 92.3%) | 64.3% | 44.4% (31.5% to 54.7%) |
+| EchoNext mini-model | 25 | 7.1 (4 to 10) | 97.7% (89.3% to 100.0%) | 10.8% | 7.9% (0.0% to 38.6%) |
+| EchoNext mini-model | 50 | 14.0 (10 to 18) | 92.7% (83.8% to 99.3%) | 30.2% | 25.7% (4.8% to 54.1%) |
+| EchoNext mini-model | 100 | 28.1 (23 to 34) | 90.9% (84.5% to 97.4%) | 43.7% | 32.4% (12.1% to 52.9%) |
+| EchoNext mini-model | 200 | 56.0 (49 to 63) | 89.4% (85.6% to 94.1%) | 59.9% | 37.5% (25.0% to 49.5%) |
+| ECGFounder | 25 | 7.1 (4 to 10) | 97.4% (90.0% to 100.0%) | 9.2% | 9.3% (0.0% to 41.0%) |
+| ECGFounder | 50 | 14.0 (10 to 18) | 91.2% (84.1% to 98.5%) | 26.5% | 32.9% (10.7% to 52.8%) |
+| ECGFounder | 100 | 28.1 (23 to 34) | 89.5% (84.1% to 92.3%) | 38.4% | 39.5% (30.3% to 52.7%) |
+| ECGFounder | 200 | 56.0 (49 to 63) | 88.8% (84.1% to 91.1%) | 48.0% | 42.1% (37.1% to 50.8%) |
+
 ### S1.10 How the published weights were run
 
 The mini-model's weights come from the authors' IntroECG repository (commit

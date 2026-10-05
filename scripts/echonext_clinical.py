@@ -23,6 +23,15 @@ exactly as ``scripts/echonext_transfer.py`` fits them:
   histogram    the trained network's score, binned, by setting and class;
   roc          each arm's specificity at every whole-percent sensitivity, by
                setting, so the curve and the threshold's point on it can be drawn;
+  calibration_variants
+               the same rule set on other validation patients: every setting
+               together, and the validation split's own outpatients, read on
+               the test split by setting;
+  ladder_validation
+               thresholds refitted on 25 to 200 outpatients drawn from the
+               validation split's outpatients, read on every test outpatient;
+  flow         ECGs and patients by split and setting, and which this study
+               uses;
   unmeasured   the healthy ECGs that carry no echocardiographic measurement,
                by setting, and the specificity, prevalence and AUROC once
                they are set aside.
@@ -46,6 +55,7 @@ from numpy.typing import NDArray
 from sklearn.metrics import roc_auc_score
 
 from ecs.clinical import (
+    external_ladder,
     holm,
     outcome_shares,
     paired_difference,
@@ -205,6 +215,74 @@ def roc(p: NDArray[np.float64], y: NDArray[np.int_], targets: dict[str, Any]) ->
     return out
 
 
+VARIANTS = {
+    "inpatients": ("inpatient",),
+    "every_setting": ("inpatient", "emergency", "outpatient", "procedural"),
+    "outpatients": ("outpatient",),
+}
+
+
+def validation_rows(meta: pd.DataFrame, settings: tuple[str, ...]) -> NDArray[np.int_]:
+    split = meta["split"].to_numpy()
+    context = meta["location_setting"].to_numpy()
+    return np.flatnonzero((split == "val") & np.isin(context, settings))
+
+
+def calibration_variants(
+    meta: pd.DataFrame,
+    probs: dict[str, NDArray[np.float64]],
+    y: NDArray[np.int_],
+    targets: dict[str, Any],
+) -> dict[str, Any]:
+    """The same 90% rule set on three groups of validation patients and read on the
+    test split: the inpatients the report uses, every validation patient whatever
+    the setting, and the validation split's own outpatients.  Validation and test
+    hold different patients, which this checks."""
+    patients = meta["patient_key"].to_numpy()
+    tested = set(patients[np.concatenate(list(targets.values()))])
+    out: dict[str, Any] = {}
+    for name, settings in VARIANTS.items():
+        pool = validation_rows(meta, settings)
+        if tested & set(patients[pool]):
+            raise ValueError(f"validation group {name} shares patients with the test split")
+        entry: dict[str, Any] = {
+            "settings": list(settings),
+            "n": int(len(pool)),
+            "n_ill": int(y[pool].sum()),
+            "arms": {},
+        }
+        for arm in ARMS:
+            p = probs[arm]
+            entry["arms"][arm] = {"threshold": thresholds(p[pool], y[pool])["ill"]}
+            for context, rows in targets.items():
+                plain = outcome_shares(
+                    conformal_sets(p[pool], y[pool], p[rows], ALPHA)["plain"], y[rows]
+                )
+                entry["arms"][arm][context] = {
+                    "sensitivity": plain["ill"]["right_alone"],
+                    "specificity": plain["healthy"]["right_alone"],
+                }
+        out[name] = entry
+    return out
+
+
+def flow(meta: pd.DataFrame) -> dict[str, Any]:
+    """Every ECG of the distribution by split and setting, the patients behind them,
+    and the cells this study reads."""
+    table = pd.crosstab(meta["split"], meta["location_setting"])
+    return {
+        "ecgs": {s: {c: int(n) for c, n in row.items()} for s, row in table.iterrows()},
+        "patients": {s: int(n) for s, n in meta.groupby("split")["patient_key"].nunique().items()},
+        "used": {
+            "train": "every setting, to train the network and fit the probes",
+            "val": "inpatients set the thresholds; every setting and the outpatients set the "
+            "variants of calibration_variants and ladder_validation",
+            "test": "inpatient, emergency and outpatient cohorts; procedural not read",
+            "no_split": "not used",
+        },
+    }
+
+
 def unmeasured(
     meta: pd.DataFrame,
     probs: dict[str, NDArray[np.float64]],
@@ -317,6 +395,22 @@ def measure(meta: pd.DataFrame) -> dict[str, Any]:
     result["histogram"] = {"arm": "resnet", **histogram(probs["resnet"], y, targets)}
     result["roc"] = {arm: roc(probs[arm], y, targets) for arm in ARMS}
     result["unmeasured"] = unmeasured(meta, probs, y, cal, targets)
+    result["calibration_variants"] = calibration_variants(meta, probs, y, targets)
+    pool = validation_rows(meta, VARIANTS["outpatients"])
+    result["ladder_validation"] = {
+        arm: external_ladder(
+            probs[arm][pool],
+            y[pool],
+            probs[arm][out_rows],
+            y[out_rows],
+            LADDER_RUNGS[1:],
+            LADDER_DRAWS,
+            alpha=ALPHA,
+            level=1 - ALPHA,
+        )
+        for arm in ARMS
+    }
+    result["flow"] = flow(meta)
     return result
 
 

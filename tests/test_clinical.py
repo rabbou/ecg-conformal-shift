@@ -12,6 +12,7 @@ import pandas as pd
 import pytest
 
 from ecs.clinical import (
+    external_ladder,
     holm,
     outcome_shares,
     paired_difference,
@@ -153,6 +154,28 @@ class TestLadder:
             p, y, p, y, rungs=(0,), draws=50, seed=2, alpha=0.10, level=0.90
         )
         assert row["sensitivity"]["max"] > row["sensitivity"]["min"]
+
+
+class TestExternalLadder:
+    def test_the_threshold_is_read_on_the_evaluation_patients_not_the_pool(self) -> None:
+        """Ill patients score 0.9 in the pool and 0.5 in the evaluation cohort: a
+        threshold set on the pool misses every ill evaluation patient."""
+        y_pool = np.array([1] * 50 + [0] * 50)
+        p_pool = np.where(y_pool == 1, 0.9, 0.1).astype(float)
+        y_eval = np.array([1] * 20 + [0] * 20)
+        p_eval = np.where(y_eval == 1, 0.5, 0.1).astype(float)
+        (row,) = external_ladder(
+            p_pool, y_pool, p_eval, y_eval, (60,), draws=20, alpha=0.10, level=0.90
+        )
+        assert row["sensitivity"]["max"] == 0.0
+        assert row["share_of_draws_below_level"] == 1.0
+        assert 20 <= row["ill_in_sample"]["mean"] <= 40
+
+    def test_a_pool_like_the_evaluation_cohort_gives_the_same_sensitivity(self) -> None:
+        y = np.array([1] * 40 + [0] * 60)
+        p = np.where(y == 1, 0.9, 0.1).astype(float)
+        (row,) = external_ladder(p, y, p, y, (50,), draws=10, alpha=0.10, level=0.90)
+        assert row["sensitivity"]["mean"] == 1.0 and row["specificity"]["mean"] == 1.0
 
 
 class TestCaseMix:

@@ -341,6 +341,28 @@ class TestClaims:
         assert all(u[c]["n_ill_unmeasured"] == 0 for c in u)
         assert "within a year before a transthoracic" not in REPORT.read_text()
 
+    def test_set_on_separate_outpatients_the_threshold_falls_short_of_ninety(self) -> None:
+        """Section 3.6 and the abstract: on outpatients it never saw, the threshold set on
+        the validation outpatients catches under 90% for each model, the trained network's
+        interval excludes 90%, and it flags more than half of the healthy."""
+        variants = v.read("echonext_clinical.json")["calibration_variants"]
+        for arm in v.STRONGEST:
+            held = variants["outpatients"]["arms"][arm]["outpatient"]
+            assert held["sensitivity"]["share"] < 0.9, arm
+            assert held["specificity"]["share"] < 0.5, arm
+        trained = variants["outpatients"]["arms"]["resnet"]["outpatient"]["sensitivity"]
+        assert trained["high"] < 0.9
+        text = REPORT.read_text() + README.read_text() + CITATION.read_text()
+        assert "restore" not in text.lower()
+        assert "short of 90% for all three" in REPORT.read_text()
+
+    def test_set_on_every_validation_patient_the_fall_shrinks_and_remains(self) -> None:
+        variants = v.read("echonext_clinical.json")["calibration_variants"]
+        for arm in v.STRONGEST:
+            paper = variants["inpatients"]["arms"][arm]["outpatient"]["sensitivity"]["share"]
+            every = variants["every_setting"]["arms"][arm]["outpatient"]["sensitivity"]
+            assert paper < every["share"] and every["high"] < 0.9, arm
+
     def test_what_a_clinic_sees_without_labels_falls_below_what_prevalence_allows(self) -> None:
         """Section 3.5: no prevalence takes the share flagged, or the share sent to a reader,
         below the floor the inpatients' rates set, and the outpatients' shares lie below it."""

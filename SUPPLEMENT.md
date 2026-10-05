@@ -14,7 +14,7 @@ A third construction, one threshold pair fitted over all calibration patients to
 
 ### S1.2 Cohorts
 
-EchoNext v1.1.1 holds 100,000 ECGs from Columbia, each within a year before a transthoracic echocardiogram, with eleven binary findings and their composite. The thresholds are fitted on the 1,903 inpatient ECGs of the validation split and applied unchanged to the test split: 1,059 outpatient ECGs, and the 1,971 emergency and 2,203 inpatient ECGs beside them. No patient appears in two of the roles (training, calibration, test); `transfer_cohorts` raises if one does. The models were fitted on the 72,475 ECGs of the training split.
+EchoNext v1.1.1 holds 100,000 ECGs from Columbia, each paired with a transthoracic echocardiogram, with eleven binary findings and their composite. Its source states the labelling rule: an ECG is positive when it was "performed within 1 year prior to an echocardiogram with SHD", and for a patient whose most recent echocardiogram shows none, "all ECGs prior to the most recent echo were labeled as negative" (PhysioNet, EchoNext 1.1.1, read on 5 October 2026). The finer measurements (grades, ejection fraction, wall thickness, pressures) are recorded only for an ECG within the year, so a healthy ECG with every measurement blank was taken earlier; Table S1b counts them. The thresholds are fitted on the 1,903 inpatient ECGs of the validation split and applied unchanged to the test split: 1,059 outpatient ECGs, and the 1,971 emergency and 2,203 inpatient ECGs beside them. No patient appears in two of the roles (training, calibration, test); `transfer_cohorts` raises if one does. The models were fitted on the 72,475 ECGs of the training split.
 
 ### S1.3 Every arm in every setting
 
@@ -34,6 +34,20 @@ Table S1. The composite under the inpatient threshold, from `results/echonext_tr
 | Untrained floor | Inpatients | 0.779 (0.758 to 0.798) | 90.9% (89.1% to 92.4%) | 36.6% (33.7% to 39.5%) | 52.7% |
 | Untrained floor | Emergency | 0.790 (0.771 to 0.810) | 84.4% (81.7% to 86.8%) | 54.5% (51.7% to 57.3%) | 43.0% |
 | Untrained floor | Outpatients | 0.758 (0.721 to 0.790) | 78.6% (73.3% to 83.1%) | 57.4% (53.9% to 60.8%) | 44.2% |
+
+Table S1b. Healthy ECGs with no echocardiographic measurement, with the calibration-inpatient threshold, from `results/echonext_clinical.json`, field `unmeasured`. The last three columns give each figure on every ECG of the setting, then on the ECGs that carry a measurement. No ill ECG lacks one.
+
+| Model | Setting | Healthy with no measurement | Prevalence | Specificity | AUROC |
+|---|---|---|---|---|---|
+| Network trained here | Inpatients | 114 of 1,047 | 52.5% to 55.3% | 42.2% to 41.1% | 0.815 to 0.810 |
+| EchoNext mini-model | Inpatients | 114 of 1,047 | 52.5% to 55.3% | 38.8% to 37.5% | 0.797 to 0.792 |
+| ECGFounder | Inpatients | 114 of 1,047 | 52.5% to 55.3% | 42.8% to 42.3% | 0.804 to 0.800 |
+| Network trained here | Emergency | 254 of 1,183 | 40.0% to 45.9% | 61.0% to 57.9% | 0.837 to 0.822 |
+| EchoNext mini-model | Emergency | 254 of 1,183 | 40.0% to 45.9% | 57.7% to 54.1% | 0.822 to 0.806 |
+| ECGFounder | Emergency | 254 of 1,183 | 40.0% to 45.9% | 60.0% to 56.9% | 0.827 to 0.810 |
+| Network trained here | Outpatients | 220 of 788 | 25.6% to 32.3% | 71.1% to 68.3% | 0.805 to 0.792 |
+| EchoNext mini-model | Outpatients | 220 of 788 | 25.6% to 32.3% | 71.1% to 68.1% | 0.795 to 0.781 |
+| ECGFounder | Outpatients | 220 of 788 | 25.6% to 32.3% | 71.3% to 69.0% | 0.791 to 0.776 |
 
 Table S2. Paired differences in outpatient sensitivity between the three models, in percentage points, with a 95% percentile interval from 2,000 bootstrap draws of the ill outpatients, from `results/echonext_clinical.json`.
 

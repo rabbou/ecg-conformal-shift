@@ -322,6 +322,15 @@ class TestClaims:
                 <= redrawn["sensitivity"]["p90"]
             )
 
+    def test_more_healthy_outpatients_than_inpatients_carry_no_measurement(self) -> None:
+        """Section 2.1 and the limitations: the healthy without a measurement are a larger
+        share among outpatients, and no ill ECG lacks one."""
+        u = v.read("echonext_clinical.json")["unmeasured"]
+        share = {c: u[c]["n_healthy_unmeasured"] / u[c]["n_healthy"] for c in u}
+        assert share["outpatient"] > 2 * share["inpatient"]
+        assert all(u[c]["n_ill_unmeasured"] == 0 for c in u)
+        assert "within a year before a transthoracic" not in REPORT.read_text()
+
     def test_what_a_clinic_sees_without_labels_falls_below_what_prevalence_allows(self) -> None:
         """Section 3.5: no prevalence takes the share flagged, or the share sent to a reader,
         below the floor the inpatients' rates set, and the outpatients' shares lie below it."""

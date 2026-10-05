@@ -5071,5 +5071,70 @@
       ]
     }
   },
-  "seconds": 21.9
+  "unmeasured": {
+    "inpatient": {
+      "n_healthy": 1047,
+      "n_healthy_unmeasured": 114,
+      "n_ill_unmeasured": 0,
+      "n_measured": 2089,
+      "prevalence_measured": 0.5533748204882719,
+      "arms": {
+        "resnet": {
+          "specificity_measured": 0.4105037513397642,
+          "auroc_measured": 0.8103162770687999
+        },
+        "echonext_mini": {
+          "specificity_measured": 0.37513397642015006,
+          "auroc_measured": 0.7922419771767227
+        },
+        "ecgfounder": {
+          "specificity_measured": 0.42336548767416937,
+          "auroc_measured": 0.7998206848466641
+        }
+      }
+    },
+    "emergency": {
+      "n_healthy": 1183,
+      "n_healthy_unmeasured": 254,
+      "n_ill_unmeasured": 0,
+      "n_measured": 1717,
+      "prevalence_measured": 0.4589400116482236,
+      "arms": {
+        "resnet": {
+          "specificity_measured": 0.5791173304628633,
+          "auroc_measured": 0.8218828717085671
+        },
+        "echonext_mini": {
+          "specificity_measured": 0.5414424111948332,
+          "auroc_measured": 0.8064468097894686
+        },
+        "ecgfounder": {
+          "specificity_measured": 0.5694294940796556,
+          "auroc_measured": 0.8102771387824909
+        }
+      }
+    },
+    "outpatient": {
+      "n_healthy": 788,
+      "n_healthy_unmeasured": 220,
+      "n_ill_unmeasured": 0,
+      "n_measured": 839,
+      "prevalence_measured": 0.3230035756853397,
+      "arms": {
+        "resnet": {
+          "specificity_measured": 0.6830985915492958,
+          "auroc_measured": 0.7923379761966634
+        },
+        "echonext_mini": {
+          "specificity_measured": 0.6813380281690141,
+          "auroc_measured": 0.7811314380749441
+        },
+        "ecgfounder": {
+          "specificity_measured": 0.6901408450704225,
+          "auroc_measured": 0.7763824645288706
+        }
+      }
+    }
+  },
+  "seconds": 115.0
 }

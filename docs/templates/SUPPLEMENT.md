@@ -14,7 +14,7 @@ A third construction, one threshold pair fitted over all calibration patients to
 
 ### S1.2 Cohorts
 
-EchoNext v1.1.1 holds 100,000 ECGs from Columbia, each within a year before a transthoracic echocardiogram, with eleven binary findings and their composite. The thresholds are fitted on the {{cal_n}} inpatient ECGs of the validation split and applied unchanged to the test split: {{out_n}} outpatient ECGs, and the {{em_n}} emergency and {{in_n}} inpatient ECGs beside them. No patient appears in two of the roles (training, calibration, test); `transfer_cohorts` raises if one does. The models were fitted on the {{train_n}} ECGs of the training split.
+EchoNext v1.1.1 holds 100,000 ECGs from Columbia, each paired with a transthoracic echocardiogram, with eleven binary findings and their composite. Its source states the labelling rule: an ECG is positive when it was "performed within 1 year prior to an echocardiogram with SHD", and for a patient whose most recent echocardiogram shows none, "all ECGs prior to the most recent echo were labeled as negative" (PhysioNet, EchoNext 1.1.1, read on 5 October 2026). The finer measurements (grades, ejection fraction, wall thickness, pressures) are recorded only for an ECG within the year, so a healthy ECG with every measurement blank was taken earlier; Table S1b counts them. The thresholds are fitted on the {{cal_n}} inpatient ECGs of the validation split and applied unchanged to the test split: {{out_n}} outpatient ECGs, and the {{em_n}} emergency and {{in_n}} inpatient ECGs beside them. No patient appears in two of the roles (training, calibration, test); `transfer_cohorts` raises if one does. The models were fitted on the {{train_n}} ECGs of the training split.
 
 ### S1.3 Every arm in every setting
 
@@ -23,6 +23,12 @@ Table S1. The composite under the inpatient threshold, from `results/echonext_tr
 | Model | Setting | AUROC | Sensitivity | Specificity | Sent to a reader |
 |---|---|---|---|---|---|
 {{rows:settings}}
+
+Table S1b. Healthy ECGs with no echocardiographic measurement, with the calibration-inpatient threshold, from `results/echonext_clinical.json`, field `unmeasured`. The last three columns give each figure on every ECG of the setting, then on the ECGs that carry a measurement. No ill ECG lacks one.
+
+| Model | Setting | Healthy with no measurement | Prevalence | Specificity | AUROC |
+|---|---|---|---|---|---|
+{{rows:unmeasured}}
 
 Table S2. Paired differences in outpatient sensitivity between the three models, in percentage points, with a 95% percentile interval from 2,000 bootstrap draws of the ill outpatients, from `results/echonext_clinical.json`.
 

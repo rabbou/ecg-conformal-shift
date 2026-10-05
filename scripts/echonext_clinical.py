@@ -22,7 +22,10 @@ exactly as ``scripts/echonext_transfer.py`` fits them:
   subgroups    sex and age among ill outpatients, each test Holm-adjusted;
   histogram    the trained network's score, binned, by setting and class;
   roc          each arm's specificity at every whole-percent sensitivity, by
-               setting, so the curve and the threshold's point on it can be drawn.
+               setting, so the curve and the threshold's point on it can be drawn;
+  unmeasured   the healthy ECGs that carry no echocardiographic measurement,
+               by setting, and the specificity, prevalence and AUROC once
+               they are set aside.
 
 Reads the stored scores under ``$ECS_ECHONEXT_DERIVED/scores`` and refuses to
 run without them.  Writes ``results/echonext_clinical.json``: counts and
@@ -40,6 +43,7 @@ from typing import Any
 import numpy as np
 import pandas as pd
 from numpy.typing import NDArray
+from sklearn.metrics import roc_auc_score
 
 from ecs.clinical import (
     holm,
@@ -71,6 +75,22 @@ SCORES_DIR = DERIVED_DIR / "scores"
 SCREENING_PREVALENCES = (0.10, 0.05)
 LADDER_RUNGS = (0, 25, 50, 100, 200)
 LADDER_DRAWS = 200
+# EchoNext records these finer measurements only for an ECG taken within a year
+# before the echocardiogram; an ECG with all of them blank was taken earlier.
+MEASUREMENTS = (
+    "aortic_stenosis_value",
+    "aortic_regurgitation_value",
+    "mitral_regurgitation_value",
+    "tricuspid_regurgitation_value",
+    "pulmonary_regurgitation_value",
+    "rv_systolic_function_value",
+    "pericardial_effusion_value",
+    "ivs_measurement",
+    "lvpw_measurement",
+    "pasp_value",
+    "tr_max_velocity_value",
+    "lvef_value",
+)
 BINS = np.linspace(0.0, 1.0, 21)
 SENSITIVITY_GRID = np.round(np.linspace(0.0, 1.0, 101), 2)
 
@@ -184,6 +204,47 @@ def roc(p: NDArray[np.float64], y: NDArray[np.int_], targets: dict[str, Any]) ->
     return out
 
 
+def unmeasured(
+    meta: pd.DataFrame,
+    probs: dict[str, NDArray[np.float64]],
+    y: NDArray[np.int_],
+    cal: NDArray[np.int_],
+    targets: dict[str, Any],
+) -> dict[str, Any]:
+    """The healthy ECGs with no echocardiographic measurement, and the figures without them.
+
+    EchoNext labels an ECG ill when it was taken within a year before an
+    abnormal echocardiogram, and healthy when it was taken at any time before
+    the patient's last normal one.  Its finer measurements exist only within the
+    year, so a healthy ECG with every measurement blank was taken earlier.  The
+    specificity, prevalence and AUROC are read again on the ECGs that carry a
+    measurement, with the same calibration-inpatient threshold.
+    """
+    blank = meta[list(MEASUREMENTS)].isna().all(axis=1).to_numpy()
+    out: dict[str, Any] = {}
+    for context, rows in targets.items():
+        yt = y[rows]
+        kept = rows[~blank[rows]]
+        yk = y[kept]
+        entry: dict[str, Any] = {
+            "n_healthy": int((yt == 0).sum()),
+            "n_healthy_unmeasured": int(blank[rows][yt == 0].sum()),
+            "n_ill_unmeasured": int(blank[rows][yt == 1].sum()),
+            "n_measured": int(len(kept)),
+            "prevalence_measured": float(yk.mean()),
+            "arms": {},
+        }
+        for arm in STRONGEST:
+            p = probs[arm]
+            flagged = conformal_sets(p[cal], y[cal], p[kept], ALPHA)["plain"][:, 1]
+            entry["arms"][arm] = {
+                "specificity_measured": float((~flagged)[yk == 0].mean()),
+                "auroc_measured": float(roc_auc_score(yk, p[kept])),
+            }
+        out[context] = entry
+    return out
+
+
 def measure(meta: pd.DataFrame) -> dict[str, Any]:
     cohorts = transfer_cohorts(meta, "inpatient", CONTEXTS)
     cal, targets = cohorts.calibration, cohorts.targets
@@ -247,6 +308,7 @@ def measure(meta: pd.DataFrame) -> dict[str, Any]:
 
     result["histogram"] = {"arm": "resnet", **histogram(probs["resnet"], y, targets)}
     result["roc"] = {arm: roc(probs[arm], y, targets) for arm in ARMS}
+    result["unmeasured"] = unmeasured(meta, probs, y, cal, targets)
     return result
 
 

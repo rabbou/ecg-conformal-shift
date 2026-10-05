@@ -239,6 +239,16 @@ def echonext() -> dict[str, str]:
         (at100,) = [r for r in fixed if r["labels"] == 100]
         out[f"fixed_lad100_{SHORT[arm]}"] = pct(at100["coverage_pos_mean"])
 
+    for context, c in CONTEXT.items():
+        u = clinical["unmeasured"][context]
+        out[f"unmeas_{c}"] = pct(u["n_healthy_unmeasured"] / u["n_healthy"])
+        out[f"unmeas_n_{c}"] = f"{u['n_healthy_unmeasured']:,} of {u['n_healthy']:,}"
+        out[f"unmeas_prev_{c}"] = pct(u["prevalence_measured"])
+        for arm in STRONGEST:
+            a = u["arms"][arm]
+            out[f"unmeas_flag_{SHORT[arm]}_{c}"] = per100(1 - a["specificity_measured"])
+            out[f"unmeas_auroc_{SHORT[arm]}_{c}"] = f"{a['auroc_measured']:.3f}"
+
     sev = severity["severity"]
     out["sev_findings_in"] = f"{sev['findings_count']['inpatient']['median']:g}"
     out["sev_findings_out"] = f"{sev['findings_count']['outpatient']['median']:g}"
@@ -444,6 +454,25 @@ def rows_case_mix() -> list[str]:
     return out
 
 
+def rows_unmeasured() -> list[str]:
+    clinical = read("echonext_clinical.json")
+    out = []
+    for context, cname in CONTEXT_NAMES.items():
+        u = clinical["unmeasured"][context]
+        measured = clinical["arms"]["resnet"][context]
+        for arm in STRONGEST:
+            a, every = u["arms"][arm], clinical["arms"][arm][context]
+            auroc = read("echonext_transfer.json")["arms"][arm]["auroc"][context][COMPOSITE]
+            out.append(
+                f"| {ARM_NAMES[arm]} | {cname} | "
+                f"{u['n_healthy_unmeasured']:,} of {u['n_healthy']:,} | "
+                f"{pct(measured['n_ill'] / measured['n'])} to {pct(u['prevalence_measured'])} | "
+                f"{pct(every['specificity'])} to {pct(a['specificity_measured'])} | "
+                f"{auroc['auroc']:.3f} to {a['auroc_measured']:.3f} |"
+            )
+    return out
+
+
 def rows_paired() -> list[str]:
     out = []
     for pair, d in read("echonext_clinical.json")["paired"]["outpatient_sensitivity"].items():
@@ -463,4 +492,5 @@ ROWS = {
     "bedside": rows_bedside,
     "case_mix": rows_case_mix,
     "paired": rows_paired,
+    "unmeasured": rows_unmeasured,
 }

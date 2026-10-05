@@ -40,15 +40,36 @@ NUMBER = re.compile(r"(?<![\w.])[-−]?\d+(?:,\d{3})*(?:\.\d+)?%?")
 
 # Figures quoted from cited papers, by the reference that holds them.
 LITERATURE = {
-    "Poterucha 2025, Table 2: AUROC by care setting": {"84.3", "84.1"},
-    "Otabor 2026: the mini-model on MIMIC-IV and on the EchoNext test split": {"0.790", "0.820"},
-    "Poterucha 2026, PREVUE-VALVE: ages and AUROCs": {"65", "85", "71%", "83%"},
+    "Poterucha 2025, Table 2: AUROC by care setting, the cut-off and the F1 scores": {
+        "0.843",
+        "0.841",
+        "0.5",
+        "0.557",
+        "0.728",
+    },
+    "Otabor 2026: the mini-model on MIMIC-IV, overall and by care setting": {
+        "0.790",
+        "0.820",
+        "0.796",
+        "0.773",
+    },
+    "Poterucha 2026, PREVUE-VALVE: ages and AUROCs": {"65", "85", "0.71", "0.83"},
+    "Dhingra 2025, PRESENT-SHD: sensitivity at four hospitals and in ELSA-Brasil": {
+        "92.5%",
+        "96.0%",
+        "87.5%",
+    },
     "Attia 2021: the label, the AUROC and the sensitivity at the derivation cut-off": {
         "35%",
         "0.82",
         "26.9%",
     },
-    "Carter 2026: patients, sensitivity and specificity": {"13,960", "84.5%", "83.6%"},
+    "Carter 2026: patients, label, sensitivity and specificity": {
+        "13,960",
+        "40%",
+        "84.5%",
+        "83.6%",
+    },
     "Wagner 2020: PTB-XL's recording years": {"1989", "1996"},
     "de Vries 2023: the local screens the mammography cut-off was reset on": {"16,204"},
 }
@@ -90,6 +111,8 @@ CONSTANTS = {
     "2021": "the Challenge-2021 collection, and its year in the sources",
     "2022": "the SPH paper's year in the sources",
     "2025": "the EchoNext and ECGFounder papers' year in the sources",
+    "2023": "Angelopoulos and Bates' year in the README's sources",
+    "5": "the day of the literature search, 5 October 2026",
 }
 
 SECTION = re.compile(
@@ -506,3 +529,14 @@ def test_table_s7_brackets_hold_the_percentiles_its_legend_names() -> None:
             cell = f"| {v.ARM_NAMES[arm]} | {row['labels']} | {ill['mean']:.1f} "
             cell += f"({ill['p10']:.0f} to {ill['p90']:.0f}) |"
             assert cell in text, cell
+
+
+def test_every_reference_of_the_report_is_cited_in_its_text() -> None:
+    """A reference no sentence cites is a claim the reader cannot place."""
+    text = REPORT.read_text()
+    body, references = text.split("## References")
+    listed = {int(n) for n in re.findall(r"^(\d+)\. ", references, flags=re.M)}
+    cited = {
+        int(n) for group in re.findall(r"\[(\d+(?:,\s*\d+)*)\]", body) for n in group.split(",")
+    }
+    assert listed == cited

@@ -99,5 +99,5 @@ The committed score files hold one row per record (identifier, label, score), de
 - SPH: Liu et al., *Sci Data* 2022, 10.1038/s41597-022-01403-5
 - ACS-ECG: Du et al., *Sci Data* 2026, 10.1038/s41597-026-07278-0
 - PhysioNet/CinC Challenge 2021: Reyna et al., Computing in Cardiology 2021
-- Split conformal: Angelopoulos & Bates, arXiv:2107.07511
+- Split conformal: Angelopoulos & Bates, Foundations and Trends in Machine Learning 2023, 10.1561/2200000101
 - Label conditional validity: Vovk, ACML 2012, PMLR 25:475-490

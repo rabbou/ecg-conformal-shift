@@ -170,6 +170,17 @@ Table S7d. Net benefit among the test outpatients, per 1,000, from `results/echo
 |---|---|---|---|---|---|---|
 {{rows:decision}}
 
+### S1.13 The search for earlier work
+
+PubMed (E-utilities) and Europe PMC were searched on 5 October 2026, with no start date:
+
+1. (ECG) AND (AI OR deep learning OR neural network) AND outpatient* AND inpatient* AND (sensitivity OR threshold): one result, a cost-effectiveness study.
+2. "spectrum effect" AND (ECG): two results, neither on a threshold carried between settings.
+3. (ECG) AND (AI OR deep learning) AND (care setting* OR clinical setting* OR clinical context*) AND (SHD OR ejection fraction OR valvular): 19 results, among them [REPORT ref. 3] and [REPORT ref. 5], which report the AUROC by setting or population without a sensitivity at a fixed threshold by care setting.
+4. (ECG) AND (AI OR deep learning) AND (threshold* OR cut-off*) AND (recalibrat* OR site-specific OR population-specific OR local) AND (SHD OR EF OR ventricular dysfunction): two results, [REPORT ref. 4] and [REPORT ref. 6].
+
+Europe PMC also returned PRESENT-SHD [REPORT ref. 19], which carries a fixed threshold between hospitals and to a population cohort but not between care settings. Google Scholar and OpenReview were not searched. The full text of PREVUE-VALVE [REPORT ref. 5] was not read, so whether it reports a sensitivity at the inpatient threshold by setting is not known.
+
 ### S1.10 How the published weights were run
 
 The mini-model's weights come from the authors' IntroECG repository (commit
@@ -460,7 +471,7 @@ Most relevant to deployment, neither conformal scheme prevented degradation at t
 
 ### S2.13 References for Part 2
 
-1. Angelopoulos AN, Bates S. *A gentle introduction to conformal prediction and distribution-free uncertainty quantification.* arXiv:2107.07511.
+1. Angelopoulos AN, Bates S. *Conformal prediction: a gentle introduction.* Foundations and Trends in Machine Learning 2023;16(4):494-591. doi:10.1561/2200000101
 2. Vovk V. *Conditional validity of inductive conformal predictors.* ACML 2012, PMLR 25:475–490. Proposition 3 gives label conditional validity for label conditional inductive conformal predictors.
 3. Tibshirani RJ, Barber RF, Candès E, Ramdas A. *Conformal prediction under covariate shift.* NeurIPS 2019. The weighted conformal quantile the reweighting arm is built on.
 4. Podkopaev A, Ramdas A. *Distribution-free uncertainty quantification for classification under label shift.* UAI 2021, PMLR 161:844–853. arXiv:2103.03323. Reweighting conformal prediction and calibration by importance weights estimated from unlabelled target data.
@@ -474,7 +485,7 @@ Most relevant to deployment, neither conformal scheme prevented degradation at t
 12. Mehrtens H, Bucher T-C, Brinker TJ. *Pitfalls of conformal predictions for medical image classification.* In: Uncertainty for Safe Utilization of Machine Learning in Medical Imaging (UNSURE 2023, MICCAI workshop), LNCS, pp. 198–207. doi:10.1007/978-3-031-44336-7_20; preprint arXiv:2506.18162. German Cancer Research Center. Coverage under domain shift and label shift on CAMELYON17 and HAM10000, and the marginal against conditional coverage distinction: "The nevus class is over-covered, all other classes, including the melanoma class are undercovered, even though the overall coverage guarantee is met."
 13. Lu C, Ahmed SR, Singh P, Kalpathy-Cramer J. *Estimating test performance for AI medical devices under distribution shift with conformal prediction.* arXiv:2207.05796, 2022. Estimates a black-box model's accuracy on an unlabelled target domain; argues for knowing performance "at new hospitals, patient populations, medical scanner equipment, etc. before actual clinical deployment".
 
-14. Kinalioglu IH. *Conformal reliability assessment of PPG-based ICU arrhythmia classification under class imbalance and patient heterogeneity.* Physiological Measurement, 24 August 2026. doi:10.1088/1361-6579/ae92e8, PMID 42532108. MIMIC-III-Ext-PPG, 826 patients: "Under global CP, marginal coverage reaches 90.0%, yet critical-rhythm coverage is only 7.5%"; class-conditional calibration raises it to 0.825 with a patient-clustered interval of [0.578, 0.985]; concludes that "systems should be evaluated by per-class and per-patient coverage".
+14. Kinalioglu IH. *Conformal reliability assessment of PPG-based ICU arrhythmia classification under class imbalance and patient heterogeneity.* Physiological Measurement 2026;47(8):085029. doi:10.1088/1361-6579/ae92e8, PMID 42532108. MIMIC-III-Ext-PPG, 826 patients: "Under global CP, marginal coverage reaches 90.0%, yet critical-rhythm coverage is only 7.5%"; class-conditional calibration raises it to 0.825 with a patient-clustered interval of [0.578, 0.985]; concludes that "systems should be evaluated by per-class and per-patient coverage".
 
 15. El Allam O, Hamlich M. *Quantization-aware Mondrian conformal prediction for embedded ECG classification.* Biomedical Signal Processing and Control 2026;127:111217. doi:10.1016/j.bspc.2026.111217. Received 29 January 2026, revised 15 July, accepted 31 July, online 10 August 2026. Read in full 8 September 2026. A binary Normal-against-MI classifier quantised to INT8 for an ESP32-S3 microcontroller. Its §4.3 compares pooled against Mondrian calibration over a patient-wise ten-fold rotation of PTB-XL: "Across ten patient-wise rotations, pooled calibration achieved 91.64% Normal coverage and 88.59% MI coverage; Mondrian calibration achieved 90.65% and 90.53%, reducing the class-coverage gap from 3.06 to 0.12 percentage points", concluding that "nominal overall coverage from a pooled threshold can conceal clinically relevant MI undercoverage". Its Chapman-Shaoxing evaluation is not a transfer experiment: §3.8 states that Chapman "was evaluated in a separate in-distribution experiment" and that "it is not evidence that PTB-XL-derived thresholds transfer without recalibration", and §4.4 that the results "should not be interpreted as evidence of cross-database transfer"; coverage there is 89.22% with a 27.65% doubleton rate. The earlier SSRN preprint (doi:10.2139/ssrn.5944060, deposited 26 December 2025) carries different figures under a different title; neither the 10.44% nor the 51.9% it reports appears anywhere in the published paper, and this report cites the published version only.
 

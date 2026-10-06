@@ -393,8 +393,9 @@ class TestClaims:
 
     def test_about_a_quarter_is_the_mean_share_the_case_mix_explains(self) -> None:
         mix = v.read("echonext_clinical.json")["case_mix"]
-        shares = [mix[a]["share_explained"]["estimate"] for a in v.STRONGEST]
-        assert 0.2 <= sum(shares) / len(shares) <= 0.3
+        for key in ("share_explained", "share_explained_predicted"):
+            shares = [mix[a][key]["estimate"] for a in v.STRONGEST]
+            assert 0.2 <= sum(shares) / len(shares) <= 0.3, key
         assert all(mix[a]["share_explained"]["high"] < 0.5 for a in v.STRONGEST)
         assert "about a quarter" in README.read_text()
         assert "about a quarter of the fall" in REPORT.read_text()

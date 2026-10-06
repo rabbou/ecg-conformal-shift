@@ -118,15 +118,15 @@ Table S4. At the outpatients' prevalence and at 10% and 5%, from `results/echone
 
 ### S1.6 The case-mix model
 
-Among the ill of the inpatient and outpatient test cohorts (1,156 and 271 patients), a logistic regression with an L2 penalty of 1 predicts whether the inpatient threshold caught each patient from the eleven findings, the ejection fraction band (35% or less, 36 to 45%, above 45%, unmeasured), the age band (18 to 49, 50 to 64, 65 to 79, 80 and over), sex and the care setting. The outpatients' sensitivity at the inpatients' case mix is the model's mean prediction over the ill inpatients, each read as an outpatient. The share of the gap explained is that prediction minus the observed outpatient sensitivity, over the inpatient sensitivity minus the outpatient one. Intervals are 95% percentiles over 1,000 draws that resample the patients within each setting and refit the model.
+Among the ill of the inpatient and outpatient test cohorts (1,156 and 271 patients), a logistic regression with an L2 penalty of 1 predicts whether the inpatient threshold caught each patient from the eleven findings, the ejection fraction band (35% or less, 36 to 45%, above 45%, unmeasured), the age band (18 to 49, 50 to 64, 65 to 79, 80 and over), sex and the care setting. The outpatients' sensitivity at the inpatients' case mix is the model's mean prediction over the ill inpatients, each read as an outpatient. The share of the gap explained is that prediction minus the observed outpatient sensitivity, over the inpatient sensitivity minus the outpatient one. With an L2 penalty the model's mean prediction among the outpatients is not exactly their observed sensitivity, so the last column takes that prediction instead, both terms then coming from the model (g-computation). Intervals are 95% percentiles over 1,000 draws that resample the patients within each setting and refit the model.
 
 Table S5. From `results/echonext_clinical.json`, field `case_mix`.
 
-| Model | Sensitivity, ill inpatients | Sensitivity, ill outpatients | Outpatients at the inpatients' case mix | Share of the gap explained |
-|---|---|---|---|---|
-| Network trained here | 90.4% (88.7% to 92.0%) | 71.6% (66.1% to 77.1%) | 76.8% (72.0% to 81.3%) | 27.5% (15.7% to 38.2%) |
-| EchoNext mini-model | 90.7% (89.1% to 92.5%) | 72.7% (67.5% to 78.2%) | 77.7% (73.4% to 81.9%) | 27.5% (15.7% to 39.5%) |
-| ECGFounder | 89.5% (87.8% to 91.3%) | 71.6% (65.7% to 77.1%) | 76.1% (71.4% to 80.8%) | 25.3% (14.6% to 37.0%) |
+| Model | Sensitivity, ill inpatients | Sensitivity, ill outpatients | Outpatients at the inpatients' case mix | Share of the gap explained | Share, both terms predicted |
+|---|---|---|---|---|---|
+| Network trained here | 90.4% (88.7% to 92.0%) | 71.6% (66.1% to 77.1%) | 76.8% (72.0% to 81.3%) | 27.5% (15.7% to 38.2%) | 25.2% (13.2% to 36.4%) |
+| EchoNext mini-model | 90.7% (89.1% to 92.5%) | 72.7% (67.5% to 78.2%) | 77.7% (73.4% to 81.9%) | 27.5% (15.7% to 39.5%) | 25.2% (13.1% to 37.4%) |
+| ECGFounder | 89.5% (87.8% to 91.3%) | 71.6% (65.7% to 77.1%) | 76.1% (71.4% to 80.8%) | 25.3% (14.6% to 37.0%) | 23.2% (12.0% to 35.0%) |
 
 The earlier reading below reweights the outpatients to the severity of the calibration inpatients, whose own coverage was read on the ECGs that set the threshold. The case-mix model replaces it in the main text: it compares with inpatients the threshold never saw, and adjusts for findings, age and sex as well.
 

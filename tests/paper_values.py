@@ -226,6 +226,9 @@ def echonext() -> dict[str, str]:
             f"{pct(mix['share_explained']['low'], 0)} to {pct(mix['share_explained']['high'], 0)}"
         )
         out[f"mix_cov_{s}"] = pct(mix["outpatient_at_inpatient_mix"]["estimate"])
+        g = mix["share_explained_predicted"]
+        out[f"mix_g_{s}"] = pct(g["estimate"])
+        out[f"mix_g_{s}_ci"] = f"{pct(g['low'], 0)} to {pct(g['high'], 0)}"
         observed_in = mix["observed_inpatient"]["estimate"]
         observed_out = mix["observed_outpatient"]["estimate"]
         at_mix = mix["outpatient_at_inpatient_mix"]["estimate"]
@@ -662,7 +665,8 @@ def rows_case_mix() -> list[str]:
 
         out.append(
             f"| {ARM_NAMES[arm]} | {show('observed_inpatient')} | {show('observed_outpatient')} | "
-            f"{show('outpatient_at_inpatient_mix')} | {show('share_explained')} |"
+            f"{show('outpatient_at_inpatient_mix')} | {show('share_explained')} | "
+            f"{show('share_explained_predicted')} |"
         )
     return out
 

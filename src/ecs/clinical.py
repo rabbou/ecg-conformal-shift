@@ -355,6 +355,7 @@ def standardised_coverage(
         x_counterfactual = x[inpatients].copy()
         x_counterfactual[:, -1] = 1.0
         at_inpatient_mix = float(model.predict_proba(x_counterfactual)[:, 1].mean())
+        predicted_out = float(model.predict_proba(x[~inpatients])[:, 1].mean())
         observed_in = float(covered[rows][inpatients].mean())
         observed_out = float(covered[rows][~inpatients].mean())
         gap = observed_in - observed_out
@@ -363,6 +364,11 @@ def standardised_coverage(
             "observed_outpatient": observed_out,
             "outpatient_at_inpatient_mix": at_inpatient_mix,
             "share_explained": (at_inpatient_mix - observed_out) / gap if gap else math.nan,
+            # Both terms the model's own predictions (g-computation), so the penalised
+            # model's misfit among outpatients does not count as case mix.
+            "share_explained_predicted": (
+                (at_inpatient_mix - predicted_out) / gap if gap else math.nan
+            ),
         }
 
     every = np.arange(len(covered))

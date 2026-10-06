@@ -3025,6 +3025,11 @@
         "estimate": 0.2751736054743241,
         "low": 0.1566074342403824,
         "high": 0.38231744010451363
+      },
+      "share_explained_predicted": {
+        "estimate": 0.25157624253802935,
+        "low": 0.13176092317426538,
+        "high": 0.36405396019678354
       }
     },
     "echonext_mini": {
@@ -3070,6 +3075,11 @@
         "estimate": 0.274619386282804,
         "low": 0.15726033777961304,
         "high": 0.39546638736246664
+      },
+      "share_explained_predicted": {
+        "estimate": 0.2519511574325895,
+        "low": 0.130553181747789,
+        "high": 0.3744900604796602
       }
     },
     "ecgfounder": {
@@ -3115,6 +3125,11 @@
         "estimate": 0.253251840524944,
         "low": 0.14556104359286703,
         "high": 0.3704841385849956
+      },
+      "share_explained_predicted": {
+        "estimate": 0.2316725483254359,
+        "low": 0.12022174942891639,
+        "high": 0.3498753724169234
       }
     }
   },
@@ -8943,15 +8958,15 @@
     "echonext-derived/scores/random_init.npz": "cfec4051d77dee952c330418a4e89e44aa982021ea206e987d5058e4632ea784"
   },
   "provenance": {
-    "commit": "e6ae324342e32ec315af2e7e90d3088bd8ef9285",
+    "commit": "b28041baa0b0c3b30bdd98d267ac15a50708d2c0+dirty",
     "producers": {
       "scripts/echonext_clinical.py": "c6e8d2c0678a87deb100089496e8a5e0120409c49d833d8082eadfe92bce5286",
-      "src/ecs/clinical.py": "951ca34c0673403ce91fbf9860e201a5a9380734f59257c74ec17fa76f20dbd3",
+      "src/ecs/clinical.py": "eb5f46c3dedd066bfca05bf8d09326cd972cfa08e3f786a15586b698a001843d",
       "src/ecs/conformal.py": "c434998b704a551d55bc2206a1a3ada6d42309947b0b92db11607746dcd068dc",
       "src/ecs/echonext.py": "f9dfdee094c555e16b1cf8300fb330b437eeead6b4d667a774fb16ff0b591c41",
       "src/ecs/metrics.py": "e04509abce93b400ac90cbd102a63a747f0559de4d2c9d20cdc2ee4ce1cf90e6",
       "src/ecs/transfer.py": "e690339b52941e150a61527ac5e0e56a3cc5dbcd5772f7ba06ec8296b112d624"
     }
   },
-  "seconds": 46.5
+  "seconds": 46.0
 }

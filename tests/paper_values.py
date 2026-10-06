@@ -56,6 +56,18 @@ def per100(x: float) -> str:
     return f"{round(100 * x)}"
 
 
+def largest_remainder(shares: list[float]) -> list[int]:
+    """Shares that sum to one, as whole counts per 100 that sum to 100: each is rounded
+    down, and the points left go to the largest remainders.  Table 1's rows then add up
+    to the totals they split."""
+    exact = [100 * s for s in shares]
+    counts = [int(x) for x in exact]
+    order = sorted(range(len(exact)), key=lambda i: exact[i] - counts[i], reverse=True)
+    for i in order[: 100 - sum(counts)]:
+        counts[i] += 1
+    return counts
+
+
 def count(n: float) -> str:
     return f"{round(n):,}"
 
@@ -101,10 +113,14 @@ def echonext() -> dict[str, str]:
             out[f"caught_{short}_{c}"] = per100(plain_o["ill"]["right_alone"]["share"])
             out[f"missed_{short}_{c}"] = per100(plain_o["ill"]["wrong_alone"]["share"])
             out[f"flagged_{short}_{c}"] = per100(plain_o["healthy"]["wrong_alone"]["share"])
-            out[f"pl_alone_{short}_{c}"] = per100(perlabel["ill"]["right_alone"]["share"])
-            out[f"pl_def_{short}_{c}"] = per100(perlabel["ill"]["deferred"]["share"])
-            out[f"pl_hdef_{short}_{c}"] = per100(perlabel["healthy"]["deferred"]["share"])
-            out[f"pl_hflag_{short}_{c}"] = per100(perlabel["healthy"]["wrong_alone"]["share"])
+            keys = ("right_alone", "deferred", "wrong_alone")
+            ill = largest_remainder([perlabel["ill"][k]["share"] for k in keys])
+            healthy = largest_remainder([perlabel["healthy"][k]["share"] for k in keys])
+            out[f"pl_alone_{short}_{c}"], out[f"pl_def_{short}_{c}"] = f"{ill[0]}", f"{ill[1]}"
+            out[f"pl_hdef_{short}_{c}"] = f"{healthy[1]}"
+            out[f"pl_hflag_{short}_{c}"] = f"{healthy[2]}"
+            out[f"n_ill_{short}_{c}"] = count(measured["n_ill"])
+            out[f"n_healthy_{short}_{c}"] = count(measured["n"] - measured["n_ill"])
             out[f"def_{short}_{c}"] = pct(measured["label_free"]["share_deferred"])
             out[f"lf_flag_{short}_{c}"] = pct(measured["label_free"]["share_flagged"])
         out[f"auroc_{short}_all"] = (

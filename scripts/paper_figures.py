@@ -88,6 +88,17 @@ def curve(result: dict[str, Any], path: Path) -> None:
     plt.close(fig)
 
 
+def largest_remainder(shares: list[float]) -> list[int]:
+    """Shares that sum to one, as whole counts per 100 that sum to 100: each is rounded
+    down, and the points left go to the largest remainders."""
+    exact = [100 * s for s in shares]
+    counts = [int(x) for x in exact]
+    order = sorted(range(len(exact)), key=lambda i: exact[i] - counts[i], reverse=True)
+    for i in order[: 100 - sum(counts)]:
+        counts[i] += 1
+    return counts
+
+
 def patients(result: dict[str, Any], path: Path) -> None:
     fig, axes = plt.subplots(1, 2, figsize=(9.0, 3.8), dpi=200, sharey=True)
     rows = [(arm, method) for arm in ARM_NAMES for method in ("plain", "perlabel")]
@@ -96,19 +107,17 @@ def patients(result: dict[str, Any], path: Path) -> None:
         for arm, method in rows
     ]
     for axis, group, names in (
-        (axes[0], "ill", ("caught", "sent to a reader", "missed")),
-        (axes[1], "healthy", ("cleared", "sent to a reader", "flagged")),
+        (axes[0], "ill", ("flagged, no reader", "sent to a reader", "missed")),
+        (axes[1], "healthy", ("cleared, no reader", "sent to a reader", "flagged, no reader")),
     ):
         style(axis)
         axis.grid(False)
         for i, (arm, method) in enumerate(rows):
             shares = result["arms"][arm]["outpatient"]["outcomes"][method][group]
+            keys = ("right_alone", "deferred", "wrong_alone")
+            counts = largest_remainder([shares[k]["share"] for k in keys])
             left = 0.0
-            for key, colour in (
-                ("right_alone", RIGHT),
-                ("deferred", DEFERRED),
-                ("wrong_alone", WRONG),
-            ):
+            for key, colour, shown in zip(keys, (RIGHT, DEFERRED, WRONG), counts, strict=True):
                 width = 100 * shares[key]["share"]
                 axis.barh(
                     i, width, left=left, color=colour, edgecolor="white", linewidth=2, height=0.75
@@ -118,7 +127,7 @@ def patients(result: dict[str, Any], path: Path) -> None:
                     axis.text(
                         left + width / 2,
                         i,
-                        f"{width:.0f}",
+                        f"{shown}",
                         ha="center",
                         va="center",
                         fontsize=7,
@@ -153,11 +162,13 @@ def repair(result: dict[str, Any], path: Path) -> None:
     x = [row["labels"] for row in ladder]
     for key, colour, dash, name in (
         ("sensitivity", OUTPATIENT, "-", "Ill caught"),
-        ("specificity", INPATIENT, "--", "Healthy cleared"),
+        ("specificity", INPATIENT, "--", "Healthy flagged"),
     ):
-        mean = [100 * row[key]["mean"] for row in ladder]
-        low = [100 * row[key]["p10"] for row in ladder]
-        high = [100 * row[key]["p90"] for row in ladder]
+        # Healthy flagged is one minus the specificity, so its band flips ends.
+        flip = key == "specificity"
+        mean = [100 * (1 - row[key]["mean"] if flip else row[key]["mean"]) for row in ladder]
+        low = [100 * (1 - row[key]["p90"] if flip else row[key]["p10"]) for row in ladder]
+        high = [100 * (1 - row[key]["p10"] if flip else row[key]["p90"]) for row in ladder]
         axis.fill_between(x, low, high, color=colour, alpha=0.15, linewidth=0)
         axis.plot(x, mean, dash, color=colour, lw=2, marker="o", ms=5, label=name)
     axis.axhline(90, color=MUTED, lw=1, ls=":")

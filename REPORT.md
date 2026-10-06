@@ -6,9 +6,9 @@ Ruben Abbou · October 2026
 
 **Background.** An ECG model for structural heart disease gives each patient a score, and a cut-off on that score, the threshold, decides who is flagged for an echocardiogram. The threshold is set on patients who already had an echocardiogram, and the model is then offered for outpatients. Published validations report the AUROC by care setting, the chance that a randomly chosen ill patient scores higher than a randomly chosen healthy one, and find that it changes little. The AUROC does not say how many ill outpatients the inpatient threshold catches.
 
-**Methods.** EchoNext holds 100,000 ECGs from Columbia, each paired with an echocardiogram. Three models scored them: a network trained here, the published EchoNext mini-model and the ECGFounder foundation model. For each, the threshold was set on 1,903 inpatients to catch 90% of those with moderate or worse structural heart disease, and applied unchanged to 1,059 outpatients, 25.6% of them ill. It was then set again on outpatients with known diagnoses: on 100 drawn from those same outpatients, and on the 858 outpatients of EchoNext's separate validation group. An infarction model carried from a German ECG database to two Chinese hospitals is reported beside it.
+**Methods.** EchoNext holds 100,000 ECGs from Columbia, each paired with an echocardiogram. Three models scored them: a network trained here, the published EchoNext mini-model and the ECGFounder foundation model. For each, the threshold was set on 1,903 inpatients to catch 90% of those with moderate or worse structural heart disease, checked on 2,203 other inpatients, and applied unchanged to 1,059 outpatients, 25.6% of them ill. It was then set again on outpatients with known diagnoses: on 100 drawn from those same outpatients, and on the 858 outpatients of EchoNext's separate validation group. An infarction model carried from a German ECG database to two Chinese hospitals is reported beside it.
 
-**Results.** Of 100 ill outpatients, the inpatient threshold caught 72 and missed 28 for the trained network; the mini-model caught 73 and ECGFounder 72. The loss sat mostly in a thick ventricular wall and valve regurgitation; among ill outpatients with an ejection fraction of 45% or less it caught 91.4%. It also flagged fewer healthy patients: 29 of 100 healthy outpatients, against 58 of 100 healthy inpatients. The AUROC moved only from 0.815 to 0.805: the model told ill from healthy outpatients almost as well, and the threshold, unchanged, flagged fewer healthy patients at the cost of missing more ill ones. Set on every validation patient whatever the setting, the threshold caught 77 of 100 ill outpatients. Set again on 100 outpatients, about 26 of them ill, it caught 91.6% of the other outpatients' ill on average, fell short of 90% in 33.1% of repetitions and flagged 70 of 100 healthy. Set on 858 separate outpatients, 240 of them ill, it caught 86.3% (81.7% to 89.9%), 87.8% for the mini-model and 89.7% for ECGFounder, and flagged 52 of 100 healthy.
+**Results.** Of 100 ill outpatients, the inpatient threshold caught 72 and missed 28 for the trained network; the mini-model caught 73 and ECGFounder 72. The loss sat mostly in a thick ventricular wall and valve regurgitation; among ill outpatients with an ejection fraction of 45% or less it caught 91.4%. It also flagged fewer healthy patients: 29 of 100 healthy outpatients, against 58 of 100 healthy among the other inpatients. The AUROC moved only from 0.815 to 0.805: the model told ill from healthy outpatients almost as well, and the threshold, unchanged, flagged fewer healthy patients at the cost of missing more ill ones. Set on every validation patient whatever the setting, the threshold caught 77 of 100 ill outpatients. Set again on 100 outpatients, about 26 of them ill, it caught 91.6% of the other outpatients' ill on average, fell short of 90% in 33.1% of repetitions and flagged 70 of 100 healthy. Set on 858 separate outpatients, 240 of them ill, it caught 86.3% (81.7% to 89.9%), 87.8% for the mini-model and 89.7% for ECGFounder, and flagged 52 of 100 healthy. The infarction threshold carried from PTB-XL caught 83.7% of infarctions at Chongqing, where the AUROC fell from 0.932 to 0.793, and 97.3% at Shandong.
 
 **Conclusion.** At Columbia, a threshold validated on inpatients caught 72 to 73 of 100 ill outpatients for three models, and the AUROC did not show it. Set again on the hospital's own outpatients with known diagnoses, it came near 90% but, read on separate outpatients, fell short of it for all three models, and it flagged more than half of the healthy. A clinic adopting such a model learns the sensitivity it gets only by measuring it on its own outpatients with known diagnoses.
 
@@ -58,7 +58,7 @@ To measure what setting the threshold again costs, the outpatients were split at
 
 ### 2.5 Infarction across three hospitals
 
-A deep neural network was trained on PTB-XL, a German research database of ECGs recorded between 1989 and 1996 [15]. Its threshold was set to catch 90% of infarctions in half of PTB-XL's held-out patients and applied unchanged; this was repeated with 200 different random halves, and each figure is the average, to Shandong Provincial Hospital [16] and to the First Affiliated Hospital of Chongqing Medical University [17]. At PTB-XL an infarction is an infarct pattern read on the tracing, most often without a stated stage; at Shandong it is read on the tracing too, and most are coded as old; at Chongqing it is an acute infarction named in the discharge diagnosis of patients who all had coronary angiography. The supplement repeats the design across five databases, each in turn setting the threshold that is then applied to the other four, on five rhythm and conduction diagnoses: sinus rhythm, atrial fibrillation, left bundle-branch block, right bundle-branch block and first-degree atrioventricular block.
+A deep neural network was trained on PTB-XL, a German research database of ECGs recorded between 1989 and 1996 [15]. Its threshold was set to catch 90% of infarctions in half of PTB-XL's held-out patients and applied unchanged to the other half, to Shandong Provincial Hospital [16] and to the First Affiliated Hospital of Chongqing Medical University [17]. This was repeated with 200 random halves, and each figure is the average. At PTB-XL an infarction is an infarct pattern read on the tracing, most often without a stated stage; at Shandong it is read on the tracing too, and most are coded as old; at Chongqing it is an acute infarction named in the discharge diagnosis of patients who all had coronary angiography. The supplement repeats the design across five databases, each in turn setting the threshold that is then applied to the other four, on five rhythm and conduction diagnoses: sinus rhythm, atrial fibrillation, left bundle-branch block, right bundle-branch block and first-degree atrioventricular block.
 
 ## 3. Results
 
@@ -72,17 +72,17 @@ Set instead on all 4,626 validation patients, whatever their setting, the thresh
 
 ![Figure 1](results/figures/fig_patients.png)
 
-Figure 1. What the inpatient threshold does to 100 ill and 100 healthy outpatients, for each model, with the threshold alone and with the second threshold. Blue: the right answer with no reader (an ill patient flagged, a healthy patient cleared). Grey: sent to a reader. Orange: the wrong answer (an ill patient missed, a healthy patient flagged). 271 ill and 788 healthy outpatients.
+Figure 1. The inpatient threshold applied to the test outpatients (271 ill, 788 healthy), per 100 of each, for the three models and the untrained floor. Rows marked one threshold use the threshold alone; rows marked two thresholds add the second threshold, and patients between the two go to a reader (grey). Blue: an ill patient flagged or a healthy one cleared, with no reader. Orange: an ill patient missed, or a healthy one flagged with no reader. Ill caught is blue plus grey. Each row's counts are rounded to sum to 100.
 
-Table 1. The trained network's inpatient threshold, per 100 patients of each group, from `results/echonext_clinical.json`.
+Table 1. The trained network's inpatient threshold, per 100 ill and per 100 healthy patients of each group: 1,156 ill and 1,047 healthy other inpatients, 271 ill and 788 healthy outpatients, from `results/echonext_clinical.json`. The second-threshold rows split the caught and the healthy flagged, and are rounded so that they add up to them.
 
 | | Other inpatients | Outpatients |
 |---|---|---|
 | Ill, caught | 90 | 72 |
 | Ill, missed | 10 | 28 |
 | Healthy, flagged | 58 | 29 |
-| With the second threshold: ill flagged with no reader | 54 | 35 |
-| With the second threshold: ill sent to a reader | 37 | 36 |
+| With the second threshold: ill flagged with no reader | 54 | 36 |
+| With the second threshold: ill sent to a reader | 36 | 36 |
 | With the second threshold: healthy sent to a reader | 49 | 27 |
 | With the second threshold: healthy flagged with no reader | 9 | 2 |
 
@@ -98,7 +98,7 @@ The AUROC of the trained network was 0.815 among inpatients (0.796 to 0.832), 0.
 
 ![Figure 2](results/figures/fig_curve.png)
 
-Figure 2. Ill patients caught against healthy patients flagged, per 100, for the trained network, among inpatients (2,203) and outpatients (1,059). Each curve runs through every possible threshold. The dots mark the threshold set on the calibration inpatients.
+Figure 2. Ill patients caught against healthy patients flagged, per 100, for the trained network at every possible threshold, among the 2,203 test inpatients (1,156 ill) and the 1,059 test outpatients (271 ill). The dots mark the one threshold set on the 1,903 calibration inpatients.
 
 The curves also give the price of catching 90 of 100 ill outpatients when every outpatient's diagnosis is known: 59 of 100 healthy outpatients flagged, against 57 of 100 healthy inpatients; for the mini-model, 65 and 59, and for ECGFounder, 58 and 58. The threshold carried from the inpatients therefore misses 18 more ill outpatients in 100 than one set for 90% among outpatients, and flags 30 fewer healthy ones.
 
@@ -124,7 +124,7 @@ These 100 were drawn from the outpatients the threshold was read on. A clinic se
 
 ![Figure 3](results/figures/fig_repair.png)
 
-Figure 3. The trained network's threshold set again on outpatients with known diagnoses, against how many there were, with the average number of ill patients among them. The result is read on other outpatients. Lines: the average over 2,000 repetitions. Bands: the middle 80% of the repetitions.
+Figure 3. The trained network's threshold set again on n outpatients with known diagnoses (x axis, with the average number of ill among them) and read on the other half of the outpatients, 2,000 repetitions with a new split each. Solid line: ill caught per 100; dashed line: healthy flagged per 100. Lines are averages and bands the middle 80% of the repetitions; x = 0 is the inpatient threshold, and the dotted line marks 90.
 
 In the same clinic of 1,000 outpatients, the new threshold would send 752 for an echocardiogram and miss 21 of the 256 ill, against 398 and 73 with the inpatient threshold: about 7 more echocardiograms for each extra ill outpatient found. With every outpatient's diagnosis known, catching 90 of 100 ill flags 59 of 100 healthy. Most of the difference is the safety margin the rule takes on a small sample: it places the threshold slightly below the sample's own 90% point, so that it still catches 90% on average when the sample happens to be unrepresentative. Placed at the sample's own 90% point, with no margin, the threshold caught 88.8% on average, flagged 61 of 100 healthy, and fell short of 90% in 48.8% of the repetitions. The untrained floor, set again on 100 outpatients the same way, caught 91.6% and flagged 76 of 100 healthy: once the threshold is set on outpatients, the trained models flag 5 to 7 fewer healthy outpatients in 100 than a network that learnt nothing.
 

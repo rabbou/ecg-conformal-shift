@@ -96,6 +96,7 @@ CONSTANTS = {
     "49": "the upper edge of the youngest age band",
     "80": "the lower edge of the oldest age band",
     "25": "a rung of the ladder",
+    "0": "the rung of the ladder that keeps the inpatient threshold",
     "200": "the draws of every ladder, and a rung",
     "23": "the download date of the public corpora, 23 August 2026",
     "2026": "the year of the study and of the download",
@@ -197,6 +198,18 @@ def test_a_figure_swapped_for_another_figure_of_the_same_file_is_caught() -> Non
 def test_a_name_no_file_defines_is_refused() -> None:
     with pytest.raises(KeyError, match="no_such_figure"):
         render("caught {{no_such_figure}} of them")
+
+
+def test_table_1_rows_add_up_to_the_totals_they_split() -> None:
+    figures = v.values()
+    for c in ("in", "out"):
+        assert int(figures[f"pl_alone_resnet_{c}"]) + int(figures[f"pl_def_resnet_{c}"]) == int(
+            figures[f"caught_resnet_{c}"]
+        )
+        assert int(figures[f"pl_hdef_resnet_{c}"]) + int(figures[f"pl_hflag_resnet_{c}"]) == int(
+            figures[f"flagged_resnet_{c}"]
+        )
+    assert v.largest_remainder([0.3542, 0.3616, 0.2842]) == [36, 36, 28]
 
 
 class TestTheReportsShape:

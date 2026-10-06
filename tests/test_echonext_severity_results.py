@@ -20,7 +20,7 @@ from ecs.transfer_report import pct
 SEVERITY = RESULTS_DIR / "echonext_severity.json"
 TRANSFER = RESULTS_DIR / "echonext_transfer.json"
 PIECE = REPO_ROOT / "SUPPLEMENT.md"
-HEADING = "### S1.7 The severity of the ill by care setting"
+HEADING = "### S1.7 Disease severity among cases by care setting"
 COMPOSITE = "shd_moderate_or_greater_flag"
 ARMS = ("resnet", "echonext_mini", "ecgfounder")
 NUMBER = re.compile(r"\d[\d,]*(?:\.\d+)?%?")
@@ -114,7 +114,7 @@ def severity_figures(severity: dict[str, Any]) -> dict[str, str]:
     inside = [
         next(r for r in a["by_lvef"]["inpatient_in_sample"] if r["stratum"] == ">45") for a in arms
     ]
-    out["above_45_n"] = f"{above[0]['n']}\nill outpatients"
+    out["above_45_n"] = f"{above[0]['n']}\noutpatients with SHD"
     out["above_45_range"] = (
         f"{pct(min(r['coverage'] for r in above))} to {pct(max(r['coverage'] for r in above))}"
     )

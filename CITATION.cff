@@ -17,12 +17,12 @@ abstract: >-
   of 5.3 (4.2 to 7.8) percentage points, against 0.3 (0.2 to 1.0) on
   controls, and fell outside the observed value's 95% confidence interval in
   75% (67% to 82%) of transfers, in both directions. At Columbia, the network
-  separated ill from healthy outpatients almost as well as inpatients (AUROC
-  0.815 and 0.805), but ill and healthy outpatients both scored lower,
-  so the inpatient threshold caught 71.6% of ill outpatients and
-  46.0% (41.3% to 50.7%) of flagged outpatients were ill, where the recomputation gave
-  34.2%. Set again on 858 separate outpatients, the threshold caught
-  86.3% of ill outpatients. The transfers cover four structural heart
+  discriminated nearly as well among outpatients as among inpatients (AUROC
+  0.805 and 0.815), but outpatients with and without structural
+  heart disease both scored lower, so at the inpatient threshold sensitivity
+  among outpatients was 71.6% and the observed positive predictive value
+  46.0% (41.3% to 50.7%), where the recomputation gave 34.2%. After threshold
+  recalibration on 858 separate outpatients, sensitivity was 86.3%. The transfers cover four structural heart
   disease models in EchoNext, an infarction network carried from PTB-XL to
   hospitals in Chongqing and Shandong, and a rotation of five public corpora
   on five rhythm and conduction diagnoses.

@@ -1,31 +1,31 @@
 # Supplement to "Predicting an ECG model's positive predictive value from a clinic's prevalence"
 
-Part 1 gives the EchoNext study in statistical terms, with every table the article summarises. Part 2 gives the infarction study and the five-corpus rotation in full. Part 3 gives the measurement of the PPV across transfers and the three repairs, whose numbers are read from `results/` by `tests/paper_values.py` as well. In Part 1, the numbers of sections S1.1 to S1.6, S1.8, S1.9 and S1.13 are read from `results/` by `tests/paper_values.py`, and `tests/test_paper_numbers.py` refuses any other number there; the severity tables of S1.7 are typed and held to `results/echonext_severity.json` by `tests/test_echonext_severity_results.py`; the timings and counts of S1.10 to S1.12 were measured once and are typed. The numbers in Part 2 are held to their files by `tests/test_rotation_report.py`, `tests/test_outcomes.py` and `tests/test_published_numbers.py`.
+Part 1 gives the EchoNext study in statistical terms, with every table the article summarises. Part 2 gives the infarction study and the five-corpus rotation in full. Part 3 gives the measurement of the PPV across transfers and the three updating methods, whose numbers are read from `results/` by `tests/paper_values.py` as well. In Part 1, the numbers of sections S1.1 to S1.6, S1.8, S1.9 and S1.13 are read from `results/` by `tests/paper_values.py`, and `tests/test_paper_numbers.py` refuses any other number there; the severity tables of S1.7 are typed and held to `results/echonext_severity.json` by `tests/test_echonext_severity_results.py`; the timings and counts of S1.10 to S1.12 were measured once and are typed. The numbers in Part 2 are held to their files by `tests/test_rotation_report.py`, `tests/test_outcomes.py` and `tests/test_published_numbers.py`.
 
 ## Part 1. Structural heart disease, from inpatients to outpatients
 
 ### S1.1 The thresholds in statistical terms
 
-Each model gives a probability p of moderate or worse structural heart disease. Split conformal prediction scores a calibration ECG by one minus the probability the model gives its true label, the least-ambiguous-set score, and admits a label for a new ECG when that label's score falls at or below the ⌈(n+1)(1−α)⌉-th smallest of the n calibration scores, here with α = 0.10 [REPORT ref. 23]. Fitted within each true class separately (class-conditional, or Mondrian, calibration [REPORT ref. 24]), it gives one cut-off from the ill calibration patients and one from the healthy. A patient's set holds "ill" when p is at or above the first cut-off and "healthy" when p is at or below the second. On these models the first cut-off sits below the second in every arm, so no set comes back empty: a set holds one label, or both, and a set holding both is a deferral to a reader.
+Each model gives a probability p of moderate or worse structural heart disease. Split conformal prediction scores a calibration ECG by one minus the probability the model gives its true label, the least-ambiguous-set score, and admits a label for a new ECG when that label's score falls at or below the ⌈(n+1)(1−α)⌉-th smallest of the n calibration scores, here with α = 0.10 [REPORT ref. 23]. Fitted within each true class separately (class-conditional, or Mondrian, calibration [REPORT ref. 24]), it gives one cut-off from the calibration cases and one from the calibration non-cases. A patient's prediction set contains "SHD" when p is at or above the first cut-off and "no SHD" when p is at or below the second. On these models the first cut-off sits below the second in every arm, so no set is empty: a set contains one label, or both, and a set containing both is a deferral to a reader.
 
-The cut-off for the ill is the 90%-sensitivity threshold of the calibration inpatients, with the (n+1) correction. The two coincide by construction: both are the ⌈(n+1)(1−α)⌉-th order statistic of the ill calibration scores, and `tests/test_paper_numbers.py` guards the code against their drifting apart, on `results/echonext_coverage.csv`. On the 1,013 ill calibration inpatients the (n+1) correction changes little: at the uncorrected 90th percentile the trained network caught 71.2% of ill outpatients against 71.6% (field `threshold_spread`). The class-conditional guarantee, 90% coverage within each class whatever the prevalence, holds while the calibration and test patients of a class are exchangeable. Between inpatients and outpatients they are not, which is the result.
+The cut-off for cases is the 90%-sensitivity threshold of the calibration inpatients, with the (n+1) correction. The two coincide by construction: both are the ⌈(n+1)(1−α)⌉-th order statistic of the calibration cases' scores, and `tests/test_paper_numbers.py` guards the code against their drifting apart, on `results/echonext_coverage.csv`. On the 1,013 cases among the calibration inpatients the (n+1) correction has little effect: at the uncorrected 90th percentile the trained network had an outpatient sensitivity of 71.2% against 71.6% (field `threshold_spread`). The class-conditional guarantee, 90% coverage within each class whatever the prevalence, holds while the calibration and test patients of a class are exchangeable. Inpatients and outpatients are not exchangeable, and that is the finding.
 
-A third construction, one threshold pair fitted over all calibration patients together (pooled), meets 90% over all patients and misses within the rarer label. On EchoNext's composite it covered 74.5% of the ill outpatients for the trained network; the main text does not use it. For the trained network the probability cut-offs were 0.27 for the ill and 0.79 for the healthy.
+A third construction, one threshold pair fitted over all calibration patients together (pooled), achieves 90% coverage over all patients and under-covers the rarer label. On EchoNext's composite it covered 74.5% of the outpatients with SHD for the trained network; the main text does not use it. For the trained network the probability cut-offs were 0.27 for cases and 0.79 for non-cases.
 
-Table S0a. The trained network's two thresholds, per 100 ill and per 100 healthy patients: 1,156 ill and 1,047 healthy other inpatients, 271 ill and 788 healthy outpatients, from `results/echonext_clinical.json`. The rows split the caught and the healthy flagged of the article's Table 2, rounded so that they add up to them.
+Table S0a. The trained network's two thresholds, per 100 patients with SHD and per 100 without: 1,156 with and 1,047 without SHD among the other inpatients, 271 with and 788 without SHD among outpatients, from `results/echonext_clinical.json`. The rows divide the true positives and false positives of the article's Table 2, rounded so that they sum to them.
 
 | | Other inpatients | Outpatients |
 |---|---|---|
-| Ill flagged with no reader | 54 | 36 |
-| Ill sent to a reader | 36 | 36 |
-| Healthy sent to a reader | 49 | 27 |
-| Healthy flagged with no reader | 9 | 2 |
+| With SHD, flagged with no reader | 54 | 36 |
+| With SHD, referred to a reader | 36 | 36 |
+| Without SHD, referred to a reader | 49 | 27 |
+| Without SHD, flagged with no reader | 9 | 2 |
 
-In all, 29.4% of outpatients went to a reader, against 42.3% of inpatients; no prevalence with the inpatients' rates could take the outpatients' share below 36.6%.
+In total, 29.4% of outpatients were referred to a reader, against 42.3% of inpatients; no prevalence with the inpatients' rates could take the outpatients' share below 36.6%.
 
 ### S1.2 Cohorts
 
-EchoNext v1.1.1 holds 100,000 ECGs from Columbia, each paired with a transthoracic echocardiogram, with eleven binary findings and their composite. Its source states the labelling rule: an ECG is positive when it was "performed within 1 year prior to an echocardiogram with SHD", and for a patient whose most recent echocardiogram shows none, "all ECGs prior to the most recent echo were labeled as negative" (PhysioNet, EchoNext 1.1.1, read on 5 October 2026). The finer measurements (grades, ejection fraction, wall thickness, pressures) are recorded only for an ECG within the year, so a healthy ECG with every measurement blank was taken earlier; Table S1b counts them. The thresholds are fitted on the 1,903 inpatient ECGs of the validation split and applied unchanged to the test split: 1,059 outpatient ECGs, and the 1,971 emergency and 2,203 inpatient ECGs beside them. No patient appears in two of the roles (training, calibration, each test setting), and no patient contributes two ECGs to one cohort; `transfer_cohorts` raises if either happens. The models were fitted on the 72,475 ECGs of the training split.
+EchoNext v1.1.1 holds 100,000 ECGs from Columbia, each paired with a transthoracic echocardiogram, with eleven binary findings and their composite. Its source states the labelling rule: an ECG is positive when it was "performed within 1 year prior to an echocardiogram with SHD", and for a patient whose most recent echocardiogram shows none, "all ECGs prior to the most recent echo were labeled as negative" (PhysioNet, EchoNext 1.1.1, read on 5 October 2026). The finer measurements (grades, ejection fraction, wall thickness, pressures) are recorded only for an ECG within the year, so a negative ECG with every measurement missing was recorded earlier; Table S1b counts them. The thresholds are fitted on the 1,903 inpatient ECGs of the validation split and applied unchanged to the test split: 1,059 outpatient ECGs, and the 1,971 emergency and 2,203 inpatient ECGs beside them. No patient appears in two of the roles (training, calibration, each test setting), and no patient contributes two ECGs to one cohort; `transfer_cohorts` raises if either happens. The models were fitted on the 72,475 ECGs of the training split.
 
 Table S0. Every ECG of EchoNext by split and care setting, and its use here, from `results/echonext_clinical.json`, field `flow`.
 
@@ -36,11 +36,11 @@ Table S0. Every ECG of EchoNext by split and care setting, and its use here, fro
 | test | 5,442 | 5,442 | 2,203 | 1,971 | 1,059 | 209 | inpatient, emergency and outpatient cohorts; procedural not read |
 | no split | 17,457 | 4,618 | 9,150 | 4,983 | 2,854 | 470 | not used |
 
-What a diagnostic-accuracy report states, item by item. The ECGs were recorded between 2008 and 2022 at the two sites, by EchoNext's authors' selection; this study takes the published splits whole, with no exclusion beyond the procedural setting. Every patient was 18 or older. Validation and test hold each patient's latest ECG. No ECG of the validation or test split lacks a score, an age, a sex or the composite label, so there are no indeterminate or missing results. No sample size was computed in advance: the cohorts are EchoNext's. The study was not registered, and no protocol was published before the analysis.
+The reporting items of the STARD checklist for diagnostic accuracy studies, in turn. The ECGs were recorded between 2008 and 2022 at the two sites, by EchoNext's authors' selection; this study takes the published splits whole, with no exclusion beyond the procedural setting. Every patient was 18 or older. Validation and test hold each patient's latest ECG. No ECG of the validation or test split lacks a score, an age, a sex or the composite label, so there are no indeterminate or missing results. No sample size was computed in advance: the cohorts are EchoNext's. The study was not registered, and no protocol was published before the analysis.
 
 The outpatients' ECGs are older than the inpatients': median year 2015 against 2017. Table S1c reads the inpatient threshold's sensitivity within three bands of years.
 
-Table S1c. Ill patients caught by the inpatient threshold within bands of recording years (2008 to 2015, 2016 to 2018, 2019 to 2022), from `results/echonext_clinical.json`, field `eras`.
+Table S1c. Sensitivity of the inpatient threshold within bands of recording years (2008 to 2015, 2016 to 2018, 2019 to 2022), from `results/echonext_clinical.json`, field `eras`.
 
 | Model | Setting | 2008 to 2015 | 2016 to 2018 | 2019 to 2022 |
 |---|---|---|---|---|
@@ -53,9 +53,9 @@ Table S1c. Ill patients caught by the inpatient threshold within bands of record
 
 ### S1.3 Every arm in every setting
 
-Table S1. The composite under the inpatient threshold, from `results/echonext_transfer.json` and `results/echonext_coverage.csv`. AUROC with a 95% interval from 500 bootstrap draws; sensitivity and specificity with 95% Wilson intervals, which resample the patients read for the threshold as set; the share sent to a reader under the class-conditional pair. Resampling the calibration inpatients too (1,000 draws, field `threshold_spread`), the outpatient sensitivity's interval widens to 65.2% to 78.0%, 66.6% to 78.8% and 65.6% to 77.6% for the three models.
+Table S1. The composite under the inpatient threshold, from `results/echonext_transfer.json` and `results/echonext_coverage.csv`. AUROC with a 95% interval from 500 bootstrap draws; sensitivity and specificity with 95% Wilson intervals, which resample the patients read for the threshold as set; the proportion referred to a reader under the class-conditional pair. Resampling the calibration inpatients too (1,000 draws, field `threshold_spread`), the outpatient sensitivity's interval widens to 65.2% to 78.0%, 66.6% to 78.8% and 65.6% to 77.6% for the three models.
 
-| Model | Setting | AUROC | Sensitivity | Specificity | Sent to a reader |
+| Model | Setting | AUROC | Sensitivity | Specificity | Referred to a reader |
 |---|---|---|---|---|---|
 | Network trained here | Inpatients | 0.815 (0.796 to 0.832) | 90.4% (88.6% to 92.0%) | 42.2% (39.3% to 45.2%) | 42.3% |
 | Network trained here | Emergency | 0.837 (0.820 to 0.854) | 86.2% (83.6% to 88.4%) | 61.0% (58.2% to 63.8%) | 35.7% |
@@ -70,9 +70,9 @@ Table S1. The composite under the inpatient threshold, from `results/echonext_tr
 | Untrained floor | Emergency | 0.790 (0.771 to 0.810) | 84.4% (81.7% to 86.8%) | 54.5% (51.7% to 57.3%) | 43.0% |
 | Untrained floor | Outpatients | 0.758 (0.721 to 0.790) | 78.6% (73.3% to 83.1%) | 57.4% (53.9% to 60.8%) | 44.2% |
 
-Table S1b. Healthy ECGs with no echocardiographic measurement, with the calibration-inpatient threshold, from `results/echonext_clinical.json`, field `unmeasured`. The last three columns give each figure on every ECG of the setting, then on the ECGs that carry a measurement. No ill ECG lacks one.
+Table S1b. Negative ECGs with no echocardiographic measurement, with the calibration-inpatient threshold, from `results/echonext_clinical.json`, field `unmeasured`. The last three columns give each figure on every ECG of the setting, then on the ECGs that carry a measurement. Every positive ECG carries one.
 
-| Model | Setting | Healthy with no measurement | Prevalence | Specificity | AUROC |
+| Model | Setting | Negatives with no measurement | Prevalence | Specificity | AUROC |
 |---|---|---|---|---|---|
 | Network trained here | Inpatients | 114 of 1,047 | 52.5% to 55.3% | 42.2% to 41.1% | 0.815 to 0.810 |
 | EchoNext mini-model | Inpatients | 114 of 1,047 | 52.5% to 55.3% | 38.8% to 37.5% | 0.797 to 0.792 |
@@ -84,7 +84,7 @@ Table S1b. Healthy ECGs with no echocardiographic measurement, with the calibrat
 | EchoNext mini-model | Outpatients | 220 of 788 | 25.6% to 32.3% | 71.1% to 68.1% | 0.795 to 0.781 |
 | ECGFounder | Outpatients | 220 of 788 | 25.6% to 32.3% | 71.3% to 69.0% | 0.791 to 0.776 |
 
-Table S2. Paired differences in outpatient sensitivity between the three models, in percentage points, with a 95% percentile interval from 2,000 bootstrap draws of the ill outpatients, from `results/echonext_clinical.json`.
+Table S2. Paired differences in outpatient sensitivity between the three models, in percentage points, with a 95% percentile interval from 2,000 bootstrap draws of the outpatients with SHD, from `results/echonext_clinical.json`.
 
 | Comparison | Difference | 95% interval |
 |---|---|---|
@@ -94,9 +94,9 @@ Table S2. Paired differences in outpatient sensitivity between the three models,
 
 ### S1.4 The eleven findings
 
-Table S3. A threshold set separately for each finding, on that finding's ill calibration inpatients, for the trained network, from `results/echonext_coverage.csv`. This is not the composite threshold the article follows; its section 3.3 reads the composite threshold finding by finding (`results/echonext_clinical.json`, field `by_finding`). Pulmonary regurgitation has no ill outpatient in the test split.
+Table S3. A threshold set separately for each finding, on the calibration inpatients with that finding, for the trained network, from `results/echonext_coverage.csv`. This is not the composite threshold the article follows; its section 3.3 reads the composite threshold finding by finding (`results/echonext_clinical.json`, field `by_finding`). No outpatient in the test split has pulmonary regurgitation.
 
-| Finding, moderate or worse | Ill inpatients, test split | Sensitivity, inpatients | Ill outpatients | Sensitivity, outpatients |
+| Finding, moderate or worse | Inpatients with the finding, test split | Sensitivity, inpatients | Outpatients with the finding | Sensitivity, outpatients |
 |---|---|---|---|---|
 | Ejection fraction 45% or less | 537 | 87.7% | 70 | 87.1% (77.3% to 93.1%) |
 | Wall thickness 1.3 cm or more | 483 | 89.4% | 146 | 74.7% (67.0% to 81.0%) |
@@ -104,7 +104,7 @@ Table S3. A threshold set separately for each finding, on that finding's ill cal
 | Aortic regurgitation | 33 | 72.7% | 4 | 100.0% (51.0% to 100.0%) |
 | Mitral regurgitation | 173 | 90.2% | 30 | 70.0% (52.1% to 83.3%) |
 | Tricuspid regurgitation | 183 | 88.5% | 26 | 69.2% (50.0% to 83.5%) |
-| Pulmonary regurgitation | 14 | 100.0% | 0 | none ill |
+| Pulmonary regurgitation | 14 | 100.0% | 0 | no cases |
 | Right ventricular dysfunction | 246 | 87.4% | 20 | 75.0% (53.1% to 88.8%) |
 | Pericardial effusion | 45 | 100.0% | 2 | 100.0% (34.2% to 100.0%) |
 | Pulmonary artery pressure 45 mmHg or more | 346 | 92.5% | 63 | 73.0% (61.0% to 82.4%) |
@@ -113,9 +113,9 @@ Table S3. A threshold set separately for each finding, on that finding's ill cal
 
 ### S1.5 Predictive values and counts per 1,000
 
-Table S4. At the outpatients' prevalence and at 10% and 5%, from `results/echonext_clinical.json`. The figures at 10% and 5% apply the outpatients' sensitivity and specificity by Bayes' rule and hold only if those carry over; the article's section 3.1 measures how far such a recomputation misses.
+Table S4. At the outpatients' prevalence and at 10% and 5%, from `results/echonext_clinical.json`. The figures at 10% and 5% apply the outpatients' sensitivity and specificity by Bayes' theorem and are valid only if those are transportable to the other prevalence; the article's section 3.1 measures the error of such a recomputation.
 
-| Model | Prevalence | PPV | NPV | Flagged per 1,000 | Ill found per 1,000 | Ill missed per 1,000 |
+| Model | Prevalence | PPV | NPV | Flagged per 1,000 | True positives per 1,000 | False negatives per 1,000 |
 |---|---|---|---|---|---|---|
 | Network trained here | 25.6% | 46.0% | 87.9% | 398 | 183 | 73 |
 | Network trained here | 10.0% | 21.6% | 95.7% | 332 | 72 | 28 |
@@ -129,23 +129,23 @@ Table S4. At the outpatients' prevalence and at 10% and 5%, from `results/echone
 
 ### S1.6 The case-mix model
 
-Among the ill of the inpatient and outpatient test cohorts (1,156 and 271 patients), a logistic regression with an L2 penalty of 1 predicts whether the inpatient threshold caught each patient from the eleven findings, the ejection fraction band (35% or less, 36 to 45%, above 45%, unmeasured), the age band (18 to 49, 50 to 64, 65 to 79, 80 and over), sex and the care setting. The outpatients' sensitivity at the inpatients' case mix is the model's mean prediction over the ill inpatients, each read as an outpatient. The share of the gap explained is that prediction minus the observed outpatient sensitivity, over the inpatient sensitivity minus the outpatient one. With an L2 penalty the model's mean prediction among the outpatients is not exactly their observed sensitivity, so the last column takes that prediction instead, both terms then coming from the model (g-computation). Intervals are 95% percentiles over 1,000 draws that resample the patients within each setting and refit the model.
+Among the cases of the inpatient and outpatient test cohorts (1,156 and 271 patients), a logistic regression with an L2 penalty of 1 predicts whether the inpatient threshold detected each patient from the eleven findings, the ejection fraction band (35% or less, 36 to 45%, above 45%, unmeasured), the age band (18 to 49, 50 to 64, 65 to 79, 80 and over), sex and the care setting. The outpatients' sensitivity at the inpatients' case mix is the model's mean prediction over the inpatients with SHD, each assigned the outpatient setting. The share of the gap explained is that prediction minus the observed outpatient sensitivity, over the inpatient sensitivity minus the outpatient one. With an L2 penalty the model's mean prediction among the outpatients is not exactly their observed sensitivity, so the last column takes that prediction instead, both terms then coming from the model (g-computation). Intervals are 95% percentiles over 1,000 draws that resample the patients within each setting and refit the model.
 
 Table S5. From `results/echonext_clinical.json`, field `case_mix`.
 
-| Model | Sensitivity, ill inpatients | Sensitivity, ill outpatients | Outpatients at the inpatients' case mix | Share of the gap explained | Share, both terms predicted |
+| Model | Sensitivity, inpatients | Sensitivity, outpatients | Outpatients at the inpatients' case mix | Share of the gap explained | Share, both terms predicted |
 |---|---|---|---|---|---|
 | Network trained here | 90.4% (88.7% to 92.0%) | 71.6% (66.1% to 77.1%) | 76.8% (72.0% to 81.3%) | 27.5% (15.7% to 38.2%) | 25.2% (13.2% to 36.4%) |
 | EchoNext mini-model | 90.7% (89.1% to 92.5%) | 72.7% (67.5% to 78.2%) | 77.7% (73.4% to 81.9%) | 27.5% (15.7% to 39.5%) | 25.2% (13.1% to 37.4%) |
 | ECGFounder | 89.5% (87.8% to 91.3%) | 71.6% (65.7% to 77.1%) | 76.1% (71.4% to 80.8%) | 25.3% (14.6% to 37.0%) | 23.2% (12.0% to 35.0%) |
 
-The earlier reading below reweights the outpatients to the severity of the calibration inpatients, whose own coverage was read on the ECGs that set the threshold. The case-mix model replaces it in the main text: it compares with inpatients the threshold never saw, and adjusts for findings, age and sex as well.
+The analysis below reweights the outpatients to the severity of the calibration inpatients, whose own coverage was read on the ECGs that set the threshold. The case-mix model replaces it in the main text: it compares with inpatients the threshold never saw, and adjusts for findings, age and sex as well.
 
-### S1.7 The severity of the ill by care setting
+### S1.7 Disease severity among cases by care setting
 
-The ill outpatients are ill differently from the ill inpatients who calibrate the thresholds. They carry fewer of the eleven findings, keep a higher ejection fraction, and have less right ventricular dysfunction, tricuspid regurgitation and pericardial effusion; they have a thicker septum and more aortic stenosis, and the wall-thickness finding is more frequent among them (Table S3). The two-sided test is Mann-Whitney's, on ranks; grades read none, mild, moderate, severe (the right ventricle normal to severely reduced, the effusion none, trace, small, moderate, large).
+The spectrum of SHD among outpatients differs from that among the calibration inpatients. Outpatients with SHD carry fewer of the eleven findings, have a higher ejection fraction, and have less right ventricular dysfunction, tricuspid regurgitation and pericardial effusion; they have a thicker septum and more aortic stenosis, and the wall-thickness finding is more frequent among them (Table S3). The two-sided test is Mann-Whitney's, on ranks; grades read none, mild, moderate, severe (the right ventricle normal to severely reduced, the effusion none, trace, small, moderate, large).
 
-| Among the ill, median (quartiles) | Inpatients, 1,013 | Outpatients, 271 | p |
+| Among cases, median (quartiles) | Inpatients, 1,013 | Outpatients, 271 | p |
 |---|---|---|---|
 | Findings present | 2 (1 to 3) | 1 (1 to 2) | < 0.001 |
 | Ejection fraction, % | 50.0 (32.5 to 57.5) | 57.5 (45.0 to 62.5) | < 0.001 |
@@ -166,13 +166,13 @@ two findings or more are covered more often than those with one, and those
 with an ejection fraction of 45% or less more often than those above it. The
 test that decides was fixed before any coverage by stratum was computed, and
 `results/echonext_severity.json` states it: the outpatients' coverage is
-reweighted to the share of ill inpatients in six cells (one finding or two and
+reweighted to the distribution of inpatient cases over six cells (one finding or two and
 more, by ejection fraction at 35 or less, 36 to 45, above 45), with intervals
 from 2,000 bootstrap draws. Severity would explain all of the drop if the
 reweighted coverage could reach 90%, and none of it if it could not differ from
 the observed one.
 
-| Arm | Ill outpatients covered | One finding, 165 | Two or more, 106 | Ejection fraction 35 or less, 37 | 36 to 45, 33 | Above 45, 201 | Reweighted to the inpatients' severity | Share of the drop, against the calibration inpatients |
+| Arm | Outpatients with SHD covered | One finding, 165 | Two or more, 106 | Ejection fraction 35 or less, 37 | 36 to 45, 33 | Above 45, 201 | Reweighted to the inpatients' severity | Share of the drop, against the calibration inpatients |
 |---|---|---|---|---|---|---|---|---|
 | Network trained here | 71.6% | 64.2% (56.7% to 71.2%) | 83.0% (74.7% to 89.0%) | 86.5% (72.0% to 94.1%) | 97.0% (84.7% to 99.5%) | 64.7% (57.9% to 71.0%) | 77.3% (72.3% to 81.9%) | 31% (16% to 47%) |
 | EchoNext mini-model | 72.7% | 65.5% (57.9% to 72.3%) | 84.0% (75.8% to 89.7%) | 94.6% (82.3% to 98.5%) | 84.8% (69.1% to 93.3%) | 66.7% (59.9% to 72.8%) | 78.7% (74.0% to 83.1%) | 35% (21% to 51%) |
@@ -182,20 +182,20 @@ Severity explains part of the drop for each of the three arms, between 29% and
 35% of it, when the drop is read against the calibration inpatients, whose own
 sensitivity was read on the ECGs that set the threshold. The case-mix model of
 the section before, read against the test inpatients, replaces this share in
-the main text, and the two are not the same quantity. At the inpatients' severity, the ill outpatients would be covered at
+the main text, and the two are not the same quantity. At the inpatients' severity, outpatients with SHD would be covered at
 76.9% to 78.7%, still short of 90%. The rest sits inside the strata. Of the 201
-ill outpatients whose ejection fraction is above 45%, 64.7% to 66.7% are
+outpatients with SHD whose ejection fraction is above 45%, 64.7% to 66.7% are
 covered; the calibration inpatients in the same band are covered at 83.5% to
-84.6%, a figure read on the ECGs that set the threshold and so flattered. Four
-of the six reweighting cells hold fewer than 30 ill outpatients and are not
+84.6%, a figure read on the ECGs that set the threshold and therefore optimistic. Four
+of the six reweighting cells hold fewer than 30 outpatients with SHD and are not
 judged one by one; their counts are in the results file. Intervals are 95%:
 Wilson for a stratum, bootstrap percentiles for the reweighted figures.
 
 ### S1.8 Subgroups
 
-Table S6. Sensitivity of the inpatient threshold among ill outpatients by sex and age band, from `results/echonext_clinical.json`. Two groups are compared by Fisher's exact test and four by a chi-square test of independence; the six p-values are adjusted together by Holm's method. Exploratory.
+Table S6. Sensitivity of the inpatient threshold among outpatients with SHD by sex and age band, from `results/echonext_clinical.json`. Two groups are compared by Fisher's exact test and four by a chi-square test of independence; the six p-values are adjusted together by Holm's method. Exploratory.
 
-| Model | Subgroup | Caught | Test | p | p, Holm |
+| Model | Subgroup | Detected | Test | p | p, Holm |
 |---|---|---|---|---|---|
 | Network trained here | sex | female 77 of 126 (61.1%); male 117 of 145 (80.7%) | Fisher's exact | < 0.001 | 0.002 |
 | Network trained here | age | 18-49 16 of 30 (53.3%); 50-64 41 of 69 (59.4%); 65-79 89 of 117 (76.1%); 80+ 48 of 55 (87.3%) | chi-square | < 0.001 | 0.002 |
@@ -204,9 +204,9 @@ Table S6. Sensitivity of the inpatient threshold among ill outpatients by sex an
 | ECGFounder | sex | female 79 of 126 (62.7%); male 115 of 145 (79.3%) | Fisher's exact | 0.003 | 0.006 |
 | ECGFounder | age | 18-49 16 of 30 (53.3%); 50-64 41 of 69 (59.4%); 65-79 94 of 117 (80.3%); 80+ 43 of 55 (78.2%) | chi-square | 0.001 | 0.004 |
 
-Table S6b. Among outpatients, by sex and age band: the healthy, the specificity of the inpatient threshold with a 95% Wilson interval, and the AUROC with a 95% bootstrap interval, from `results/echonext_clinical.json`, field `subgroups.healthy_and_auroc`.
+Table S6b. Among outpatients, by sex and age band: the number without SHD, the specificity of the inpatient threshold with a 95% Wilson interval, and the AUROC with a 95% bootstrap interval, from `results/echonext_clinical.json`, field `subgroups.healthy_and_auroc`.
 
-| Model | Group | Healthy outpatients | Specificity | AUROC |
+| Model | Group | Outpatients without SHD | Specificity | AUROC |
 |---|---|---|---|---|
 | Network trained here | sex female | 473 | 78.9% (75.0% to 82.3%) | 0.773 (0.719 to 0.826) |
 | Network trained here | sex male | 315 | 59.4% (53.9% to 64.6%) | 0.827 (0.784 to 0.871) |
@@ -227,7 +227,7 @@ Table S6b. Among outpatients, by sex and age band: the healthy, the specificity 
 | ECGFounder | age 65-79 | 272 | 62.9% (57.0% to 68.4%) | 0.800 (0.753 to 0.845) |
 | ECGFounder | age 80+ | 47 | 51.1% (37.2% to 64.7%) | 0.715 (0.621 to 0.818) |
 
-Table S6c. Ill patients caught by the inpatient threshold in each race and ethnicity group EchoNext records, among test inpatients and outpatients, from field `subgroups.race_ethnicity`. Descriptive; no test was run.
+Table S6c. Sensitivity of the inpatient threshold in each race and ethnicity group EchoNext records, among test inpatients and outpatients, from field `subgroups.race_ethnicity`. Descriptive; no test was run.
 
 | Model | Group | Inpatients | Outpatients |
 |---|---|---|---|
@@ -250,13 +250,13 @@ Table S6c. Ill patients caught by the inpatient threshold in each race and ethni
 | ECGFounder | unknown | 181 of 200, 90.5% | 24 of 32, 75.0% |
 | ECGFounder | white | 325 of 368, 88.3% | 75 of 109, 68.8% |
 
-### S1.9 Refitting on labelled outpatients
+### S1.9 Threshold recalibration on labelled outpatients
 
-In each of 2,000 draws the 1,059 outpatients were shuffled and cut into two halves; the labelled sample was drawn from the first half, both thresholds were refitted on it, and every figure was read on the second. Rung zero spends the inpatient thresholds on the same halves.
+In each of 2,000 draws the 1,059 outpatients were shuffled and cut into two halves; the labelled sample was drawn from the first half, both thresholds were refitted on it, and every figure was read on the second. Rung zero applies the inpatient thresholds to the same halves.
 
 Table S7. From `results/echonext_clinical.json`, field `ladder`. Means over 2,000 draws, with the 10th to 90th percentile of the draws in brackets.
 
-| Model | Labelled outpatients | Ill among them | Sensitivity | Draws below 90% | Specificity | Sent to a reader |
+| Model | Labelled outpatients | Cases among them | Sensitivity | Draws below 90% | Specificity | Referred to a reader |
 |---|---|---|---|---|---|---|
 | Network trained here | 0 | none | 71.5% (68.0% to 75.0%) | 100.0% | 71.1% (69.2% to 73.2%) | 29.3% |
 | Network trained here | 25 | 6.5 (4 to 9) | 98.3% (94.3% to 100.0%) | 6.5% | 5.5% (0.0% to 19.2%) | 77.6% |
@@ -274,30 +274,30 @@ Table S7. From `results/echonext_clinical.json`, field `ladder`. Means over 2,00
 | ECGFounder | 100 | 25.6 (20 to 31) | 91.8% (83.9% to 98.4%) | 29.9% | 29.9% (12.5% to 48.8%) | 56.2% |
 | ECGFounder | 200 | 51.1 (44 to 58) | 91.0% (84.8% to 96.4%) | 36.4% | 33.7% (19.4% to 46.6%) | 52.6% |
 
-`results/echonext_transfer.json`, field `ladder`, holds the same refit with the outpatients cut once, by a fixed seed, and the labelled samples drawn from the same pool every time. On that one evaluation half, refitting on 100 outpatients covered 93.4%, 97.6% and 95.3% of the ill for the three models. Re-drawing the halves in every draw gives 91.6%, 91.9% and 91.8%. The fixed figure is a mean over labelled samples on one half, so it belongs among the same means taken on other halves, not among single draws. Over 400 random halves (field `half_means`), that mean ran from 85.6% to 96.1% for the trained network (2.5th to 97.5th percentile; 86.0% to 96.4% and 86.2% to 96.4% for the other two). The fixed half sat above 70.5%, 99.8% and 91.5% of them: an unusually favourable half, and for the mini-model as favourable as almost none. The re-drawn figures average over halves and are the ones reported; the one-page pages in `reports/transfer/` keep the fixed half and say so.
+`results/echonext_transfer.json`, field `ladder`, holds the same refit with the outpatients cut once, by a fixed seed, and the labelled samples drawn from the same pool every time. On that one evaluation half, recalibration on 100 outpatients gave sensitivities of 93.4%, 97.6% and 95.3% for the three models. Redrawing the halves in every draw gives 91.6%, 91.9% and 91.8%. The fixed figure is a mean over labelled samples on one half, so it belongs among the same means taken on other halves, not among single draws. Over 400 random halves (field `half_means`), that mean ran from 85.6% to 96.1% for the trained network (2.5th to 97.5th percentile; 86.0% to 96.4% and 86.2% to 96.4% for the other two). The fixed half sat above 70.5%, 99.8% and 91.5% of them: an unusually favourable half, and for the mini-model more favourable than almost every other. The re-drawn figures average over halves and are the ones reported; the one-page reports in `reports/transfer/` keep the fixed half and state it.
 
-The redrawn ladder draws its labelled outpatients from the patients it reads. Table S7b sets the same rule on other validation patients and reads it on every test outpatient; Table S7c draws the labelled outpatients from the 858 validation outpatients and reads each refit on all 1,059 test outpatients. Validation and test hold different patients, which `calibration_variants` checks before it runs.
+In the redrawn series, the labelled outpatients are drawn from the patients on whom the threshold is evaluated. Table S7b sets the same rule on other validation patients and reads it on every test outpatient; Table S7c draws the labelled outpatients from the 858 validation outpatients and reads each refit on all 1,059 test outpatients. Validation and test hold different patients, which `calibration_variants` checks before it runs.
 
 Table S7b. The 90% rule set on three groups of validation patients, read on the test split, from `results/echonext_clinical.json`, field `calibration_variants`. Sensitivity and specificity among the test outpatients with 95% Wilson intervals, and the sensitivity among the test inpatients.
 
 | Threshold set on | Model | Sensitivity, outpatients | Specificity, outpatients | Sensitivity, inpatients |
 |---|---|---|---|---|
-| Validation inpatients (the report's threshold), 1,903 (1,013 ill) | Network trained here | 71.6% (65.9% to 76.6%) | 71.1% (67.8% to 74.1%) | 90.4% |
-| Validation inpatients (the report's threshold), 1,903 (1,013 ill) | EchoNext mini-model | 72.7% (67.1% to 77.7%) | 71.1% (67.8% to 74.1%) | 90.7% |
-| Validation inpatients (the report's threshold), 1,903 (1,013 ill) | ECGFounder | 71.6% (65.9% to 76.6%) | 71.3% (68.1% to 74.4%) | 89.5% |
-| Validation inpatients (the report's threshold), 1,903 (1,013 ill) | Untrained floor | 78.6% (73.3% to 83.1%) | 57.4% (53.9% to 60.8%) | 90.9% |
-| Every validation patient, 4,626 (1,990 ill) | Network trained here | 77.1% (71.8% to 81.7%) | 63.5% (60.0% to 66.7%) | 94.0% |
-| Every validation patient, 4,626 (1,990 ill) | EchoNext mini-model | 76.4% (71.0% to 81.0%) | 66.1% (62.7% to 69.3%) | 92.6% |
-| Every validation patient, 4,626 (1,990 ill) | ECGFounder | 77.9% (72.5% to 82.4%) | 62.8% (59.4% to 66.1%) | 92.8% |
-| Every validation patient, 4,626 (1,990 ill) | Untrained floor | 83.0% (78.1% to 87.0%) | 45.4% (42.0% to 48.9%) | 93.8% |
-| Validation outpatients, 858 (240 ill) | Network trained here | 86.3% (81.7% to 89.9%) | 48.5% (45.0% to 52.0%) | 97.1% |
-| Validation outpatients, 858 (240 ill) | EchoNext mini-model | 87.8% (83.4% to 91.2%) | 40.0% (36.6% to 43.4%) | 97.8% |
-| Validation outpatients, 858 (240 ill) | ECGFounder | 89.7% (85.5% to 92.8%) | 42.9% (39.5% to 46.4%) | 98.2% |
-| Validation outpatients, 858 (240 ill) | Untrained floor | 91.9% (88.0% to 94.6%) | 24.7% (21.9% to 27.9%) | 97.5% |
+| Validation inpatients (the report's threshold), 1,903 (1,013 with SHD) | Network trained here | 71.6% (65.9% to 76.6%) | 71.1% (67.8% to 74.1%) | 90.4% |
+| Validation inpatients (the report's threshold), 1,903 (1,013 with SHD) | EchoNext mini-model | 72.7% (67.1% to 77.7%) | 71.1% (67.8% to 74.1%) | 90.7% |
+| Validation inpatients (the report's threshold), 1,903 (1,013 with SHD) | ECGFounder | 71.6% (65.9% to 76.6%) | 71.3% (68.1% to 74.4%) | 89.5% |
+| Validation inpatients (the report's threshold), 1,903 (1,013 with SHD) | Untrained floor | 78.6% (73.3% to 83.1%) | 57.4% (53.9% to 60.8%) | 90.9% |
+| Every validation patient, 4,626 (1,990 with SHD) | Network trained here | 77.1% (71.8% to 81.7%) | 63.5% (60.0% to 66.7%) | 94.0% |
+| Every validation patient, 4,626 (1,990 with SHD) | EchoNext mini-model | 76.4% (71.0% to 81.0%) | 66.1% (62.7% to 69.3%) | 92.6% |
+| Every validation patient, 4,626 (1,990 with SHD) | ECGFounder | 77.9% (72.5% to 82.4%) | 62.8% (59.4% to 66.1%) | 92.8% |
+| Every validation patient, 4,626 (1,990 with SHD) | Untrained floor | 83.0% (78.1% to 87.0%) | 45.4% (42.0% to 48.9%) | 93.8% |
+| Validation outpatients, 858 (240 with SHD) | Network trained here | 86.3% (81.7% to 89.9%) | 48.5% (45.0% to 52.0%) | 97.1% |
+| Validation outpatients, 858 (240 with SHD) | EchoNext mini-model | 87.8% (83.4% to 91.2%) | 40.0% (36.6% to 43.4%) | 97.8% |
+| Validation outpatients, 858 (240 with SHD) | ECGFounder | 89.7% (85.5% to 92.8%) | 42.9% (39.5% to 46.4%) | 98.2% |
+| Validation outpatients, 858 (240 with SHD) | Untrained floor | 91.9% (88.0% to 94.6%) | 24.7% (21.9% to 27.9%) | 97.5% |
 
 Table S7c. Thresholds refitted on outpatients drawn from the validation split's 858 outpatients and read on every test outpatient, from `results/echonext_clinical.json`, field `ladder_validation`. Means over 2,000 draws, with the 10th to 90th percentile of the draws in brackets.
 
-| Model | Labelled outpatients | Ill among them | Sensitivity | Draws below 90% | Specificity |
+| Model | Labelled outpatients | Cases among them | Sensitivity | Draws below 90% | Specificity |
 |---|---|---|---|---|---|
 | Network trained here | 25 | 7.1 (4 to 10) | 97.3% (88.6% to 100.0%) | 10.9% | 9.3% (0.0% to 44.5%) |
 | Network trained here | 50 | 14.0 (10 to 18) | 91.0% (82.3% to 98.5%) | 33.4% | 31.9% (8.5% to 58.0%) |
@@ -312,7 +312,7 @@ Table S7c. Thresholds refitted on outpatients drawn from the validation split's 
 | ECGFounder | 100 | 28.1 (23 to 34) | 89.5% (84.1% to 92.3%) | 38.4% | 39.5% (30.3% to 52.7%) |
 | ECGFounder | 200 | 56.0 (49 to 63) | 88.8% (84.1% to 91.1%) | 48.0% | 42.1% (37.1% to 50.8%) |
 
-Table S7d. Net benefit among the test outpatients, per 1,000, from `results/echonext_clinical.json`, field `decision`: the ill found, less the healthy flagged weighted by t/(1-t) at a decision threshold t of 5%, 10% and 20% (Vickers and Elkin, Med Decis Making 2006;26:565-574). Sensitivities are those of Table S1, the means of Table S7 and Table S7b; the 90% point with every diagnosis known is read on the outpatients' own curve.
+Table S7d. Net benefit among the test outpatients, per 1,000, from `results/echonext_clinical.json`, field `decision`: true positives minus false positives weighted by t/(1-t) at a decision threshold t of 5%, 10% and 20% (Vickers and Elkin, Med Decis Making 2006;26:565-574). Sensitivities are those of Table S1, the means of Table S7 and Table S7b; the 90% point with every diagnosis known is read on the outpatients' own curve.
 
 | Model | Threshold | Sensitivity | Flagged per 1,000 | Net benefit, 5% | 10% | 20% |
 |---|---|---|---|---|---|---|
@@ -347,7 +347,7 @@ PubMed (E-utilities) and Europe PMC were searched on 5 October 2026, with no sta
 3. (ECG) AND (AI OR deep learning) AND (care setting* OR clinical setting* OR clinical context*) AND (SHD OR ejection fraction OR valvular): 19 results, among them [REPORT ref. 6] and [REPORT ref. 8], which report the AUROC by setting or population without a sensitivity at a fixed threshold by care setting.
 4. (ECG) AND (AI OR deep learning) AND (threshold* OR cut-off*) AND (recalibrat* OR site-specific OR population-specific OR local) AND (SHD OR EF OR ventricular dysfunction): two results, [REPORT ref. 7] and [REPORT ref. 9].
 
-Europe PMC also returned PRESENT-SHD [REPORT ref. 11], which carries a fixed threshold between hospitals and to a population cohort but not between care settings. Google Scholar and OpenReview were not searched. The full text of PREVUE-VALVE [REPORT ref. 8] was not read, so whether it reports a sensitivity at the inpatient threshold by setting is not known.
+Europe PMC also returned PRESENT-SHD [REPORT ref. 11], which transfers a fixed threshold between hospitals and to a population cohort but not between care settings. Google Scholar and OpenReview were not searched. The full text of PREVUE-VALVE [REPORT ref. 8] was not read, so whether it reports a sensitivity at the inpatient threshold by setting is not known.
 
 ### S1.10 How the published weights were run
 
@@ -424,7 +424,7 @@ Binary classifiers intended for clinical use report one label per case, obtained
 
 Conformal prediction addresses the second half of that problem. Given any scoring model and a labelled calibration sample the model has not been trained on, split CP returns for each new case the set of labels that cannot be excluded at a requested confidence level, guaranteeing without distributional assumptions that the set contains the true label in a stated proportion of cases [1]. That proportion is the coverage, and it is the only quantity the guarantee constrains. In a two-label problem the output takes one of four forms: either label alone, both labels, or neither. The last two are deferrals, also called abstentions, and route the case to a specialist rather than to an automated label. They are not the same event clinically: a both-label set says the evidence admits either answer, an empty set says the case resembles nothing in the calibration data. Which of the two a scheme can produce is a property of its thresholds, and section S2.2 gives the condition.
 
-Two properties of the guarantee shape everything that follows. It holds only while the calibration and deployment populations remain exchangeable, meaning drawn from the same distribution, which is precisely the condition a change of site breaks. And it is marginal, meaning that it averages over cases rather than holding within any subgroup of them. Ninety per cent coverage therefore implies neither ninety per cent for a given patient nor ninety per cent among the patients who are ill.
+Two properties of the guarantee shape everything that follows. It holds only while the calibration and deployment populations remain exchangeable, meaning drawn from the same distribution, which is precisely the condition a change of site breaks. And it is marginal, meaning that it averages over cases rather than holding within any subgroup of them. Ninety per cent coverage therefore implies neither ninety per cent for a given patient nor ninety per cent among cases.
 
 On imbalanced data the marginal property has a known consequence: since the guarantee averages over the whole population, it can be satisfied while coverage within the minority label falls well below the requested level. Both variants below are split CP and differ only in the population each threshold is fitted on. Class-conditional CP avoids the failure by fitting one threshold within each label, which Vovk proves is valid conditionally on the label whatever the class proportions turn out to be, the threshold being fitted inside a taxonomy that partitions the calibration set by label [2]; the same construction is widely called Mondrian conformal prediction. A weighted alternative instead reweights the calibration cases toward the target population's estimated prevalence, with an asymptotic guarantee that depends on that estimate [3,4].
 
@@ -666,7 +666,7 @@ References 1 to 13 and 15 were read in full: the AIME 2025 chapter [8] and the p
 
 Numbers: `results/outcomes.json` (per-label outcomes and decision boundaries), `results/shift.json` (coverage per site and correction), `results/subgroups.json` (coverage within sex and age), `results/auxiliary.json` (the quantities sections S2.11 and S2.12 argue from), `results/perturbations.json` with the score arrays in `results/perturbations.npz`, `results/abstention.json`, `results/baseline.json`. `results/arms.json` holds a comparison of five encoders; it records the seed it was drawn with, and section S2.10 quotes it for the two AUROCs at the ends of its range, for the coverage each arm reaches at the three sites, and for which corpora each arm was pretrained on. The rotation of sections S2.4 and S2.10 adds `results/label_map.json` (the join of three label vocabularies onto five classes, with the counts that check it), `results/duplicate_groups.json` and `results/split_leak.json` (the repeated tracings and the split they would have crossed), `results/rotation.csv` with `results/rotation.json` (every source-target cell and the summary), `results/rotation_uncertainty.csv` with its own summary, and `results/target_scale.json`. Every figure those sections print is held to one of those files by `tests/test_rotation_report.py`, which rebuilds the number from the file and fails if the prose does not say it. Those two results files are built by separate scripts that each draw their own 200 patient-level splits, so the same quantity can differ between them in the third digit; the source-site decomposition here is quoted from `outcomes.json` throughout and the per-site coverage from `shift.json`, and neither is mixed into a single sentence. `scripts/outcomes.py` builds the outcome table and `scripts/figures.py` redraws every figure, pixel for pixel, from a committed results file. That script draws more figures than this report shows and numbers its files in its own order, so figure S4 here is `fig7_rotation.png` and figure S5 is `fig8_target_scale.png`; the figure number is the report's and the file name is the script's, and a test holds each of the five to the file it names. Each results file that can be rebuilt from committed inputs carries the digest of every source file its numbers depend on, and a test fails if any of those files has changed since: `results/outcomes.json`, `results/shift.json`, `results/abstention.json`, `results/subgroups.json` and `results/perturbations.json` are therefore the output of the code in this commit. The files that cannot be rebuilt in minutes — the training run, the two external re-scores, the ingest report, the encoder arms and the two timing files — are named in `tests/test_provenance.py` with the reason, so the distinction is on the record. `scripts/subgroups.py` builds the subgroup table. Reproduction: `uv sync`, `uv run pytest`, `uv run python scripts/figures.py`, then `uv run python scripts/outcomes.py` and `uv run python scripts/subgroups.py`, which need PTB-XL's `ptbxl_database.csv` for the patient, sex and age of each record; the README gives the timings and the environment variable that points at it. The rotation is rebuilt by `scripts/label_table.py`, `scripts/duplicate_scan.py`, `scripts/split_leak.py`, `scripts/train_source.py` once per corpus, then `scripts/rotation_table.py`, `scripts/rotation_uncertainty.py` and `scripts/target_scale.py`, in that order and with the same README pointing at the corpora; the five training runs are the part that takes hours.
 
-## Part 3. The PPV across transfers, and three repairs
+## Part 3. The PPV across transfers, and three updating methods
 
 ### S3.1 Intervals across transfers
 
@@ -674,7 +674,7 @@ The shares of the article's Table 1 (within two points, outside the observed int
 
 ### S3.2 The transfers
 
-Table S11. The pairs measured and the transfers summarised, from `results/ppv_gap.json` and `results/echonext_ppv_gap.json`. A transfer is summarised when its target holds at least 10 ill patients and its threshold flags at least 20.
+Table S11. The pairs measured and the transfers summarised, from `results/ppv_gap.json` and `results/echonext_ppv_gap.json`. A transfer is summarised when its target holds at least 10 cases and its threshold flags at least 20 patients.
 
 | Pairs | Models | Diagnoses | Transfers summarised |
 |---|---|---|---|
@@ -686,11 +686,11 @@ The source's sensitivity and specificity are those of the threshold on the patie
 
 ### S3.3 The likelihood-ratio check and the predictions without diagnoses
 
-The model's probabilities are first recalibrated on the source by a logistic intercept and slope. The likelihood ratio of a patient is the odds of that recalibrated probability divided by the source's prevalence odds. Under label shift, its mean among the healthy is the same at the target as at the source; the article reports the median of those means over diagnoses and models. The prevalence estimate without diagnoses is the maximum-likelihood estimate of Saerens and colleagues [REPORT ref. 5], run on the recalibrated probabilities as Alexandari and colleagues advise [REPORT ref. 20], and the corrected probabilities are the recalibrated ones moved to that prevalence.
+The model's probabilities are first recalibrated on the source by a logistic intercept and slope. The likelihood ratio of a patient is the odds of that recalibrated probability divided by the source's prevalence odds. Under label shift, its mean among non-cases is the same at the target as at the source; the article reports the median of those means over diagnoses and models. The prevalence estimate without diagnoses is the maximum-likelihood estimate of Saerens and colleagues [REPORT ref. 5], run on the recalibrated probabilities as Alexandari and colleagues advise [REPORT ref. 20], and the corrected probabilities are the recalibrated ones moved to that prevalence.
 
-### S3.4 The three repairs
+### S3.4 The three updating methods
 
-Each target was cut once by patient into a pool and an evaluation half. In each of 200 draws, logistic recalibration fitted an intercept and a slope on 100 ECGs drawn from the pool, or the intercept alone when the draw held fewer than 10 of the rarer class [REPORT ref. 21]; the label-free correction and the per-label sets need no draw. Net benefit is the true positives per patient minus the false positives per patient times t / (1 − t), at decision thresholds t of 5%, 10% and 20% [REPORT ref. 22]. Under the per-label sets a patient sent to a reader is counted once as not referred and once as referred, because what the reader decides is not modelled. A transfer is summarised when its evaluation half holds at least 20 ill patients; 146 were. `results/repairs.json` holds each transfer's curve and the summary the article's Table 4 prints.
+Each target was cut once by patient into a pool and an evaluation half. In each of 200 draws, logistic recalibration fitted an intercept and a slope on 100 ECGs drawn from the pool, or the intercept alone when the draw held fewer than 10 of the rarer class [REPORT ref. 21]; the label-free correction and the per-label sets need no draw. Net benefit is the true positives per patient minus the false positives per patient times t / (1 − t), at decision thresholds t of 5%, 10% and 20% [REPORT ref. 22]. Under the per-label sets a patient referred to a reader is counted once as not referred and once as referred, because what the reader decides is not modelled. A transfer is summarised when its evaluation half holds at least 20 cases; 146 were. `results/repairs.json` holds each transfer's curve and the summary the article's Table 4 prints.
 
 ### S3.5 Reproduce the PPV measurement
 

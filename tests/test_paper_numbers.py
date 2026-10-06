@@ -259,12 +259,11 @@ def test_a_figure_swapped_for_another_figure_of_the_same_file_is_caught() -> Non
     """The specificity among inpatients written where the outpatient one belongs fails."""
     figures = v.values()
     text = REPORT.read_text()
-    right = f"It also flagged fewer healthy patients: {figures['flagged_resnet_out']} of 100"
+    lead = "The threshold also flagged fewer patients without SHD:"
+    right = f"{lead} {figures['flagged_resnet_out']} per 100"
     assert right in text
     assert figures["flagged_resnet_out"] != figures["flagged_resnet_in"]
-    swapped = text.replace(
-        right, f"It also flagged fewer healthy patients: {figures['flagged_resnet_in']} of 100", 1
-    )
+    swapped = text.replace(right, f"{lead} {figures['flagged_resnet_in']} per 100", 1)
     assert swapped != rendered(REPORT)
 
 
@@ -612,7 +611,7 @@ class TestClaims:
             assert sex["female"]["specificity"] > sex["male"]["specificity"], arm
             assert age["18-49"]["specificity"] > age["80+"]["specificity"], arm
             assert sex["female"]["auroc"]["high"] > sex["male"]["auroc"]["low"], arm
-        assert "Women and younger outpatients scored lower, ill and healthy alike" in (
+        assert "Women and younger outpatients scored lower, with and without SHD" in (
             REPORT.read_text()
         )
 
@@ -702,16 +701,16 @@ class TestPPVClaims:
     """The sentences of sections 3.1, 3.4 to 3.6 that read the PPV files in words."""
 
     def test_the_direction_of_the_miss_by_pair(self) -> None:
-        """'Too low in every outpatient transfer'; 'more often too high' in the rotation."""
+        """'Underestimated in every outpatient transfer'; more often too high in the rotation."""
         blocks = v.read("ppv_intervals.json")["across_transfers"]
         assert blocks["columbia_outpatient"]["share_recipe_too_high"]["estimate"] == 0
         assert blocks["rotation"]["share_recipe_too_high"]["estimate"] > 0.5
-        assert "too low in every outpatient transfer" in REPORT.read_text()
+        assert "underestimated the PPV in every outpatient transfer" in REPORT.read_text()
 
     def test_the_largest_miss_is_the_named_one(self) -> None:
         worst = v.worst_transfer()
         assert (worst["label"], worst["source"], worst["target"]) == ("LBBB", "ptbxl", "sph")
-        assert "left bundle-branch block carried from PTB-XL to Shandong" in REPORT.read_text()
+        assert "left bundle-branch block transferred from PTB-XL to Shandong" in REPORT.read_text()
 
     def test_the_gap_follows_the_specificity(self) -> None:
         """'Where specificity rose, too low; where it fell, too high', for most transfers."""
@@ -769,7 +768,7 @@ class TestPPVClaims:
     def test_the_conclusion_does_not_prescribe_a_reset(self) -> None:
         """REGISTRE A05-7, A19-3: the conclusion leaves the choice; it never prescribes."""
         text = REPORT.read_text()
-        conclusion = text[text.index("**Conclusion.**") : text.index("## 1. Introduction")]
+        conclusion = text[text.index("**Conclusions.**") : text.index("## 1. Introduction")]
         assert "should" not in conclusion and "recalibrat" not in conclusion
         abstract = text[: text.index("## 1. Introduction")].lower()
         assert "conformal" not in abstract

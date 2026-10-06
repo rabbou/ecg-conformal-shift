@@ -394,6 +394,8 @@ def echonext() -> dict[str, str]:
         out[f"vo_sens_{s}"] = pct(held["sensitivity"]["share"])
         out[f"vo_sens_{s}_ci"] = interval(held["sensitivity"]["low"], held["sensitivity"]["high"])
         out[f"vo_hflag_{s}"] = per100(1 - held["specificity"]["share"])
+        out[f"vo_spec_{s}"] = pct(held["specificity"]["share"])
+        out[f"vo_spec_{s}_ci"] = interval(held["specificity"]["low"], held["specificity"]["high"])
         drawn = {r["labels"]: r for r in clinical["ladder_validation"][arm]}
         for rung in (100, 200):
             out[f"vl{rung}_sens_{s}"] = pct(drawn[rung]["sensitivity"]["mean"])
@@ -705,7 +707,7 @@ def rows_findings() -> list[str]:
         if int(outside["n_pos"]) == 0:
             out.append(
                 f"| {name} | {int(inside['n_pos']):,} | "
-                f"{pct(float(inside['coverage_pos']))} | 0 | none ill |"
+                f"{pct(float(inside['coverage_pos']))} | 0 | no cases |"
             )
             continue
         out.append(
@@ -845,7 +847,7 @@ def rows_variants() -> list[str]:
             a = entry["arms"][arm]
             sens, spec = a["outpatient"]["sensitivity"], a["outpatient"]["specificity"]
             out.append(
-                f"| {VARIANT_NAMES[name]}, {entry['n']:,} ({entry['n_ill']:,} ill) | "
+                f"| {VARIANT_NAMES[name]}, {entry['n']:,} ({entry['n_ill']:,} with SHD) | "
                 f"{ARM_NAMES[arm]} | "
                 f"{pct(sens['share'])} ({interval(sens['low'], sens['high'])}) | "
                 f"{pct(spec['share'])} ({interval(spec['low'], spec['high'])}) | "

@@ -286,6 +286,12 @@ class TestTheReportsShape:
         assert "conformal" not in title.lower()
         assert not re.search(r"\d", title)
 
+    def test_the_citation_does_not_reuse_an_earlier_article_s_version(self) -> None:
+        """v1.0.0 and v1.1.0 are published tags of earlier articles under other titles."""
+        version = re.search(r"^version: (\S+)$", CITATION.read_text(), flags=re.M)
+        assert version and version.group(1) not in {"1.0.0", "1.1.0"}
+        assert "date-released: 2026-09-30" not in CITATION.read_text()
+
     def test_the_seven_conditions_are_named_in_the_report(self) -> None:
         """Ruben, 5/10: name all seven conditions."""
         text = REPORT.read_text().lower()

@@ -6,8 +6,9 @@ authors:
   - family-names: Abbou
     given-names: Ruben
 repository-code: https://github.com/rabbou/ecg-conformal-shift
-version: 1.0.0
-date-released: 2026-09-30
+# v1.0.0 and v1.1.0 are tags of earlier articles; this one is cited as 2.0.0, and
+# date-released is written when that tag is made at the merge.
+version: 2.0.0
 license: MIT
 abstract: >-
   At Columbia, a threshold set to catch 90% of inpatients with moderate or
@@ -30,3 +31,11 @@ keywords:
   - sensitivity
   - spectrum effect
   - distribution shift
+preferred-citation:
+  type: article
+  title: "Carrying an ECG-AI threshold from inpatients to outpatients: a retrospective measurement of three structural heart disease models in one hospital system"
+  authors:
+    - family-names: Abbou
+      given-names: Ruben
+  year: 2026
+  url: https://github.com/rabbou/ecg-conformal-shift/blob/master/REPORT.md

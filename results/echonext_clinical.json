@@ -8973,7 +8973,7 @@
     "echonext-derived/scores/random_init.npz": "cfec4051d77dee952c330418a4e89e44aa982021ea206e987d5058e4632ea784"
   },
   "provenance": {
-    "commit": "843148726cd6ce479b7f4557e571db1803d76af4+dirty",
+    "commit": "2cb00fdb55b6b7297492411df592a0cb8e92e842",
     "producers": {
       "scripts/echonext_clinical.py": "f3743906c286b6a386725f45a81337c3af4fefd35d046b730deb084a291030e4",
       "src/ecs/clinical.py": "eb5f46c3dedd066bfca05bf8d09326cd972cfa08e3f786a15586b698a001843d",
@@ -8983,5 +8983,5 @@
       "src/ecs/transfer.py": "e690339b52941e150a61527ac5e0e56a3cc5dbcd5772f7ba06ec8296b112d624"
     }
   },
-  "seconds": 47.7
+  "seconds": 46.3
 }

@@ -664,3 +664,15 @@ def test_at_ninety_four_encoders_over_cover_shandong_and_ecg_fm_under_covers_bot
     text = SUPPLEMENT.read_text()
     assert "ECG-FM under-covers at both" in text
     assert "recommend" not in text
+
+
+def test_the_dropped_seen_target_cell_is_named_with_its_rule() -> None:
+    seen = v.read("seen_target.json")
+    assert seen["decision"]["seen_target_cell"] == "dropped"
+    readings = seen["readings"]
+    assert readings["four_partitions_named"]["enough_infarction"]["n_infarction"] == 212
+    share = readings["with_cpsc_extra"]["prevalence_is_a_population_not_an_assembly"]
+    assert round(100 * share["share_of_infarction"], 1) == 87.7
+    assert "was planned and dropped by a rule fixed before any coverage was read" in (
+        SUPPLEMENT.read_text()
+    )

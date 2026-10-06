@@ -68,7 +68,7 @@
     }
   },
   "provenance": {
-    "commit": "73bc5dfecd6c874d2e7735c0f12c14afc1272b60+dirty",
+    "commit": "e6ae324342e32ec315af2e7e90d3088bd8ef9285",
     "producers": {
       "results/baseline/scores.npz": "ba5c637ab63001d60a1678dc34efdeeaefef13c57de5bbb41e000a781ce43482",
       "results/external/acs.npz": "94a2069dccd60b19564e46c53cfae8e1a68593d6c21b869d461bbee2835875d7",
@@ -78,5 +78,5 @@
       "src/ecs/transfer.py": "e690339b52941e150a61527ac5e0e56a3cc5dbcd5772f7ba06ec8296b112d624"
     }
   },
-  "seconds": 4.4
+  "seconds": 4.5
 }

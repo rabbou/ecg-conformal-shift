@@ -42,6 +42,8 @@ exactly as ``scripts/echonext_transfer.py`` fits them:
   refit_without_margin
                the refit on 100 outpatients with the sample's own 10th
                percentile and no finite-sample margin;
+  age_sex      a score on age and sex alone, a logistic regression fitted on the
+               training split, thresholded and read like the ECG models;
   threshold_spread
                how far the sensitivity moves when the calibration inpatients
                are redrawn, by bootstrap, and the sensitivity at the plain
@@ -288,6 +290,40 @@ def calibration_variants(
                     "specificity": plain["healthy"]["right_alone"],
                 }
         out[name] = entry
+    return out
+
+
+def age_sex(
+    meta: pd.DataFrame, y: NDArray[np.int_], cal: NDArray[np.int_], targets: dict[str, Any]
+) -> dict[str, Any]:
+    """A comparator that sees no ECG: age and sex in a logistic regression fitted on
+    the training split, its threshold set on the calibration inpatients by the same
+    rule.  If its sensitivity also fell among outpatients, the fall would belong to the
+    population rather than to what the ECG shows."""
+    from sklearn.linear_model import LogisticRegression
+
+    x = np.column_stack(
+        [
+            meta["age_at_ecg"].to_numpy(dtype=float),
+            (meta["sex"].astype(str) == "male").to_numpy(dtype=float),
+        ]
+    )
+    train = np.flatnonzero(meta["split"].to_numpy() == "train")
+    model = LogisticRegression(max_iter=1000).fit(x[train], y[train])
+    p = model.predict_proba(x)[:, 1]
+    out: dict[str, Any] = {"n_train": int(len(train))}
+    roc_at = roc(p, y, targets)
+    at90 = SENSITIVITY_GRID.tolist().index(0.9)
+    for context in ("inpatient", "outpatient"):
+        rows = targets[context]
+        flagged = conformal_sets(p[cal], y[cal], p[rows], ALPHA)["plain"][:, 1]
+        yt = y[rows]
+        out[context] = {
+            "sensitivity": float(flagged[yt == 1].mean()),
+            "specificity": float((~flagged)[yt == 0].mean()),
+            "auroc": float(roc_auc_score(yt, p[rows])),
+            "specificity_at_90": roc_at[context][at90],
+        }
     return out
 
 
@@ -659,6 +695,7 @@ def measure(meta: pd.DataFrame) -> dict[str, Any]:
         for arm in ARMS
     }
     result["decision"] = {arm: decision(result, arm) for arm in ARMS}
+    result["age_sex"] = age_sex(meta, y, cal, targets)
     result["threshold_spread"] = {
         arm: threshold_spread(probs[arm], y, cal, targets) for arm in STRONGEST
     }

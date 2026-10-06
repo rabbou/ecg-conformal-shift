@@ -366,6 +366,16 @@ class TestClaims:
         assert "widens the outpatient interval" in REPORT.read_text()
         assert "With 95% confidence, no pair" not in REPORT.read_text()
 
+    def test_a_score_on_age_and_sex_keeps_its_sensitivity(self) -> None:
+        """Section 3.3: no ECG, no fall; and it flags more healthy than the ECG models."""
+        demo = v.read("echonext_clinical.json")["age_sex"]
+        assert demo["inpatient"]["sensitivity"] - demo["outpatient"]["sensitivity"] < 0.03
+        roc = v.read("echonext_clinical.json")["roc"]
+        at90 = roc["resnet"]["sensitivity"].index(0.9)
+        for arm in v.STRONGEST:
+            assert roc[arm]["outpatient"][at90] > demo["outpatient"]["specificity"], arm
+        assert "A score built on age and sex alone" in REPORT.read_text()
+
     def test_the_curve_held_and_both_groups_scored_lower(self) -> None:
         """'Separated almost as well': the AUROC moves by under two hundredths, while
         sensitivity falls and specificity rises from inpatients to outpatients."""

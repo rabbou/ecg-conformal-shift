@@ -172,6 +172,13 @@ def echonext() -> dict[str, str]:
         for context, c in (("inpatient", "in"), ("outpatient", "out")):
             out[f"oracle_spec_{SHORT[arm]}_{c}"] = pct(roc[arm][context][at90])
             out[f"oracle_flag_{SHORT[arm]}_{c}"] = per100(1 - roc[arm][context][at90])
+    flags90 = sorted(1 - roc[arm]["outpatient"][at90] for arm in STRONGEST)
+    out["oracle_flag_range_out"] = f"{per100(flags90[0])} to {per100(flags90[-1])}"
+    demo = clinical["age_sex"]
+    out["as_sens_in"] = pct(demo["inpatient"]["sensitivity"])
+    out["as_sens_out"] = pct(demo["outpatient"]["sensitivity"])
+    out["as_flag_out"] = per100(1 - demo["outpatient"]["specificity"])
+    out["as_auroc_out"] = f"{demo['outpatient']['auroc']:.3f}"
     spec_out = resnet_out["specificity"]
     out["extra_missed"] = per100(0.9 - resnet_out["sensitivity"])
     out["extra_cleared"] = per100(spec_out - roc["resnet"]["outpatient"][at90])

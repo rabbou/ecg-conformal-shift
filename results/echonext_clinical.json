@@ -7680,6 +7680,21 @@
       }
     }
   },
+  "age_sex": {
+    "n_train": 72475,
+    "inpatient": {
+      "sensitivity": 0.9039792387543253,
+      "specificity": 0.19579751671442217,
+      "auroc": 0.6331758558808658,
+      "specificity_at_90": 0.19579751671442217
+    },
+    "outpatient": {
+      "sensitivity": 0.8966789667896679,
+      "specificity": 0.26903553299492383,
+      "auroc": 0.6780489632307491,
+      "specificity_at_90": 0.23604060913705585
+    }
+  },
   "threshold_spread": {
     "resnet": {
       "draws": 1000,
@@ -8958,9 +8973,9 @@
     "echonext-derived/scores/random_init.npz": "cfec4051d77dee952c330418a4e89e44aa982021ea206e987d5058e4632ea784"
   },
   "provenance": {
-    "commit": "b28041baa0b0c3b30bdd98d267ac15a50708d2c0+dirty",
+    "commit": "843148726cd6ce479b7f4557e571db1803d76af4+dirty",
     "producers": {
-      "scripts/echonext_clinical.py": "c6e8d2c0678a87deb100089496e8a5e0120409c49d833d8082eadfe92bce5286",
+      "scripts/echonext_clinical.py": "f3743906c286b6a386725f45a81337c3af4fefd35d046b730deb084a291030e4",
       "src/ecs/clinical.py": "eb5f46c3dedd066bfca05bf8d09326cd972cfa08e3f786a15586b698a001843d",
       "src/ecs/conformal.py": "c434998b704a551d55bc2206a1a3ada6d42309947b0b92db11607746dcd068dc",
       "src/ecs/echonext.py": "f9dfdee094c555e16b1cf8300fb330b437eeead6b4d667a774fb16ff0b591c41",
@@ -8968,5 +8983,5 @@
       "src/ecs/transfer.py": "e690339b52941e150a61527ac5e0e56a3cc5dbcd5772f7ba06ec8296b112d624"
     }
   },
-  "seconds": 46.0
+  "seconds": 47.7
 }

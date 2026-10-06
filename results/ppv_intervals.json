@@ -1,0 +1,240 @@
+{
+  "question": "95% intervals for the shares across transfers and the Columbia proportions the report quotes without one elsewhere.",
+  "interval_rule": "across transfers: 2.5th and 97.5th percentiles of 2,000 draws resampling whole clusters, one per model and pair of populations; among patients: Wilson, 95%",
+  "close_points": 0.02,
+  "across_transfers": {
+    "transfer": {
+      "cells": 174,
+      "clusters": 30,
+      "median_abs_gap_points": {
+        "estimate": 0.053485950000000004,
+        "low": 0.0421665,
+        "high": 0.0784147
+      },
+      "share_outside_observed_interval": {
+        "estimate": 0.7471264367816092,
+        "low": 0.6666666666666666,
+        "high": 0.825
+      },
+      "share_within_two_points": {
+        "estimate": 0.25287356321839083,
+        "low": 0.17740563967522494,
+        "high": 0.33170016750418735
+      },
+      "share_recipe_too_high": {
+        "estimate": 0.3563218390804598,
+        "low": 0.22484574249280131,
+        "high": 0.5098039215686274
+      },
+      "share_ratio_off_by_a_quarter_or_more": {
+        "estimate": 0.5747126436781609,
+        "low": 0.4596120557987985,
+        "high": 0.6949204216618438
+      }
+    },
+    "control": {
+      "cells": 72,
+      "clusters": 9,
+      "median_abs_gap_points": {
+        "estimate": 0.00326704,
+        "low": 0.00210049,
+        "high": 0.0100398
+      },
+      "share_outside_observed_interval": {
+        "estimate": 0.013888888888888888,
+        "low": 0.0,
+        "high": 0.05263157894736842
+      },
+      "share_within_two_points": {
+        "estimate": 0.8611111111111112,
+        "low": 0.6724137931034483,
+        "high": 0.9746835443037974
+      },
+      "share_recipe_too_high": {
+        "estimate": 0.4027777777777778,
+        "low": 0.3176470588235294,
+        "high": 0.5254237288135594
+      },
+      "share_ratio_off_by_a_quarter_or_more": {
+        "estimate": 0.013888888888888888,
+        "low": 0.0,
+        "high": 0.041666666666666664
+      }
+    },
+    "columbia_emergency": {
+      "cells": 44,
+      "clusters": 4,
+      "median_abs_gap_points": {
+        "estimate": 0.031731949999999995,
+        "low": 0.025820299999999997,
+        "high": 0.04483255
+      },
+      "share_outside_observed_interval": {
+        "estimate": 0.6590909090909091,
+        "low": 0.5909090909090909,
+        "high": 0.7272727272727273
+      },
+      "share_within_two_points": {
+        "estimate": 0.36363636363636365,
+        "low": 0.2727272727272727,
+        "high": 0.45454545454545453
+      },
+      "share_recipe_too_high": {
+        "estimate": 0.09090909090909091,
+        "low": 0.022727272727272728,
+        "high": 0.1590909090909091
+      },
+      "share_ratio_off_by_a_quarter_or_more": {
+        "estimate": 0.38636363636363635,
+        "low": 0.22727272727272727,
+        "high": 0.5454545454545454
+      }
+    },
+    "columbia_outpatient": {
+      "cells": 36,
+      "clusters": 4,
+      "median_abs_gap_points": {
+        "estimate": 0.0484705,
+        "low": 0.02144265,
+        "high": 0.0548282
+      },
+      "share_outside_observed_interval": {
+        "estimate": 0.8055555555555556,
+        "low": 0.5,
+        "high": 1.0
+      },
+      "share_within_two_points": {
+        "estimate": 0.19444444444444445,
+        "low": 0.0,
+        "high": 0.5
+      },
+      "share_recipe_too_high": {
+        "estimate": 0.0,
+        "low": 0.0,
+        "high": 0.0
+      },
+      "share_ratio_off_by_a_quarter_or_more": {
+        "estimate": 0.7777777777777778,
+        "low": 0.4166666666666667,
+        "high": 1.0
+      }
+    },
+    "rotation": {
+      "cells": 92,
+      "clusters": 20,
+      "median_abs_gap_points": {
+        "estimate": 0.1086985,
+        "low": 0.0632853,
+        "high": 0.158178
+      },
+      "share_outside_observed_interval": {
+        "estimate": 0.7608695652173914,
+        "low": 0.6702127659574468,
+        "high": 0.8506171630094042
+      },
+      "share_within_two_points": {
+        "estimate": 0.21739130434782608,
+        "low": 0.1444047619047619,
+        "high": 0.2903225806451613
+      },
+      "share_recipe_too_high": {
+        "estimate": 0.6195652173913043,
+        "low": 0.45555555555555555,
+        "high": 0.7608695652173914
+      },
+      "share_ratio_off_by_a_quarter_or_more": {
+        "estimate": 0.5869565217391305,
+        "low": 0.46808510638297873,
+        "high": 0.7191011235955056
+      }
+    },
+    "infarction": {
+      "cells": 2,
+      "clusters": 2,
+      "median_abs_gap_points": {
+        "estimate": 0.10039157,
+        "low": 0.00911214,
+        "high": 0.191671
+      },
+      "share_outside_observed_interval": {
+        "estimate": 1.0,
+        "low": 1.0,
+        "high": 1.0
+      },
+      "share_within_two_points": {
+        "estimate": 0.5,
+        "low": 0.0,
+        "high": 1.0
+      },
+      "share_recipe_too_high": {
+        "estimate": 0.5,
+        "low": 0.0,
+        "high": 1.0
+      },
+      "share_ratio_off_by_a_quarter_or_more": {
+        "estimate": 0.5,
+        "low": 0.0,
+        "high": 1.0
+      }
+    }
+  },
+  "columbia": {
+    "inpatient": {
+      "prevalence": {
+        "share": 0.5247389922832502,
+        "successes": 1156,
+        "n": 2203,
+        "low": 0.5038605592450309,
+        "high": 0.5455312987719234
+      },
+      "share_flagged": {
+        "share": 0.7489786654561961,
+        "successes": 1650,
+        "n": 2203,
+        "low": 0.7304494933700625,
+        "high": 0.7666410409840554
+      },
+      "npv": {
+        "share": 0.7992766726943942,
+        "successes": 442,
+        "n": 553,
+        "low": 0.76387982445195,
+        "high": 0.8305443060734743
+      }
+    },
+    "outpatient": {
+      "prevalence": {
+        "share": 0.2559017941454202,
+        "successes": 271,
+        "n": 1059,
+        "low": 0.23053514643454676,
+        "high": 0.28303294435704507
+      },
+      "share_flagged": {
+        "share": 0.39848914069877245,
+        "successes": 422,
+        "n": 1059,
+        "low": 0.3694201175555827,
+        "high": 0.4282919511488511
+      },
+      "npv": {
+        "share": 0.8791208791208791,
+        "successes": 560,
+        "n": 637,
+        "low": 0.8515071337869043,
+        "high": 0.9021894215028218
+      }
+    }
+  },
+  "provenance": {
+    "commit": "300fb4da98af8e5e18e50297e1416d59e106e375",
+    "producers": {
+      "results/echonext_clinical.json": "791088551738f273a7228d5514aea572e8e34ef4b0431eb88b4f93dd8b245889",
+      "results/echonext_ppv_gap.json": "2bfb4cd3d624e79e57976c2e6deeb5a3eebcc534c4039b0e68423b186e291cfb",
+      "results/ppv_gap.json": "c397026136517c942c1d2570d4e8724ba5663a633e54f111efb79dcca1eb2717",
+      "scripts/ppv_intervals.py": "7107bb4621dcf50e07be574459666ee39804cfaa8fb7aca6057f8662998d1b08",
+      "src/ecs/metrics.py": "e04509abce93b400ac90cbd102a63a747f0559de4d2c9d20cdc2ee4ce1cf90e6"
+    }
+  },
+  "seconds": 1.0
+}

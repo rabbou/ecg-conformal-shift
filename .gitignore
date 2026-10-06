@@ -29,6 +29,7 @@ results/baseline/model.pt
 !results/echonext_coverage.csv
 !results/echonext_severity.json
 !results/ppv_gap.json
+!results/ppv_intervals.json
 !results/ppv_gap.csv
 !results/echonext_ppv_gap.json
 !results/repairs.json

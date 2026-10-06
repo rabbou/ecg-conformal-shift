@@ -13,17 +13,17 @@ license: MIT
 abstract: >-
   Across {{ppv_gap_cells}} transfers of a threshold between hospitals, care
   settings and corpora, the positive predictive value recomputed by Bayes'
-  theorem at the target's true prevalence missed the observed one by a median
-  of {{ppv_gap_median_ci}} percentage points, against {{ppv_control_median_ci}} on
+  theorem at the target's true prevalence differed from the observed value by a median
+  of {{ppv_gap_median_ci}} percentage points, against {{ppv_control_median_ci}} in
   controls, and fell outside the observed value's 95% confidence interval in
-  {{ppv_outside}} of transfers, in both directions. At Columbia, the network
+  {{ppv_outside}} of transfers, overestimating it in some and underestimating it in others. At Columbia, the network
   discriminated nearly as well among outpatients as among inpatients (AUROC
   {{auroc_resnet_out}} and {{auroc_resnet_in}}), but outpatients with and without structural
   heart disease both scored lower, so at the inpatient threshold sensitivity
   among outpatients was {{sens_resnet_out}} and the observed positive predictive value
   {{col_ppv_obs_ci}}, where the recomputation gave {{col_ppv_rec}}. After threshold
   recalibration on {{vo_n}} separate outpatients, sensitivity was {{vo_sens_resnet}}. The transfers cover four structural heart
-  disease models in EchoNext, an infarction network carried from PTB-XL to
+  disease models in EchoNext, an infarction network transferred from PTB-XL to
   hospitals in Chongqing and Shandong, and a rotation of five public corpora
   on five rhythm and conduction diagnoses.
 keywords:

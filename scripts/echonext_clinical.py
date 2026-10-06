@@ -42,6 +42,10 @@ exactly as ``scripts/echonext_transfer.py`` fits them:
   refit_without_margin
                the refit on 100 outpatients with the sample's own 10th
                percentile and no finite-sample margin;
+  threshold_spread
+               how far the sensitivity moves when the calibration inpatients
+               are redrawn, by bootstrap, and the sensitivity at the plain
+               90th-percentile threshold without the (n+1) correction;
   half_means   the mean sensitivity of the refit on 100 over the draws of one
                cut into halves, for 400 random cuts: the spread a refit read
                on one fixed half belongs in;
@@ -284,6 +288,42 @@ def calibration_variants(
                     "specificity": plain["healthy"]["right_alone"],
                 }
         out[name] = entry
+    return out
+
+
+def threshold_spread(
+    p: NDArray[np.float64],
+    y: NDArray[np.int_],
+    cal: NDArray[np.int_],
+    targets: dict[str, Any],
+    draws: int = 1000,
+    seed: int = 0,
+) -> dict[str, Any]:
+    """The sensitivity in each setting when the calibration inpatients are resampled
+    and the threshold set again, and at the uncorrected 90th percentile.
+
+    A Wilson interval holds the threshold fixed and resamples the patients read; a
+    clinic that sets the threshold on its own calibration sample also carries that
+    sample's chance.  The spread here is that second part.
+    """
+    rng = np.random.default_rng(seed)
+    out: dict[str, Any] = {"draws": draws}
+    resampled = [rng.choice(cal, size=len(cal), replace=True) for _ in range(draws)]
+    ill_cal = np.sort(p[cal][y[cal] == 1])
+    plain_cut = np.quantile(ill_cal, ALPHA, method="inverted_cdf")
+    for context in ("inpatient", "outpatient"):
+        rows = targets[context]
+        ill = rows[y[rows] == 1]
+        spread = [
+            float(conformal_sets(p[c], y[c], p[ill], ALPHA)["plain"][:, 1].mean())
+            for c in resampled
+        ]
+        out[context] = {
+            "sd": float(np.std(spread)),
+            "p2_5": float(np.percentile(spread, 2.5)),
+            "p97_5": float(np.percentile(spread, 97.5)),
+            "uncorrected_sensitivity": float((p[ill] >= plain_cut).mean()),
+        }
     return out
 
 
@@ -619,6 +659,9 @@ def measure(meta: pd.DataFrame) -> dict[str, Any]:
         for arm in ARMS
     }
     result["decision"] = {arm: decision(result, arm) for arm in ARMS}
+    result["threshold_spread"] = {
+        arm: threshold_spread(probs[arm], y, cal, targets) for arm in STRONGEST
+    }
     result["half_means"] = {
         arm: {
             "labels": 100,

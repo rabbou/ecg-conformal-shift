@@ -330,6 +330,22 @@ def echonext() -> dict[str, str]:
     band_in = [r["share"] for arm in STRONGEST for r in clinical["eras"]["arms"][arm]["inpatient"]]
     out["era_in_range"] = f"{pct(min(band_in))} to {pct(max(band_in))}"
 
+    for arm in STRONGEST:
+        spread = clinical["threshold_spread"][arm]
+        for context, c in (("inpatient", "in"), ("outpatient", "out")):
+            measured = clinical["arms"][arm][context]
+            sens, n = measured["sensitivity"], measured["n_ill"]
+            half = 1.959964 * math.sqrt(spread[context]["sd"] ** 2 + sens * (1 - sens) / n)
+            out[f"ts_ci_{SHORT[arm]}_{c}"] = interval(sens - half, sens + half)
+        out[f"unc_sens_{SHORT[arm]}_out"] = pct(spread["outpatient"]["uncorrected_sensitivity"])
+    at72 = roc["resnet"]["sensitivity"].index(0.72)
+    out["roc72_in"] = per100(1 - roc["resnet"]["inpatient"][at72])
+    out["roc72_out"] = per100(1 - roc["resnet"]["outpatient"][at72])
+    for arm in STRONGEST:
+        for context, c in CONTEXT.items():
+            a = transfer["arms"][arm]["auroc"][context][COMPOSITE]
+            out[f"auroc_{SHORT[arm]}_{c}_ci"] = f"{a['low']:.3f} to {a['high']:.3f}"
+
     variants = clinical["calibration_variants"]
     every, outside = variants["every_setting"], variants["outpatients"]
     out["va_n"], out["va_ill"] = count(every["n"]), count(every["n_ill"])

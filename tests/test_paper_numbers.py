@@ -286,6 +286,14 @@ class TestClaims:
             assert o["perlabel"]["ill"]["deferred"]["share"] / caught >= 0.5, arm
             assert o["perlabel"]["healthy"]["deferred"]["share"] / flagged >= 0.9, arm
 
+    def test_redrawing_the_calibration_widens_the_outpatient_interval(self) -> None:
+        """Section 3.1 and Table S1: the threshold's own spread widens the interval."""
+        clinical = v.read("echonext_clinical.json")
+        for arm in v.STRONGEST:
+            assert clinical["threshold_spread"][arm]["outpatient"]["sd"] > 0.005, arm
+        assert "widens the outpatient interval" in REPORT.read_text()
+        assert "With 95% confidence, no pair" not in REPORT.read_text()
+
     def test_the_curve_held_and_both_groups_scored_lower(self) -> None:
         """'Separated almost as well': the AUROC moves by under two hundredths, while
         sensitivity falls and specificity rises from inpatients to outpatients."""

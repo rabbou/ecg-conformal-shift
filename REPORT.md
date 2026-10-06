@@ -48,7 +48,7 @@ The main figures set the threshold on the calibration inpatients alone: the case
 
 ### 2.4 What was counted
 
-For 100 ill patients: caught, meaning flagged by the first threshold, and missed. For 100 healthy patients: cleared and flagged. With the second threshold, the flagged split into those flagged with no reader and those sent to a reader. The positive predictive value is the share of flagged patients who are ill, and the negative predictive value the share of cleared patients who are healthy. Both depend on the prevalence, the share of patients who are ill, and are given at the outpatients' own prevalence and at 10% and 5%. The figures at 10% and 5% assume that sensitivity and specificity stay the same at those prevalences, an assumption a companion study measured and found off by several points [14]. A range in brackets after a percentage is its 95% confidence interval; a range across repetitions is named as such.
+For 100 ill patients: caught, meaning flagged by the first threshold, and missed. For 100 healthy patients: cleared and flagged. With the second threshold, the flagged split into those flagged with no reader and those sent to a reader. The positive predictive value is the share of flagged patients who are ill, and the negative predictive value the share of cleared patients who are healthy. Both depend on the prevalence, the share of patients who are ill, and are given at the outpatients' own prevalence and at 10% and 5%. The figures at 10% and 5% assume that sensitivity and specificity stay the same at those prevalences, an assumption a companion study measured and found off by several points [14]. A range in brackets after a percentage is its 95% confidence interval, which resamples the patients read for the threshold as set; where the calibration patients are resampled as well, the text says so. A range across repetitions is named as such.
 
 To see how well each model separates ill from healthy in each setting, the AUROC was computed, and Figure 2 draws every possible threshold as a curve of ill caught against healthy flagged. The three models were compared on the same outpatients.
 
@@ -66,7 +66,7 @@ The inpatient threshold caught 72 to 73 of 100 ill outpatients for each of the t
 
 ### 3.1 The threshold catches 72 of 100 ill outpatients
 
-Set to catch 90% of the ill calibration inpatients, the trained network's threshold caught 90.4% of the ill among the other inpatients (95% confidence interval 88.6% to 92.0%) and 71.6% of ill outpatients (65.9% to 76.6%). The published mini-model caught 72.7% and ECGFounder 71.6% of the ill outpatients. Emergency patients sat between, at 86.2%. Figure 1 counts the outcomes per 100 outpatients.
+Set to catch 90% of the ill calibration inpatients, the trained network's threshold caught 90.4% of the ill among the other inpatients (95% confidence interval 88.6% to 92.0%) and 71.6% of ill outpatients (65.9% to 76.6%). The published mini-model caught 72.7% and ECGFounder 71.6% of the ill outpatients. Redrawing the calibration inpatients as well, so that the threshold moves too, widens the outpatient interval to 65.2% to 78.0%. Emergency patients sat between, at 86.2%. Figure 1 counts the outcomes per 100 outpatients.
 
 Set instead on all 4,626 validation patients, whatever their setting, the threshold caught 77.1% of ill outpatients (71.8% to 81.7%) and 94.0% of ill inpatients; for the mini-model and ECGFounder, 76.4% and 77.9% of ill outpatients. The fall is smaller from that threshold, and it remains.
 
@@ -94,7 +94,7 @@ The loss was not spread evenly over the eleven findings. Among ill patients with
 
 ### 3.2 The model separates as well; the threshold sits elsewhere
 
-The AUROC of the trained network was 0.815 among inpatients and 0.805 among outpatients. For the mini-model it moved from 0.797 to 0.795, and for ECGFounder from 0.804 to 0.791. Figure 2 draws, for every possible threshold, how many ill it catches against how many healthy it flags. The inpatient and outpatient curves nearly coincide, so the model separates the two groups about as well in both settings. The same threshold lands at a different point on that curve: among inpatients it caught 90 ill in 100 and flagged 58 healthy in 100; among outpatients it caught 72 and flagged 29. Ill and healthy outpatients both scored lower than their inpatient counterparts.
+The AUROC of the trained network was 0.815 among inpatients (0.796 to 0.832), 0.805 among outpatients (0.774 to 0.837) and 0.837 among emergency patients (0.820 to 0.854). For the mini-model it moved from 0.797 to 0.795, and for ECGFounder from 0.804 to 0.791. Figure 2 draws, for every possible threshold, how many ill it catches against how many healthy it flags. The inpatient and outpatient curves lie within a few points of each other: catching 90 ill in 100 flags 57 and 59 healthy in 100, and catching 72 flags 25 and 31. The model separates the two groups about as well in both settings. The same threshold lands at a different point on that curve: among inpatients it caught 90 ill in 100 and flagged 58 healthy in 100; among outpatients it caught 72 and flagged 29. Ill and healthy outpatients both scored lower than their inpatient counterparts.
 
 ![Figure 2](results/figures/fig_curve.png)
 
@@ -104,7 +104,7 @@ The curves also give the price of catching 90 of 100 ill outpatients when every 
 
 ### 3.3 Three models lose the same share
 
-On the same ill outpatients, the trained network caught exactly as many as ECGFounder and 1.1 points fewer than the mini-model. With 95% confidence, no pair of the three models differs by more than 5.5 points. The fourth, untrained model caught more ill outpatients, 78.6%, only because it flagged far more healthy ones: 43 in 100, against 29 for the trained network. Three models built three ways fall to the same level, so the loss does not belong to one model. All three learned from the same EchoNext patients, so they are not three independent tests of its cause.
+On the same ill outpatients, the trained network caught exactly as many as ECGFounder and 1.1 points fewer than the mini-model. Each pair's 95% interval lies within 5.5 points of zero (supplement, Table S2); the three intervals hold at 95% each, not jointly. The fourth, untrained model caught more ill outpatients, 78.6%, only because it flagged far more healthy ones: 43 in 100, against 29 for the trained network. Three models built three ways fall to the same level, so the loss does not belong to one model. All three learned from the same EchoNext patients, so they are not three independent tests of its cause.
 
 ### 3.4 Case mix explains about a quarter of the fall
 

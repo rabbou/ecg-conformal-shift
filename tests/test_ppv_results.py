@@ -5,14 +5,15 @@ The infarction rows are recomputed here from the score files without importing
 from their definitions, so agreement is evidence rather than a shared bug.  The
 EchoNext rows cannot be recomputed without restricted data; they are held
 against ``echonext_transfer.json``, which reached the same two PPVs through
-other code.  Every figure PPV.md and PPV.fr.md print is read back out of the
-result files.
+other code.  The article prints these figures through ``tests/paper_values.py``,
+and ``tests/test_paper_numbers.py`` holds the text to them.
 """
 
 from __future__ import annotations
 
 import json
 import math
+import re
 from typing import Any
 
 import numpy as np
@@ -108,93 +109,29 @@ def test_echonext_holds_every_arm_context_and_label(private: dict[str, Any]) -> 
     assert len(private["rows"]) == 4 * 3 * 12
 
 
-def one(x: float) -> str:
-    return f"{x:.1f}"
-
-
-def pct(x: float) -> str:
-    return f"{100 * x:.0f}%"
-
-
-def quoted(public: dict[str, Any], private: dict[str, Any], repairs: dict[str, Any]) -> list[str]:
-    """Every figure PPV.md prints, as it prints it, from the result files."""
+def test_the_cluster_intervals_hold_the_summary_they_bracket(private: dict[str, Any]) -> None:
+    """The interval file's estimates are the PPV files' own summary, and each interval
+    brackets its estimate."""
+    blocks = load(RESULTS_DIR / "ppv_intervals.json")["across_transfers"]
     every = private["all_families"]
-    echo = private["summary"]["echonext"]["by_target"]
-    rotation = public["summary"]["rotation"]["transfer"]
-    lvef = row(private["rows"], model="resnet", target="outpatient", label=LVEF)
-    shd = row(private["rows"], model="resnet", target="outpatient", label=COMPOSITE)
-    sph = row(public["rows"], family="infarction", target="sph")
-    acs = row(public["rows"], family="infarction", target="acs")
-    free = every["transfer"]["label_free_predictors"]
-    ten = repairs["summary"]["all"]["0.10"]
-    out = [
-        f"{every['transfer']['cells']} transfers",
-        f"median of {one(100 * every['transfer']['median_abs_gap_points'])} percentage points",
-        f"in {pct(every['transfer']['share_outside_observed_interval'])} of the transfers",
-        f"On {every['in_distribution']['cells']} control pairs",
-        f"missed by {one(100 * every['in_distribution']['median_abs_gap_points'])} points",
-        f"In {pct(every['transfer']['share_ratio_off_by_a_quarter_or_more'])} of transfers",
-        *(
-            f"| {block['cells']} | {one(100 * block['median_abs_gap_points'])} |"
-            for block in (echo["outpatient"], echo["emergency"], rotation)
-        ),
-        f"that {pct(lvef['ppv_recomputed'])} of the outpatients",
-        f"The observed figure was {pct(lvef['ppv_observed'])}",
-        f"{one(lvef['false_alerts_recomputed'])} false alerts per patient found where there "
-        f"were {one(lvef['false_alerts_observed'])}",
-        f"it predicted {pct(shd['ppv_recomputed'])} and the observed figure was "
-        f"{pct(shd['ppv_observed'])}",
-        f"specificity rose from {pct(shd['spec_source'])} to {pct(shd['spec_target'])}",
-        f"is {echo['inpatient']['median_likelihood_ratio_healthy_target']:.2f}",
-        f"it is {echo['emergency']['median_likelihood_ratio_healthy_target']:.2f}",
-        f"outpatients {echo['outpatient']['median_likelihood_ratio_healthy_target']:.2f}",
-        f"PPV of {pct(acs['ppv_recomputed'])} for infarction, and {pct(acs['ppv_observed'])}",
-        f"from {pct(acs['spec_source'])} to {pct(acs['spec_target'])}",
-        f"{100 * sph['ppv_recomputed']:.1f}% against {100 * sph['ppv_observed']:.1f}%",
-        f"{sph['false_alerts_recomputed']:.0f} false alerts per infarction found, where there "
-        f"were {sph['false_alerts_observed']:.0f}",
-        f"median of {one(100 * free['recipe_estimated_prevalence']['median_abs_points'])} points",
-        f"missed by {one(100 * free['mean_probability']['median_abs_points'])}",
-        f"by {one(100 * free['mean_probability_prior_corrected']['median_abs_points'])}",
-        f"over {repairs['summary']['all']['cells']} transfers",
-    ]
-    for name in ("prior", "recalibrated", "abstention_cleared", "abstention_referred"):
-        gain = ten["mean_gain_per_1000"][name]
-        out.append(f"| {gain:+.1f} | {ten['wins'][name]} |".replace("-", "−"))
-    gains = [
-        repairs["summary"]["all"][t]["mean_gain_per_1000"]["recalibrated"]
-        for t in ("0.05", "0.10", "0.20")
-    ]
-    out.append(", ".join(one(g) for g in gains[:2]) + f" and {one(gains[2])} net true positives")
-    return out
+    for name, summary in (("transfer", every["transfer"]), ("control", every["in_distribution"])):
+        block = blocks[name]
+        assert block["cells"] == summary["cells"]
+        for key in (
+            "median_abs_gap_points",
+            "share_within_two_points",
+            "share_outside_observed_interval",
+            "share_recipe_too_high",
+            "share_ratio_off_by_a_quarter_or_more",
+        ):
+            assert block[key]["estimate"] == pytest.approx(summary[key], abs=1e-5), (name, key)
+            assert block[key]["low"] <= block[key]["estimate"] <= block[key]["high"], (name, key)
 
 
-def test_every_figure_in_ppv_md_is_in_the_results(
-    public: dict[str, Any], private: dict[str, Any], repairs: dict[str, Any]
-) -> None:
-    """The article's numbers are the files' numbers; a rerun that moves one fails here."""
-    text = (REPO_ROOT / "PPV.md").read_text()
-    missing = [q for q in quoted(public, private, repairs) if q not in text]
-    assert missing == []
-
-
-def test_the_french_article_quotes_the_same_headline(private: dict[str, Any]) -> None:
-    every = private["all_families"]
-    text = (REPO_ROOT / "PPV.fr.md").read_text()
-    median = f"{100 * every['transfer']['median_abs_gap_points']:.1f}".replace(".", ",")
-    assert f"{every['transfer']['cells']} transferts" in text
-    assert f"de {median} points de pourcentage en médiane" in text
-
-
-def test_the_readme_quotes_the_headline(private: dict[str, Any]) -> None:
-    every = private["all_families"]
-    text = (REPO_ROOT / "README.md").read_text()
-    transfer, control = every["transfer"], every["in_distribution"]
-    assert (
-        f"median of {100 * transfer['median_abs_gap_points']:.1f} percentage points over "
-        f"{transfer['cells']} transfers" in text
-    )
-    assert (
-        f"{100 * control['median_abs_gap_points']:.1f} points on {control['cells']} controls"
-        in text
-    )
+def test_ppv_md_points_to_the_article() -> None:
+    """One text says each thing: PPV.md and its French page point to REPORT.md."""
+    for name in ("PPV.md", "PPV.fr.md"):
+        text = (REPO_ROOT / name).read_text()
+        assert "](REPORT.md)" in text and "](SUPPLEMENT.md)" in text
+        assert not re.search(r"\d%|\d points", text), f"{name} prints a result of its own"
+        assert len(text.split()) < 120, name

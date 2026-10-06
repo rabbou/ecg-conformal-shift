@@ -1,5 +1,5 @@
 cff-version: 1.2.0
-title: "Carrying an ECG-AI threshold from inpatients to outpatients: a retrospective measurement of three structural heart disease models in one hospital system"
+title: "Predicting an ECG model's positive predictive value from a clinic's prevalence: a retrospective measurement across hospitals and care settings"
 message: If you use this repository, please cite it as below.
 type: software
 authors:
@@ -11,29 +11,32 @@ repository-code: https://github.com/rabbou/ecg-conformal-shift
 version: 2.0.0
 license: MIT
 abstract: >-
-  At Columbia, a threshold set to catch 90% of inpatients with moderate or
-  worse structural heart disease caught {{sens_resnet_out}} of outpatients with
-  it for a network trained on EchoNext, {{sens_mini_out}} for the published
-  EchoNext mini-model and {{sens_ecgf_out}} for ECGFounder, while the AUROC
-  moved from {{auroc_resnet_in}} to {{auroc_resnet_out}} for the trained network. Set
-  again on 100 outpatients with known diagnoses, the threshold caught
-  {{lad100_sens_resnet}} of the other outpatients' ill on average and flagged
-  {{lad100_hflag_resnet}} of 100 healthy; set on {{vo_n}} separate outpatients, it
-  caught {{vo_sens_resnet}}, {{vo_sens_mini}} and {{vo_sens_ecgf}}, short of 90% for
-  all three models. An infarction
-  model carried from PTB-XL to hospitals in Chongqing and Shandong is reported
-  beside it, with a rotation of five public corpora on five rhythm and
-  conduction diagnoses.
+  Across {{ppv_gap_cells}} transfers of a threshold between hospitals, care
+  settings and corpora, the positive predictive value recomputed by Bayes'
+  theorem at the target's true prevalence missed the observed one by a median
+  of {{ppv_gap_median_ci}} percentage points, against {{ppv_control_median_ci}} on
+  controls, and fell outside the observed value's 95% confidence interval in
+  {{ppv_outside}} of transfers, in both directions. At Columbia, the network
+  separated ill from healthy outpatients almost as well as inpatients (AUROC
+  {{auroc_resnet_in}} and {{auroc_resnet_out}}), but ill and healthy outpatients both scored lower,
+  so the inpatient threshold caught {{sens_resnet_out}} of ill outpatients and
+  {{col_ppv_obs_ci}} of flagged outpatients were ill, where the recomputation gave
+  {{col_ppv_rec}}. Set again on {{vo_n}} separate outpatients, the threshold caught
+  {{vo_sens_resnet}} of ill outpatients. The transfers cover four structural heart
+  disease models in EchoNext, an infarction network carried from PTB-XL to
+  hospitals in Chongqing and Shandong, and a rotation of five public corpora
+  on five rhythm and conduction diagnoses.
 keywords:
   - electrocardiography
   - structural heart disease
+  - positive predictive value
   - decision threshold
   - sensitivity
   - spectrum effect
   - distribution shift
 preferred-citation:
   type: article
-  title: "Carrying an ECG-AI threshold from inpatients to outpatients: a retrospective measurement of three structural heart disease models in one hospital system"
+  title: "Predicting an ECG model's positive predictive value from a clinic's prevalence: a retrospective measurement across hospitals and care settings"
   authors:
     - family-names: Abbou
       given-names: Ruben

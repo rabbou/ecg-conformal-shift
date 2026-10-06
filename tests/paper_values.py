@@ -108,6 +108,10 @@ def echonext() -> dict[str, str]:
             out[f"sens_{short}_{c}_ci"] = interval(
                 float(plain["coverage_pos_low"]), float(plain["coverage_pos_high"])
             )
+            out[f"spec_{short}_{c}"] = pct(float(plain["coverage_neg"]))
+            out[f"spec_{short}_{c}_ci"] = interval(
+                float(plain["coverage_neg_low"]), float(plain["coverage_neg_high"])
+            )
             measured = clinical["arms"][arm][context]
             plain_o = measured["outcomes"]["plain"]
             perlabel = measured["outcomes"]["perlabel"]
@@ -496,15 +500,145 @@ def infarction() -> dict[str, str]:
     return out
 
 
+PPV_BLOCKS = {
+    "control": "Controls, same population",
+    "transfer": "All transfers",
+    "columbia_emergency": "Columbia, inpatients to emergency",
+    "columbia_outpatient": "Columbia, inpatients to outpatients",
+    "rotation": "Five corpora, each to the other four",
+}
+SHARES = (
+    "share_within_two_points",
+    "share_outside_observed_interval",
+    "share_ratio_off_by_a_quarter_or_more",
+    "share_recipe_too_high",
+)
+
+
+def ppv_rows() -> list[dict[str, Any]]:
+    return [*read("ppv_gap.json")["rows"], *read("echonext_ppv_gap.json")["rows"]]
+
+
+def ppv_row(**key: str) -> dict[str, Any]:
+    (row,) = [r for r in ppv_rows() if all(r[k] == v for k, v in key.items())]
+    return row
+
+
+def worst_transfer() -> dict[str, Any]:
+    kept = [r for r in ppv_rows() if r["summarised"] and not r["in_distribution"]]
+    return max(kept, key=lambda r: abs(r["gap"]))
+
+
+def share_ci(s: dict[str, float]) -> str:
+    """A share across transfers, with its cluster-bootstrap interval."""
+    return f"{pct(s['estimate'], 0)} ({pct(s['low'], 0)} to {pct(s['high'], 0)})"
+
+
+def points_ci(s: dict[str, float]) -> str:
+    return f"{100 * s['estimate']:.1f} ({100 * s['low']:.1f} to {100 * s['high']:.1f})"
+
+
+def wilson_ci(w: dict[str, float], digits: int = 1) -> str:
+    return f"{pct(w['share'], digits)} ({pct(w['low'], digits)} to {pct(w['high'], digits)})"
+
+
+def observed_ci(row: dict[str, Any], digits: int = 1) -> str:
+    return (
+        f"{pct(row['ppv_observed'], digits)} "
+        f"({pct(row['ppv_observed_low'], digits)} to {pct(row['ppv_observed_high'], digits)})"
+    )
+
+
 def ppv() -> dict[str, str]:
     every = read("echonext_ppv_gap.json")["all_families"]
-    transfer, control = every["transfer"], every["in_distribution"]
-    return {
-        "ppv_gap_median": f"{100 * transfer['median_abs_gap_points']:.1f}",
+    echo = read("echonext_ppv_gap.json")["summary"]["echonext"]["by_target"]
+    blocks = read("ppv_intervals.json")["across_transfers"]
+    columbia = read("ppv_intervals.json")["columbia"]
+    transfer, control = blocks["transfer"], blocks["control"]
+    assert transfer["cells"] == every["transfer"]["cells"]
+    out = {
         "ppv_gap_cells": f"{transfer['cells']}",
-        "ppv_control_median": f"{100 * control['median_abs_gap_points']:.1f}",
         "ppv_control_cells": f"{control['cells']}",
+        "ppv_clusters": f"{transfer['clusters']}",
+        "ppv_control_clusters": f"{control['clusters']}",
+        "ppv_gap_median": f"{100 * transfer['median_abs_gap_points']['estimate']:.1f}",
+        "ppv_gap_median_ci": points_ci(transfer["median_abs_gap_points"]),
+        "ppv_control_median": f"{100 * control['median_abs_gap_points']['estimate']:.1f}",
+        "ppv_control_median_ci": points_ci(control["median_abs_gap_points"]),
+        "ppv_not_summarised": f"{every['transfer']['cells_not_summarised']}",
+        "ppv_rotation_cells": f"{blocks['rotation']['cells']}",
+        "ppv_infarction_cells": f"{blocks['infarction']['cells']}",
+        "ppv_columbia_cells": (
+            f"{blocks['columbia_emergency']['cells'] + blocks['columbia_outpatient']['cells']}"
+        ),
+        "ppv_outside_share": pct(transfer["share_outside_observed_interval"]["estimate"], 0),
     }
+    for key, short in zip(SHARES, ("within2", "outside", "quarter", "high"), strict=True):
+        out[f"ppv_{short}"] = share_ci(transfer[key])
+        out[f"ppv_control_{short}"] = share_ci(control[key])
+        out[f"ppv_{short}_out"] = share_ci(blocks["columbia_outpatient"][key])
+    for target, c in (("inpatient", "in"), ("emergency", "em"), ("outpatient", "out")):
+        ratio = echo[target]["median_likelihood_ratio_healthy_target"]
+        out[f"lr_healthy_{c}"] = f"{ratio:.2f}"
+
+    shd = ppv_row(family="echonext", model="resnet", target="outpatient", label=COMPOSITE)
+    lvef = ppv_row(family="echonext", model="resnet", target="outpatient", label="lvef_lte_45_flag")
+    bedside = read("echonext_clinical.json")["arms"]["resnet"]["outpatient"]["bedside"][0]
+    assert abs(shd["ppv_observed"] - bedside["ppv"]) < 1e-5
+    out["col_ppv_obs_ci"] = observed_ci(shd)
+    out["col_ppv_rec"] = pct(shd["ppv_recomputed"])
+    out["col_gap"] = f"{abs(100 * shd['gap']):.1f}"
+    out["col_gap_ci"] = f"{abs(100 * shd['gap_high']):.1f} to {abs(100 * shd['gap_low']):.1f}"
+    out["col_sens_src"], out["col_sens_tgt"] = pct(shd["sens_source"]), pct(shd["sens_target"])
+    out["col_spec_src"], out["col_spec_tgt"] = pct(shd["spec_source"]), pct(shd["spec_target"])
+    out["col_fa_obs"] = f"{shd['false_alerts_observed']:.1f}"
+    out["col_fa_rec"] = f"{shd['false_alerts_recomputed']:.1f}"
+    out["lv_ppv_rec"] = pct(lvef["ppv_recomputed"])
+    out["lv_ppv_obs_ci"] = observed_ci(lvef)
+    out["lv_fa_obs"] = f"{lvef['false_alerts_observed']:.1f}"
+    out["lv_fa_rec"] = f"{lvef['false_alerts_recomputed']:.1f}"
+    for context, c in (("inpatient", "in"), ("outpatient", "out")):
+        w = columbia[context]
+        out[f"col_prev_{c}_ci"] = wilson_ci(w["prevalence"])
+        out[f"lf_flag_{c}_ci"] = wilson_ci(w["share_flagged"])
+        out[f"col_npv_{c}_ci"] = wilson_ci(w["npv"])
+
+    for corpus in ("acs", "sph"):
+        r = ppv_row(family="infarction", target=corpus)
+        digits = 1 if r["ppv_observed"] < 0.1 else 0
+        out[f"{corpus}_ppv_rec"] = pct(r["ppv_recomputed"], digits)
+        out[f"{corpus}_ppv_obs_ci"] = observed_ci(r, digits)
+        out[f"{corpus}_spec_src"] = pct(r["spec_source"], 0)
+        out[f"{corpus}_spec_tgt"] = pct(r["spec_target"], 0)
+        out[f"{corpus}_fa_obs"] = f"{r['false_alerts_observed']:.0f}"
+        out[f"{corpus}_fa_rec"] = f"{r['false_alerts_recomputed']:.0f}"
+    worst = worst_transfer()
+    out["worst_rec"] = pct(worst["ppv_recomputed"], 0)
+    out["worst_obs_ci"] = observed_ci(worst, 0)
+
+    free = every["transfer"]["label_free_predictors"]
+    out["free_recipe_est"] = f"{100 * free['recipe_estimated_prevalence']['median_abs_points']:.1f}"
+    out["free_mean_prob"] = f"{100 * free['mean_probability']['median_abs_points']:.1f}"
+    out["free_mean_prob_corr"] = (
+        f"{100 * free['mean_probability_prior_corrected']['median_abs_points']:.1f}"
+    )
+
+    repairs = read("repairs.json")
+    summary = repairs["summary"]["all"]
+    out["rep_cells"] = f"{summary['cells']}"
+    out["rep_draws"] = f"{repairs['draws']}"
+    for t in ("0.05", "0.10", "0.20"):
+        gain = summary[t]["mean_gain_per_1000"]["recalibrated"]
+        out[f"rep_gain{round(100 * float(t))}"] = f"{gain:.1f}"
+    cells = {(c["family"], c["model"], c["target"], c["label"]): c for c in repairs["cells"]}
+    col = cells[("echonext", "resnet", "outpatient", COMPOSITE)]
+    at10 = {r["threshold"]: r for r in col["net_benefit"]}[0.1]
+    out["rep_col_eval"] = count(col["n_eval"])
+    out["rep_col_model"] = count(1000 * at10["as_delivered"])
+    out["rep_col_all"] = count(1000 * at10["treat_all"])
+    sph = cells[("infarction", "ptbxl_baseline", "sph", "MI")]
+    out["rep_sph_ill_per100"] = f"{round(100 * sph['prevalence_eval'])}"
+    return out
 
 
 @cache
@@ -794,7 +928,45 @@ def rows_paired() -> list[str]:
     return out
 
 
+def rows_ppv_blocks() -> list[str]:
+    blocks = read("ppv_intervals.json")["across_transfers"]
+    out = []
+    for key, name in PPV_BLOCKS.items():
+        b = blocks[key]
+        shares = " | ".join(share_ci(b[k]) for k in SHARES)
+        out.append(
+            f"| {name} | {b['cells']} | {b['clusters']} | "
+            f"{points_ci(b['median_abs_gap_points'])} | {shares} |"
+        )
+    return out
+
+
+REPAIR_NAMES = {
+    "prior": "Prevalence corrected, no label",
+    "recalibrated": "Logistic recalibration on 100 local labels",
+    "abstention_cleared": "Per-label sets, patients sent to a reader counted as cleared",
+    "abstention_referred": "Per-label sets, patients sent to a reader counted as referred",
+    "as_delivered": "Model as delivered",
+}
+
+
+def rows_repairs() -> list[str]:
+    summary = read("repairs.json")["summary"]["all"]
+    out = []
+    for key, name in REPAIR_NAMES.items():
+        gains = " | ".join(
+            "0"
+            if key == "as_delivered"
+            else f"{summary[t]['mean_gain_per_1000'][key]:+.1f}".replace("-", "−")
+            for t in ("0.05", "0.10", "0.20")
+        )
+        out.append(f"| {name} | {gains} | {summary['0.10']['wins'][key]} |")
+    return out
+
+
 ROWS = {
+    "ppv_blocks": rows_ppv_blocks,
+    "repairs": rows_repairs,
     "settings": rows_settings,
     "findings": rows_findings,
     "ladder": rows_ladder,

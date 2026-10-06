@@ -1,16 +1,27 @@
-# Supplement to "Carrying an ECG-AI threshold from inpatients to outpatients"
+# Supplement to "Predicting an ECG model's positive predictive value from a clinic's prevalence"
 
-Part 1 gives the EchoNext study in statistical terms, with every table the report summarises. Part 2 gives the infarction study and the five-corpus rotation in full. In Part 1, the numbers of sections S1.1 to S1.6, S1.8, S1.9 and S1.13 are read from `results/` by `tests/paper_values.py`, and `tests/test_paper_numbers.py` refuses any other number there; the severity tables of S1.7 are typed and held to `results/echonext_severity.json` by `tests/test_echonext_severity_results.py`; the timings and counts of S1.10 to S1.12 were measured once and are typed. The numbers in Part 2 are held to their files by `tests/test_rotation_report.py`, `tests/test_outcomes.py` and `tests/test_published_numbers.py`.
+Part 1 gives the EchoNext study in statistical terms, with every table the article summarises. Part 2 gives the infarction study and the five-corpus rotation in full. Part 3 gives the measurement of the PPV across transfers and the three repairs, whose numbers are read from `results/` by `tests/paper_values.py` as well. In Part 1, the numbers of sections S1.1 to S1.6, S1.8, S1.9 and S1.13 are read from `results/` by `tests/paper_values.py`, and `tests/test_paper_numbers.py` refuses any other number there; the severity tables of S1.7 are typed and held to `results/echonext_severity.json` by `tests/test_echonext_severity_results.py`; the timings and counts of S1.10 to S1.12 were measured once and are typed. The numbers in Part 2 are held to their files by `tests/test_rotation_report.py`, `tests/test_outcomes.py` and `tests/test_published_numbers.py`.
 
 ## Part 1. Structural heart disease, from inpatients to outpatients
 
 ### S1.1 The thresholds in statistical terms
 
-Each model gives a probability p of moderate or worse structural heart disease. Split conformal prediction scores a calibration ECG by one minus the probability the model gives its true label, the least-ambiguous-set score, and admits a label for a new ECG when that label's score falls at or below the ⌈(n+1)(1−α)⌉-th smallest of the n calibration scores, here with α = 0.10 [REPORT ref. 13]. Fitted within each true class separately (class-conditional, or Mondrian, calibration [REPORT ref. 12]), it gives one cut-off from the ill calibration patients and one from the healthy. A patient's set holds "ill" when p is at or above the first cut-off and "healthy" when p is at or below the second. On these models the first cut-off sits below the second in every arm, so no set comes back empty: a set holds one label, or both, and a set holding both is a deferral to a reader.
+Each model gives a probability p of moderate or worse structural heart disease. Split conformal prediction scores a calibration ECG by one minus the probability the model gives its true label, the least-ambiguous-set score, and admits a label for a new ECG when that label's score falls at or below the ⌈(n+1)(1−α)⌉-th smallest of the n calibration scores, here with α = 0.10 [REPORT ref. 23]. Fitted within each true class separately (class-conditional, or Mondrian, calibration [REPORT ref. 24]), it gives one cut-off from the ill calibration patients and one from the healthy. A patient's set holds "ill" when p is at or above the first cut-off and "healthy" when p is at or below the second. On these models the first cut-off sits below the second in every arm, so no set comes back empty: a set holds one label, or both, and a set holding both is a deferral to a reader.
 
 The cut-off for the ill is the 90%-sensitivity threshold of the calibration inpatients, with the (n+1) correction. The two coincide by construction: both are the ⌈(n+1)(1−α)⌉-th order statistic of the ill calibration scores, and `tests/test_paper_numbers.py` guards the code against their drifting apart, on `results/echonext_coverage.csv`. On the 1,013 ill calibration inpatients the (n+1) correction changes little: at the uncorrected 90th percentile the trained network caught 71.2% of ill outpatients against 71.6% (field `threshold_spread`). The class-conditional guarantee, 90% coverage within each class whatever the prevalence, holds while the calibration and test patients of a class are exchangeable. Between inpatients and outpatients they are not, which is the result.
 
 A third construction, one threshold pair fitted over all calibration patients together (pooled), meets 90% over all patients and misses within the rarer label. On EchoNext's composite it covered 74.5% of the ill outpatients for the trained network; the main text does not use it. For the trained network the probability cut-offs were 0.27 for the ill and 0.79 for the healthy.
+
+Table S0a. The trained network's two thresholds, per 100 ill and per 100 healthy patients: 1,156 ill and 1,047 healthy other inpatients, 271 ill and 788 healthy outpatients, from `results/echonext_clinical.json`. The rows split the caught and the healthy flagged of the article's Table 2, rounded so that they add up to them.
+
+| | Other inpatients | Outpatients |
+|---|---|---|
+| Ill flagged with no reader | 54 | 36 |
+| Ill sent to a reader | 36 | 36 |
+| Healthy sent to a reader | 49 | 27 |
+| Healthy flagged with no reader | 9 | 2 |
+
+In all, 29.4% of outpatients went to a reader, against 42.3% of inpatients; no prevalence with the inpatients' rates could take the outpatients' share below 36.6%.
 
 ### S1.2 Cohorts
 
@@ -83,7 +94,7 @@ Table S2. Paired differences in outpatient sensitivity between the three models,
 
 ### S1.4 The eleven findings
 
-Table S3. A threshold set separately for each finding, on that finding's ill calibration inpatients, for the trained network, from `results/echonext_coverage.csv`. This is not the composite threshold the report follows; section 3.1 reads the composite threshold finding by finding (`results/echonext_clinical.json`, field `by_finding`). Pulmonary regurgitation has no ill outpatient in the test split.
+Table S3. A threshold set separately for each finding, on that finding's ill calibration inpatients, for the trained network, from `results/echonext_coverage.csv`. This is not the composite threshold the article follows; its section 3.3 reads the composite threshold finding by finding (`results/echonext_clinical.json`, field `by_finding`). Pulmonary regurgitation has no ill outpatient in the test split.
 
 | Finding, moderate or worse | Ill inpatients, test split | Sensitivity, inpatients | Ill outpatients | Sensitivity, outpatients |
 |---|---|---|---|---|
@@ -102,7 +113,7 @@ Table S3. A threshold set separately for each finding, on that finding's ill cal
 
 ### S1.5 Predictive values and counts per 1,000
 
-Table S4. At the outpatients' prevalence and at 10% and 5%, from `results/echonext_clinical.json`. The figures at 10% and 5% apply the outpatients' sensitivity and specificity by Bayes' rule and hold only if those carry over; [PPV.md](PPV.md) measures how far such a recomputation misses.
+Table S4. At the outpatients' prevalence and at 10% and 5%, from `results/echonext_clinical.json`. The figures at 10% and 5% apply the outpatients' sensitivity and specificity by Bayes' rule and hold only if those carry over; the article's section 3.1 measures how far such a recomputation misses.
 
 | Model | Prevalence | PPV | NPV | Flagged per 1,000 | Ill found per 1,000 | Ill missed per 1,000 |
 |---|---|---|---|---|---|---|
@@ -333,10 +344,10 @@ PubMed (E-utilities) and Europe PMC were searched on 5 October 2026, with no sta
 
 1. (ECG) AND (AI OR deep learning OR neural network) AND outpatient* AND inpatient* AND (sensitivity OR threshold): one result, a cost-effectiveness study.
 2. "spectrum effect" AND (ECG): two results, neither on a threshold carried between settings.
-3. (ECG) AND (AI OR deep learning) AND (care setting* OR clinical setting* OR clinical context*) AND (SHD OR ejection fraction OR valvular): 19 results, among them [REPORT ref. 3] and [REPORT ref. 5], which report the AUROC by setting or population without a sensitivity at a fixed threshold by care setting.
-4. (ECG) AND (AI OR deep learning) AND (threshold* OR cut-off*) AND (recalibrat* OR site-specific OR population-specific OR local) AND (SHD OR EF OR ventricular dysfunction): two results, [REPORT ref. 4] and [REPORT ref. 6].
+3. (ECG) AND (AI OR deep learning) AND (care setting* OR clinical setting* OR clinical context*) AND (SHD OR ejection fraction OR valvular): 19 results, among them [REPORT ref. 6] and [REPORT ref. 8], which report the AUROC by setting or population without a sensitivity at a fixed threshold by care setting.
+4. (ECG) AND (AI OR deep learning) AND (threshold* OR cut-off*) AND (recalibrat* OR site-specific OR population-specific OR local) AND (SHD OR EF OR ventricular dysfunction): two results, [REPORT ref. 7] and [REPORT ref. 9].
 
-Europe PMC also returned PRESENT-SHD [REPORT ref. 19], which carries a fixed threshold between hospitals and to a population cohort but not between care settings. Google Scholar and OpenReview were not searched. The full text of PREVUE-VALVE [REPORT ref. 5] was not read, so whether it reports a sensitivity at the inpatient threshold by setting is not known.
+Europe PMC also returned PRESENT-SHD [REPORT ref. 11], which carries a fixed threshold between hospitals and to a population cohort but not between care settings. Google Scholar and OpenReview were not searched. The full text of PREVUE-VALVE [REPORT ref. 8] was not read, so whether it reports a sensitivity at the inpatient threshold by setting is not known.
 
 ### S1.10 How the published weights were run
 
@@ -392,7 +403,7 @@ export PYTORCH_ENABLE_MPS_FALLBACK=1
 uv run python scripts/echonext_transfer.py     # the coverage table and the reports
 uv run pytest -m data tests/test_echonext_data.py
 uv run python scripts/echonext_clinical.py     # results/echonext_clinical.json, about 30 s
-uv run python scripts/paper_figures.py          # the report's three figures
+uv run python scripts/paper_figures.py          # the article's Figures 2, 3 and 5
 ```
 
 `echonext_clinical.py` reads the stored scores and refits nothing; it refuses to run without them.
@@ -654,3 +665,38 @@ References 1 to 13 and 15 were read in full: the AIME 2025 chapter [8] and the p
 ### S2.14 Data and code
 
 Numbers: `results/outcomes.json` (per-label outcomes and decision boundaries), `results/shift.json` (coverage per site and correction), `results/subgroups.json` (coverage within sex and age), `results/auxiliary.json` (the quantities sections S2.11 and S2.12 argue from), `results/perturbations.json` with the score arrays in `results/perturbations.npz`, `results/abstention.json`, `results/baseline.json`. `results/arms.json` holds a comparison of five encoders; it records the seed it was drawn with, and section S2.10 quotes it for the two AUROCs at the ends of its range, for the coverage each arm reaches at the three sites, and for which corpora each arm was pretrained on. The rotation of sections S2.4 and S2.10 adds `results/label_map.json` (the join of three label vocabularies onto five classes, with the counts that check it), `results/duplicate_groups.json` and `results/split_leak.json` (the repeated tracings and the split they would have crossed), `results/rotation.csv` with `results/rotation.json` (every source-target cell and the summary), `results/rotation_uncertainty.csv` with its own summary, and `results/target_scale.json`. Every figure those sections print is held to one of those files by `tests/test_rotation_report.py`, which rebuilds the number from the file and fails if the prose does not say it. Those two results files are built by separate scripts that each draw their own 200 patient-level splits, so the same quantity can differ between them in the third digit; the source-site decomposition here is quoted from `outcomes.json` throughout and the per-site coverage from `shift.json`, and neither is mixed into a single sentence. `scripts/outcomes.py` builds the outcome table and `scripts/figures.py` redraws every figure, pixel for pixel, from a committed results file. That script draws more figures than this report shows and numbers its files in its own order, so figure S4 here is `fig7_rotation.png` and figure S5 is `fig8_target_scale.png`; the figure number is the report's and the file name is the script's, and a test holds each of the five to the file it names. Each results file that can be rebuilt from committed inputs carries the digest of every source file its numbers depend on, and a test fails if any of those files has changed since: `results/outcomes.json`, `results/shift.json`, `results/abstention.json`, `results/subgroups.json` and `results/perturbations.json` are therefore the output of the code in this commit. The files that cannot be rebuilt in minutes — the training run, the two external re-scores, the ingest report, the encoder arms and the two timing files — are named in `tests/test_provenance.py` with the reason, so the distinction is on the record. `scripts/subgroups.py` builds the subgroup table. Reproduction: `uv sync`, `uv run pytest`, `uv run python scripts/figures.py`, then `uv run python scripts/outcomes.py` and `uv run python scripts/subgroups.py`, which need PTB-XL's `ptbxl_database.csv` for the patient, sex and age of each record; the README gives the timings and the environment variable that points at it. The rotation is rebuilt by `scripts/label_table.py`, `scripts/duplicate_scan.py`, `scripts/split_leak.py`, `scripts/train_source.py` once per corpus, then `scripts/rotation_table.py`, `scripts/rotation_uncertainty.py` and `scripts/target_scale.py`, in that order and with the same README pointing at the corpora; the five training runs are the part that takes hours.
+
+## Part 3. The PPV across transfers, and three repairs
+
+### S3.1 Intervals across transfers
+
+The shares of the article's Table 1 (within two points, outside the observed interval, off by a quarter or more, too high) and the median gap are summaries over transfers that are not independent: the transfers of one model on one pair of populations share the model, the threshold rule and the target. Their 95% interval resamples whole groups, one group per model and pair of populations, 30 groups for the transfers and 9 for the controls, 2,000 times, and takes the 2.5th and 97.5th percentiles (`scripts/ppv_intervals.py`, `results/ppv_intervals.json`). Each Columbia block has four groups, one per model, so its intervals are rough. The Columbia shares of patients the article quotes without an interval elsewhere (the prevalence, the share flagged and the NPV) carry Wilson intervals in the same file.
+
+### S3.2 The transfers
+
+Table S11. The pairs measured and the transfers summarised, from `results/ppv_gap.json` and `results/echonext_ppv_gap.json`. A transfer is summarised when its target holds at least 10 ill patients and its threshold flags at least 20.
+
+| Pairs | Models | Diagnoses | Transfers summarised |
+|---|---|---|---|
+| Columbia inpatients to Columbia emergency patients and outpatients (EchoNext) | four: the network trained here, the published EchoNext mini-model, ECGFounder with logistic regressions, the untrained floor | eleven echocardiographic findings and their composite | 80 |
+| Five corpora from Germany, China and the United States, each to the other four | a residual network trained on each source | sinus rhythm, atrial fibrillation, left and right bundle-branch block, first-degree atrioventricular block | 92 |
+| PTB-XL (Germany) to Shandong and Chongqing (China) | a residual network trained on PTB-XL | myocardial infarction | 2 |
+
+The source's sensitivity and specificity are those of the threshold on the patients it was set on; the target's prevalence is the true one. The gap's interval comes from 2,000 multinomial redraws of the source and the target counts, and the observed PPV's from Wilson's formula. Each EchoNext model's one-page transfer report, in `reports/transfer/`, prints the gap for every finding.
+
+### S3.3 The likelihood-ratio check and the predictions without diagnoses
+
+The model's probabilities are first recalibrated on the source by a logistic intercept and slope. The likelihood ratio of a patient is the odds of that recalibrated probability divided by the source's prevalence odds. Under label shift, its mean among the healthy is the same at the target as at the source; the article reports the median of those means over diagnoses and models. The prevalence estimate without diagnoses is the maximum-likelihood estimate of Saerens and colleagues [REPORT ref. 5], run on the recalibrated probabilities as Alexandari and colleagues advise [REPORT ref. 20], and the corrected probabilities are the recalibrated ones moved to that prevalence.
+
+### S3.4 The three repairs
+
+Each target was cut once by patient into a pool and an evaluation half. In each of 200 draws, logistic recalibration fitted an intercept and a slope on 100 ECGs drawn from the pool, or the intercept alone when the draw held fewer than 10 of the rarer class [REPORT ref. 21]; the label-free correction and the per-label sets need no draw. Net benefit is the true positives per patient minus the false positives per patient times t / (1 − t), at decision thresholds t of 5%, 10% and 20% [REPORT ref. 22]. Under the per-label sets a patient sent to a reader is counted once as not referred and once as referred, because what the reader decides is not modelled. A transfer is summarised when its evaluation half holds at least 20 ill patients; 146 were. `results/repairs.json` holds each transfer's curve and the summary the article's Table 4 prints.
+
+### S3.5 Reproduce the PPV measurement
+
+```bash
+uv run python scripts/ppv_gap.py         # results/ppv_gap.json; with EchoNext installed, results/echonext_ppv_gap.json
+uv run python scripts/repairs.py         # results/repairs.json
+uv run python scripts/ppv_intervals.py   # results/ppv_intervals.json, from the two files above and results/echonext_clinical.json
+uv run python scripts/ppv_figures.py     # the article's Figures 1 and 4
+```

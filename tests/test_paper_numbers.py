@@ -72,6 +72,19 @@ LITERATURE = {
     },
     "Wagner 2020: PTB-XL's recording years": {"1989", "1996"},
     "de Vries 2023: the local screens the mammography cut-off was reset on": {"16,204"},
+    "Harmon 2024: prevalence, potassium, sensitivity, specificity and PPV in two units": {
+        "1%",
+        "6.0",
+        "80%",
+        "3%",
+        "82%",
+        "14%",
+    },
+    "Leeflang 2013: meta-analyses and the largest change": {"23", "40"},
+    "Poterucha 2025, external validation: the fixed sensitivity and the specificity drop": {
+        "70%",
+        "10",
+    },
 }
 
 # Constants of the design, not results.
@@ -79,12 +92,15 @@ CONSTANTS = {
     "90%": "the sensitivity each threshold is set for, and the level of the refit",
     "90": "90 of 100 ill patients, the same target counted in patients; the 90th percentile",
     "1": "the +1 of the rank correction",
+    "2": "Part 2 of the supplement",
+    "2,000": "the redraws of the gap's interval",
+    "2018": "CPSC 2018, a corpus's name",
     "95%": "the level of every interval",
     "100": "outcomes are counted per 100 patients; the rung of the ladder the text reads",
     "1,000": "the clinic of 1,000 outpatients the counts are scaled to",
     "100,000": "EchoNext's ECGs",
-    "10%": "a screening prevalence, and a decision threshold of net benefit",
-    "5%": "a screening prevalence, and a decision threshold of net benefit",
+    "10%": "a decision threshold of net benefit",
+    "5%": "a decision threshold of net benefit",
     "20%": "a decision threshold of net benefit",
     "80%": "the middle 80% of the repetitions a band of Figure 3 spans",
     "45%": "EchoNext's ejection-fraction threshold",
@@ -195,9 +211,13 @@ SUPPLEMENT_CONSTANTS = {
     "65": "an age band edge",
     "79": "an age band edge",
     "35%": "an ejection-fraction band edge",
-    "12": "a reference of the report",
-    "13": "a reference of the report",
-    "19": "a reference of the report",
+    "7": "a reference of the report",
+    "8": "a reference of the report",
+    "9": "a reference of the report",
+    "11": "a reference of the report",
+    "19": "the results of a query in S1.13",
+    "23": "a reference of the report",
+    "24": "a reference of the report",
     "2": "a query's number in S1.13",
     "3": "a query's number in S1.13",
     "4": "a query's number in S1.13",
@@ -676,3 +696,80 @@ def test_the_dropped_seen_target_cell_is_named_with_its_rule() -> None:
     assert "was planned and dropped by a rule fixed before any coverage was read" in (
         SUPPLEMENT.read_text()
     )
+
+
+class TestPPVClaims:
+    """The sentences of sections 3.1, 3.4 to 3.6 that read the PPV files in words."""
+
+    def test_the_direction_of_the_miss_by_pair(self) -> None:
+        """'Too low in every outpatient transfer'; 'more often too high' in the rotation."""
+        blocks = v.read("ppv_intervals.json")["across_transfers"]
+        assert blocks["columbia_outpatient"]["share_recipe_too_high"]["estimate"] == 0
+        assert blocks["rotation"]["share_recipe_too_high"]["estimate"] > 0.5
+        assert "too low in every outpatient transfer" in REPORT.read_text()
+
+    def test_the_largest_miss_is_the_named_one(self) -> None:
+        worst = v.worst_transfer()
+        assert (worst["label"], worst["source"], worst["target"]) == ("LBBB", "ptbxl", "sph")
+        assert "left bundle-branch block carried from PTB-XL to Shandong" in REPORT.read_text()
+
+    def test_the_gap_follows_the_specificity(self) -> None:
+        """'Where specificity rose, too low; where it fell, too high', for most transfers."""
+        kept = [r for r in v.ppv_rows() if r["summarised"] and not r["in_distribution"]]
+        rose = [r["gap"] < 0 for r in kept if r["spec_target"] - r["spec_source"] > 0.02]
+        fell = [r["gap"] > 0 for r in kept if r["spec_target"] - r["spec_source"] < -0.02]
+        assert sum(rose) / len(rose) > 0.75 and sum(fell) / len(fell) > 0.75
+
+    def test_the_three_settings_rank_alike_on_the_ratio_and_the_gap(self) -> None:
+        echo = v.read("echonext_ppv_gap.json")["summary"]["echonext"]["by_target"]
+        ratio = [echo[t]["median_likelihood_ratio_healthy_target"] for t in v.CONTEXT]
+        gap = [echo[t]["median_abs_gap_points"] for t in v.CONTEXT]
+        assert ratio == sorted(ratio, reverse=True) and gap == sorted(gap)
+        assert abs(ratio[0] - 1) < 0.05
+
+    def test_predictions_without_diagnoses_miss_more(self) -> None:
+        free = v.read("echonext_ppv_gap.json")["all_families"]["transfer"]["label_free_predictors"]
+        true = free["recipe_true_prevalence"]["median_abs_points"]
+        for key in ("recipe_estimated_prevalence", "mean_probability"):
+            assert free[key]["median_abs_points"] > true, key
+        assert free["mean_probability_prior_corrected"]["median_abs_points"] > true
+
+    def test_chongqing_too_high_and_shandong_under_a_point(self) -> None:
+        acs = v.ppv_row(family="infarction", target="acs")
+        sph = v.ppv_row(family="infarction", target="sph")
+        assert acs["gap"] > 0 and acs["spec_target"] < acs["spec_source"]
+        assert abs(sph["gap"]) < 0.01
+        assert sph["false_alerts_recomputed"] > sph["false_alerts_observed"]
+
+    def test_the_repairs_as_section_3_6_reads_them(self) -> None:
+        """Only logistic recalibration gains on average at every threshold; at Shandong the
+        model as delivered is below treating no one, the label-free correction is best of
+        the four rules at 10% and 20% and above the recalibration; at Columbia the model
+        as delivered and an echocardiogram for all tie at 10%."""
+        repairs = v.read("repairs.json")
+        summary = repairs["summary"]["all"]
+        for t in ("0.05", "0.10", "0.20"):
+            gain = summary[t]["mean_gain_per_1000"]
+            assert gain["recalibrated"] > 0, t
+            assert all(gain[k] < 0 for k in ("prior", "abstention_cleared", "abstention_referred"))
+        cells = {(c["family"], c["model"], c["target"], c["label"]): c for c in repairs["cells"]}
+        sph = cells[("infarction", "ptbxl_baseline", "sph", "MI")]
+        rules = ("as_delivered", "prior", "recalibrated", "abstention_cleared")
+        for row in sph["net_benefit"]:
+            assert row["as_delivered"] < row["treat_none"] == 0
+            assert row["recalibrated"] < row["prior"]
+            if row["threshold"] in (0.1, 0.2):
+                assert max(rules, key=lambda k: row[k]) == "prior"
+        assert sph["prevalence_eval"] < 0.015 and sph["prevalence_source"] > 0.2
+        col = cells[("echonext", "resnet", "outpatient", v.COMPOSITE)]
+        (at10,) = [r for r in col["net_benefit"] if r["threshold"] == 0.1]
+        assert abs(at10["as_delivered"] - at10["treat_all"]) < 0.005
+        assert col["prevalence_estimated"] < 0.01
+
+    def test_the_conclusion_does_not_prescribe_a_reset(self) -> None:
+        """REGISTRE A05-7, A19-3: the conclusion leaves the choice; it never prescribes."""
+        text = REPORT.read_text()
+        conclusion = text[text.index("**Conclusion.**") : text.index("## 1. Introduction")]
+        assert "should" not in conclusion and "recalibrat" not in conclusion
+        abstract = text[: text.index("## 1. Introduction")].lower()
+        assert "conformal" not in abstract

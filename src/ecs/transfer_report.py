@@ -192,7 +192,7 @@ def _ladder_section(arm: dict[str, Any], target: str) -> list[str]:
         "on n ECGs drawn from the pool, over repeated draws, all read on the same evaluation "
         "half. One fixed half makes every draw share its luck, so the centiles below spread "
         "the labelled sample only. The study's report draws a new half in every draw and "
-        "reads the refit on separate outpatients as well (REPORT.md section 3.6, "
+        "reads the refit on separate outpatients as well (REPORT.md section 3.7, "
         "SUPPLEMENT.md Tables S7 to S7c); those figures supersede this ladder's.",
         "",
         "| Label | Target labels | Ill covered, mean [10th, 90th centile] "

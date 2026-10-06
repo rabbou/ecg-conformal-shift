@@ -1,6 +1,6 @@
 # Corpus reference
 
-Seven public corpora feed the study, counting Chapman-Shaoxing and Ningbo apart. Each count below is of the full release unless it says otherwise; [REPORT.md](../REPORT.md) section 2.1 gives the smaller counts that were scored.
+Seven public corpora feed the study, counting Chapman-Shaoxing and Ningbo apart. Each count below is of the full release unless it says otherwise; [SUPPLEMENT.md](../SUPPLEMENT.md) section S2.1 gives the smaller counts that were scored.
 
 ## Corpora, licences and downloads
 

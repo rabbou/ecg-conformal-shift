@@ -41,6 +41,7 @@ REGENERABLE = (
     "outcomes.json",
     "perturbations.json",
     "ppv_gap.json",
+    "ppv_intervals.json",
     "shift.json",
     "subgroups.json",
 )

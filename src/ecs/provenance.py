@@ -37,13 +37,16 @@ def provenance_block(producers: list[str]) -> dict[str, Any]:
     cannot change the numbers costs a regeneration for nothing; leaving out one
     that can is the failure this block exists to catch.
     """
+
+    def git(*args: str) -> str:
+        return subprocess.run(
+            ["git", *args], capture_output=True, text=True, check=False, cwd=REPO_ROOT
+        ).stdout.strip()
+
+    # A producer that differs from HEAD makes HEAD a false witness: the commit is then
+    # marked, so the digests, not the commit, are what the record vouches for.
+    dirty = git("status", "--porcelain", "--", *sorted(producers))
     return {
-        "commit": subprocess.run(
-            ["git", "rev-parse", "HEAD"],
-            capture_output=True,
-            text=True,
-            check=False,
-            cwd=REPO_ROOT,
-        ).stdout.strip(),
+        "commit": git("rev-parse", "HEAD") + ("+dirty" if dirty else ""),
         "producers": {path: digest_of(REPO_ROOT / path) for path in sorted(producers)},
     }

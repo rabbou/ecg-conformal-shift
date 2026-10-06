@@ -8935,5 +8935,23 @@
       ]
     }
   },
-  "seconds": 51.6
+  "inputs": {
+    "echonext/echonext_metadata_100k.csv": "a1fb9f1a4d5fa2ea7238fe70247a2b8ad8a13d7b3ed9ee3685dd40871fac3c1f",
+    "echonext-derived/scores/resnet.npz": "42f312f3254e8d57756ee7db3468245862e77e83176bee355a568de3ac13e304",
+    "echonext-derived/scores/echonext_mini.npz": "b44030a97428179f262312c48dd12cb12424cc4cfdbccead9fefe8a8b1c67f5d",
+    "echonext-derived/scores/ecgfounder.npz": "749ed769122e03b9f8cf74b97f54ae6b141d2516d92480002addd5309ea03a74",
+    "echonext-derived/scores/random_init.npz": "cfec4051d77dee952c330418a4e89e44aa982021ea206e987d5058e4632ea784"
+  },
+  "provenance": {
+    "commit": "73bc5dfecd6c874d2e7735c0f12c14afc1272b60+dirty",
+    "producers": {
+      "scripts/echonext_clinical.py": "c6e8d2c0678a87deb100089496e8a5e0120409c49d833d8082eadfe92bce5286",
+      "src/ecs/clinical.py": "951ca34c0673403ce91fbf9860e201a5a9380734f59257c74ec17fa76f20dbd3",
+      "src/ecs/conformal.py": "c434998b704a551d55bc2206a1a3ada6d42309947b0b92db11607746dcd068dc",
+      "src/ecs/echonext.py": "f9dfdee094c555e16b1cf8300fb330b437eeead6b4d667a774fb16ff0b591c41",
+      "src/ecs/metrics.py": "e04509abce93b400ac90cbd102a63a747f0559de4d2c9d20cdc2ee4ce1cf90e6",
+      "src/ecs/transfer.py": "e690339b52941e150a61527ac5e0e56a3cc5dbcd5772f7ba06ec8296b112d624"
+    }
+  },
+  "seconds": 50.6
 }

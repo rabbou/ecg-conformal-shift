@@ -171,6 +171,59 @@ def test_the_template_types_no_number_a_file_should_give(target: Path) -> None:
     assert typed(checked(target)) - allowed() == set()
 
 
+# Part 1 of the supplement, beyond the report's constants: the design of each table.
+SUPPLEMENT_CONSTANTS = {
+    "0.10": "alpha",
+    "2,000": "bootstrap and ladder draws",
+    "500": "the AUROC bootstrap draws",
+    "1,000": "the case-mix and threshold bootstrap draws",
+    "2.5": "a percentile of an interval",
+    "97.5": "a percentile of an interval",
+    "2006": "Vickers and Elkin's year",
+    "26": "Vickers and Elkin's volume",
+    "565": "Vickers and Elkin's first page",
+    "574": "Vickers and Elkin's last page",
+    "2008": "the edge of the first band of years",
+    "2015": "the edge of the first band of years",
+    "2016": "the edge of the second band of years",
+    "2018": "the edge of the second band of years",
+    "2019": "the edge of the third band of years",
+    "2022": "the edge of the third band of years",
+    "36": "an ejection-fraction band edge",
+    "50": "an age band edge",
+    "64": "an age band edge",
+    "65": "an age band edge",
+    "79": "an age band edge",
+    "35%": "an ejection-fraction band edge",
+    "12": "a reference of the report",
+    "13": "a reference of the report",
+    "19": "a reference of the report",
+    "2": "a query's number in S1.13",
+    "3": "a query's number in S1.13",
+    "4": "a query's number in S1.13",
+    "6": "a reference of the report",
+    "10": "the eight NewYork-Presbyterian hospitals' table, and a reference",
+    "1.1": "EchoNext's version, 1.1.1",
+}
+
+
+def supplement_part_one_read() -> str:
+    """The sections of Part 1 whose numbers paper_values gives: S1.7 and S1.10 to S1.12
+    are typed, and say so in the supplement's first paragraph."""
+    text = (TEMPLATES / "SUPPLEMENT.md").read_text()
+    part = text[text.index("## Part 1") : text.index("## Part 2")]
+    keep = []
+    for section in re.split(r"(?=^### S1\.)", part, flags=re.M):
+        heading = section.split("\n", 1)[0]
+        if not re.match(r"### S1\.(7|10|11|12) ", heading):
+            keep.append(section)
+    return "".join(keep)
+
+
+def test_the_supplement_part_one_types_no_number_a_file_should_give() -> None:
+    assert typed(supplement_part_one_read()) - allowed() - set(SUPPLEMENT_CONSTANTS) == set()
+
+
 def test_every_constant_and_cited_figure_is_still_typed() -> None:
     """A constant nobody types any more is a door left open for a typed number."""
     used = set().union(*(typed(checked(t)) for t in (REPORT, README, CITATION)))

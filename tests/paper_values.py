@@ -88,6 +88,7 @@ def echonext() -> dict[str, str]:
     source, targets = transfer["source"], transfer["targets"]
     out["cal_n"] = count(source["n"])
     out["cal_prev"] = pct(source["prevalence"][COMPOSITE])
+    out["cal_ill"] = count(clinical["calibration"]["n_ill"])
     out["train_n"] = count(transfer["training"]["n"])
     for context, short in CONTEXT.items():
         out[f"{short}_n"] = count(targets[context]["n"])

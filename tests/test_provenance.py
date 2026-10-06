@@ -22,6 +22,7 @@ Two rules replace it:
 
 from __future__ import annotations
 
+import hashlib
 import json
 import subprocess
 from pathlib import Path
@@ -43,6 +44,11 @@ REGENERABLE = (
     "shift.json",
     "subgroups.json",
 )
+
+# Not regenerable here, yet carrying a provenance block whose digests are checked: the
+# code that wrote them cannot drift unnoticed even where the data are absent, and
+# tests/test_echonext_data.py rebuilds the numbers where the data are present.
+DIGEST_CHECKED = ("echonext_clinical.json",)
 
 # Not regenerable in a session, and why. The reason is the point: it is what a
 # reader needs in order to judge how much the recorded commit is worth.
@@ -133,7 +139,8 @@ NOT_REGENERABLE = {
 FAMILIES = {
     "results/embeddings/": "one cached representation per encoder arm and corpus",
     "results/figures/": (
-        "redrawn from the committed tables by scripts/figures.py and scripts/ppv_figures.py"
+        "redrawn from the committed tables by scripts/figures.py, scripts/ppv_figures.py, "
+        "scripts/paper_figures.py (the report's three figures) and scripts/bilingual_figures.py"
     ),
     "scores/": "the frozen score arrays a rotation source wrote for one corpus",
 }
@@ -186,7 +193,7 @@ def commit_is_known(commit: str) -> bool:
 
 
 class TestRegenerableFilesRecordTheirProducers:
-    @pytest.mark.parametrize("name", REGENERABLE)
+    @pytest.mark.parametrize("name", REGENERABLE + DIGEST_CHECKED)
     def test_every_recorded_producer_still_has_its_recorded_digest(self, name: str) -> None:
         block = json.loads((RESULTS / name).read_text())["provenance"]
         assert block["producers"], f"{name} records no producer"
@@ -209,6 +216,7 @@ class TestRegenerableFilesRecordTheirProducers:
     def test_the_recorded_commit_is_an_ancestor_of_this_one(self, name: str) -> None:
         commit = json.loads((RESULTS / name).read_text())["provenance"]["commit"]
         assert commit, f"{name} records no commit"
+        commit = commit.removesuffix("+dirty")
         if not commit_is_known(commit):
             pytest.skip("shallow checkout: the recorded commit is not in this clone")
         assert (
@@ -238,6 +246,9 @@ class TestNothingIsUnaccountedFor:
         """
         if name.endswith((".csv", ".npz")):
             pytest.skip("neither a CSV nor an array file carries a provenance block")
+        if name in DIGEST_CHECKED:
+            assert "provenance" in json.loads((RESULTS / name).read_text())
+            return
         assert "provenance" not in json.loads((RESULTS / name).read_text())
 
     @pytest.mark.parametrize("name", sorted(NOT_REGENERABLE))
@@ -252,3 +263,60 @@ def test_a_changed_producer_would_be_caught(tmp_path: Path) -> None:
     tampered = tmp_path / "tampered.py"
     tampered.write_bytes((REPO_ROOT / path).read_bytes() + b"\n# one more line\n")
     assert digest_of(tampered) != recorded
+
+
+# Commits a results file names that no clone of the repository reaches, and why. A
+# reader cannot check out these; the digests or the regenerating test are what hold the
+# file instead.
+UNREACHABLE = {
+    "rotation.json": (
+        "1463cd61 exists neither in a clone nor on GitHub; the rotation was rebuilt by "
+        "4232c77, which wrote this field, and test_rotation.py holds the table to the code"
+    ),
+    "split_leak.json": "names 1463cd61, as rotation.json, from the same rebuild",
+    "arms.json": "7522385c survives only as an orphan commit on GitHub, after a history rewrite",
+    "target_scale.json": "f9d4943e survives only as an orphan commit on GitHub",
+}
+
+
+def _git(*args: str) -> subprocess.CompletedProcess[bytes]:
+    return subprocess.run(["git", *args], capture_output=True, cwd=REPO_ROOT, check=False)
+
+
+def _shallow() -> bool:
+    return _git("rev-parse", "--is-shallow-repository").stdout.strip() == b"true"
+
+
+def _named_commit(data: dict) -> str | None:
+    block = data.get("provenance") or {}
+    return block.get("commit") or data.get("commit") or data.get("git_commit")
+
+
+@pytest.mark.skipif(_shallow(), reason="a shallow clone holds no older commit to read")
+@pytest.mark.parametrize("name", REGENERABLE + DIGEST_CHECKED)
+def test_the_named_commit_holds_the_producers_the_digests_describe(name: str) -> None:
+    """A results file written on an uncommitted tree named HEAD while its producers'
+    digests described other code; the commit it names must hold that code, or say
+    +dirty."""
+    block = json.loads((RESULTS / name).read_text())["provenance"]
+    commit = block["commit"]
+    if commit.endswith("+dirty"):
+        return
+    for path, digest in block["producers"].items():
+        shown = _git("show", f"{commit}:{path}")
+        assert shown.returncode == 0, f"{path} is not in {commit}"
+        assert hashlib.sha256(shown.stdout).hexdigest() == digest, f"{name}: {path} at {commit}"
+
+
+@pytest.mark.skipif(_shallow(), reason="a shallow clone cannot tell what HEAD reaches")
+def test_every_named_commit_is_reachable_or_its_absence_is_explained() -> None:
+    unreachable = set()
+    for path in sorted(RESULTS.glob("*.json")):
+        data = json.loads(path.read_text())
+        commit = _named_commit(data) if isinstance(data, dict) else None
+        if not commit:
+            continue
+        sha = commit.removesuffix("+dirty")
+        if _git("merge-base", "--is-ancestor", sha, "HEAD").returncode != 0:
+            unreachable.add(path.name)
+    assert unreachable == set(UNREACHABLE)

@@ -674,9 +674,33 @@ def measure(meta: pd.DataFrame) -> dict[str, Any]:
     return result
 
 
+PRODUCERS = [
+    "scripts/echonext_clinical.py",
+    "src/ecs/clinical.py",
+    "src/ecs/conformal.py",
+    "src/ecs/echonext.py",
+    "src/ecs/metrics.py",
+    "src/ecs/transfer.py",
+]
+
+
+def inputs() -> dict[str, str]:
+    """The SHA-256 of every file the numbers are read from that cannot be committed."""
+    from ecs.echonext import ECHONEXT_DIR, METADATA
+    from ecs.provenance import digest_of
+
+    files = {f"echonext/{METADATA}": ECHONEXT_DIR / METADATA}
+    files |= {f"echonext-derived/scores/{arm}.npz": SCORES_DIR / f"{arm}.npz" for arm in ARMS}
+    return {name: digest_of(path) for name, path in files.items()}
+
+
 def main() -> None:
+    from ecs.provenance import provenance_block
+
     start = time.time()
     result = measure(read_metadata())
+    result["inputs"] = inputs()
+    result["provenance"] = provenance_block(PRODUCERS)
     result["seconds"] = round(time.time() - start, 1)
     path = RESULTS_DIR / "echonext_clinical.json"
     path.write_text(json.dumps(result, indent=2) + "\n")

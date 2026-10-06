@@ -5563,7 +5563,7 @@
  },
  "seconds": 1.2,
  "provenance": {
-  "commit": "4a460274e9f11cb0bc9cde4bacee992708a7f828",
+  "commit": "87067f488d0110a2c6d469c703fb12f2b6b506b1",
   "producers": {
    "scripts/ppv_gap.py": "01e50f0048aa529c113093552ef90c1e3cc80573040abea20ad7eecf0565675e",
    "scripts/score_pairs.py": "6faf9a18b793f43d543cade0eeef1127ff3510907006f33907bc787e9edf3805",

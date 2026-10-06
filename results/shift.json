@@ -15,7 +15,7 @@
   "n_draws": 200,
   "seed": 0,
   "provenance": {
-    "commit": "4b589da48a0eea54bf29629ecd6e5f3bc05e1ee0",
+    "commit": "ff8e0ee18f3cb8a240563ae0389e3ed98dfddd80",
     "producers": {
       "scripts/shift_table.py": "b8d35d311a44d187d5ca0f92f14caf8b543409792123a9a09c3ed0318f3453d6",
       "src/ecs/conformal.py": "c434998b704a551d55bc2206a1a3ada6d42309947b0b92db11607746dcd068dc",
@@ -1994,7 +1994,7 @@
           "prevalence": 0.1492063492063492,
           "deviations": [
             "only the 17960 records of CSV/train.csv carry labels; the published test split withholds them, so the remaining waveforms on disk are not scored",
-            "the label is the corpus's own AMI column, read from a coronary angiogram rather than from the tracing, and acute by construction; PTB-XL's and Shandong's positives are dominated by the chronic infarct pattern, so the two label sets name different clinical events and no re-coding here makes them the same",
+            "the label is the corpus's own AMI column, set when the discharge diagnosis names an acute myocardial infarction in a cohort that all had coronary angiography, and acute by construction; PTB-XL's and Shandong's positives are infarct patterns read on the tracing, so the two label sets name different clinical events and no re-coding here makes them the same",
             "5 of 17960 records excluded: see the excluded field"
           ],
           "threshold_by_class": {
@@ -4711,7 +4711,7 @@
           "prevalence": 0.1492063492063492,
           "deviations": [
             "only the 17960 records of CSV/train.csv carry labels; the published test split withholds them, so the remaining waveforms on disk are not scored",
-            "the label is the corpus's own AMI column, read from a coronary angiogram rather than from the tracing, and acute by construction; PTB-XL's and Shandong's positives are dominated by the chronic infarct pattern, so the two label sets name different clinical events and no re-coding here makes them the same",
+            "the label is the corpus's own AMI column, set when the discharge diagnosis names an acute myocardial infarction in a cohort that all had coronary angiography, and acute by construction; PTB-XL's and Shandong's positives are infarct patterns read on the tracing, so the two label sets name different clinical events and no re-coding here makes them the same",
             "5 of 17960 records excluded: see the excluded field"
           ],
           "threshold_by_class": {
@@ -7440,7 +7440,7 @@
           "prevalence": 0.1492063492063492,
           "deviations": [
             "only the 17960 records of CSV/train.csv carry labels; the published test split withholds them, so the remaining waveforms on disk are not scored",
-            "the label is the corpus's own AMI column, read from a coronary angiogram rather than from the tracing, and acute by construction; PTB-XL's and Shandong's positives are dominated by the chronic infarct pattern, so the two label sets name different clinical events and no re-coding here makes them the same",
+            "the label is the corpus's own AMI column, set when the discharge diagnosis names an acute myocardial infarction in a cohort that all had coronary angiography, and acute by construction; PTB-XL's and Shandong's positives are infarct patterns read on the tracing, so the two label sets name different clinical events and no re-coding here makes them the same",
             "5 of 17960 records excluded: see the excluded field"
           ],
           "threshold_by_class": {
@@ -10163,7 +10163,7 @@
           "prevalence": 0.1492063492063492,
           "deviations": [
             "only the 17960 records of CSV/train.csv carry labels; the published test split withholds them, so the remaining waveforms on disk are not scored",
-            "the label is the corpus's own AMI column, read from a coronary angiogram rather than from the tracing, and acute by construction; PTB-XL's and Shandong's positives are dominated by the chronic infarct pattern, so the two label sets name different clinical events and no re-coding here makes them the same",
+            "the label is the corpus's own AMI column, set when the discharge diagnosis names an acute myocardial infarction in a cohort that all had coronary angiography, and acute by construction; PTB-XL's and Shandong's positives are infarct patterns read on the tracing, so the two label sets name different clinical events and no re-coding here makes them the same",
             "5 of 17960 records excluded: see the excluded field"
           ],
           "threshold_by_class": {
@@ -12880,7 +12880,7 @@
           "prevalence": 0.1492063492063492,
           "deviations": [
             "only the 17960 records of CSV/train.csv carry labels; the published test split withholds them, so the remaining waveforms on disk are not scored",
-            "the label is the corpus's own AMI column, read from a coronary angiogram rather than from the tracing, and acute by construction; PTB-XL's and Shandong's positives are dominated by the chronic infarct pattern, so the two label sets name different clinical events and no re-coding here makes them the same",
+            "the label is the corpus's own AMI column, set when the discharge diagnosis names an acute myocardial infarction in a cohort that all had coronary angiography, and acute by construction; PTB-XL's and Shandong's positives are infarct patterns read on the tracing, so the two label sets name different clinical events and no re-coding here makes them the same",
             "5 of 17960 records excluded: see the excluded field"
           ],
           "threshold_by_class": {
@@ -15609,7 +15609,7 @@
           "prevalence": 0.1492063492063492,
           "deviations": [
             "only the 17960 records of CSV/train.csv carry labels; the published test split withholds them, so the remaining waveforms on disk are not scored",
-            "the label is the corpus's own AMI column, read from a coronary angiogram rather than from the tracing, and acute by construction; PTB-XL's and Shandong's positives are dominated by the chronic infarct pattern, so the two label sets name different clinical events and no re-coding here makes them the same",
+            "the label is the corpus's own AMI column, set when the discharge diagnosis names an acute myocardial infarction in a cohort that all had coronary angiography, and acute by construction; PTB-XL's and Shandong's positives are infarct patterns read on the tracing, so the two label sets name different clinical events and no re-coding here makes them the same",
             "5 of 17960 records excluded: see the excluded field"
           ],
           "threshold_by_class": {
@@ -18332,7 +18332,7 @@
           "prevalence": 0.1492063492063492,
           "deviations": [
             "only the 17960 records of CSV/train.csv carry labels; the published test split withholds them, so the remaining waveforms on disk are not scored",
-            "the label is the corpus's own AMI column, read from a coronary angiogram rather than from the tracing, and acute by construction; PTB-XL's and Shandong's positives are dominated by the chronic infarct pattern, so the two label sets name different clinical events and no re-coding here makes them the same",
+            "the label is the corpus's own AMI column, set when the discharge diagnosis names an acute myocardial infarction in a cohort that all had coronary angiography, and acute by construction; PTB-XL's and Shandong's positives are infarct patterns read on the tracing, so the two label sets name different clinical events and no re-coding here makes them the same",
             "5 of 17960 records excluded: see the excluded field"
           ],
           "threshold_by_class": {
@@ -21049,7 +21049,7 @@
           "prevalence": 0.1492063492063492,
           "deviations": [
             "only the 17960 records of CSV/train.csv carry labels; the published test split withholds them, so the remaining waveforms on disk are not scored",
-            "the label is the corpus's own AMI column, read from a coronary angiogram rather than from the tracing, and acute by construction; PTB-XL's and Shandong's positives are dominated by the chronic infarct pattern, so the two label sets name different clinical events and no re-coding here makes them the same",
+            "the label is the corpus's own AMI column, set when the discharge diagnosis names an acute myocardial infarction in a cohort that all had coronary angiography, and acute by construction; PTB-XL's and Shandong's positives are infarct patterns read on the tracing, so the two label sets name different clinical events and no re-coding here makes them the same",
             "5 of 17960 records excluded: see the excluded field"
           ],
           "threshold_by_class": {
@@ -23778,7 +23778,7 @@
           "prevalence": 0.1492063492063492,
           "deviations": [
             "only the 17960 records of CSV/train.csv carry labels; the published test split withholds them, so the remaining waveforms on disk are not scored",
-            "the label is the corpus's own AMI column, read from a coronary angiogram rather than from the tracing, and acute by construction; PTB-XL's and Shandong's positives are dominated by the chronic infarct pattern, so the two label sets name different clinical events and no re-coding here makes them the same",
+            "the label is the corpus's own AMI column, set when the discharge diagnosis names an acute myocardial infarction in a cohort that all had coronary angiography, and acute by construction; PTB-XL's and Shandong's positives are infarct patterns read on the tracing, so the two label sets name different clinical events and no re-coding here makes them the same",
             "5 of 17960 records excluded: see the excluded field"
           ],
           "threshold_by_class": {
@@ -26501,7 +26501,7 @@
           "prevalence": 0.1492063492063492,
           "deviations": [
             "only the 17960 records of CSV/train.csv carry labels; the published test split withholds them, so the remaining waveforms on disk are not scored",
-            "the label is the corpus's own AMI column, read from a coronary angiogram rather than from the tracing, and acute by construction; PTB-XL's and Shandong's positives are dominated by the chronic infarct pattern, so the two label sets name different clinical events and no re-coding here makes them the same",
+            "the label is the corpus's own AMI column, set when the discharge diagnosis names an acute myocardial infarction in a cohort that all had coronary angiography, and acute by construction; PTB-XL's and Shandong's positives are infarct patterns read on the tracing, so the two label sets name different clinical events and no re-coding here makes them the same",
             "5 of 17960 records excluded: see the excluded field"
           ],
           "threshold_by_class": {
@@ -29218,7 +29218,7 @@
           "prevalence": 0.1492063492063492,
           "deviations": [
             "only the 17960 records of CSV/train.csv carry labels; the published test split withholds them, so the remaining waveforms on disk are not scored",
-            "the label is the corpus's own AMI column, read from a coronary angiogram rather than from the tracing, and acute by construction; PTB-XL's and Shandong's positives are dominated by the chronic infarct pattern, so the two label sets name different clinical events and no re-coding here makes them the same",
+            "the label is the corpus's own AMI column, set when the discharge diagnosis names an acute myocardial infarction in a cohort that all had coronary angiography, and acute by construction; PTB-XL's and Shandong's positives are infarct patterns read on the tracing, so the two label sets name different clinical events and no re-coding here makes them the same",
             "5 of 17960 records excluded: see the excluded field"
           ],
           "threshold_by_class": {
@@ -31947,7 +31947,7 @@
           "prevalence": 0.1492063492063492,
           "deviations": [
             "only the 17960 records of CSV/train.csv carry labels; the published test split withholds them, so the remaining waveforms on disk are not scored",
-            "the label is the corpus's own AMI column, read from a coronary angiogram rather than from the tracing, and acute by construction; PTB-XL's and Shandong's positives are dominated by the chronic infarct pattern, so the two label sets name different clinical events and no re-coding here makes them the same",
+            "the label is the corpus's own AMI column, set when the discharge diagnosis names an acute myocardial infarction in a cohort that all had coronary angiography, and acute by construction; PTB-XL's and Shandong's positives are infarct patterns read on the tracing, so the two label sets name different clinical events and no re-coding here makes them the same",
             "5 of 17960 records excluded: see the excluded field"
           ],
           "threshold_by_class": {
@@ -34670,7 +34670,7 @@
           "prevalence": 0.1492063492063492,
           "deviations": [
             "only the 17960 records of CSV/train.csv carry labels; the published test split withholds them, so the remaining waveforms on disk are not scored",
-            "the label is the corpus's own AMI column, read from a coronary angiogram rather than from the tracing, and acute by construction; PTB-XL's and Shandong's positives are dominated by the chronic infarct pattern, so the two label sets name different clinical events and no re-coding here makes them the same",
+            "the label is the corpus's own AMI column, set when the discharge diagnosis names an acute myocardial infarction in a cohort that all had coronary angiography, and acute by construction; PTB-XL's and Shandong's positives are infarct patterns read on the tracing, so the two label sets name different clinical events and no re-coding here makes them the same",
             "5 of 17960 records excluded: see the excluded field"
           ],
           "threshold_by_class": {
@@ -37387,7 +37387,7 @@
           "prevalence": 0.1492063492063492,
           "deviations": [
             "only the 17960 records of CSV/train.csv carry labels; the published test split withholds them, so the remaining waveforms on disk are not scored",
-            "the label is the corpus's own AMI column, read from a coronary angiogram rather than from the tracing, and acute by construction; PTB-XL's and Shandong's positives are dominated by the chronic infarct pattern, so the two label sets name different clinical events and no re-coding here makes them the same",
+            "the label is the corpus's own AMI column, set when the discharge diagnosis names an acute myocardial infarction in a cohort that all had coronary angiography, and acute by construction; PTB-XL's and Shandong's positives are infarct patterns read on the tracing, so the two label sets name different clinical events and no re-coding here makes them the same",
             "5 of 17960 records excluded: see the excluded field"
           ],
           "threshold_by_class": {
@@ -40116,7 +40116,7 @@
           "prevalence": 0.1492063492063492,
           "deviations": [
             "only the 17960 records of CSV/train.csv carry labels; the published test split withholds them, so the remaining waveforms on disk are not scored",
-            "the label is the corpus's own AMI column, read from a coronary angiogram rather than from the tracing, and acute by construction; PTB-XL's and Shandong's positives are dominated by the chronic infarct pattern, so the two label sets name different clinical events and no re-coding here makes them the same",
+            "the label is the corpus's own AMI column, set when the discharge diagnosis names an acute myocardial infarction in a cohort that all had coronary angiography, and acute by construction; PTB-XL's and Shandong's positives are infarct patterns read on the tracing, so the two label sets name different clinical events and no re-coding here makes them the same",
             "5 of 17960 records excluded: see the excluded field"
           ],
           "threshold_by_class": {
@@ -42839,7 +42839,7 @@
           "prevalence": 0.1492063492063492,
           "deviations": [
             "only the 17960 records of CSV/train.csv carry labels; the published test split withholds them, so the remaining waveforms on disk are not scored",
-            "the label is the corpus's own AMI column, read from a coronary angiogram rather than from the tracing, and acute by construction; PTB-XL's and Shandong's positives are dominated by the chronic infarct pattern, so the two label sets name different clinical events and no re-coding here makes them the same",
+            "the label is the corpus's own AMI column, set when the discharge diagnosis names an acute myocardial infarction in a cohort that all had coronary angiography, and acute by construction; PTB-XL's and Shandong's positives are infarct patterns read on the tracing, so the two label sets name different clinical events and no re-coding here makes them the same",
             "5 of 17960 records excluded: see the excluded field"
           ],
           "threshold_by_class": {
@@ -45556,7 +45556,7 @@
           "prevalence": 0.1492063492063492,
           "deviations": [
             "only the 17960 records of CSV/train.csv carry labels; the published test split withholds them, so the remaining waveforms on disk are not scored",
-            "the label is the corpus's own AMI column, read from a coronary angiogram rather than from the tracing, and acute by construction; PTB-XL's and Shandong's positives are dominated by the chronic infarct pattern, so the two label sets name different clinical events and no re-coding here makes them the same",
+            "the label is the corpus's own AMI column, set when the discharge diagnosis names an acute myocardial infarction in a cohort that all had coronary angiography, and acute by construction; PTB-XL's and Shandong's positives are infarct patterns read on the tracing, so the two label sets name different clinical events and no re-coding here makes them the same",
             "5 of 17960 records excluded: see the excluded field"
           ],
           "threshold_by_class": {
@@ -48285,7 +48285,7 @@
           "prevalence": 0.1492063492063492,
           "deviations": [
             "only the 17960 records of CSV/train.csv carry labels; the published test split withholds them, so the remaining waveforms on disk are not scored",
-            "the label is the corpus's own AMI column, read from a coronary angiogram rather than from the tracing, and acute by construction; PTB-XL's and Shandong's positives are dominated by the chronic infarct pattern, so the two label sets name different clinical events and no re-coding here makes them the same",
+            "the label is the corpus's own AMI column, set when the discharge diagnosis names an acute myocardial infarction in a cohort that all had coronary angiography, and acute by construction; PTB-XL's and Shandong's positives are infarct patterns read on the tracing, so the two label sets name different clinical events and no re-coding here makes them the same",
             "5 of 17960 records excluded: see the excluded field"
           ],
           "threshold_by_class": {

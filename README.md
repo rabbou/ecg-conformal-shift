@@ -10,7 +10,7 @@ The PPV of an ECG model in a new clinical setting is not reliably predicted from
 
 Each point is one transfer: one model, one diagnosis, one pair of populations. Grey points are controls, in which the target is drawn from the source population. Right: the gap in percentage points against the change in specificity from source to target.
 
-## What else the article measures
+## Secondary findings
 
 Case mix, the fewer findings and higher ejection fraction of outpatients with SHD, accounted for about a quarter of the fall in sensitivity at Columbia. Two other models showed the same decrease there: the outpatient sensitivity was 72.7% for the published EchoNext mini-model and 71.6% for the ECGFounder foundation model. Of three updating methods compared by net benefit (decision curve analysis) over 146 transfers, logistic recalibration on 100 local labels was the only one with a positive mean gain; for Columbia's outpatients it lowered net benefit at decision thresholds of 5% and 10% for all three models. Threshold recalibration on 100 outpatients with known diagnoses, about 26 of them cases, gave a mean sensitivity of 91.6% among the other outpatients and 70 false positives per 100 non-cases, about 7 additional echocardiograms per additional case detected. Conformal prediction, a method that sets a threshold with a coverage guarantee valid when new patients are exchangeable with the calibration sample, was the method with which the study began; it gave a threshold equal to the empirical 90th percentile, and its guarantee did not hold for outpatients, who are not exchangeable with inpatients.
 

@@ -172,8 +172,8 @@ class TestTheFiguresDrawnFromIt:
     def test_the_report_shows_exactly_the_figures_it_names(self) -> None:
         """On the report itself: no figure in it that a script cannot redraw.
 
-        Parts 2 and 3 of the supplement carry exactly the figures they name. A claim about SUPPLEMENT.md
-        needs a test that opens it.
+        Parts 2 and 3 of the supplement carry exactly the figures they name. A claim about
+        SUPPLEMENT.md needs a test that opens it.
         """
         report = (RESULTS_DIR.parent / "SUPPLEMENT.md").read_text()
         shown = re.findall(r"!\[[^\]]*\]\(([^)]+)\)", report)

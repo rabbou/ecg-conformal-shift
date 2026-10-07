@@ -245,8 +245,10 @@ def test_the_supplement_part_one_types_no_number_a_file_should_give() -> None:
 
 
 def test_every_constant_and_cited_figure_is_still_typed() -> None:
-    """A constant nobody types any more is a door left open for a typed number."""
-    used = set().union(*(typed(checked(t)) for t in (REPORT, README, CITATION)))
+    """A constant nobody types any more is a door left open for a typed number. The
+    cited figures the article summarises are typed in full in supplement S1.14."""
+    texts = [checked(t) for t in (REPORT, README, CITATION)] + [supplement_part_one_read()]
+    used = set().union(*(typed(text) for text in texts))
     assert allowed() - used == set()
 
 
@@ -636,7 +638,7 @@ class TestClaims:
         low, high = sites["ptbxl"]["sensitivity_interval"]
         assert high - low >= 2 * 1.95 * draws["sd"]
         assert sites["ptbxl"]["n_mi_read_per_draw"] < 0.6 * sites["ptbxl"]["n_mi"]
-        assert "{{mi_pos_read_ptbxl}}" in (v.ROOT / "docs/templates/REPORT.md").read_text()
+        assert "{{mi_pos_read_ptbxl}}" in (v.ROOT / "docs/templates/SUPPLEMENT.md").read_text()
         assert sites["acs"]["auroc"]["high"] < sites["ptbxl"]["auroc"]["low"]
 
 

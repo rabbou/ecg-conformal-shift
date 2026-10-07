@@ -42,14 +42,14 @@ uv sync                                  # 1 min
 uv run pytest -m "not data"              # unit tests, no corpora needed, 2 min
 uv run python tests/paper_render.py      # checks REPORT.md, SUPPLEMENT.md, README.md and CITATION.cff against results/
 uv run python scripts/figures.py         # redraws the infarction and rotation figures, 5 s
-uv run python scripts/paper_figures.py   # redraws Figures 2, 3 and 5 from results/echonext_clinical.json
+uv run python scripts/paper_figures.py   # redraws Figures 2, 3 and 4 from results/echonext_clinical.json
 uv run python scripts/infarction_sites.py  # rebuilds results/infarction_sites.json, 2 s
 export ECS_PTBXL_DIR=/path/to/ptbxl      # the directory with ptbxl_database.csv
 uv run python scripts/outcomes.py        # rebuilds results/outcomes.json, 3 s
 uv run python scripts/subgroups.py       # rebuilds results/subgroups.json, 23 s
 uv run python scripts/ppv_gap.py         # rebuilds results/ppv_gap.json, 2 s
 uv run python scripts/ppv_intervals.py   # rebuilds results/ppv_intervals.json, the intervals across transfers
-uv run python scripts/ppv_figures.py     # redraws Figures 1 and 4, from the committed results
+uv run python scripts/ppv_figures.py     # redraws Figure 1 and supplement Figure S6, from the committed results
 ```
 
 Timings are wall clock on a six-core i7-8700, CPU only; the full suite on a cold clone took 28 minutes. Re-scoring from the raw tracings, the corpus downloads and the rotation chain are in [docs/data.md](docs/data.md).

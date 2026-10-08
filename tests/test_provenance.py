@@ -275,7 +275,6 @@ UNREACHABLE = {
         "4232c77, which wrote this field, and test_rotation.py holds the table to the code"
     ),
     "split_leak.json": "names 1463cd61, as rotation.json, from the same rebuild",
-    "arms.json": "7522385c survives only as an orphan commit on GitHub, after a history rewrite",
     "target_scale.json": "f9d4943e survives only as an orphan commit on GitHub",
 }
 

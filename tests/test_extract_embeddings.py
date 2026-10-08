@@ -234,6 +234,31 @@ class TestTheUntrainedControlIsOneNetwork:
         assert meta_a["weights_source"] == meta_b["weights_source"]
         assert "seed unset" not in str(meta_a["weights_source"])
 
+    def test_two_extractions_of_one_corpus_write_the_same_array(self, corpus: Fixture) -> None:
+        """T-071: a rerun of the published pass must rebuild the same array.
+        The whole pass runs twice over the fixture corpus, as the results
+        files were made, and the second array has to equal the first bit for bit."""
+        arrays = []
+        for global_seed, out in ((12345, corpus.out / "a"), (999, corpus.out / "b")):
+            torch.manual_seed(global_seed)
+            ee.extract("random_init", "acs", corpus.ids, corpus.load, out)
+            with np.load(out / "random_init/acs.npz", allow_pickle=False) as data:
+                arrays.append((list(data["ids"]), data["embedding"].tobytes()))
+        assert arrays[0] == arrays[1]
+
+    def test_every_committed_file_of_the_arm_names_the_seed_it_was_drawn_with(self) -> None:
+        """T-071: a committed file of this arm that says "seed unset" cannot be rebuilt.
+        Each sidecar has to carry the seed the builder uses now, which is what
+        the numbers downstream of it were computed from."""
+        from ecs.encoders import ARMS
+
+        _, meta = ARMS["random_init"]()
+        directory = Path(__file__).resolve().parents[1] / "results/embeddings/random_init"
+        sidecars = sorted(directory.glob("*.json"))
+        assert [p.stem for p in sidecars] == ["acs", "ptbxl", "sph"]
+        for path in sidecars:
+            assert json.loads(path.read_text())["weights_source"] == meta["weights_source"], path
+
 
 class TestNoThirdPartyWeightOpensUnchecked:
     """A .pth is a pickle, so opening one runs what it says to run. Every

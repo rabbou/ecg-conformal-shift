@@ -172,10 +172,10 @@ class TestTheFiguresDrawnFromIt:
     def test_the_report_shows_exactly_the_figures_it_names(self) -> None:
         """On the report itself: no figure in it that a script cannot redraw.
 
-        The report carries exactly the figures it names. A claim about REPORT.md
-        needs a test that opens it.
+        Parts 2 and 3 of the supplement carry exactly the figures they name. A claim about
+        SUPPLEMENT.md needs a test that opens it.
         """
-        report = (RESULTS_DIR.parent / "REPORT.md").read_text()
+        report = (RESULTS_DIR.parent / "SUPPLEMENT.md").read_text()
         shown = re.findall(r"!\[[^\]]*\]\(([^)]+)\)", report)
         assert shown == [
             "results/figures/fig1_thresholds.png",
@@ -183,6 +183,7 @@ class TestTheFiguresDrawnFromIt:
             "results/figures/fig3_coverage.png",
             "results/figures/fig7_rotation.png",
             "results/figures/fig8_target_scale.png",
+            "results/figures/decision_curves.png",
         ]
         for relative in shown:
             assert (RESULTS_DIR.parent / relative).exists(), relative

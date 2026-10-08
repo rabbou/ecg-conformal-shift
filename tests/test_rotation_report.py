@@ -1,7 +1,7 @@
 """Hold every rotation number the prose prints to the file it was read from.
 
-Section 2.4 and section 3.6 of ``REPORT.md``, and the sentences the rotation adds
-to the abstract and the discussion, quote roughly fifty figures.  Each one is
+Sections S2.4 and S2.10 of ``SUPPLEMENT.md``, and the sentences the rotation adds
+to Part 2's summary and discussion, quote roughly fifty figures.  Each one is
 recomputed here from a file under ``results/`` and asserted to appear in the
 prose, so that regenerating a table and forgetting to reread the paragraph
 fails the suite rather than shipping.
@@ -91,16 +91,16 @@ def _finite(rows: list[dict[str, str]]) -> list[dict[str, str]]:
 
 @pytest.fixture(scope="module")
 def report() -> str:
-    return (ROOT / "REPORT.md").read_text()
+    return (ROOT / "SUPPLEMENT.md").read_text()
 
 
 @pytest.fixture(scope="module")
 def rotation_section(report: str) -> str:
-    """Section 2.4 and section 3.6, which is where every figure below is printed."""
-    method = report.index("### 2.4 The source rotation")
-    method_end = report.index("## 3. Results")
-    results = report.index("### 3.6 Five corpora in the calibration role")
-    results_end = report.index("## 4. Discussion")
+    """Sections S2.4 and S2.10, which is where every figure below is printed."""
+    method = report.index("### S2.4 The source rotation")
+    method_end = report.index("### S2.5 Threshold placement")
+    results = report.index("### S2.10 Five corpora in the calibration role")
+    results_end = report.index("### S2.11 ")
     return report[method:method_end] + report[results:results_end]
 
 
@@ -511,7 +511,7 @@ GROUPS = [
 def test_the_rotation_section_prints_what_the_results_files_hold(
     group: str, rotation_section: str
 ) -> None:
-    """Every figure in sections 2.4 and 3.6, rebuilt from results/ and searched for."""
+    """Every figure in sections S2.4 and S2.10, rebuilt from results/ and searched for."""
     for what, expected in _cases(group):
         assert expected.lower() in rotation_section.lower(), (
             f"{group}/{what}: {expected!r} not in the section"
@@ -519,8 +519,8 @@ def test_the_rotation_section_prints_what_the_results_files_hold(
 
 
 def test_the_abstract_carries_the_rotation_figures_it_claims(report: str) -> None:
-    """The abstract quotes five of the section's numbers and must quote them alike."""
-    abstract = report[report.index("## Abstract") : report.index("## 1. Introduction")]
+    """Part 2's summary quotes five of the section's numbers and must quote them alike."""
+    abstract = report[report.index("### Summary of Part 2") : report.index("### S2.0 Background")]
     home_none = [r for r in _grid("none") if r["role"] == "home"]
     home_mondrian = [r for r in _grid("mondrian") if r["role"] == "home"]
     away_mondrian = [r for r in _grid("mondrian") if r["role"] == "away"]
@@ -557,13 +557,13 @@ def test_the_abstract_carries_the_rotation_figures_it_claims(report: str) -> Non
 
 
 def test_the_discussion_and_limitations_quote_the_same_files(report: str) -> None:
-    """The rotation reaches past section 3.6, and those sentences went unpinned.
+    """The rotation reaches past section S2.10, and those sentences went unpinned.
 
     The discussion qualifies its Chow reading with a rotation figure and the
     limitations count the pairs that cover by abstaining under two schemes.
     Neither sits inside the section slice the other tests read.
     """
-    tail = report[report.index("## 4. Discussion") :]
+    tail = report[report.index("### S2.11 ") : report.index("### S2.13 ")]
     chow = _read("rotation_uncertainty.json")["reading"]["conformal_minus_chow"]
     counts = {
         correction: len(
@@ -580,7 +580,7 @@ def test_the_discussion_and_limitations_quote_the_same_files(report: str) -> Non
             "chow over the rotation",
             f"differ by a median of {chow['by_correction']['mondrian']['median']:.3f} in coverage",
         ),
-        ("mondrian pairs", f"{_word(counts['mondrian'])} source-diagnosis pairs of section 3.6"),
+        ("mondrian pairs", f"{_word(counts['mondrian'])} source-diagnosis pairs of section S2.10"),
         ("weighted pairs", f"reweights, {_word(counts['weighted'])} do"),
     ):
         assert expected in tail, f"{what}: {expected!r} not in the discussion or limitations"
@@ -608,7 +608,7 @@ def test_the_figure_reads_the_abstention_field_in_both_role_loops() -> None:
     assert len(reads) >= 2, f"only {len(reads)} role loop(s) consult the field"
 
 
-DRAWING_SCRIPTS = ("figures.py", "ppv_figures.py")
+DRAWING_SCRIPTS = ("figures.py", "ppv_figures.py", "paper_figures.py")
 
 
 def drawn_names() -> set[str]:

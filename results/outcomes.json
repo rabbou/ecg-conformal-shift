@@ -13,7 +13,7 @@
   "n_draws": 200,
   "seed": 0,
   "provenance": {
-    "commit": "4b589da48a0eea54bf29629ecd6e5f3bc05e1ee0",
+    "commit": "ff8e0ee18f3cb8a240563ae0389e3ed98dfddd80",
     "producers": {
       "scripts/outcomes.py": "ff9b268d351d0678c1e223274686fbb1e9e6098d1c0dd91848993ba1cfeb6114",
       "scripts/shift_table.py": "b8d35d311a44d187d5ca0f92f14caf8b543409792123a9a09c3ed0318f3453d6",

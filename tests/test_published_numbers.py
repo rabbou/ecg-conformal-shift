@@ -353,7 +353,7 @@ class TestSubgroupCoverage:
     def test_a_cell_the_report_quotes_is_not_flat_across_age(
         self, recomputed_subgroups: dict[str, float]
     ) -> None:
-        """The non-MI age gradient under the recommended scheme is real, not rounding."""
+        """The non-MI age gradient under class-conditional calibration is real, not rounding."""
         young = recomputed_subgroups["perlabel|age:0-49:non_mi"]
         old = recomputed_subgroups["perlabel|age:75+:non_mi"]
         assert young - old > 0.15, f"gradient collapsed to {young - old:.4f}"

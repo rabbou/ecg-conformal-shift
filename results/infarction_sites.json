@@ -1,0 +1,82 @@
+{
+  "question": "How well the infarction model separates at each site, and how far the sensitivity and specificity of the threshold set at PTB-XL move between draws.",
+  "interval_rule": "mean +/- 1.96 sd; the sd is the spread between the 200 draws, plus the binomial variance of the site's count where every draw reads the whole site",
+  "threshold": "outcomes.json, scheme plain: 90% sensitivity on a PTB-XL calibration half",
+  "sites": {
+    "ptbxl": {
+      "n": 2198,
+      "n_mi": 550,
+      "n_read_per_draw": 1099.14,
+      "n_mi_read_per_draw": 275.91,
+      "auroc": {
+        "auroc": 0.9321877758164165,
+        "low": 0.9203181629230899,
+        "high": 0.9431053248264897
+      },
+      "sensitivity": 0.8957,
+      "sensitivity_interval": [
+        0.8404290152,
+        0.9509709848000001
+      ],
+      "specificity": 0.8098,
+      "specificity_interval": [
+        0.7641328387999999,
+        0.8554671612
+      ]
+    },
+    "sph": {
+      "n": 25770,
+      "n_mi": 260,
+      "n_read_per_draw": 25770.0,
+      "n_mi_read_per_draw": 260.0,
+      "auroc": {
+        "auroc": 0.9782296535295358,
+        "low": 0.9693449798789016,
+        "high": 0.9850400250344165
+      },
+      "sensitivity": 0.9733,
+      "sensitivity_interval": [
+        0.9535645714207367,
+        0.9930354285792634
+      ],
+      "specificity": 0.8286,
+      "specificity_interval": [
+        0.8003869116271967,
+        0.8568130883728033
+      ]
+    },
+    "acs": {
+      "n": 17955,
+      "n_mi": 2679,
+      "n_read_per_draw": 17955.0,
+      "n_mi_read_per_draw": 2679.0,
+      "auroc": {
+        "auroc": 0.7934089767073944,
+        "low": 0.7844323727187353,
+        "high": 0.8029332443285024
+      },
+      "sensitivity": 0.8365,
+      "sensitivity_interval": [
+        0.8122516891482265,
+        0.8607483108517735
+      ],
+      "specificity": 0.5789,
+      "specificity_interval": [
+        0.5414217149126359,
+        0.616378285087364
+      ]
+    }
+  },
+  "provenance": {
+    "commit": "e6ae324342e32ec315af2e7e90d3088bd8ef9285",
+    "producers": {
+      "results/baseline/scores.npz": "ba5c637ab63001d60a1678dc34efdeeaefef13c57de5bbb41e000a781ce43482",
+      "results/external/acs.npz": "94a2069dccd60b19564e46c53cfae8e1a68593d6c21b869d461bbee2835875d7",
+      "results/external/sph.npz": "1702b2b7dfad09a10eca7ddd607b580456fcdd184b56a37a35a350f26e58bea5",
+      "results/outcomes.json": "61a9377eee03bf91941baf584386908a853de8652bdad58dbca5fcd955dbec43",
+      "scripts/infarction_sites.py": "a60a4ed0f959f6e16bd49851300edde55b3f028a9510a6742ca73effff8d97d7",
+      "src/ecs/transfer.py": "e690339b52941e150a61527ac5e0e56a3cc5dbcd5772f7ba06ec8296b112d624"
+    }
+  },
+  "seconds": 4.5
+}

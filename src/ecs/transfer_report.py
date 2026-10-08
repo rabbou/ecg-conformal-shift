@@ -70,7 +70,8 @@ def _coverage_section(result: dict[str, Any], arm: dict[str, Any], target: str) 
         "",
         "| Label | Prevalence, source | Prevalence, target | Ill in target "
         "| Ill covered, plain | Ill covered, pooled | Ill covered, per-label "
-        "| Healthy covered, per-label | Sent to a human, per-label | AUROC, target |",
+        "| Healthy covered, per-label, sent to a human included "
+        "| Sent to a human, per-label | AUROC, target |",
         "|---|---|---|---|---|---|---|---|---|---|",
     ]
     for label in result["labels"]:
@@ -189,9 +190,13 @@ def _ladder_section(arm: dict[str, Any], target: str) -> list[str]:
         "The target is cut once by patient into a pool and an evaluation half. Rung 0 spends "
         "the source thresholds; rung n refits the per-label thresholds and an intercept shift "
         "on n ECGs drawn from the pool, over repeated draws, all read on the same evaluation "
-        "half.",
+        "half. One fixed half makes every draw share its luck, so the centiles below spread "
+        "the labelled sample only. The study's report draws a new half in every draw and "
+        "reads the refit on separate outpatients as well (REPORT.md section 3.7, "
+        "SUPPLEMENT.md Tables S7 to S7c); those figures supersede this ladder's.",
         "",
-        "| Label | Target labels | Ill covered, mean [10th, 90th centile] | Healthy covered "
+        "| Label | Target labels | Ill covered, mean [10th, 90th centile] "
+        "| Healthy covered, sent to a human included "
         "| Draws that flag everyone | Absolute intercept after shift |",
         "|---|---|---|---|---|---|",
     ]
@@ -311,9 +316,12 @@ def render(
         f"Calibrated on {source['n']} inpatient ECGs and applied unchanged to {tgt['n']} "
         f"{CONTEXT_NAMES[target]}, the per-label thresholds cover "
         f"{pct(per['coverage_pos'])} of {CONTEXT_NAMES[target]} with structural heart "
-        f"disease (composite) where {pct(1 - result['alpha'], 0)} was asked, cover "
-        f"{pct(per['coverage_neg'])} of those without it, and send "
-        f"{pct(per['abstention'])} to a human. The composite's prevalence falls from "
+        f"disease (composite) where {pct(1 - result['alpha'], 0)} was asked, leave "
+        f"{pct(_cell(arm['coverage'], COMPOSITE, target, 'plain')['coverage_neg'])} of "
+        f"those without it unflagged, and send {pct(per['abstention'])} to a human. A "
+        "patient without it whom the thresholds send to a human counts below as covered, "
+        f"which makes the healthy covered ({pct(per['coverage_neg'])}) more than the "
+        "healthy left unflagged. The composite's prevalence falls from "
         f"{pct(source['prevalence'][COMPOSITE])} to {pct(tgt['prevalence'][COMPOSITE])}.",
         "",
         "| | Source | Target |",

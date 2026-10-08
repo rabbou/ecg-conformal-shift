@@ -25,6 +25,7 @@ the arm's factory is called.
 from __future__ import annotations
 
 import hashlib
+import os
 import pickle
 import platform
 import subprocess
@@ -47,12 +48,33 @@ __all__ = [
     "SAW",
     "WEIGHTS",
     "Arm",
+    "weights_dir",
     "allowlisted_load",
     "ecgfounder_net",
     "machine_info",
 ]
 
-WEIGHTS = REPO_ROOT / "data/weights"
+
+def weights_dir(root: Path = REPO_ROOT) -> Path:
+    """Where the published weights sit: ``ECS_WEIGHTS_DIR`` when set, else ``data/weights``
+    of this checkout, or of the main checkout when this one is a linked worktree.
+
+    The weights are untracked and fetched once per clone, so a worktree of the clone
+    holds none of its own; its ``.git`` file names the main checkout's git directory.
+    """
+    if override := os.environ.get("ECS_WEIGHTS_DIR"):
+        return Path(override)
+    local = root / "data/weights"
+    marker = root / ".git"
+    if local.exists() or not marker.is_file():
+        return local
+    gitdir = Path(marker.read_text().split("gitdir:", 1)[1].strip())
+    if gitdir.parent.name != "worktrees":
+        return local
+    return gitdir.parent.parent.parent / "data/weights"
+
+
+WEIGHTS = weights_dir()
 
 # A .pth or .pt file is a pickle: opening one runs whatever the file says to
 # run, under the identity of whoever opened it.  The ECGFounder checkpoint does

@@ -53,7 +53,7 @@
   },
   "deviations": [
     "only the 17960 records of CSV/train.csv carry labels; the published test split withholds them, so the remaining waveforms on disk are not scored",
-    "the label is the corpus's own AMI column, read from a coronary angiogram rather than from the tracing, and acute by construction; PTB-XL's and Shandong's positives are dominated by the chronic infarct pattern, so the two label sets name different clinical events and no re-coding here makes them the same",
+    "the label is the corpus's own AMI column, set when the discharge diagnosis names an acute myocardial infarction in a cohort that all had coronary angiography, and acute by construction; PTB-XL's and Shandong's positives are infarct patterns read on the tracing, so the two label sets name different clinical events and no re-coding here makes them the same",
     "5 of 17960 records excluded: see the excluded field"
   ],
   "seconds": 240.9,

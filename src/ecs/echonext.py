@@ -1,7 +1,9 @@
 """EchoNext read as one more corpus: its files, one provenance row per tracing, its cohorts.
 
-EchoNext (PhysioNet, restricted licence) ships 100,000 Columbia ECGs paired with
-an echocardiogram within a year, eleven echo-derived flags and their composite.
+EchoNext (PhysioNet, restricted licence) ships 100,000 Columbia ECGs, each paired
+with an echocardiogram, eleven echo-derived flags and their composite.  An ECG
+with a flag precedes an abnormal echocardiogram by a year at most; an ECG with
+none may precede the patient's last normal echocardiogram by any time.
 The tracings are stored already processed: 250 Hz, median-filtered, clipped at
 the 0.1st and 99.9th percentiles and standardised per lead with a mean and a
 standard deviation computed over the whole training set.  Nothing on disk says
@@ -323,9 +325,13 @@ def transfer_cohorts(
     names = list(roles)
     for i, a in enumerate(names):
         for b in names[i + 1 :]:
-            if a.startswith("target:") and b.startswith("target:"):
-                continue  # two target contexts are read side by side, never pooled
+            # Two target contexts are compared with each other, so they too must hold
+            # different patients.
             shared = set(patients[roles[a]]) & set(patients[roles[b]])
             if shared:
                 raise ValueError(f"{len(shared)} patients are in both {a} and {b}")
+    for name in names[1:]:
+        repeated = pd.Series(patients[roles[name]]).duplicated().sum()
+        if repeated:
+            raise ValueError(f"{repeated} patients contribute more than one ECG to {name}")
     return Cohorts(training=training, calibration=calibration, targets=targets)

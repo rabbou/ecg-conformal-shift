@@ -1,6 +1,6 @@
 # Transfer report: ECGFounder frozen, with logistic probes, Columbia inpatients to Columbia outpatients
 
-Calibrated on 1903 inpatient ECGs and applied unchanged to 1059 outpatients, the per-label thresholds cover 71.6% of outpatients with structural heart disease (composite) where 90% was asked, cover 97.7% of those without it, and send 32.2% to a human. The composite's prevalence falls from 53.2% to 25.6%.
+Calibrated on 1903 inpatient ECGs and applied unchanged to 1059 outpatients, the per-label thresholds cover 71.6% of outpatients with structural heart disease (composite) where 90% was asked, leave 71.3% of those without it unflagged, and send 32.2% to a human. A patient without it whom the thresholds send to a human counts below as covered, which makes the healthy covered (97.7%) more than the healthy left unflagged. The composite's prevalence falls from 53.2% to 25.6%.
 
 | | Source | Target |
 |---|---|---|
@@ -15,7 +15,7 @@ Model: ECGFounder 12-lead Net1D frozen, one logistic probe per label. Input: the
 
 Ill covered is the share of patients with the finding whose decision includes it: the sensitivity for the plain threshold, the coverage of the positive class for the two conformal schemes. A per-label threshold that the calibration positives cannot certify flags everyone, and the row then shows the whole target flagged. The plain threshold and the per-label threshold of the ill are the same calibration quantile, so their columns agree; the per-label scheme adds a threshold for the healthy, and with it the share sent to a human.
 
-| Label | Prevalence, source | Prevalence, target | Ill in target | Ill covered, plain | Ill covered, pooled | Ill covered, per-label | Healthy covered, per-label | Sent to a human, per-label | AUROC, target |
+| Label | Prevalence, source | Prevalence, target | Ill in target | Ill covered, plain | Ill covered, pooled | Ill covered, per-label | Healthy covered, per-label, sent to a human included | Sent to a human, per-label | AUROC, target |
 |---|---|---|---|---|---|---|---|---|---|
 | LVEF ≤45% | 24.5% | 6.6% | 70 | 84.3% | 55.7% | 84.3% [74.0%, 91.0%] | 98.0% | 12.6% | 0.915 |
 | LV wall ≥1.3 cm | 22.1% | 13.8% | 146 | 80.1% | 50.0% | 80.1% [72.9%, 85.8%] | 97.0% | 41.7% | 0.781 |
@@ -96,9 +96,9 @@ The source column is what a buyer computes from the sensitivity and specificity 
 
 ## Target labels that repair the threshold and the calibration
 
-The target is cut once by patient into a pool and an evaluation half. Rung 0 spends the source thresholds; rung n refits the per-label thresholds and an intercept shift on n ECGs drawn from the pool, over repeated draws, all read on the same evaluation half.
+The target is cut once by patient into a pool and an evaluation half. Rung 0 spends the source thresholds; rung n refits the per-label thresholds and an intercept shift on n ECGs drawn from the pool, over repeated draws, all read on the same evaluation half. One fixed half makes every draw share its luck, so the centiles below spread the labelled sample only. The study's report draws a new half in every draw and reads the refit on separate outpatients as well (REPORT.md section 3.7, SUPPLEMENT.md Tables S7 to S7c); those figures supersede this ladder's.
 
-| Label | Target labels | Ill covered, mean [10th, 90th centile] | Healthy covered | Draws that flag everyone | Absolute intercept after shift |
+| Label | Target labels | Ill covered, mean [10th, 90th centile] | Healthy covered, sent to a human included | Draws that flag everyone | Absolute intercept after shift |
 |---|---|---|---|---|---|
 | Composite (any of the above) | 0 | 70.8% [70.8%, 70.8%] | 97.2% | 0.0% | 0.44 |
 | Composite (any of the above) | 25 | 99.3% [100.0%, 100.0%] | 90.3% | 86.5% | 0.48 |

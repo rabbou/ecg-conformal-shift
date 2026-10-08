@@ -55,6 +55,10 @@ python_version = "3.11"
 ignore_missing_imports = true
 disallow_untyped_defs = true
 warn_unused_ignores = true
+# The same exclusions as ruff and pre-commit: upstream code kept as published,
+# the data directory (it holds the mini-model's own numpy.py, which shadows
+# numpy), and local worktrees.
+exclude = ["^third_party/", "^data/", "^\\.claude/"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

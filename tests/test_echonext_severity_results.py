@@ -1,4 +1,4 @@
-"""The committed severity results and the ECHONEXT.md section that quotes them.
+"""The committed severity results and the SUPPLEMENT.md section that quotes them.
 
 Every figure the section prints is rebuilt here from ``results/echonext_severity.json``
 and looked for in the section's text, and the section may print no number the
@@ -19,8 +19,8 @@ from ecs.transfer_report import pct
 
 SEVERITY = RESULTS_DIR / "echonext_severity.json"
 TRANSFER = RESULTS_DIR / "echonext_transfer.json"
-PIECE = REPO_ROOT / "ECHONEXT.md"
-HEADING = "## Severity explains about a third of the lost coverage"
+PIECE = REPO_ROOT / "SUPPLEMENT.md"
+HEADING = "### S1.7 Disease severity among cases by care setting"
 COMPOSITE = "shd_moderate_or_greater_flag"
 ARMS = ("resnet", "echonext_mini", "ecgfounder")
 NUMBER = re.compile(r"\d[\d,]*(?:\.\d+)?%?")
@@ -47,8 +47,8 @@ def severity() -> dict[str, Any]:
 
 def section() -> str:
     text = PIECE.read_text()
-    start = text.index(HEADING)
-    return text[start : text.index("\n## ", start + 1)]
+    start = text.index("\n", text.index(HEADING))
+    return text[start : text.index("\n#", start)]
 
 
 def interval(row: dict[str, Any], point: str, low: str, high: str) -> str:
@@ -114,7 +114,7 @@ def severity_figures(severity: dict[str, Any]) -> dict[str, str]:
     inside = [
         next(r for r in a["by_lvef"]["inpatient_in_sample"] if r["stratum"] == ">45") for a in arms
     ]
-    out["above_45_n"] = f"{above[0]['n']}\nill outpatients"
+    out["above_45_n"] = f"{above[0]['n']}\noutpatients with SHD"
     out["above_45_range"] = (
         f"{pct(min(r['coverage'] for r in above))} to {pct(max(r['coverage'] for r in above))}"
     )
